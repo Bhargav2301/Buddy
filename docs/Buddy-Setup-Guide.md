@@ -10,7 +10,7 @@ This is a first installable alpha, not the full year-long platform in the Nexa s
 
 ## Cursor companion: start here
 
-Use **Buddy-Windows-v<version>.zip** for the Windows application. Extract all files, quit any running Buddy instance from its tray menu, and run **Install-Buddy.cmd** from the extracted folder containing **Buddy.exe**. The source ZIP is for development. The Windows package contains **Cursor-Companion.txt** and **Build-Info.json**, which identifies its version and source commit.
+Use **`Buddy-Windows-v<version>.zip`** for the Windows application. Extract all files, quit any running Buddy instance from its tray menu, and run **Install-Buddy.cmd** from the extracted folder containing **Buddy.exe**. The source ZIP is for development. The Windows package contains **Cursor-Companion.txt** and **Build-Info.json**, which identifies its version and source commit.
 
 Buddy now includes a small mint pointer with eyes that follows beside your Windows pointer. It is designed to let clicks pass through and leave your original pointer available. The companion runs while Buddy is running; this version does not add Windows login autostart.
 
@@ -34,7 +34,7 @@ The compact bar streams real answers through the same PC service and saves compl
 
 ## 1. Install on Windows
 
-1. Download the **Buddy-Windows-v<version>.zip** from the chosen release and choose **Extract All** into a new folder, such as `Downloads\Buddy-fixed`. Keep all extracted files together. The corrected download contains **Windows-Repair.txt**, **Run-Buddy.cmd**, and **Install-Buddy.cmd**.
+1. Download the **`Buddy-Windows-v<version>.zip`** from the chosen release and choose **Extract All** into a new folder, such as `Downloads\Buddy-fixed`. Keep all extracted files together. The corrected download contains **Windows-Repair.txt**, **Run-Buddy.cmd**, and **Install-Buddy.cmd**.
 2. Double-click **Install-Buddy.cmd** from that folder. Click OK after installation to open Buddy. This installs for your Windows account and creates Start menu and desktop shortcuts; it requires neither administrator rights nor a PowerShell script-policy change. A separate .NET installation is not required. Quit any running Buddy instance before installing an update. Existing conversations in `%LOCALAPPDATA%\Buddy` are retained.
 3. To use Buddy without installing shortcuts, double-click **Run-Buddy.cmd** instead. **Buddy.exe** also runs directly; the CMD launcher additionally records .NET startup errors.
 4. Open **PC setup & models** in Buddy.
@@ -75,7 +75,7 @@ Downloading requires internet. Once installed, text inference can run without in
 
 ## 2. Install on Android and pair
 
-1. Download **Buddy-Android-v<version>.apk** to your phone and open it. This is a testing APK for sideloading, not a Google Play release.
+1. Download **`Buddy-Android-v<version>.apk`** to your phone and open it. This is a testing APK for sideloading, not a Google Play release.
 2. If Android asks, allow installation from the particular app you used to open the APK. Device or organization policy may prohibit this.
 3. Put the PC and phone on the same trusted Wi-Fi network. Keep the PC awake, with Buddy and Ollama running.
 4. In Windows Buddy, click **Pair Android phone**.

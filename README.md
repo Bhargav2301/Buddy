@@ -4,7 +4,7 @@ Native Windows and Android applications backed by an AI model running on the use
 
 **Current version:** [VERSION](VERSION) · testing prerelease. [Changes](CHANGELOG.md) · [Downloads](https://github.com/Bhargav2301/Buddy/releases) · [Build status](https://github.com/Bhargav2301/Buddy/actions/workflows/build.yml).
 
- This repository implements a usable local-PC subset of the supplied Nexa technical specification. It does not claim completion of the specification's multi-phase cloud, agent, and automation platform.
+This repository implements a usable local-PC subset of the supplied Nexa technical specification. It does not claim completion of the specification's multi-phase cloud, agent, and automation platform.
 
 ## Start using it
 

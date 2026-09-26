@@ -30,6 +30,8 @@ source, including the earlier Windows repair and cursor companion work.
   prepares a tagged draft prerelease after a successful build on `main`.
 - Release downloads include a setup guide, changelog, source commit, and SHA-256
   checksums. A version check rejects mismatched manifests and incomplete notes.
+- Android CI explicitly installs SDK 35 and Build Tools 34.0.0 instead of the
+  setup action's obsolete `tools` package default.
 
 ### Validation limits
 

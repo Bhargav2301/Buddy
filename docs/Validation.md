@@ -1,6 +1,24 @@
-# Buddy 0.1 validation record
+# Buddy validation record
 
 Build date: 26 September 2026.
+
+## Repository CI — version 0.2.0
+
+The [first GitHub Actions run](https://github.com/Bhargav2301/Buddy/actions/runs/36247292696)
+compiled and published the native Windows application on a Windows runner. All
+28 service assertions, all 13 desktop logic assertions, and the Windows package
+integrity check passed. The version/manifest/changelog check also passed.
+
+Android setup in that run stopped before compilation because the setup action
+requested the obsolete SDK `tools` package. The workflow now explicitly requests
+platform-tools, Android platform 35, and Build Tools 34.0.0. Consult the
+[latest Actions run](https://github.com/Bhargav2301/Buddy/actions/workflows/build.yml)
+for the rebuilt Android result and release status.
+
+CI does not drive the Windows UI or connect to a real microphone. The manual
+Windows acceptance items below remain open. Earlier Linux compilation and Android
+device records are historical evidence for the pre-repository source snapshot;
+they are not a claim that every later APK has been retested on a device.
 
 ## Windows cursor companion 1
 
