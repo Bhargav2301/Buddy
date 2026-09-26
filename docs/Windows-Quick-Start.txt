@@ -1,0 +1,26 @@
+BUDDY - WINDOWS CURSOR COMPANION
+
+1. Keep every extracted file together. This folder must contain Buddy.exe.
+2. If Buddy is running, choose Quit from its tray menu.
+3. Double-click Install-Buddy.cmd. Or use Run-Buddy.cmd without installing.
+4. If prompted in Buddy Home, finish PC setup: install/start Ollama and
+   download the chat model. No cloud API key is required.
+
+Ctrl + Space          Open the compact chat bar beside your pointer
+Ctrl + Shift + Space  Start voice; speak, then pause to send one utterance
+Enter                 Send typed text (Shift + Enter adds a line)
+Esc                   Stop and dismiss the compact bar
+Ctrl + Alt + Esc      Stop listening and generation
+
+Home > Cursor & shortcuts changes the main shortcut and cursor visibility.
+Windows + Space is normally used by Windows to switch keyboard layouts.
+Use Home or Buddy's tray icon for models, history, screen context and pairing.
+
+The cursor companion does not replace or move your original pointer.
+Microphone and screen input activate only through explicit controls.
+Read Buddy-Setup-Guide.md for the full workflow and device requirements.
+
+If launch fails, run Run-Buddy.cmd and inspect:
+  %LOCALAPPDATA%\Buddy\Logs
+
+This is a testing build. Native Windows interactions require device testing.

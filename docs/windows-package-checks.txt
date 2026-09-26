@@ -1,0 +1,19 @@
+Original delivered package: expected failure
+Exit code: 1
+FAIL: WindowsBase.dll is the wrong Windows runtime component. Download and extract the updated Buddy Windows ZIP.
+
+Windows repair 1: expected pass
+Exit code: 0
+PASS: Windows x64 host/native binaries, WPF implementation types, managed type-reference dependencies, no reference assemblies.
+
+Incomplete extraction regression: expected failure
+Exit code: 1
+FAIL: Missing QRCoder.dll. Choose Extract All on the updated Windows ZIP, then run Buddy from the extracted folder.
+
+Restored repair package: expected pass
+Exit code: 0
+PASS: Windows x64 host/native binaries, WPF implementation types, managed type-reference dependencies, no reference assemblies.
+
+Managed entry point (Linux .NET host, package-check mode only): PASS
+Failure path: missing WindowsBase.dll caught; startup log written; exit 1.
+This does not execute the Windows GUI or native installer.

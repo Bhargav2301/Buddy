@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+**/build/
+**/.gradle/
+**/.kotlin/
+**/local.properties
+.idea/
+dist/
+*.user
+*.encrypted
+*.keystore
+*.jks
+*.pfx
+.env
+*.log

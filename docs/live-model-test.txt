@@ -1,0 +1,5 @@
+Model: qwen3:4b-instruct-2507-q4_K_M
+Runtime: Ollama 0.34.4
+Real model ready: True
+PASS: real Qwen3 4B inference through Buddy service: 4
+Live host ready on 47831

@@ -1,0 +1,29 @@
+PASS: model availability reflects Ollama response
+PASS: missing model is not reported ready
+PASS: reasoning prefix is excluded even when closing tag spans stream chunks
+PASS: streamed answer completes and preserves deltas
+PASS: one completed request stores exactly one user/assistant pair
+PASS: frames and raw screen context never enter persisted conversation data
+PASS: conversation store is encrypted at rest
+PASS: screen OTP is redacted before inference
+PASS: encrypted history survives reopening
+PASS: duplicate request replays stored answer without a second model call
+PASS: idempotency key cannot be reused for changed text
+PASS: malformed request IDs are rejected
+PASS: empty messages are rejected
+PASS: refine does not send a chat message
+PASS: pairing codes are single-use
+PASS: five wrong pairing attempts close the pairing window
+PASS: device authentication validates hashed tokens
+PASS: revocation takes effect on the next request
+PASS: concurrent writes to one conversation are blocked
+PASS: deleting an active conversation is rejected
+PASS: cancelled answers do not leave partial history
+PASS: cancellation releases generation lock
+PASS: conversation deletion persists
+PASS: API refuses unauthenticated history access
+PASS: paired phone sees shared conversation store through pinned HTTPS
+PASS: HTTP pairing code replay is rejected
+PASS: revoked phone loses API access
+PASS: untrusted TLS certificate is rejected
+ALL BUDDY SERVICE TESTS PASSED

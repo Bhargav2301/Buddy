@@ -1,0 +1,14 @@
+PASS: Chat opens beside the pointer with a gap
+PASS: Bottom-right activation flips left/up and stays above the taskbar
+PASS: Negative monitor origins remain negative and correctly clamped
+PASS: 200 percent scale uses physical pixels and the target work area
+PASS: A smaller work area never throws from an inverted clamp
+PASS: 1,815 activation positions across negative origins and 100–300 percent scales stay inside the work area
+PASS: Initial shortcut is registered
+PASS: Reserved Windows shortcut failure preserves the working shortcut
+PASS: Successful replacement removes only the previous shortcut
+PASS: Holding the shortcut does not generate repeated activations
+PASS: Saving an unchanged shortcut does not re-register it
+PASS: Quit releases the shortcut
+PASS: Default shortcut opens chat without activating the microphone
+13 desktop logic assertions passed. Native Windows interaction is a separate acceptance check.

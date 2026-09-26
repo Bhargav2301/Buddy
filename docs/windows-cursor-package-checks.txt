@@ -1,0 +1,5 @@
+Cursor companion 1 package metadata and managed entry checks
+PASS: Windows x64 host/native binaries, WPF implementation types, managed type-reference dependencies, no reference assemblies.
+PASS: Windows package integrity and assembly dependencies
+
+Native Windows UI, hotkey delivery and audio were not executed on this Linux host.

@@ -1,0 +1,8 @@
+
+app.buddy.BuddyIntegrationTest:..
+
+Time: 63.528
+
+OK (2 tests)
+
+
