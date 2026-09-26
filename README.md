@@ -2,15 +2,17 @@
 
 Native Windows and Android applications backed by an AI model running on the user's Windows PC.
 
-**Current release: 0.1.0 alpha.** This repository implements a usable local-PC subset of the supplied Nexa technical specification. It does not claim completion of the specification's multi-phase cloud, agent, and automation platform.
+**Current version:** [VERSION](VERSION) · testing prerelease. [Changes](CHANGELOG.md) · [Downloads](https://github.com/Bhargav2301/Buddy/releases) · [Build status](https://github.com/Bhargav2301/Buddy/actions/workflows/build.yml).
+
+ This repository implements a usable local-PC subset of the supplied Nexa technical specification. It does not claim completion of the specification's multi-phase cloud, agent, and automation platform.
 
 ## Start using it
 
 Read [the setup guide](docs/Buddy-Setup-Guide.md). The Windows download contains a self-contained native `Buddy.exe`; the Android download is a signed testing APK. Install Ollama and download a model on the PC, then pair Android by QR code. There is no cloud API key requirement.
 
-**Windows repair 1:** the updated Windows ZIP corrects the `WindowsBase.dll` packaging collision. Extract it into a fresh folder, then run `Install-Buddy.cmd` to install, or `Run-Buddy.cmd` to launch with startup diagnostics. Logs are in `%LOCALAPPDATA%\Buddy\Logs`. Windows voice initialization is deferred until read-aloud is used. This repair leaves the Android APK and saved conversations unchanged.
+**Windows installation:** the updated Windows ZIP corrects the `WindowsBase.dll` packaging collision. Extract it into a fresh folder, then run `Install-Buddy.cmd` to install, or `Run-Buddy.cmd` to launch with startup diagnostics. Logs are in `%LOCALAPPDATA%\Buddy\Logs`. Windows voice initialization is deferred until read-aloud is used. The native installer keeps PC conversations and pairing state in the user profile.
 
-**Windows cursor companion 1:** Buddy has a native click-through companion beside the mouse and a compact chat/voice bar. Ctrl+Space opens chat; Ctrl+Shift+Space starts one voice utterance. Use Home → Cursor & shortcuts to change activation, hide the companion or control spoken answers. Win+Space is reserved by Windows for keyboard-layout switching and is only selectable if registration succeeds. Existing local AI, conversation history and Android pairing are reused. Native Windows interaction still needs device acceptance; see the validation record.
+**Windows cursor companion:** Buddy has a native click-through companion beside the mouse and a compact chat/voice bar. Ctrl+Space opens chat; Ctrl+Shift+Space starts one voice utterance. Use Home → Cursor & shortcuts to change activation, hide the companion or control spoken answers. Win+Space is reserved by Windows for keyboard-layout switching and is only selectable if registration succeeds. Existing local AI, conversation history and Android pairing are reused. Native Windows interaction still needs device acceptance; see the validation record.
 
 ## Project map
 
@@ -25,6 +27,10 @@ Read [the setup guide](docs/Buddy-Setup-Guide.md). The Windows download contains
 | `apps/android/app/src/androidTest` | Native Android UI integration and sensitive-field tests |
 | `scripts` | Windows build, per-user install, local AI setup, narrowly scoped firewall setup |
 | `docs` | Setup, coverage, architecture, and validation |
+
+## Version history
+
+Both apps read the root `VERSION` file. [CHANGELOG.md](CHANGELOG.md) records release changes, and Git tags identify the exact source for each download. Successful builds on `main` prepare a tagged draft prerelease. See [the versioning guide](docs/Versioning.md) to prepare future versions and publish reviewed downloads.
 
 ## Build
 

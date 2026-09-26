@@ -1,22 +1,52 @@
 name: Build native Buddy apps
-on: [push, pull_request, workflow_dispatch]
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
 permissions:
   contents: read
+
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check native versions and release notes
+        id: version
+        run: |
+          python scripts/version.py check
+          echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+
   windows:
+    needs: version
     runs-on: windows-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
-      - run: ./scripts/build-windows.ps1
+      - name: Test, publish, and verify Windows package
+        run: ./scripts/build-windows.ps1
       - uses: actions/upload-artifact@v4
         with:
-          name: Buddy-Windows
-          path: dist/Buddy-Windows-v0.1.0.zip
+          name: Buddy-Windows-v${{ needs.version.outputs.version }}
+          path: dist/Buddy-Windows-v${{ needs.version.outputs.version }}.zip
+          if-no-files-found: error
+
   android:
+    needs: version
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -25,9 +55,97 @@ jobs:
           java-version: '17'
       - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
-      - run: chmod +x gradlew && ./gradlew :app:assembleDebug :app:lintDebug
+      - name: Build testing APK and run Android lint
+        run: ./gradlew :app:assembleDebug :app:lintDebug
         working-directory: apps/android
+      - name: Give the APK its release version
+        env:
+          BUDDY_VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          mkdir -p dist
+          cp apps/android/app/build/outputs/apk/debug/app-debug.apk "dist/Buddy-Android-v$BUDDY_VERSION.apk"
       - uses: actions/upload-artifact@v4
         with:
-          name: Buddy-Android-testing
-          path: apps/android/app/build/outputs/apk/debug/*.apk
+          name: Buddy-Android-v${{ needs.version.outputs.version }}
+          path: dist/Buddy-Android-v${{ needs.version.outputs.version }}.apk
+          if-no-files-found: error
+
+  release:
+    name: Prepare tagged draft prerelease
+    needs: [version, windows, android]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: buddy-release-${{ needs.version.outputs.version }}
+      cancel-in-progress: false
+    env:
+      BUDDY_VERSION: ${{ needs.version.outputs.version }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Preserve existing version tags
+        id: release
+        shell: bash
+        run: |
+          tag="v$BUDDY_VERSION"
+          if git rev-parse --verify "refs/tags/$tag" >/dev/null 2>&1; then
+            existing=$(git rev-parse "$tag^{commit}")
+            if [ "$existing" != "$GITHUB_SHA" ]; then
+              echo "Version $tag is already tagged at $existing; bump VERSION for the next release."
+              echo "create=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            draft=$(gh release view "$tag" --json isDraft --jq .isDraft 2>/dev/null || true)
+            if [ "$draft" = false ]; then
+              echo "Published release $tag is unchanged."
+              echo "create=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+          echo "create=true" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v4
+        if: steps.release.outputs.create == 'true'
+        with:
+          pattern: Buddy-*
+          merge-multiple: true
+          path: release
+      - name: Prepare release notes and checksums
+        if: steps.release.outputs.create == 'true'
+        shell: bash
+        run: |
+          cp docs/Buddy-Setup-Guide.md CHANGELOG.md release/
+          python scripts/version.py notes > release-notes.md
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path('release')
+          info = {'version': os.environ['BUDDY_VERSION'], 'commit': os.environ['GITHUB_SHA'],
+                  'workflow': f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+                  'androidSigning': 'Temporary debug key; testing only', 'windowsGuiAcceptance': 'Manual device check required'}
+          (root / 'Build-Info.json').write_text(json.dumps(info, indent=2) + '\n')
+          paths = sorted(p for p in root.iterdir() if p.is_file())
+          (root / 'SHA256SUMS.txt').write_text(''.join(f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}\n' for p in paths))
+          PY
+      - name: Tag the source and prepare draft downloads
+        if: steps.release.outputs.create == 'true'
+        shell: bash
+        run: |
+          tag="v$BUDDY_VERSION"
+          if ! git rev-parse --verify "refs/tags/$tag" >/dev/null 2>&1; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git tag -a "$tag" "$GITHUB_SHA" -m "Buddy $tag"
+            git push origin "refs/tags/$tag"
+          fi
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" release/* --clobber
+            gh release edit "$tag" --notes-file release-notes.md
+          else
+            gh release create "$tag" release/* --verify-tag --draft --prerelease \
+              --title "Buddy $tag (testing)" --notes-file release-notes.md
+          fi

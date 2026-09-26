@@ -1,12 +1,17 @@
 plugins { id("com.android.application"); id("org.jetbrains.kotlin.android"); id("org.jetbrains.kotlin.plugin.compose") }
+val buddyVersion = rootProject.file("../../VERSION").readText().trim()
+require(Regex("(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)").matches(buddyVersion)) { "VERSION must be major.minor.patch" }
+val buddyVersionParts = buddyVersion.split('.').map(String::toInt)
+require(buddyVersionParts[0] <= 2000 && buddyVersionParts[1] < 1000 && buddyVersionParts[2] < 1000) { "VERSION exceeds supported Android versionCode range" }
+val buddyVersionCode = buddyVersionParts[0] * 1_000_000 + buddyVersionParts[1] * 1_000 + buddyVersionParts[2] + 1
 android {
     namespace = "app.buddy"
     compileSdk = 35
-    defaultConfig { applicationId = "app.buddy.local"; minSdk = 29; targetSdk = 35; versionCode = 1; versionName = "0.1.0"; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
+    defaultConfig { applicationId = "app.buddy.local"; minSdk = 29; targetSdk = 35; versionCode = buddyVersionCode; versionName = buddyVersion; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
     buildTypes { release { isMinifyEnabled = false; proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro") } }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
-    buildFeatures { compose = true }
+    buildFeatures { compose = true; buildConfig = true }
     packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }
 }
 dependencies {

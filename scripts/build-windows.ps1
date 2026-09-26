@@ -1,6 +1,9 @@
 $ErrorActionPreference = 'Stop'
 $buddyRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
+$buddyVersion = (Get-Content (Join-Path $buddyRoot 'VERSION') -Raw).Trim()
+if ($buddyVersion -notmatch '^\d+\.\d+\.\d+$') { throw 'Invalid VERSION file.' }
 $buddyOutput = Join-Path $buddyRoot 'dist\Buddy-Windows'
+if (Test-Path $buddyOutput) { Remove-Item $buddyOutput -Recurse -Force }
 dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Tests') -c Release
 if ($LASTEXITCODE -ne 0) { throw 'Service tests failed.' }
 dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Desktop.Tests') -c Release
@@ -10,9 +13,17 @@ if ($LASTEXITCODE -ne 0) { throw 'Windows build failed.' }
 dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Windows.PackageChecks') -c Release -- $buddyOutput
 if ($LASTEXITCODE -ne 0) { throw 'Windows package validation failed.' }
 Copy-Item (Join-Path $buddyRoot 'scripts\Install-Buddy.cmd'), (Join-Path $buddyRoot 'scripts\Run-Buddy.cmd'), (Join-Path $buddyRoot 'scripts\Install-Buddy.ps1'), (Join-Path $buddyRoot 'scripts\Enable-Phone-Access.ps1'), (Join-Path $buddyRoot 'scripts\Setup-Local-AI.ps1') $buddyOutput
-Set-Content -Path (Join-Path $buddyOutput 'Windows-Repair.txt') -Value 'Buddy 0.1.0 - Windows repair 1 - 2026-09-26'
-Set-Content -Path (Join-Path $buddyOutput 'Cursor-Companion.txt') -Value 'Buddy 0.1.0 - Cursor companion 1 - Ctrl+Space for chat; Ctrl+Shift+Space for voice'
+Set-Content -Path (Join-Path $buddyOutput 'Windows-Repair.txt') -Value "Buddy $buddyVersion - Windows Desktop runtime packaging repair included"
+Set-Content -Path (Join-Path $buddyOutput 'Cursor-Companion.txt') -Value "Buddy $buddyVersion - Ctrl+Space for chat; Ctrl+Shift+Space for voice"
+$buddyCommit = 'source-archive'
+if (Test-Path (Join-Path $buddyRoot '.git')) {
+    $buddyCommit = git -C $buddyRoot rev-parse HEAD
+    if ($LASTEXITCODE -ne 0) { throw 'Could not identify the source commit.' }
+}
+@{ version = $buddyVersion; commit = $buddyCommit; target = 'win-x64'; builtAtUtc = [DateTime]::UtcNow.ToString('O') } |
+    ConvertTo-Json | Set-Content (Join-Path $buddyOutput 'Build-Info.json') -Encoding utf8
+Copy-Item (Join-Path $buddyRoot 'CHANGELOG.md'), (Join-Path $buddyRoot 'VERSION') $buddyOutput
 Copy-Item (Join-Path $buddyRoot 'docs\Buddy-Setup-Guide.md') $buddyOutput
 Copy-Item (Join-Path $buddyRoot 'docs\Windows-Quick-Start.txt') (Join-Path $buddyOutput 'START-HERE.txt')
 Copy-Item (Join-Path $buddyRoot 'docs\licenses') $buddyOutput -Recurse -Force
-Compress-Archive -Path (Join-Path $buddyOutput '*') -DestinationPath (Join-Path $buddyRoot 'dist\Buddy-Windows-v0.1.0.zip') -Force
+Compress-Archive -Path (Join-Path $buddyOutput '*') -DestinationPath (Join-Path $buddyRoot "dist\Buddy-Windows-v$buddyVersion.zip") -Force

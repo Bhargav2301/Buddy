@@ -80,7 +80,7 @@ public sealed class BuddyHost : IAsyncDisposable
             catch (BuddyException ex) { if (!ctx.Response.HasStarted) { ctx.Response.StatusCode = ex.Status; await ctx.Response.WriteAsJsonAsync(new { error = new { code = ex.Code, message = ex.Message } }); } }
             catch (Exception) { if (!ctx.Response.HasStarted) { ctx.Response.StatusCode = 500; await ctx.Response.WriteAsJsonAsync(new { error = new { code = "INTERNAL_ERROR", message = "Buddy could not complete this request. Restart the PC app if it persists." } }); } }
         });
-        app.MapGet("/health", () => new { app = "Buddy", version = "0.1.0" });
+        app.MapGet("/health", () => new { app = "Buddy", version = typeof(BuddyHost).Assembly.GetName().Version?.ToString(3) });
         app.MapPost("/v1/pair", async (PairRequest input) => {
             var name = Security.Text(input.Name, 60, "Device name");
             service.Pairing.Redeem(Security.Text(input.Code, 6, "Pairing code"));

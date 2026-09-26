@@ -161,7 +161,7 @@ fun BuddyApp(vm: BuddyViewModel, onScan: () -> Unit, onDictate: () -> Unit, onSt
         Text("AI runs on your PC. Messages, saved prompts, and memories stay in its encrypted store. Pairing credentials are encrypted with Android Keystore. Screenshots and attached images are not saved by Buddy.", color = Subtle)
         Text("An active request may finish on the PC if Android closes unexpectedly. Use Stop to cancel before leaving.", color = Subtle, fontSize = 12.sp)
         TextButton(onClick = onScan) { Text("Scan a new PC code") }; TextButton(onClick = { unlink = true }) { Text("Forget this PC") }
-        Text("Buddy 0.1.0 · Local PC edition\nPhone access requires the PC to stay on and reachable.", color = Subtle, fontSize = 12.sp)
+        Text("Buddy ${BuildConfig.VERSION_NAME} · Local PC edition\nPhone access requires the PC to stay on and reachable.", color = Subtle, fontSize = 12.sp)
     }
     if (unlink) AlertDialog(onDismissRequest = { unlink = false }, title = { Text("Forget this PC?") }, text = { Text("Your conversations remain on the PC. Pair again to reconnect. For full revocation, remove this phone in the PC’s paired devices panel.") }, confirmButton = { TextButton(onClick = { vm.disconnect(); unlink = false }) { Text("Forget") } }, dismissButton = { TextButton(onClick = { unlink = false }) { Text("Cancel") } })
 }

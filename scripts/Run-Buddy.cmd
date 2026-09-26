@@ -18,7 +18,7 @@ pause
 exit /b %BUDDY_EXIT%
 :missing
 echo Buddy.exe was not found in this folder.
-echo Download Buddy-Windows-v0.1.0.zip and choose Extract All.
+echo Download the Windows application ZIP from Buddy Releases and choose Extract All.
 echo Run this file beside Buddy.exe in that extracted Windows application folder.
 pause
 exit /b 1

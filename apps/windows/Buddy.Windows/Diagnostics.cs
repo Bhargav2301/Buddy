@@ -17,7 +17,7 @@ internal static class Diagnostics
                 File.Move(LogPath, LogPath + ".previous", true);
         }
         catch { /* Logging must never prevent startup. */ }
-        Write("Buddy 0.1.0 Windows cursor companion 1 | " + RuntimeInformation.OSDescription +
+        Write("Buddy " + typeof(Diagnostics).Assembly.GetName().Version?.ToString(3) + " | " + RuntimeInformation.OSDescription +
             " | " + RuntimeInformation.ProcessArchitecture + " | .NET " + Environment.Version +
             " | " + AppContext.BaseDirectory);
     }
