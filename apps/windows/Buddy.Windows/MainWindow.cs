@@ -129,7 +129,13 @@ public sealed partial class MainWindow : Window
             ConfigurePtt();
             foreground.Start(); refresh.Start(); await RefreshList();
             if (conversations.Items.Count > 0) await Select(((Conversation)conversations.Items[0]).Id); else await NewChat();
-            var s = await host.Service.Store.Read(s => s); var modelStatus = await host.Service.Engine.Status(s.Model, s.VisionModel); status.Text = modelStatus.Message;
+            var s = await host.Service.Store.Read(s => s); var modelStatus = await host.Service.Engine.Status(s.Model, s.VisionModel);
+            var availableDefault = OllamaEngine.AvailableDefault(s.Model, modelStatus.Installed);
+            if (availableDefault != s.Model) {
+                await host.Service.Store.Update(settings => { settings.Model = availableDefault; return true; });
+                modelStatus = await host.Service.Engine.Status(availableDefault, s.VisionModel);
+            }
+            status.Text = modelStatus.Message;
             if (modelStatus.Ready && desktop.StartInCompanionMode) Hide();
         }
         catch (Exception ex) { Diagnostics.Write("Service startup failed", ex); status.Text = "Could not start Buddy: " + ex.Message; MessageBox.Show(status.Text + "\n\nError log: " + Diagnostics.LogPath, "Buddy startup"); }

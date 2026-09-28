@@ -5,7 +5,7 @@ This Windows-first increment follows the repository's TRD and UI/UX v1.2. It imp
 ## Use it
 
 1. Extract the versioned Windows ZIP. Quit the old Buddy from the tray, then run `Install-Buddy.cmd`. Your existing history, models and pairing remain in `%LOCALAPPDATA%\Buddy`.
-2. In **PC setup & models**, choose an installed Ollama model. Live planning was checked with `gemma3:4b`; capability and speed depend on the chosen model. No cloud AI key is needed.
+2. In **PC setup & models**, choose an installed Ollama model. Live planning was checked with `gemma3:4b`; capability and speed depend on the chosen model. When the original Qwen default is unavailable and Gemma is installed, startup selects Gemma automatically. Custom selections are preserved. No cloud AI key is needed.
 3. **Ctrl+Space** opens typed chat. **Ctrl+Shift+Space** opens the independent voice bubble. Speech stops before TTS starts. **Cursor & shortcuts** enables optional tap/hold, spoken answers and voice screen context.
 4. **Home → Assistant settings** enables internet research and/or Agent mode. Both default off. The settings also expose a process blocklist and an encrypted activity log.
 5. Focus the tool you need, summon Buddy, enter a task, and choose **Guide** or **Agent**. Examples: “Show me where Export is”; “Open Notepad and type a short packing list”. Explicit `Open`, `Click`, `Type`, `Do this`, and `Buddy agent` commands route to Agent; `Show me`, `Guide`, and `Walk me` route to Guide.
@@ -54,6 +54,6 @@ Interactive native fixture (foreground desktop required; briefly opens a test wi
 dotnet run --project tests/Buddy.Windows.IntegrationTests -c Release
 ```
 
-The native fixture must fail if it cannot acquire foreground focus; it must not silently claim a skipped action passed. During this delivery the helper could not initialize and Windows denied fixture focus, so native action/microphone acceptance remains open. The 54 deterministic/live assistant checks passed, including actual Gemma grounded plans and a fetched, cited answer.
+The native fixture must fail if it cannot acquire foreground focus; it must not silently claim a skipped action passed. During this delivery the helper could not initialize and Windows denied fixture focus, so native action/microphone acceptance remains open. The suite includes 53 deterministic checks plus four live model checks, including actual Gemma grounded plans and a fetched, cited answer.
 
 Before treating the preview as accepted: verify the separate voice shortcut; speak and stop a response; tap and hold; point at Export in the tutorial; run and undo a practice field edit; stop a multi-step run; move/scroll the target; try 100/150/200% scaling and a negative monitor origin; confirm web-off produces no research, then enable it and check a cited answer. Keep the release a testing prerelease until these checks pass.

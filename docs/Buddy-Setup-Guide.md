@@ -30,7 +30,7 @@ The voice shortcut opens a separate 360 px bubble and starts one utterance. Spea
 
 When the configured AI model is ready, Buddy can start in companion mode with Home hidden. If Ollama/model setup is incomplete, Home stays open. Turn this behavior off in Cursor & shortcuts if you prefer Home at launch. The companion follows monitor work areas and is designed for different display scales; native monitor/DPI behavior still needs a Windows device check.
 
-The compact bar streams real answers and saves completed turns to the selected conversation. Failed or stopped replies restore your draft. Typed chat captures context only when **Screen** is checked. Voice captures active-window accessibility text and, when safe and available, a redacted memory-only frame; turn this off with **Include active window when voice starts** in Cursor & shortcuts. Frames stay on this PC and never enter stored chat history or web queries. Microphone support depends on an installed Windows speech language and audio device.
+The compact bar streams real answers and saves completed turns to the selected conversation. Failed or stopped replies restore your draft. Typed chat captures context only when **Screen** is checked. Voice captures active-window accessibility text and, when safe and available, a redacted memory-only frame; turn this off with **Include active-window context when talking** in Cursor & shortcuts. Frames stay on this PC and never enter stored chat history or web queries. Microphone support depends on an installed Windows speech language and audio device.
 
 ## Guide, Agent and internet research (0.3.0 preview)
 

@@ -9,6 +9,9 @@ void Check(bool condition, string name) { if (!condition) throw new Exception("F
 async Task Reject(Func<Task> action, string code, string name) { try { await action(); } catch (BuddyException e) when (e.Code == code) { Check(true, name); return; } throw new Exception("FAIL: " + name); }
 async Task<List<StreamEvent>> Collect(IAsyncEnumerable<StreamEvent> source) { var items = new List<StreamEvent>(); await foreach (var item in source) items.Add(item); return items; }
 var controls = new List<ScreenElement> { new("a", "Export", "Button", -120, 40, 80, 30), new("b", "Example text", "Edit", 0, 0, 300, 100) };
+Check(OllamaEngine.AvailableDefault("qwen3:4b-instruct-2507-q4_K_M", ["gemma3:4b"]) == "gemma3:4b", "An unavailable factory default uses the installed Gemma model");
+Check(OllamaEngine.AvailableDefault("custom:model", ["gemma3:4b"]) == "custom:model", "A user's explicit model choice is preserved");
+Check(OllamaEngine.AvailableDefault("qwen3:4b-instruct-2507-q4_K_M", ["qwen3:4b-instruct-2507-q4_K_M", "gemma3:4b"]) == "qwen3:4b-instruct-2507-q4_K_M", "An installed default is preserved");
 Check(GroundingResolver.Resolve(controls, "a", "wrong", "Button")?.Ref == "a", "A real UIA reference grounds across negative monitor origins");
 Check(GroundingResolver.Resolve(controls, "stale", "Export", "Button") is null, "A stale reference cannot silently retarget a command");
 Check(GroundingResolver.Resolve(controls, "", "Export", "Button")?.Ref == "a", "Unique name and role resolve a future window target");

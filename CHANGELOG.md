@@ -11,6 +11,7 @@ The root [VERSION](VERSION) file controls both applications. See
 - Opt-in public HTTPS research with bounded search/fetch, source citations, redirect/DNS checks, and isolated untrusted page content.
 - Per-capture privacy checks, password redaction, encrypted activity metadata, and memory-only voice frames when accessibility enumeration is complete.
 - Require Buddy.deps.json and probe the native apphost during packaging; add noninteractive installer flags and self-contained regression tests.
+- If the original Qwen default is missing but Gemma 3 4B is installed, select Gemma on startup. Preserve installed or custom model selections.
 - Validation: live Gemma planning, grounding and cited research checks passed. Native foreground acquisition was blocked in this automation session; microphone, real app execution, monitor/DPI and guide accuracy acceptance remain manual. See docs/Windows-Assistant-Preview.md. Android feature work remains deferred.
 
 ## [0.2.0] - 2026-09-26
