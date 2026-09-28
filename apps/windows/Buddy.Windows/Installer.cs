@@ -5,7 +5,7 @@ namespace Buddy.Windows;
 
 internal static class Installer
 {
-    internal static int Run()
+    internal static int Run(bool quiet = false, bool launch = true)
     {
         var source = Path.GetFullPath(AppContext.BaseDirectory).TrimEnd(Path.DirectorySeparatorChar);
         var target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "Buddy");
@@ -37,10 +37,10 @@ internal static class Installer
             shortcutWarning = "\nShortcuts could not be created. Open Buddy.exe from that folder.";
         }
         Diagnostics.Write("Installed to " + target);
-        Program.ShowMessage("Buddy is installed in:\n" + target + "\n\nClick OK to open Buddy." + shortcutWarning);
+        if (!quiet) Program.ShowMessage("Buddy is installed in:\n" + target + "\n\nClick OK to open Buddy." + shortcutWarning);
         single.ReleaseMutex();
         single.Dispose();
-        Process.Start(new ProcessStartInfo(Path.Combine(target, "Buddy.exe")) { WorkingDirectory = target, UseShellExecute = true });
+        if (launch) Process.Start(new ProcessStartInfo(Path.Combine(target, "Buddy.exe")) { WorkingDirectory = target, UseShellExecute = true });
         return 0;
     }
 

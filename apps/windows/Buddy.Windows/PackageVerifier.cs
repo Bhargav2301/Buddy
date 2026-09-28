@@ -7,7 +7,7 @@ internal static class PackageVerifier
 {
     internal static void Verify(string folder)
     {
-        string[] required = ["Buddy.exe", "Buddy.dll", "Buddy.Server.dll", "Buddy.runtimeconfig.json",
+        string[] required = ["Buddy.exe", "Buddy.dll", "Buddy.Server.dll", "Buddy.runtimeconfig.json", "Buddy.deps.json",
             "hostfxr.dll", "hostpolicy.dll", "coreclr.dll", "System.Private.CoreLib.dll",
             "PresentationNative_cor3.dll", "wpfgfx_cor3.dll", "D3DCompiler_47_cor3.dll", "vcruntime140_cor3.dll", "clrjit.dll"];
         foreach (var name in required) RequireFile(folder, name);

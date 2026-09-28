@@ -3,5 +3,6 @@
   <ItemGroup>
     <Compile Include="../../apps/windows/Buddy.Windows/OverlayPlacement.cs" Link="OverlayPlacement.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/DesktopPreferences.cs" Link="DesktopPreferences.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/AssistantInteraction.cs" Link="AssistantInteraction.cs" />
   </ItemGroup>
 </Project>

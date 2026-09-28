@@ -20,7 +20,7 @@ public static class Program
             Diagnostics.Start();
             AppDomain.CurrentDomain.UnhandledException += (_, e) =>
                 Diagnostics.Write("Unhandled exception", e.ExceptionObject as Exception);
-            if (args.Contains("--install")) return Installer.Run();
+            if (args.Contains("--install")) return Installer.Run(args.Contains("--quiet"), !args.Contains("--no-launch"));
             using var single = new Mutex(true, "Local\\Buddy.Desktop.v1", out bool first);
             if (!first)
             {
@@ -35,7 +35,7 @@ public static class Program
         {
             Diagnostics.Write("Startup failed", ex);
             var message = "Buddy could not start.\n\n" + ex.Message + "\n\nError log: " + Diagnostics.LogPath;
-            if (OperatingSystem.IsWindows()) ShowMessage(message);
+            if (OperatingSystem.IsWindows() && !args.Contains("--quiet") && !args.Contains("--check-package")) ShowMessage(message);
             else Console.Error.WriteLine(message);
             return 1;
         }

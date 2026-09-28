@@ -44,4 +44,9 @@ internal static class OverlayNative
         var position = OverlayPlacement.NearPointer(point.X, point.Y, width, height, WorkArea(point), scale);
         SetWindowPos(handle, new IntPtr(-1), (int)Math.Round(position.X), (int)Math.Round(position.Y), 0, 0, 0x0010 | 0x0001);
     }
+    internal static void SetBounds(Window window, int x, int y, int width, int height)
+    {
+        var handle = new WindowInteropHelper(window).EnsureHandle();
+        SetWindowPos(handle, new IntPtr(-1), x, y, width, height, 0x0010);
+    }
 }

@@ -7,18 +7,24 @@ BUDDY - WINDOWS CURSOR COMPANION
    download the chat model. No cloud API key is required.
 
 Ctrl + Space          Open the compact chat bar beside your pointer
-Ctrl + Shift + Space  Start voice; speak, then pause to send one utterance
+Ctrl + Shift + Space  Open the separate voice overlay; speak, then pause
 Enter                 Send typed text (Shift + Enter adds a line)
 Esc                   Stop and dismiss the compact bar
-Ctrl + Alt + Esc      Stop listening and generation
+Ctrl + Alt + Esc      Stop listening, generation, guidance and Agent actions
 
 Home > Cursor & shortcuts changes the main shortcut and cursor visibility.
+It also enables optional tap-for-chat / hold-to-talk and voice screen context.
+Home > Assistant settings enables internet research and Agent mode (off by default).
+Focus a tool, summon Buddy, and choose Guide or Agent after entering your task.
+Home > Try pointing tutorial opens a harmless practice window.
+Agent shows a plan before running and asks approval for each change.
 Windows + Space is normally used by Windows to switch keyboard layouts.
 Use Home or Buddy's tray icon for models, history, screen context and pairing.
 
 The cursor companion does not replace or move your original pointer.
 Microphone and screen input activate only through explicit controls.
 Read Buddy-Setup-Guide.md for the full workflow and device requirements.
+Read Windows-Assistant-Preview.md for supported actions and current limits.
 
 If launch fails, run Run-Buddy.cmd and inspect:
   %LOCALAPPDATA%\Buddy\Logs

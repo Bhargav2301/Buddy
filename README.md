@@ -12,7 +12,7 @@ Read [the setup guide](docs/Buddy-Setup-Guide.md). The Windows download contains
 
 **Windows installation:** the updated Windows ZIP corrects the `WindowsBase.dll` packaging collision. Extract it into a fresh folder, then run `Install-Buddy.cmd` to install, or `Run-Buddy.cmd` to launch with startup diagnostics. Logs are in `%LOCALAPPDATA%\Buddy\Logs`. Windows voice initialization is deferred until read-aloud is used. The native installer keeps PC conversations and pairing state in the user profile.
 
-**Windows cursor companion:** Buddy has a native click-through companion beside the mouse and a compact chat/voice bar. Ctrl+Space opens chat; Ctrl+Shift+Space starts one voice utterance. Use Home → Cursor & shortcuts to change activation, hide the companion or control spoken answers. Win+Space is reserved by Windows for keyboard-layout switching and is only selectable if registration succeeds. Existing local AI, conversation history and Android pairing are reused. Native Windows interaction still needs device acceptance; see the validation record.
+**Windows assistant preview (0.3.0):** Ctrl+Space opens typed chat; Ctrl+Shift+Space opens a separate voice overlay. Guide draws arrows and highlights around accessible controls. Agent creates a local action plan and executes supported Windows actions after review. Internet research reads public HTTPS pages and cites its sources. Enable Agent and Internet research in Home → Assistant settings; both default off. See [the preview guide and limitations](docs/Windows-Assistant-Preview.md). Existing history and pairing are preserved. Native Windows interaction still needs device acceptance.
 
 ## Project map
 
@@ -24,6 +24,8 @@ Read [the setup guide](docs/Buddy-Setup-Guide.md). The Windows download contains
 | `tests/Buddy.Tests` | Dependency-free executable service test suite, including actual TLS/HTTP integration |
 | `tests/Buddy.Windows.PackageChecks` | Windows PE architecture, WPF type and managed dependency validation; runs on any .NET 8 build host |
 | `tests/Buddy.Desktop.Tests` | Placement across monitor origins/scales and shortcut conflict regression checks |
+| `tests/Buddy.Assistant.Tests` | Grounding, action policy, web isolation, tool loop and cancellation; optional live Ollama checks |
+| `tests/Buddy.Windows.IntegrationTests` | Interactive native fixture for UIA edits/invocation, overlay flags and cancellation |
 | `apps/android/app/src/androidTest` | Native Android UI integration and sensitive-field tests |
 | `scripts` | Windows build, per-user install, local AI setup, narrowly scoped firewall setup |
 | `docs` | Setup, coverage, architecture, and validation |
@@ -78,6 +80,7 @@ Images and raw screen context are request-scoped and excluded from persisted con
 ## Source references
 
 - Supplied `Technical Specification: Nexa — Windows + Android AI Buddy Ecosystem`, v1.0, 26 September 2026.
+- [Updated Windows TRD](docs/Buddy-TRD.md) and [UI/UX specification](docs/Buddy-UI-UX.md), v1.2; [0.3.0 implementation scope](docs/Windows-Assistant-Preview.md).
 - [Ollama chat API](https://docs.ollama.com/api/chat)
 - [Ollama on Windows](https://docs.ollama.com/windows)
 - [Qwen3 4B model](https://ollama.com/library/qwen3:4b-instruct-2507-q4_K_M)

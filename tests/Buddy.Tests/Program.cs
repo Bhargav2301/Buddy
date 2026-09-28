@@ -67,6 +67,7 @@ try
     var pairResponse = await tls.PostAsJsonAsync("/v1/pair", new PairRequest(code, "Integration phone")); pairResponse.EnsureSuccessStatusCode();
     var pairJson = await pairResponse.Content.ReadFromJsonAsync<JsonElement>(); tls.DefaultRequestHeaders.Authorization = new("Bearer", pairJson.GetProperty("token").GetString());
     var created = await tls.PostAsJsonAsync("/v1/conversations", new NoteRequest("Across devices", "")); created.EnsureSuccessStatusCode();
+    Assert((await tls.PostAsJsonAsync("/v1/agent/plan", new PlanningRequest("Open Notepad", new("example", "Example", [])))).StatusCode == HttpStatusCode.Forbidden, "paired phones cannot request PC action plans");
     Assert((await tls.GetFromJsonAsync<JsonElement>("/v1/conversations")).GetArrayLength() == 1, "paired phone sees shared conversation store through pinned HTTPS");
     Assert((await tls.PostAsJsonAsync("/v1/pair", new PairRequest(code, "Other phone"))).StatusCode == HttpStatusCode.Forbidden, "HTTP pairing code replay is rejected");
     await host.Service.Store.Update(s => s.Devices.ClearResult()); Assert((await tls.GetAsync("/v1/conversations")).StatusCode == HttpStatusCode.Unauthorized, "revoked phone loses API access");

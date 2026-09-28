@@ -4,6 +4,15 @@ Versions follow `major.minor.patch`; Git tags use `v` plus the version.
 The root [VERSION](VERSION) file controls both applications. See
 [Versioning](docs/Versioning.md) for the release process.
 
+## [0.3.0] - 2026-09-28
+
+- Separate 360 px voice overlay for Ctrl+Shift+Space, with transcript, microphone level, sentence-based speech and cancellation. Optional tap/hold main shortcut.
+- Windows Guide and opt-in Agent preview: local structured plans, live UIA targets, click-through arrows/highlights, saved walkthrough progress, confirmed allowlisted actions, emergency stop, and guarded field undo.
+- Opt-in public HTTPS research with bounded search/fetch, source citations, redirect/DNS checks, and isolated untrusted page content.
+- Per-capture privacy checks, password redaction, encrypted activity metadata, and memory-only voice frames when accessibility enumeration is complete.
+- Require Buddy.deps.json and probe the native apphost during packaging; add noninteractive installer flags and self-contained regression tests.
+- Validation: live Gemma planning, grounding and cited research checks passed. Native foreground acquisition was blocked in this automation session; microphone, real app execution, monitor/DPI and guide accuracy acceptance remain manual. See docs/Windows-Assistant-Preview.md. Android feature work remains deferred.
+
 ## [0.2.0] - 2026-09-26
 
 First version tracked in this GitHub repository. This imports the latest Buddy

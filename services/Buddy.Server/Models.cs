@@ -4,7 +4,7 @@ public record ChatMessage(string Id, string Role, string Text, DateTimeOffset At
 public record Conversation(string Id, string Title, DateTimeOffset UpdatedAt, List<ChatMessage> Messages);
 public record Note(string Id, string Title, string Text);
 public record PairedDevice(string Id, string Name, string TokenHash, DateTimeOffset AddedAt);
-public record ChatRequest(string ConversationId, string Text, string RequestId, string Mode = "type", string? Context = null, string? ImageBase64 = null);
+public record ChatRequest(string ConversationId, string Text, string RequestId, string Mode = "type", string? Context = null, string? ImageBase64 = null, bool UseWeb = false);
 public record PairRequest(string Code, string Name);
 public record RefineRequest(string Prompt);
 public record NoteRequest(string Title, string Text);
@@ -19,6 +19,8 @@ public sealed class BuddyState
     public List<PairedDevice> Devices { get; set; } = [];
     public List<Note> Memories { get; set; } = [];
     public List<Note> Prompts { get; set; } = [];
+    public List<AuditEntry> Audit { get; set; } = [];
+    public List<SavedGuide> Guides { get; set; } = [];
 }
 public class BuddyException(string code, string message, int status = 400) : Exception(message)
 {

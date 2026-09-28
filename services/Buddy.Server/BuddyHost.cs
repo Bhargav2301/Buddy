@@ -101,6 +101,11 @@ public sealed class BuddyHost : IAsyncDisposable
             catch (Exception) when (!ctx.RequestAborted.IsCancellationRequested) { await ctx.Response.WriteAsync("{\"type\":\"error\",\"code\":\"ENGINE_ERROR\",\"text\":\"The local AI connection failed. Check PC setup.\"}\n"); }
         });
         app.MapPost("/v1/refine", async (RefineRequest input, CancellationToken ct) => new { refinedPrompt = await service.Refine(input.Prompt, ct), engine = "buddy_local" });
+        app.MapPost("/v1/agent/plan", (PlanningRequest input, HttpContext ctx, CancellationToken ct) => {
+            if (ctx.Items["device"] as string != "desktop") throw new BuddyException("PC_ONLY", "Create computer-control plans on the PC.", 403);
+            return service.PlanAgent(input, ct);
+        });
+        app.MapPost("/v1/guide/start", (PlanningRequest input, CancellationToken ct) => service.PlanGuide(input, ct));
         app.MapGet("/v1/memories", () => store.Read(s => s.Memories));
         app.MapGet("/v1/prompts", () => store.Read(s => s.Prompts));
         foreach (var kind in new[] { "memories", "prompts" })
@@ -113,5 +118,5 @@ public sealed class BuddyHost : IAsyncDisposable
         }
         await app.StartAsync(); return new(app, service, cert, client, port);
     }
-    public async ValueTask DisposeAsync() { Service.StopAll(); await app.StopAsync(); await app.DisposeAsync(); client.Dispose(); cert.Dispose(); }
+    public async ValueTask DisposeAsync() { Service.StopAll(); await app.StopAsync(); await app.DisposeAsync(); (Service.Web as IDisposable)?.Dispose(); client.Dispose(); cert.Dispose(); }
 }

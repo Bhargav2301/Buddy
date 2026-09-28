@@ -1,6 +1,14 @@
 # Buddy validation record
 
-Build date: 26 September 2026.
+## Windows assistant preview — 28 September 2026
+
+29 service checks, 22 desktop logic checks and 54 assistant checks passed on the Windows development host, including four live checks against the installed Gemma 3 4B model and real public HTTPS. The checks cover actual structured action and guide planning, fetched evidence passed back to inference, citations, ambiguous/stale targets, allowlisted actions, web-off isolation, blocked URLs/IP ranges/redirects, HTML extraction, size limits, encrypted audit metadata, and global cancellation. The self-contained Windows package also passed PE/dependency validation and the native apphost integrity probe.
+
+The interactive native fixture compiled but could not obtain foreground focus, including after an explicit activation attempt. Its action and overlay assertions did **not** execute. The desktop computer-use helper also failed to initialize (`failed to write kernel assets`, OS error 3) after a reset. No claim is made that microphone/PTT, UIA actions in user applications, overlay accuracy, or mixed-DPI behavior passed native acceptance. Run the fixture and the checklist in [Windows-Assistant-Preview.md](Windows-Assistant-Preview.md) in an interactive Windows session.
+
+Earlier validation records below are historical. See the branch's CI run for current package and regression checks.
+
+Historical build date: 26 September 2026.
 
 ## Repository CI — version 0.2.0
 

@@ -5,7 +5,7 @@ using System.Windows.Threading;
 
 namespace Buddy.Windows;
 
-internal enum CompanionMood { Idle, Listening, Thinking, Speaking }
+internal enum CompanionMood { Idle, Listening, Looking, Thinking, Speaking, Pointing, Unsure, Error, AgentWorking, Researching, Sleeping }
 
 internal sealed class CursorCompanionWindow : Window, IDisposable
 {
@@ -67,10 +67,11 @@ internal sealed class CursorGlyph : FrameworkElement
     internal void SetBlink(bool value) { if (blink != value) { blink = value; InvalidateVisual(); } }
     protected override void OnRender(DrawingContext drawing)
     {
-        var color = mood switch { CompanionMood.Listening => "#9DBAFF", CompanionMood.Thinking => "#F7D487", CompanionMood.Speaking => "#C5A7FF", _ => "#8EE4C5" };
+        var color = mood switch { CompanionMood.Listening => "#9DBAFF", CompanionMood.Thinking or CompanionMood.Researching => "#F7D487", CompanionMood.Speaking => "#C5A7FF", CompanionMood.AgentWorking => "#FFB078", CompanionMood.Error or CompanionMood.Unsure => "#B6BEC5", _ => "#20B8A6" };
         var fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color));
         drawing.DrawGeometry(null, new Pen(Brushes.White, 4), Shape);
         drawing.DrawGeometry(fill, new Pen(Dark, 1.6), Shape);
+        if (mood == CompanionMood.Listening) drawing.DrawEllipse(null, new Pen(fill, 2), new(21,25), 20, 24);
         if (blink) { drawing.DrawLine(new Pen(Dark, 1.6), new(12, 23), new(15, 23)); drawing.DrawLine(new Pen(Dark, 1.6), new(19, 23), new(22, 23)); }
         else { drawing.DrawEllipse(Dark, null, new(13.5, 22), 1.6, 2.3); drawing.DrawEllipse(Dark, null, new(20.5, 22), 1.6, 2.3); }
     }

@@ -17,20 +17,24 @@ Buddy now includes a small mint pointer with eyes that follows beside your Windo
 | Action | Default control |
 |---|---|
 | Open a compact chat bar beside the pointer | **Ctrl + Space** |
-| Activate voice in the compact bar | **Ctrl + Shift + Space** |
+| Open the separate voice overlay | **Ctrl + Shift + Space** |
 | Send typed text / add a new line | **Enter** / **Shift + Enter** |
 | Dismiss the bar and cancel listening, speech and its unfinished reply | **Esc** or **×** |
 | Stop listening or an answer | **Stop**, or **Ctrl + Alt + Esc** |
 | Open history, models, pairing and screen-context tools | **Home** in the bar, or double-click Buddy's tray icon |
 | Change the main shortcut, choose chat/voice activation, hide the companion | **Home → Cursor & shortcuts** |
 
-The voice shortcut starts one utterance. Speak, then pause: Buddy turns the microphone off, sends the transcript to the PC's local AI, and reads the answer if **Read voice answers aloud** is enabled. Press the voice shortcut again while listening to cancel; the **Finish** button ends listening and submits recognized speech. Clicking outside the bar stops an active microphone. Press the voice shortcut again for your next turn. This is not a continuous or wake-word listener.
+The voice shortcut opens a separate 360 px bubble and starts one utterance. Speak, then pause: Buddy turns the microphone off, sends the transcript to the PC's local AI, and reads sentences as they arrive if **Read voice answers aloud** is enabled. Press the voice shortcut again while listening to cancel; **Finish** submits recognized speech. Changing to another application stops the microphone. Enable **Hold to talk** in Cursor & shortcuts for a short tap to chat and a hold of at least 250 ms to talk; release sends. Windows may need longer to prepare the microphone on its first use. This is not a continuous or wake-word listener.
 
 **Windows + Space normally switches keyboard layouts.** It appears in the shortcut picker as **if available**. If Windows rejects it, Buddy keeps the previous working shortcut. Ctrl + Space is the default, and Ctrl + Alt + Space or Alt + Shift + Space are alternatives. The dedicated voice shortcut is Ctrl + Shift + Space; if another application owns it, use Voice in the bar or tray menu.
 
 When the configured AI model is ready, Buddy can start in companion mode with Home hidden. If Ollama/model setup is incomplete, Home stays open. Turn this behavior off in Cursor & shortcuts if you prefer Home at launch. The companion follows monitor work areas and is designed for different display scales; native monitor/DPI behavior still needs a Windows device check.
 
-The compact bar streams real answers through the same PC service and saves completed turns to the selected conversation, including Android history. Failed or stopped replies restore your draft. Opening the bar does **not** capture your screen: use Home's existing reviewed screen-context tools when you want to share it. Microphone support depends on an installed Windows speech language and available audio device. If unavailable, the bar remains usable for typing; Win+H can dictate into the text field using your Windows settings.
+The compact bar streams real answers and saves completed turns to the selected conversation. Failed or stopped replies restore your draft. Typed chat captures context only when **Screen** is checked. Voice captures active-window accessibility text and, when safe and available, a redacted memory-only frame; turn this off with **Include active window when voice starts** in Cursor & shortcuts. Frames stay on this PC and never enter stored chat history or web queries. Microphone support depends on an installed Windows speech language and audio device.
+
+## Guide, Agent and internet research (0.3.0 preview)
+
+Read [Windows-Assistant-Preview.md](Windows-Assistant-Preview.md) for supported actions and acceptance limits. Open **Home → Assistant settings** to enable **Internet research** or **Agent mode**; both are off by default. Focus the app you want help with, then summon Buddy. Type a task and choose **Guide** for on-screen directions or **Agent** for a reviewable action plan. Agent changes require **Run this plan** and **Allow this step**. **Esc**, **Ctrl+Alt+Esc**, **Stop**, or mouse movement during execution stops further actions. Try **Home → Try pointing tutorial** first.
 
 ## 1. Install on Windows
 

@@ -46,4 +46,15 @@ Check(shortcut.TrySet(ShortcutChoice.Choices[1]) && nativeCalls == calls, "Savin
 shortcut.Dispose();
 Check(registered.Count == 0 && shortcut.ActiveId == 0, "Quit releases the shortcut");
 Check(!new DesktopPreferences().ShortcutStartsVoice, "Default shortcut opens chat without activating the microphone");
+var gesture = new HoldGesture();
+gesture.Down(1000); Check(!gesture.Tick(1249) && gesture.Up(), "A short press opens typed chat without starting the microphone");
+gesture.Down(2000); gesture.Down(2100); Check(gesture.Tick(2250) && !gesture.Tick(2300), "Hold fires once at 250 ms despite key repeat");
+Check(!gesture.Up() && !gesture.Up(), "Release after hold never opens typed chat");
+gesture.Down(3000); Check(gesture.Up(), "A later tap works after hold completion");
+var sentences = new SentenceBuffer();
+Check(!sentences.Add("The result is 3.").Any(), "An incomplete stream fragment is not spoken prematurely");
+Check(sentences.Add("14. Next").Single() == "The result is 3.14.", "Decimal and split sentence boundaries survive streaming");
+sentences.Clear(); Check(!sentences.Flush().Any(), "Stop discards queued partial speech");
+Check(AssistantIntent.Mode("Open Notepad") == "agent" && AssistantIntent.Mode("Show me Export") == "guide" && AssistantIntent.Mode("What does this mean?") == "talk", "Explicit commands route to action/guide workflows; questions remain chat");
+Check(!new DesktopPreferences().AgentEnabled && !new DesktopPreferences().AllowWebResearch && !new DesktopPreferences().HoldToTalk, "Agent, internet and keyboard hook require opt-in");
 Console.WriteLine($"{assertions} desktop logic assertions passed. Native Windows interaction is a separate acceptance check.");

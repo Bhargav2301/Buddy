@@ -51,14 +51,17 @@ internal static class Native
         }
         return Buddy.Server.Security.Redact(result.ToString());
     }
-    internal static byte[] Capture(IntPtr window)
+    internal static byte[] Capture(IntPtr window, IReadOnlyList<System.Windows.Rect>? privateRects = null)
     {
         CheckWindow(window);
         if (!GetWindowRect(window, out var rect)) throw new InvalidOperationException("That window is no longer available.");
         var bounds = System.Drawing.Rectangle.Intersect(new(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top), System.Windows.Forms.SystemInformation.VirtualScreen);
         if (bounds.Width < 1 || bounds.Height < 1) throw new InvalidOperationException("Restore the target window before capturing it.");
         using var bitmap = new System.Drawing.Bitmap(bounds.Width, bounds.Height);
-        using (var graphics = System.Drawing.Graphics.FromImage(bitmap)) graphics.CopyFromScreen(bounds.Location, System.Drawing.Point.Empty, bounds.Size);
+        using (var graphics = System.Drawing.Graphics.FromImage(bitmap)) {
+            graphics.CopyFromScreen(bounds.Location, System.Drawing.Point.Empty, bounds.Size);
+            if (privateRects is not null) foreach (var r in privateRects) graphics.FillRectangle(System.Drawing.Brushes.Black, (float)r.X - bounds.X, (float)r.Y - bounds.Y, (float)r.Width, (float)r.Height);
+        }
         var scale = Math.Min(1, 1280.0 / Math.Max(bounds.Width, bounds.Height));
         using var resized = new System.Drawing.Bitmap(bitmap, (int)(bounds.Width * scale), (int)(bounds.Height * scale));
         using var buffer = new MemoryStream(); resized.Save(buffer, System.Drawing.Imaging.ImageFormat.Jpeg); return buffer.ToArray();

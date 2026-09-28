@@ -9,6 +9,11 @@ internal sealed record DesktopPreferences
     public string Shortcut { get; init; } = "Ctrl + Space";
     public bool ShortcutStartsVoice { get; init; }
     public bool ReadVoiceAnswers { get; init; } = true;
+    public bool HoldToTalk { get; init; }
+    public bool CaptureOnVoice { get; init; } = true;
+    public bool AllowWebResearch { get; init; }
+    public bool AgentEnabled { get; init; }
+    public string BlockedApps { get; init; } = "keepass,1password,bitwarden,lastpass";
 
     private static string FilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Buddy", "desktop.json");
     internal static DesktopPreferences Load()
