@@ -110,6 +110,17 @@ Check(cancelledBeforeWrite && field.Writes == writes, "Cancellation during valid
 field.Transform = true; edit = new GuardedEdit(field, field.Value);
 Reject(() => edit.Apply("Replacement", now, default), "A host that transforms text cannot be reported as a successful replacement");
 InstallationTests.Run(Check);
+var activity = new CompanionState();
+activity.Set("guide", CompanionMood.Pointing); activity.Set("voice", CompanionMood.Listening); activity.Set("chat", CompanionMood.Idle);
+Check(activity.Current == CompanionMood.Listening, "An idle chat cannot erase the microphone's active companion state");
+activity.Set("voice", CompanionMood.Idle);
+Check(activity.Current == CompanionMood.Pointing, "Ending voice restores the still-active Guide state");
+activity.Set("guide", CompanionMood.Idle);
+Check(activity.Current == CompanionMood.Idle, "Companion returns to idle only after all activities finish");
+var spring = new CompanionSpring(); spring.Step(new(-500, 100), .033, true);
+for (int i = 0; i < 180; i++) spring.Step(new(-200, 500), .033, true);
+Check(Math.Abs(spring.Position.X + 200) + Math.Abs(spring.Position.Y - 500) < 1, "Companion spring converges across negative screen coordinates");
+Check(spring.Step(new(10, 20), .033, false) == new PixelPosition(10, 20), "Reduced motion places the companion immediately");
 Console.WriteLine($"{assertions} desktop logic assertions passed. Native Windows interaction is a separate acceptance check.");
 
 sealed class TestField : IVerifiedTextField

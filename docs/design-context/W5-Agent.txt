@@ -1,0 +1,60 @@
+Figma file JzvFxWvZqgP0d6fNYMgxHa, node 5:105. Extracted 2026-09-30.
+Reference only; native WPF adaptation is in apps/windows.
+
+const assetPathPrefix = "https://www.figma.com/api/mcp/asset/2e1dc455-8a5e-401f-a9f2-693cf60080d5";
+const imgEllipse = `${assetPathPrefix}/1cced.svg`;
+
+export default function W5AgentPlan() {
+  return (
+    <a className="bg-[#1e293b] block cursor-pointer relative size-full" data-node-id="5:105" data-name="W5 Agent plan">
+      <div className="absolute bg-[#dc2626] h-[40px] left-0 top-0 w-[1440px]" data-node-id="5:106" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[40px] not-italic text-[14px] text-left text-white top-[10px] whitespace-pre" data-node-id="5:107">{`Buddy is controlling  -  Esc to stop`}</p>
+      <div className="absolute bg-white h-[460px] left-[40px] overflow-clip rounded-[16px] top-[80px] w-[420px]" data-node-id="5:108" data-name="Frame">
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[20px] not-italic text-[#111827] text-[16px] text-left top-[16px] whitespace-pre" data-node-id="5:109">{`Plan  -  4 actions`}</p>
+        <div className="absolute bg-[#f8fafc] h-[72px] left-[20px] rounded-[12px] top-[56px] w-[380px]" data-node-id="5:110" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[36px] not-italic text-[#0f766e] text-[12px] text-left top-[68px] whitespace-pre" data-node-id="5:111">{`1  Read  -  low`}</p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[36px] not-italic text-[#111827] text-[14px] text-left top-[88px] whitespace-nowrap" data-node-id="5:112">
+          Invoice total in Excel
+        </p>
+        <div className="absolute bg-[#f8fafc] h-[72px] left-[20px] rounded-[12px] top-[140px] w-[380px]" data-node-id="5:113" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[36px] not-italic text-[#0f766e] text-[12px] text-left top-[152px] whitespace-pre" data-node-id="5:114">{`2  Click  -  low`}</p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[36px] not-italic text-[#111827] text-[14px] text-left top-[172px] whitespace-nowrap" data-node-id="5:115">
+          Export
+        </p>
+        <div className="absolute bg-[#f8fafc] h-[72px] left-[20px] rounded-[12px] top-[224px] w-[380px]" data-node-id="5:116" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[36px] not-italic text-[#0f766e] text-[12px] text-left top-[236px] whitespace-pre" data-node-id="5:117">{`3  Type  -  low`}</p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[36px] not-italic text-[#111827] text-[14px] text-left top-[256px] whitespace-nowrap" data-node-id="5:118">
+          Q3-summary.csv
+        </p>
+        <div className="absolute bg-[#fee2e2] h-[72px] left-[20px] rounded-[12px] top-[308px] w-[380px]" data-node-id="5:119" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[36px] not-italic text-[#dc2626] text-[12px] text-left top-[320px] whitespace-pre" data-node-id="5:120">{`4  Confirm  -  high`}</p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[36px] not-italic text-[#111827] text-[14px] text-left top-[340px] whitespace-nowrap" data-node-id="5:121">
+          Send in Outlook
+        </p>
+      </div>
+      <div className="absolute bg-[#20b8a6] h-[44px] left-[40px] rounded-[12px] top-[560px] w-[160px]" data-node-id="5:122" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[104px] not-italic text-[14px] text-left text-white top-[572px] whitespace-nowrap" data-node-id="5:123">
+        Go
+      </p>
+      <div className="absolute left-[1288px] size-[40px] top-[700px]" data-node-id="5:124" data-name="Ellipse">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgEllipse} />
+      </div>
+      <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Bold'] font-bold h-[16px] leading-[normal] left-[1308px] not-italic text-[10px] text-center text-white top-[712px] w-[40px]" data-node-id="5:125">
+        go
+      </p>
+      <div className="absolute bg-[#0b1220] h-[40px] left-0 top-[860px] w-[1440px]" data-node-id="5:126" data-name="Rectangle" />
+    </a>
+  );
+}
+
+SUPER CRITICAL: The generated React+Tailwind code MUST be converted to match the target project's technology stack and styling system.
+1. Analyze the target codebase to identify: technology stack, styling approach, component patterns, and design tokens
+2. Convert React syntax to the target framework/library
+3. Transform all Tailwind classes to the target styling system while preserving exact visual design
+4. Follow the project's existing patterns and conventions
+DO NOT install any Tailwind as a dependency unless the user instructs you to do so.
+
+
+Node ids have been added to the code as data attributes, e.g. `data-node-id="1:2"`.
+
+Images and SVGs will be stored as constants, e.g. const image = `${assetPathPrefix}/<asset file name>`, where assetPathPrefix is declared once at the top of the code and every asset URL interpolates it. These constants will be used in the code as the source for the image, ex: <img src={image} />. Image assets are stored on a remote server for 7 days and can be fetched using the provided URLs until they expire.

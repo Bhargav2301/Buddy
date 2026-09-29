@@ -21,7 +21,7 @@ namespace Buddy.Windows;
 
 public sealed partial class MainWindow : Window
 {
-    private static readonly SolidColorBrush Bg = Brush("#111820"), Panel = Brush("#1A242E"), Ink = Brush("#EBF3F7"), Muted = Brush("#9DB0BF"), Accent = Brush("#8EE4C5");
+    private static readonly SolidColorBrush Bg = BuddyTheme.Canvas, Panel = BuddyTheme.Surface, Ink = BuddyTheme.Ink, Muted = BuddyTheme.Muted, Accent = BuddyTheme.Deep;
     private BuddyHost? host;
     private readonly TextBlock status = Text("Starting Buddy…", 13, Muted), contextLabel = Text("", 12, Accent);
     private readonly TextBox input = new() { AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 76, MaxHeight = 180, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
@@ -42,9 +42,11 @@ public sealed partial class MainWindow : Window
     private bool busy, shuttingDown, refreshing;
     private DesktopPreferences desktop = DesktopPreferences.Load();
     private CursorCompanionWindow? companion;
+    private readonly CompanionState companionState = new();
     private QuickChatWindow? quick;
     private VoiceOverlayWindow? voiceOverlay;
     private DesktopAssistant? assistant;
+    private OnboardingWindow? onboarding;
     private PushToTalkHook? ptt;
     private ShortcutRegistration? shortcut;
     private bool voiceShortcutReady;
@@ -53,33 +55,33 @@ public sealed partial class MainWindow : Window
     private static TextBlock Text(string value, double size = 15, System.Windows.Media.Brush? color = null) => new() { Text = value, FontSize = size, Foreground = color ?? Ink, TextWrapping = TextWrapping.Wrap, Margin = new(0, 0, 0, 8) };
     private static Button Btn(string label, Action action, bool primary = false)
     {
-        var b = new Button { Content = label, Padding = new(14, 9, 14, 9), Margin = new(0, 0, 8, 8), Background = primary ? Accent : Panel, Foreground = primary ? Bg : Ink, BorderThickness = new(0), Cursor = System.Windows.Input.Cursors.Hand };
-        b.Click += (_, _) => action(); return b;
+        return BuddyTheme.Button(label, action, primary);
     }
     private static StackPanel Row(params UIElement[] children) { var row = new StackPanel { Orientation = Orientation.Horizontal }; foreach (var c in children) row.Children.Add(c); return row; }
-    private static void StyleBox(TextBox box) { box.Background = Panel; box.Foreground = Ink; box.CaretBrush = Accent; box.BorderBrush = Brush("#344553"); box.Padding = new(12); box.FontSize = 15; }
+    private static void StyleBox(TextBox box) { box.Background = Panel; box.Foreground = Ink; box.CaretBrush = Accent; box.BorderBrush = BuddyTheme.Line; box.Padding = new(12); box.FontSize = 14; }
 
     public MainWindow() : this(true) { }
     internal MainWindow(bool startService)
     {
-        Title = "Buddy — your local AI companion"; Width = 1160; Height = 820; MinWidth = 850; MinHeight = 620; Background = Bg; Foreground = Ink; FontFamily = new("Segoe UI"); WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        var layout = new Grid(); layout.ColumnDefinitions.Add(new() { Width = new(250) }); layout.ColumnDefinitions.Add(new());
+        BuddyTheme.Apply(desktop.Appearance, desktop.ReduceMotion);
+        Title = "Buddy — your local AI companion"; Width = 1160; Height = 820; MinWidth = 760; MinHeight = 560; Background = Bg; Foreground = Ink; FontFamily = BuddyTheme.Font; WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        var layout = new Grid { Background = Bg }; layout.ColumnDefinitions.Add(new() { Width = new(240) }); layout.ColumnDefinitions.Add(new());
         var side = new DockPanel { Background = Panel, Margin = new(0) }; Grid.SetColumn(side, 0); layout.Children.Add(side);
-        var brand = new StackPanel { Margin = new(24, 28, 16, 8) }; brand.Children.Add(Text("◉  Buddy", 28)); brand.Children.Add(Text("A little clarity. Any time.", 12, Muted)); brand.Children.Add(Btn("＋ New conversation", () => _ = NewChat(), true)); brand.Children.Add(Btn("Settings", OpenSettings)); DockPanel.SetDock(brand, Dock.Top); side.Children.Add(brand);
-        var nav = new StackPanel { Margin = new(18, 12, 12, 16) };
-        nav.Children.Add(Btn("Saved prompts", () => _ = Notes(false))); nav.Children.Add(Btn("What Buddy remembers", () => _ = Notes(true))); nav.Children.Add(Btn("Pair Android phone", Pair)); nav.Children.Add(Btn("PC setup & models", () => _ = Setup())); nav.Children.Add(Btn("Export conversation", () => _ = Export())); nav.Children.Add(Btn("Delete conversation", () => _ = Delete())); nav.Children.Add(Btn("Quit Buddy", () => _ = Quit()));
-        nav.Children.Insert(0, Btn("Open quick chat", () => OpenQuick(false), true));
-        nav.Children.Insert(1, Btn("Cursor & shortcuts", CursorSettings));
-        nav.Children.Insert(2, Btn("Assistant settings", AssistantSettings));
-        nav.Children.Insert(3, Btn("Guide this screen", () => StartWorkflow("guide", input.Text)));
-        nav.Children.Insert(4, Btn("Agent task", () => StartWorkflow("agent", input.Text)));
-        nav.Children.Insert(5, Btn("Resume walkthrough", () => { if (assistant is not null) _ = assistant.ResumeLatest(); }));
-        nav.Children.Insert(6, Btn("Try pointing tutorial", ShowPractice));
-        var navigation = new ScrollViewer { Content = nav, MaxHeight = 380, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
-        DockPanel.SetDock(navigation, Dock.Bottom); side.Children.Add(navigation); side.Children.Add(conversations);
-        var main = new Grid { Margin = new(36, 28, 36, 24) }; Grid.SetColumn(main, 1); layout.Children.Add(main);
+        var brand = new StackPanel { Margin = new(24, 24, 16, 24) }; var brandText = Text("Buddy", 18, Accent); brandText.FontWeight = FontWeights.Bold; brand.Children.Add(brandText); DockPanel.SetDock(brand, Dock.Top); side.Children.Add(brand);
+        var footer = new StackPanel { Margin = new(24, 12, 16, 16) };
+        footer.Children.Add(Btn("Talk", () => OpenQuick(false))); footer.Children.Add(Btn("Voice", () => OpenQuick(true))); footer.Children.Add(Btn("Quit Buddy", () => _ = Quit()));
+        DockPanel.SetDock(footer, Dock.Bottom); side.Children.Add(footer);
+        var nav = new StackPanel { Margin = new(12, 0, 12, 0) };
+        foreach (var section in HomeSections) {
+            var button = Btn(section, () => NavigateHome(section)); button.HorizontalContentAlignment = HorizontalAlignment.Left;
+            button.Background = Brushes.Transparent; button.BorderThickness = new(0); button.Margin = new(0, 0, 0, 4);
+            navigationButtons[section] = button; nav.Children.Add(button);
+        }
+        side.Children.Add(new ScrollViewer { Content = nav, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
+        homeBody.Margin = new(40, 40, 40, 24); Grid.SetColumn(homeBody, 1); layout.Children.Add(homeBody);
+        var main = new Grid(); chatView = main;
         main.RowDefinitions.Add(new() { Height = GridLength.Auto }); main.RowDefinitions.Add(new()); main.RowDefinitions.Add(new() { Height = GridLength.Auto });
-        var header = new StackPanel(); header.Children.Add(Text("YOUR EVERYDAY THINKING PARTNER", 11, Accent)); header.Children.Add(Text("What’s on your mind?", 30)); header.Children.Add(status); main.Children.Add(header);
+        var header = new StackPanel(); header.Children.Add(Btn("Back to conversations", () => NavigateHome("Conversations"))); header.Children.Add(Text("Talk with Buddy", 28)); header.Children.Add(status); main.Children.Add(header);
         scroller = new ScrollViewer { Content = messages, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Margin = new(0, 18, 0, 20) }; Grid.SetRow(scroller, 1); main.Children.Add(scroller);
         var composer = new StackPanel(); Grid.SetRow(composer, 2); main.Children.Add(composer); composer.Children.Add(contextLabel);
         StyleBox(input); composer.Children.Add(input);
@@ -87,7 +89,8 @@ public sealed partial class MainWindow : Window
         composer.Children.Add(Row(mode, Btn("Dictate", Dictate), Btn("Refine", () => _ = Refine()), speak, stop, send));
         composer.Children.Add(Row(Btn("Read screen text", () => _ = ReadContext()), Btn("Capture window", () => _ = Capture()), Btn("Clear context", ClearContext)));
         composer.Children.Add(shortcutHint);
-        Content = layout;
+        Content = layout; NavigateHome("Conversations");
+        SizeChanged += (_, _) => homeBody.Margin = new(ActualWidth < 1000 ? 24 : 40, 32, ActualWidth < 1000 ? 24 : 40, 24);
         input.PreviewKeyDown += (_, e) => { if (e.Key == System.Windows.Input.Key.Enter && System.Windows.Input.Keyboard.Modifiers.HasFlag(System.Windows.Input.ModifierKeys.Control)) { e.Handled = true; _ = Send(); } };
         mode.SelectionChanged += (_, _) => { StopMainDictation(); tts?.SpeakAsyncCancelAll(); };
         conversations.SelectionChanged += (_, _) => { if (!refreshing && !busy && conversations.SelectedItem is Conversation c) _ = Select(c.Id); };
@@ -99,6 +102,7 @@ public sealed partial class MainWindow : Window
             if (!shortcut.TrySet(preferred))
                 foreach (var choice in ShortcutChoice.Choices.Where(c => c.Modifiers != 8)) if (shortcut.TrySet(choice)) break;
             voiceShortcutReady = Native.RegisterHotKey(hwnd, 3, 0x4006, 0x20);
+            refineShortcutReady = Native.RegisterHotKey(hwnd, 5, 0x4003, 0x52);
             Native.RegisterHotKey(hwnd, 2, 0x4003, 0x1B);
             UpdateShortcutHint();
         };
@@ -118,20 +122,29 @@ public sealed partial class MainWindow : Window
             menu.Items.Add("Voice", null, (_, _) => Dispatcher.Invoke(() => OpenQuick(true)));
             menu.Items.Add("Open Buddy Home", null, (_, _) => Dispatcher.Invoke(Summon));
             menu.Items.Add("Settings", null, (_, _) => Dispatcher.Invoke(OpenSettings));
+            menu.Items.Add("Refine focused prompt", null, (_, _) => Dispatcher.Invoke(() => _ = RefineFocusedField()));
+            var companionMenu = new System.Windows.Forms.ToolStripMenuItem("Companion");
+            companionMenu.DropDownItems.Add("Settings", null, (_, _) => Dispatcher.Invoke(OpenSettings));
+            companionMenu.DropDownItems.Add("Dock", null, (_, _) => Dispatcher.Invoke(() => companion?.SetDocked(true)));
+            companionMenu.DropDownItems.Add("Follow pointer", null, (_, _) => Dispatcher.Invoke(() => companion?.SetDocked(false)));
+            companionMenu.DropDownItems.Add("Snooze 15 minutes", null, (_, _) => Dispatcher.Invoke(() => companion?.Snooze()));
+            menu.Items.Add(companionMenu);
             menu.Items.Add("Cursor & shortcuts", null, (_, _) => Dispatcher.Invoke(() => { Summon(); CursorSettings(); }));
             menu.Items.Add("Quit", null, (_, _) => Dispatcher.Invoke(() => _ = Quit())); tray.ContextMenuStrip = menu;
             host.Service.WebEnabled = desktop.AllowWebResearch; host.Service.AgentEnabled = desktop.AgentEnabled;
-            assistant = new DesktopAssistant(() => host?.Service, () => desktop, () => previousWindow, mood => companion?.SetMood(mood));
-            voiceOverlay = new VoiceOverlayWindow(() => host?.Service, EnsureConversation, () => desktop, mood => companion?.SetMood(mood), () => previousWindow,
+            companionState.Changed += mood => companion?.SetMood(mood);
+            assistant = new DesktopAssistant(() => host?.Service, () => desktop, () => previousWindow, mood => companionState.Set("assistant", mood));
+            voiceOverlay = new VoiceOverlayWindow(() => host?.Service, EnsureConversation, () => desktop, mood => companionState.Set("voice", mood), () => previousWindow,
                 assistant.Perception, StartWorkflow, () => OpenQuick(false));
             quick = new QuickChatWindow(() => host?.Service, EnsureConversation, () => desktop,
-                mood => companion?.SetMood(mood), Summon, OpenSettings, () => OpenQuick(true), StartWorkflow,
+                mood => companionState.Set("talk", mood), Summon, OpenSettings, () => OpenQuick(true), StartWorkflow,
                 async ct => { var snapshot = await assistant.Perception.Capture(previousWindow, ct); await host.Service.Audit("capture", snapshot.Context.App, "UIA text; no screenshot stored"); return snapshot.PromptText; });
             companion = new CursorCompanionWindow(() => quick?.IsVisible == true && quick.IsMouseOver);
             companion.SetEnabled(desktop.ShowCompanion);
             ConfigurePtt();
             foreground.Start(); refresh.Start(); await RefreshList();
-            if (conversations.Items.Count > 0) await Select(((Conversation)conversations.Items[0]).Id); else await NewChat();
+            if (conversations.Items.Count > 0) { currentId = ((Conversation)conversations.Items[0]).Id; await ShowHistory(); }
+            NavigateHome(homeSection);
             var s = await host.Service.Store.Read(s => s); var modelStatus = await host.Service.Engine.Status(s.Model, s.VisionModel);
             var availableDefault = OllamaEngine.AvailableDefault(s.Model, modelStatus.Installed);
             if (availableDefault != s.Model) {
@@ -139,6 +152,7 @@ public sealed partial class MainWindow : Window
                 modelStatus = await host.Service.Engine.Status(availableDefault, s.VisionModel);
             }
             status.Text = modelStatus.Message;
+            if (!desktop.OnboardingCompleted) ShowOnboarding();
             if (modelStatus.Ready && desktop.StartInCompanionMode && !keepHomeOpen) Hide();
         }
         catch (Exception ex) { Diagnostics.Write("Service startup failed", ex); status.Text = "Could not start Buddy: " + ex.Message; MessageBox.Show(status.Text + "\n\nError log: " + Diagnostics.LogPath, "Buddy startup"); }
@@ -150,11 +164,12 @@ public sealed partial class MainWindow : Window
             int id = w.ToInt32();
             if (id == shortcut?.ActiveId) { OpenQuick(desktop.ShortcutStartsVoice); handled = true; }
             else if (id == 3) { OpenQuick(true); handled = true; }
+            else if (id == 5) { _ = RefineFocusedField(); handled = true; }
             else if (id == 2) { Cancel(); handled = true; }
         }
         return IntPtr.Zero;
     }
-    private void Summon() { keepHomeOpen = true; quick?.Dismiss(); voiceOverlay?.Dismiss(); Show(); WindowState = WindowState.Normal; Activate(); input.Focus(); if (host is not null) { _ = RefreshList(); _ = ShowHistory(); } }
+    private void Summon() { keepHomeOpen = true; quick?.Dismiss(); voiceOverlay?.Dismiss(); Show(); WindowState = WindowState.Normal; Activate(); if (homeBody.Content == chatView) input.Focus(); if (host is not null) { _ = RefreshList(); _ = ShowHistory(); } }
     private async Task<string?> EnsureConversation() { if (currentId is null) await NewChat(); return currentId; }
     private void OpenQuick(bool voice)
     {
@@ -170,46 +185,18 @@ public sealed partial class MainWindow : Window
     {
         shortcutHint.Text = (ptt is not null ? desktop.Shortcut + " tap for chat / hold to talk" : shortcut?.Active?.Label ?? "Main shortcut unavailable — use tray") +
             (desktop.ShortcutStartsVoice ? " for voice" : " for quick chat") +
-            (voiceShortcutReady ? " · Ctrl+Shift+Space for voice" : " · Voice shortcut unavailable — use tray") + " · Ctrl+Alt+Esc stops";
+            (voiceShortcutReady ? " · Ctrl+Shift+Space for voice" : " · Voice shortcut unavailable — use tray") +
+            (refineShortcutReady ? " · Ctrl+Alt+R refines" : " · Refine shortcut unavailable — use tray") + " · Ctrl+Alt+Esc stops";
     }
-    private void CursorSettings()
-    {
-        var p = new StackPanel(); p.Children.Add(Text("Buddy, beside your cursor", 25));
-        p.Children.Add(Text("A small companion follows your pointer. Use a shortcut to open chat or speak.", 14, Muted));
-        var enabled = new CheckBox { Content = "Show the cursor companion", IsChecked = desktop.ShowCompanion, Foreground = Ink, Margin = new(0, 12, 0, 12) };
-        var start = new CheckBox { Content = "Hide Home for background launches when the AI model is ready", IsChecked = desktop.StartInCompanionMode, Foreground = Ink, Margin = new(0, 0, 0, 14) };
-        p.Children.Add(enabled); p.Children.Add(start); p.Children.Add(Text("Main shortcut", 14));
-        var keys = new ComboBox { ItemsSource = ShortcutChoice.Choices, SelectedItem = ShortcutChoice.Choices.FirstOrDefault(c => c.Label == desktop.Shortcut) ?? ShortcutChoice.Choices[0], Margin = new(0, 0, 0, 14) }; p.Children.Add(keys);
-        p.Children.Add(Text("Windows + Space normally switches keyboard layouts. Buddy can use it only if Windows makes it available. A conflicting selection leaves your working shortcut active.", 12, Muted));
-        p.Children.Add(Text("When I press the main shortcut", 14));
-        var action = new ComboBox { ItemsSource = new[] { "Open chat bar", "Start voice" }, SelectedIndex = desktop.ShortcutStartsVoice ? 1 : 0, Margin = new(0, 0, 0, 14) }; p.Children.Add(action);
-        var read = new CheckBox { Content = "Read voice answers aloud", IsChecked = desktop.ReadVoiceAnswers, Foreground = Ink, Margin = new(0, 0, 0, 14) }; p.Children.Add(read);
-        var hold = new CheckBox { Content = "Enable hold-to-talk (uses only the selected shortcut)", IsChecked = desktop.HoldToTalk, Foreground = Ink, Margin = new(0,0,0,14) }; p.Children.Add(hold);
-        var screen = new CheckBox { Content = "Include active-window context when talking", IsChecked = desktop.CaptureOnVoice, Foreground = Ink, Margin = new(0,0,0,14) }; p.Children.Add(screen);
-        p.Children.Add(Text("Voice opens a separate speech bubble. Hold at least 250 ms to talk; release to send. Tap opens typed chat. Ctrl+Shift+Space starts one utterance. Esc or Ctrl+Alt+Esc stops. Screen context stays on this PC.", 12, Muted));
-        var notice = Text("", 12, Accent); p.Children.Add(notice);
-        p.Children.Add(Btn("Save preferences", () =>
-        {
-            if (keys.SelectedItem is not ShortcutChoice choice || shortcut is null) return;
-            var old = shortcut.Active;
-            if (!shortcut.TrySet(choice)) { notice.Text = "That shortcut is already in use or reserved by Windows. Your current shortcut is unchanged."; return; }
-            try
-            {
-                var next = desktop with { ShowCompanion = enabled.IsChecked == true, StartInCompanionMode = start.IsChecked == true, Shortcut = choice.Label, ShortcutStartsVoice = action.SelectedIndex == 1, ReadVoiceAnswers = read.IsChecked == true, HoldToTalk = hold.IsChecked == true, CaptureOnVoice = screen.IsChecked == true };
-                next.Save(); desktop = next; companion?.SetEnabled(desktop.ShowCompanion); ConfigurePtt(); UpdateShortcutHint(); notice.Text = "Saved. " + shortcutHint.Text;
-            }
-            catch (Exception ex) { if (old is not null) shortcut.TrySet(old); UpdateShortcutHint(); notice.Text = "Could not save: " + ex.Message; }
-        }, true));
-        Dialog("Buddy · Cursor & shortcuts", p, 620, 760);
-    }
+    private void CursorSettings() => OpenSettingsSection("Shortcuts");
     private async Task RefreshList()
     {
         if (host is null) return; refreshing = true;
         try { conversations.ItemsSource = await host.Service.Store.Read(s => s.Conversations.OrderByDescending(c => c.UpdatedAt).Select(c => c with { Messages = [] }).ToList()); conversations.SelectedItem = conversations.Items.Cast<Conversation>().FirstOrDefault(c => c.Id == currentId); }
         finally { refreshing = false; }
     }
-    private async Task NewChat() { if (host is null || busy) return; currentId = (await host.Service.CreateConversation(null)).Id; ClearContext(); await RefreshList(); await ShowHistory(); input.Focus(); }
-    private async Task Select(string id) { if (busy) return; currentId = id; ClearContext(); await ShowHistory(); }
+    private async Task NewChat() { if (host is null || busy) return; currentId = (await host.Service.CreateConversation(null)).Id; ClearContext(); await RefreshList(); await ShowHistory(); ShowChat(); }
+    private async Task Select(string id) { if (busy) return; currentId = id; ClearContext(); await ShowHistory(); ShowChat(); }
     private async Task ShowHistory()
     {
         if (host is null) return; var c = await host.Service.Store.Read(s => s.Conversations.FirstOrDefault(c => c.Id == currentId)); messages.Children.Clear();
@@ -249,7 +236,7 @@ public sealed partial class MainWindow : Window
         catch (Exception ex) { status.Text = ex.Message; input.Text = draft; answer.Text += "\n[Answer failed — not saved]"; }
         finally { request.Dispose(); request = null; SetBusy(false); await RefreshList(); }
     }
-    private void Cancel() { request?.Cancel(); host?.Service.StopAll(); StopMainDictation(); tts?.SpeakAsyncCancelAll(); quick?.Cancel(); voiceOverlay?.Cancel(); assistant?.Cancel(); }
+    private void Cancel() { request?.Cancel(); fieldCapture?.Cancel(); refineWindow?.Cancel(); onboarding?.Cancel(); host?.Service.StopAll(); StopMainDictation(); tts?.SpeakAsyncCancelAll(); quick?.Cancel(); voiceOverlay?.Cancel(); assistant?.Cancel(); }
     private void StopMainDictation()
     {
         var engine = recognizer; recognizer = null;
@@ -284,29 +271,6 @@ public sealed partial class MainWindow : Window
     {
         var w = new Window { Title = title, Content = new ScrollViewer { Content = content, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Margin = new(24) }, Width = Math.Min(width, SystemParameters.WorkArea.Width), Height = Math.Min(height, SystemParameters.WorkArea.Height), Background = Bg, Foreground = Ink, Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner };
         w.Show(); return w;
-    }
-    private async Task Refine()
-    {
-        if (host is null || busy || string.IsNullOrWhiteSpace(input.Text)) return; var original = input.Text; request = new(); SetBusy(true); status.Text = "Refining with local AI…";
-        try
-        {
-            var result = await host.Service.RefineDetailed(new(original), request.Token); var p = new StackPanel(); p.Children.Add(Text("Review your refined prompt · on this PC", 23));
-            var notice = Text(result.Message, 13, Muted); p.Children.Add(notice);
-            var editor = new TextBox { Text = result.RefinedPrompt, IsReadOnly = true, AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 260 }; StyleBox(editor); p.Children.Add(editor); Window? w = null;
-            DateTimeOffset? applied = null;
-            var apply = Btn("Apply to draft", () => {
-                if (input.Text != original || applied is not null) { notice.Text = "The draft changed. Copy the rewrite instead."; return; }
-                input.Text = result.RefinedPrompt; applied = DateTimeOffset.UtcNow; notice.Text = "Applied without sending. Undo is available for 30 seconds.";
-            }, true); apply.IsEnabled = result.Accepted; p.Children.Add(apply);
-            p.Children.Add(Btn("Undo", () => {
-                if (applied is null || DateTimeOffset.UtcNow - applied > TimeSpan.FromSeconds(30) || input.Text != result.RefinedPrompt) { notice.Text = "Undo unavailable: the field changed or 30 seconds elapsed."; return; }
-                input.Text = original; applied = null; notice.Text = "Exact original restored.";
-            }));
-            p.Children.Add(Btn("Copy", () => System.Windows.Clipboard.SetText(editor.Text)));
-            p.Children.Add(Btn("Close", () => w?.Close())); w = Dialog("Buddy · Refine", p);
-        }
-        catch (Exception ex) { status.Text = ex is OperationCanceledException ? "Refinement stopped." : ex.Message; }
-        finally { request?.Dispose(); request = null; SetBusy(false); }
     }
     private void ClearContext() { context = null; if (image is not null) Array.Clear(image); image = null; contextLabel.Text = ""; }
     private async Task ReadContext()
@@ -346,7 +310,7 @@ public sealed partial class MainWindow : Window
         catch (Exception ex) { status.Text = ex.Message; }
     }
     private static BitmapImage Bitmap(byte[] bytes) { using var stream = new MemoryStream(bytes); var b = new BitmapImage(); b.BeginInit(); b.CacheOption = BitmapCacheOption.OnLoad; b.StreamSource = stream; b.EndInit(); b.Freeze(); return b; }
-    private async Task Setup()
+    private async Task Setup(bool embedded = false, int revision = 0)
     {
         if (host is null) return; var p = new StackPanel(); p.Children.Add(Text("Make Buddy yours", 27)); p.Children.Add(Text("1. Install or start Ollama\n2. Download the chat model\n3. Ask Buddy a question\n4. Pair your phone on the same Wi-Fi", 15, Muted));
         var info = Text("Checking…", 14, Accent); p.Children.Add(info);
@@ -371,7 +335,9 @@ public sealed partial class MainWindow : Window
         p.Children.Add(Btn("Pause download", () => download?.Cancel()));
         async Task Check() { var st = await host.Service.Store.Read(st => st); var result = await host.Service.Engine.Status(st.Model, st.VisionModel); info.Text = result.Message + "\nSelected: " + st.Model + "\nInstalled: " + string.Join(", ", result.Installed); }
         p.Children.Add(Btn("Check connection", () => _ = Check())); p.Children.Add(Text("Closing Buddy to the tray keeps phone access available. Quit stops it. No cloud API key is needed.", 13, Muted));
-        var w = Dialog("Buddy · PC setup", p); w.Closed += (_, _) => download?.Cancel(); await Check();
+        if (embedded) { if (homeSection != "Settings" || settingsSection != "AI" || settingsRevision != revision) return; settingsBody.Content = p; p.Unloaded += (_, _) => download?.Cancel(); }
+        else { var w = Dialog("Buddy · PC setup", p); w.Closed += (_, _) => download?.Cancel(); }
+        await Check();
     }
     private void Pair()
     {
@@ -417,6 +383,6 @@ public sealed partial class MainWindow : Window
     }
     internal async Task Quit()
     {
-        if (shuttingDown) return; shuttingDown = true; Cancel(); ptt?.Dispose(); voiceOverlay?.Dispose(); assistant?.Dispose(); quick?.Dispose(); companion?.Dispose(); refresh.Stop(); foreground.Stop(); tray.Dispose(); tts?.Dispose(); shortcut?.Dispose(); Native.UnregisterHotKey(hwnd, 2); Native.UnregisterHotKey(hwnd, 3); if (host is not null) await host.DisposeAsync(); System.Windows.Application.Current.Shutdown();
+        if (shuttingDown) return; shuttingDown = true; Cancel(); refineWindow?.Close(); ptt?.Dispose(); voiceOverlay?.Dispose(); assistant?.Dispose(); quick?.Dispose(); companion?.Dispose(); refresh.Stop(); foreground.Stop(); tray.Dispose(); tts?.Dispose(); shortcut?.Dispose(); Native.UnregisterHotKey(hwnd, 2); Native.UnregisterHotKey(hwnd, 3); Native.UnregisterHotKey(hwnd, 5); if (host is not null) await host.DisposeAsync(); System.Windows.Application.Current.Shutdown();
     }
 }

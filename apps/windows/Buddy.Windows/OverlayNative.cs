@@ -35,14 +35,28 @@ internal static class OverlayNative
         Native.SetWindowDisplayAffinity(window, 0x11);
     }
     internal static void Place(Window window, Point point)
+        => Move(window, Position(window, point));
+    internal static PixelPosition Position(Window window, Point point)
     {
         var handle = new WindowInteropHelper(window).EnsureHandle();
         double scale = Scale(handle);
         double width = window.Width * scale, height = window.Height * scale;
         if (GetWindowRect(handle, out var rect) && rect.Right > rect.Left && rect.Bottom > rect.Top)
         { width = rect.Right - rect.Left; height = rect.Bottom - rect.Top; }
-        var position = OverlayPlacement.NearPointer(point.X, point.Y, width, height, WorkArea(point), scale);
+        return OverlayPlacement.NearPointer(point.X, point.Y, width, height, WorkArea(point), scale);
+    }
+    internal static void Move(Window window, PixelPosition position)
+    {
+        var handle = new WindowInteropHelper(window).EnsureHandle();
         SetWindowPos(handle, new IntPtr(-1), (int)Math.Round(position.X), (int)Math.Round(position.Y), 0, 0, 0x0010 | 0x0001);
+    }
+    internal static bool IsFullscreenForeground()
+    {
+        var window = Native.GetForegroundWindow();
+        if (window == IntPtr.Zero || Native.IsOwnWindow(window) || !GetWindowRect(window, out var rect)) return false;
+        var info = new MonitorInfo { Size = Marshal.SizeOf<MonitorInfo>() };
+        if (!GetMonitorInfoW(MonitorFromPoint(new Point { X = (rect.Left + rect.Right) / 2, Y = (rect.Top + rect.Bottom) / 2 }, 2), ref info)) return false;
+        return rect.Left <= info.Monitor.Left && rect.Top <= info.Monitor.Top && rect.Right >= info.Monitor.Right && rect.Bottom >= info.Monitor.Bottom;
     }
     internal static void SetBounds(Window window, int x, int y, int width, int height)
     {

@@ -12,6 +12,11 @@ internal static class PackageVerifier
             "PresentationNative_cor3.dll", "wpfgfx_cor3.dll", "D3DCompiler_47_cor3.dll", "vcruntime140_cor3.dll", "clrjit.dll",
             "Tesseract.dll", "x64/tesseract50.dll", "x64/leptonica-1.82.0.dll", "tessdata/eng.traineddata"];
         foreach (var name in required) RequireFile(folder, name);
+        foreach (var asset in new[] { "1cced", "2f2b4", "5d71e", "785ba", "91dcc", "9a20f", "a9b00", "ab83a", "fc18a" })
+        {
+            var name = "Assets/Figma/" + asset + ".svg"; RequireFile(folder, name);
+            if (new FileInfo(Path.Combine(folder, name)).Length == 0) throw new InvalidDataException("Empty Buddy design asset: " + name);
+        }
         foreach (var name in new[] { "Buddy.exe", "hostfxr.dll", "hostpolicy.dll", "coreclr.dll", "PresentationNative_cor3.dll", "wpfgfx_cor3.dll", "x64/tesseract50.dll", "x64/leptonica-1.82.0.dll" })
         {
             using var stream = File.OpenRead(Path.Combine(folder, name));

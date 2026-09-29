@@ -1,0 +1,241 @@
+Figma file JzvFxWvZqgP0d6fNYMgxHa, node 2:24. Extracted 2026-09-30.
+Reference only; native WPF adaptation is in apps/windows.
+
+const assetPathPrefix = "https://www.figma.com/api/mcp/asset/f7c1dc90-5af6-43a1-a915-85542b322fcd";
+const imgEllipse = `${assetPathPrefix}/9a20f.svg`;
+const imgEllipse1 = `${assetPathPrefix}/91dcc.svg`;
+const imgEllipse2 = `${assetPathPrefix}/ab83a.svg`;
+const imgEllipse3 = `${assetPathPrefix}/785ba.svg`;
+
+type CompanionFaceProps = {
+  className?: string;
+  state?: "Idle" | "Listening" | "Looking" | "Thinking" | "Speaking" | "Pointing" | "Unsure" | "Error" | "Agent" | "Sleeping";
+};
+
+function CompanionFace({ className, state = "Idle" }: CompanionFaceProps) {
+  const isAgent = state === "Agent";
+  const isError = state === "Error";
+  const isIdleOrLookingOrThinkingOrSpeakingOrPointingOrUnsureOrErrorOr = ["Idle", "Looking", "Thinking", "Speaking", "Pointing", "Unsure", "Error", "Agent", "Sleeping"].includes(state);
+  const isListening = state === "Listening";
+  const isLooking = state === "Looking";
+  const isPointing = state === "Pointing";
+  const isSleeping = state === "Sleeping";
+  const isSpeaking = state === "Speaking";
+  const isThinking = state === "Thinking";
+  const isUnsure = state === "Unsure";
+  return (
+    <div className={className || "h-[110px] relative w-[120px]"} id={isSleeping ? "node-2_141" : isAgent ? "node-2_137" : isError ? "node-2_133" : isUnsure ? "node-2_129" : isPointing ? "node-2_125" : isSpeaking ? "node-2_121" : isThinking ? "node-2_117" : isLooking ? "node-2_113" : isListening ? "node-2_108" : "node-2_104"}>
+      <div className={`absolute ${isListening ? "left-[24px] size-[72px] top-0" : "left-[32px] size-[56px] top-[8px]"}`} id={isSleeping ? "node-2_142" : isAgent ? "node-2_138" : isError ? "node-2_134" : isUnsure ? "node-2_130" : isPointing ? "node-2_126" : isSpeaking ? "node-2_122" : isThinking ? "node-2_118" : isLooking ? "node-2_114" : isListening ? "node-2_110" : "node-2_105"} data-name="Ellipse">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={isSleeping ? imgEllipse3 : isError ? imgEllipse2 : isListening ? imgEllipse1 : imgEllipse} />
+      </div>
+      {isIdleOrLookingOrThinkingOrSpeakingOrPointingOrUnsureOrErrorOr && (
+        <>
+          <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[normal] left-[60px] not-italic text-[12px] text-center text-white top-[26px] w-[56px]" id={isSleeping ? "node-2_143" : isAgent ? "node-2_139" : isError ? "node-2_135" : isUnsure ? "node-2_131" : isPointing ? "node-2_127" : isSpeaking ? "node-2_123" : isThinking ? "node-2_119" : isLooking ? "node-2_115" : "node-2_106"}>
+            {isSleeping ? "- ω -" : isAgent ? "fight" : isError ? "(¬_¬)" : isUnsure ? "¯\\_(tsu)_/¯" : isPointing ? "^ ω ^" : isSpeaking ? "^ ▽ ^" : isThinking ? "- _ -" : isLooking ? "◉ _ ◉" : "^ ‿ ^"}
+          </p>
+          <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[60px] not-italic text-[#111827] text-[11px] text-center top-[72px] w-[104px]" id={isSleeping ? "node-2_144" : isAgent ? "node-2_140" : isError ? "node-2_136" : isUnsure ? "node-2_132" : isPointing ? "node-2_128" : isSpeaking ? "node-2_124" : isThinking ? "node-2_120" : isLooking ? "node-2_116" : "node-2_107"}>
+            {isSleeping ? "Sleeping" : isAgent ? "Agent" : isError ? "Error" : isUnsure ? "Unsure" : isPointing ? "Pointing" : isSpeaking ? "Speaking" : isThinking ? "Thinking" : isLooking ? "Looking" : "Idle"}
+          </p>
+        </>
+      )}
+      {isListening && (
+        <>
+          <div className="absolute left-[32px] size-[56px] top-[8px]" data-node-id="2:109" data-name="Ellipse">
+            <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgEllipse} />
+          </div>
+          <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[normal] left-[60px] not-italic text-[12px] text-center text-white top-[26px] w-[56px]" data-node-id="2:111">
+            • ᴗ •
+          </p>
+          <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[60px] not-italic text-[#111827] text-[11px] text-center top-[72px] w-[104px]" data-node-id="2:112">
+            Listening
+          </p>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default function FoundationsBoard() {
+  return (
+    <div className="bg-[#f8fafc] relative size-full" data-node-id="2:24" data-name="Foundations board">
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[normal] left-[48px] not-italic text-[#0f766e] text-[32px] top-[40px] w-[900px]" data-node-id="2:25">
+        Buddy Design System
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[48px] not-italic text-[#4b5563] text-[14px] top-[84px] w-[1000px] whitespace-pre-wrap" data-node-id="2:26">{`v2.0  ·  Windows + Android  ·  Tokens locked to the UI/UX Design Specification`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[48px] not-italic text-[#111827] text-[20px] top-[140px] w-[500px]" data-node-id="2:27">
+        Color — brand + semantic
+      </p>
+      <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[128px] left-[48px] overflow-clip rounded-[12px] top-[184px] w-[200px]" data-node-id="2:28" data-name="Swatch/Accent">
+        <div className="absolute bg-[#20b8a6] h-[52px] left-[11px] rounded-[8px] top-[11px] w-[176px]" data-node-id="2:29" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[11px] not-italic text-[#111827] text-[13px] top-[71px] w-[176px]" data-node-id="2:30">
+          Accent
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[11px] not-italic text-[#4b5563] text-[10px] top-[91px] w-[176px]" data-node-id="2:31">
+          #20B8A6 companion / ink / rings
+        </p>
+      </div>
+      <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[128px] left-[268px] overflow-clip rounded-[12px] top-[184px] w-[200px]" data-node-id="2:32" data-name="Swatch/Accent Deep">
+        <div className="absolute bg-[#0f766e] h-[52px] left-[11px] rounded-[8px] top-[11px] w-[176px]" data-node-id="2:33" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[11px] not-italic text-[#111827] text-[13px] top-[71px] w-[176px]" data-node-id="2:34">
+          Accent Deep
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[11px] not-italic text-[#4b5563] text-[10px] top-[91px] w-[176px]" data-node-id="2:35">
+          #0F766E headings
+        </p>
+      </div>
+      <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[128px] left-[488px] overflow-clip rounded-[12px] top-[184px] w-[200px]" data-node-id="2:36" data-name="Swatch/Accent Soft">
+        <div className="absolute bg-[#ccfbf1] h-[52px] left-[11px] rounded-[8px] top-[11px] w-[176px]" data-node-id="2:37" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[11px] not-italic text-[#111827] text-[13px] top-[71px] w-[176px]" data-node-id="2:38">
+          Accent Soft
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[11px] not-italic text-[#4b5563] text-[10px] top-[91px] w-[176px]" data-node-id="2:39">
+          #CCFBF1 chips + pills
+        </p>
+      </div>
+      <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[128px] left-[708px] overflow-clip rounded-[12px] top-[184px] w-[200px]" data-node-id="2:40" data-name="Swatch/Ink">
+        <div className="absolute bg-[#111827] h-[52px] left-[11px] rounded-[8px] top-[11px] w-[176px]" data-node-id="2:41" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[11px] not-italic text-[#111827] text-[13px] top-[71px] w-[176px]" data-node-id="2:42">
+          Ink
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[11px] not-italic text-[#4b5563] text-[10px] top-[91px] w-[176px]" data-node-id="2:43">
+          #111827 primary text
+        </p>
+      </div>
+      <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[128px] left-[928px] overflow-clip rounded-[12px] top-[184px] w-[200px]" data-node-id="2:44" data-name="Swatch/Muted">
+        <div className="absolute bg-[#4b5563] h-[52px] left-[11px] rounded-[8px] top-[11px] w-[176px]" data-node-id="2:45" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[11px] not-italic text-[#111827] text-[13px] top-[71px] w-[176px]" data-node-id="2:46">
+          Muted
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[11px] not-italic text-[#4b5563] text-[10px] top-[91px] w-[176px]" data-node-id="2:47">
+          #4B5563 secondary
+        </p>
+      </div>
+      <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[128px] left-[1148px] overflow-clip rounded-[12px] top-[184px] w-[200px]" data-node-id="2:48" data-name="Swatch/Canvas">
+        <div className="absolute bg-[#f8fafc] h-[52px] left-[11px] rounded-[8px] top-[11px] w-[176px]" data-node-id="2:49" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[11px] not-italic text-[#111827] text-[13px] top-[71px] w-[176px]" data-node-id="2:50">
+          Canvas
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[11px] not-italic text-[#4b5563] text-[10px] top-[91px] w-[176px]" data-node-id="2:51">
+          #F8FAFC page ground
+        </p>
+      </div>
+      <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[128px] left-[48px] overflow-clip rounded-[12px] top-[332px] w-[200px]" data-node-id="2:52" data-name="Swatch/Raised">
+        <div className="absolute bg-white h-[52px] left-[11px] rounded-[8px] top-[11px] w-[176px]" data-node-id="2:53" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[11px] not-italic text-[#111827] text-[13px] top-[71px] w-[176px]" data-node-id="2:54">
+          Raised
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[11px] not-italic text-[#4b5563] text-[10px] top-[91px] w-[176px]" data-node-id="2:55">
+          #FFFFFF bubbles + cards
+        </p>
+      </div>
+      <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[128px] left-[268px] overflow-clip rounded-[12px] top-[332px] w-[200px]" data-node-id="2:56" data-name="Swatch/Line">
+        <div className="absolute bg-[#e5e7eb] h-[52px] left-[11px] rounded-[8px] top-[11px] w-[176px]" data-node-id="2:57" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[11px] not-italic text-[#111827] text-[13px] top-[71px] w-[176px]" data-node-id="2:58">
+          Line
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[11px] not-italic text-[#4b5563] text-[10px] top-[91px] w-[176px]" data-node-id="2:59">
+          #E5E7EB hairline
+        </p>
+      </div>
+      <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[128px] left-[488px] overflow-clip rounded-[12px] top-[332px] w-[200px]" data-node-id="2:60" data-name="Swatch/Risk">
+        <div className="absolute bg-[#dc2626] h-[52px] left-[11px] rounded-[8px] top-[11px] w-[176px]" data-node-id="2:61" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[11px] not-italic text-[#111827] text-[13px] top-[71px] w-[176px]" data-node-id="2:62">
+          Risk
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[11px] not-italic text-[#4b5563] text-[10px] top-[91px] w-[176px]" data-node-id="2:63">
+          #DC2626 high-risk agent
+        </p>
+      </div>
+      <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[128px] left-[708px] overflow-clip rounded-[12px] top-[332px] w-[200px]" data-node-id="2:64" data-name="Swatch/Warn">
+        <div className="absolute bg-[#d97706] h-[52px] left-[11px] rounded-[8px] top-[11px] w-[176px]" data-node-id="2:65" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[11px] not-italic text-[#111827] text-[13px] top-[71px] w-[176px]" data-node-id="2:66">
+          Warn
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[11px] not-italic text-[#4b5563] text-[10px] top-[91px] w-[176px]" data-node-id="2:67">
+          #D97706 dwell / confirm
+        </p>
+      </div>
+      <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[128px] left-[928px] overflow-clip rounded-[12px] top-[332px] w-[200px]" data-node-id="2:68" data-name="Swatch/Dark">
+        <div className="absolute bg-[#0b1220] h-[52px] left-[11px] rounded-[8px] top-[11px] w-[176px]" data-node-id="2:69" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[11px] not-italic text-[#111827] text-[13px] top-[71px] w-[176px]" data-node-id="2:70">
+          Dark
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[11px] not-italic text-[#4b5563] text-[10px] top-[91px] w-[176px]" data-node-id="2:71">
+          #0B1220 dark theme
+        </p>
+      </div>
+      <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[128px] left-[1148px] overflow-clip rounded-[12px] top-[332px] w-[200px]" data-node-id="2:72" data-name="Swatch/Halo">
+        <div className="absolute bg-white h-[52px] left-[11px] rounded-[8px] top-[11px] w-[176px]" data-node-id="2:73" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[11px] not-italic text-[#111827] text-[13px] top-[71px] w-[176px]" data-node-id="2:74">
+          Halo
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[11px] not-italic text-[#4b5563] text-[10px] top-[91px] w-[176px]" data-node-id="2:75">
+          #FFFFFF 2px overlay halo
+        </p>
+      </div>
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[48px] not-italic text-[#111827] text-[20px] top-[500px] w-[1200px] whitespace-pre-wrap" data-node-id="2:76">{`Type  ·  Inter stands in for Segoe UI Variable (Win) and Roboto (Android). Bubble min 14.`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[normal] left-[48px] not-italic text-[#111827] text-[28px] top-[548px] w-[1200px] whitespace-pre-wrap" data-node-id="2:77">{`Display 28  —  Hello, my name is Buddy.`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[48px] not-italic text-[#111827] text-[20px] top-[600px] w-[1200px] whitespace-pre-wrap" data-node-id="2:78">{`Title 20  —  Step 2 of 5  ·  Export the workbook`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[48px] not-italic text-[#111827] text-[14px] top-[652px] w-[1200px] whitespace-pre-wrap" data-node-id="2:79">{`Body 14  —  I only look while you hold the key. I never save screenshots.`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[48px] not-italic text-[#111827] text-[14px] top-[704px] w-[1200px] whitespace-pre-wrap" data-node-id="2:80">{`Body Strong 14  —  Thinking on your PC…`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[48px] not-italic text-[#111827] text-[12px] top-[756px] w-[1200px] whitespace-pre-wrap" data-node-id="2:81">{`Caption 12  —  ● Looking  ·  Excel — Book1`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[48px] not-italic text-[#111827] text-[12px] top-[808px] w-[1200px] whitespace-pre-wrap" data-node-id="2:82">{`Chip 12  —  Follow-up   Guide me   Do it   Refine`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[48px] not-italic text-[#111827] text-[16px] top-[880px] w-[1200px] whitespace-pre-wrap" data-node-id="2:83">{`Spacing 4–48  ·  Radius 12 bubbles / 20 compact bar / 999 companion  ·  Overlay 3px + 2px halo`}</p>
+      <div className="absolute bg-[#20b8a6] h-[28px] left-[48px] rounded-[4px] top-[920px] w-[8px]" data-node-id="2:84" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[48px] not-italic text-[#4b5563] text-[11px] top-[956px] w-[48px]" data-node-id="2:85">
+        4
+      </p>
+      <div className="absolute bg-[#20b8a6] h-[28px] left-[188px] rounded-[4px] top-[920px] w-[8px]" data-node-id="2:86" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[188px] not-italic text-[#4b5563] text-[11px] top-[956px] w-[48px]" data-node-id="2:87">
+        8
+      </p>
+      <div className="absolute bg-[#20b8a6] h-[28px] left-[328px] rounded-[4px] top-[920px] w-[12px]" data-node-id="2:88" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[328px] not-italic text-[#4b5563] text-[11px] top-[956px] w-[48px]" data-node-id="2:89">
+        12
+      </p>
+      <div className="absolute bg-[#20b8a6] h-[28px] left-[468px] rounded-[4px] top-[920px] w-[16px]" data-node-id="2:90" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[468px] not-italic text-[#4b5563] text-[11px] top-[956px] w-[48px]" data-node-id="2:91">
+        16
+      </p>
+      <div className="absolute bg-[#20b8a6] h-[28px] left-[608px] rounded-[4px] top-[920px] w-[20px]" data-node-id="2:92" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[608px] not-italic text-[#4b5563] text-[11px] top-[956px] w-[48px]" data-node-id="2:93">
+        20
+      </p>
+      <div className="absolute bg-[#20b8a6] h-[28px] left-[748px] rounded-[4px] top-[920px] w-[24px]" data-node-id="2:94" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[748px] not-italic text-[#4b5563] text-[11px] top-[956px] w-[48px]" data-node-id="2:95">
+        24
+      </p>
+      <div className="absolute bg-[#20b8a6] h-[28px] left-[888px] rounded-[4px] top-[920px] w-[32px]" data-node-id="2:96" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[888px] not-italic text-[#4b5563] text-[11px] top-[956px] w-[48px]" data-node-id="2:97">
+        32
+      </p>
+      <div className="absolute bg-[#20b8a6] h-[28px] left-[1028px] rounded-[4px] top-[920px] w-[40px]" data-node-id="2:98" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[1028px] not-italic text-[#4b5563] text-[11px] top-[956px] w-[48px]" data-node-id="2:99">
+        40
+      </p>
+      <div className="absolute bg-[#20b8a6] h-[28px] left-[1168px] rounded-[4px] top-[920px] w-[48px]" data-node-id="2:100" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[1168px] not-italic text-[#4b5563] text-[11px] top-[956px] w-[48px]" data-node-id="2:101">
+        48
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[48px] not-italic text-[#4b5563] text-[13px] top-[996px] w-[1300px]" data-node-id="2:102">
+        Windows: 240 rail + 24 gutter, bubble max 360 / 6 lines, bar max 420. Android: 16 inset, 48dp bubble + IME. Hit target ≥ 44. Motion ≤ 200ms; fly-to 300ms; ring pulse 600ms; spring k=180 c=22; reduce-motion = instant.
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[48px] not-italic text-[#111827] text-[20px] top-[1056px] w-[800px] whitespace-pre-wrap" data-node-id="2:103">{`Companion faces  ·  CompanionState`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[48px] not-italic text-[#0f766e] text-[13px] top-[1260px] w-[1200px]" data-node-id="2:146">
+        Show then tell. Never steal focus. Unsure draws nothing. Indicators cannot be disabled.
+      </p>
+    </div>
+  );
+}
+
+SUPER CRITICAL: The generated React+Tailwind code MUST be converted to match the target project's technology stack and styling system.
+1. Analyze the target codebase to identify: technology stack, styling approach, component patterns, and design tokens
+2. Convert React syntax to the target framework/library
+3. Transform all Tailwind classes to the target styling system while preserving exact visual design
+4. Follow the project's existing patterns and conventions
+DO NOT install any Tailwind as a dependency unless the user instructs you to do so.
+
+
+Node ids have been added to the code as data attributes, e.g. `data-node-id="1:2"`.
+
+Images and SVGs will be stored as constants, e.g. const image = `${assetPathPrefix}/<asset file name>`, where assetPathPrefix is declared once at the top of the code and every asset URL interpolates it. These constants will be used in the code as the source for the image, ex: <img src={image} />. Image assets are stored on a remote server for 7 days and can be fetched using the provided URLs until they expire.

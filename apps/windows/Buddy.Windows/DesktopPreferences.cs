@@ -5,6 +5,12 @@ namespace Buddy.Windows;
 internal sealed record DesktopPreferences
 {
     public int SchemaVersion { get; init; } = 2;
+    public string Appearance { get; init; } = "System";
+    public bool ReduceMotion { get; init; }
+    public string CompanionName { get; init; } = "Buddy";
+    public bool OnboardingCompleted { get; init; }
+    [System.Text.Json.Serialization.JsonExtensionData]
+    public Dictionary<string, JsonElement>? AdditionalSettings { get; init; }
     public bool GuideAutoAdvance { get; init; }
     public bool StrictAgentConfirmations { get; init; }
     public bool ShowCompanion { get; init; } = true;
@@ -21,11 +27,16 @@ internal sealed record DesktopPreferences
     private static string FilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Buddy", "desktop.json");
     internal static DesktopPreferences Load()
     {
-        try { return JsonSerializer.Deserialize<DesktopPreferences>(File.ReadAllText(FilePath)) ?? new(); }
-        catch { return new(); }
+        if (!File.Exists(FilePath)) return new();
+        var json = File.ReadAllText(FilePath);
+        var value = JsonSerializer.Deserialize<DesktopPreferences>(json) ?? throw new InvalidDataException("Buddy preferences are empty; the existing file has been preserved.");
+        if (value.SchemaVersion > 2) throw new InvalidDataException("These preferences need a newer Buddy version. The existing file has been preserved.");
+        using var fields = JsonDocument.Parse(json);
+        return value with { SchemaVersion = 2, OnboardingCompleted = fields.RootElement.TryGetProperty(nameof(OnboardingCompleted), out _) ? value.OnboardingCompleted : true };
     }
     internal void Save()
     {
+        if (File.Exists(FilePath)) _ = Load(); // Never overwrite a corrupt or newer preference file.
         Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
         File.WriteAllText(FilePath + ".tmp", JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
         File.Move(FilePath + ".tmp", FilePath, true);

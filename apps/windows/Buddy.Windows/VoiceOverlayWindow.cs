@@ -24,9 +24,9 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
     private readonly Func<IntPtr> target;
     private readonly ScreenPerception perception;
     private readonly Action<string, string> workflow;
-    private readonly TextBlock state = new() { Foreground = Brushes.White, FontSize = 14, Text = "Listening · preparing microphone…" };
-    private readonly TextBlock transcript = new() { Foreground = Brushes.LightGray, FontSize = 14, TextWrapping = TextWrapping.Wrap, MaxHeight = 54 };
-    private readonly TextBlock answer = new() { Foreground = Brushes.White, FontSize = 14, TextWrapping = TextWrapping.Wrap };
+    private readonly TextBlock state = new() { Foreground = BuddyTheme.Deep, FontSize = 12, Text = "Listening · preparing microphone…" };
+    private readonly TextBlock transcript = new() { Foreground = BuddyTheme.Muted, FontSize = 14, TextWrapping = TextWrapping.Wrap, MaxHeight = 54 };
+    private readonly TextBlock answer = new() { Foreground = BuddyTheme.Ink, FontSize = 14, TextWrapping = TextWrapping.Wrap };
     private readonly ProgressBar level = new() { Minimum = 0, Maximum = 100, Height = 4, Margin = new(0, 8, 0, 8), Foreground = Brushes.Turquoise };
     private readonly DispatcherTimer monitor = new() { Interval = TimeSpan.FromMilliseconds(25) };
     private readonly DispatcherTimer collapse = new() { Interval = TimeSpan.FromSeconds(6) };
@@ -50,7 +50,8 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
         Action<CompanionMood> mood, Func<IntPtr> target, ScreenPerception perception, Action<string,string> workflow, Action openChat)
     {
         this.service = service; this.conversation = conversation; this.preferences = preferences; this.mood = mood; this.target = target; this.perception = perception; this.workflow = workflow;
-        Title = "Buddy · voice overlay"; Width = 360; SizeToContent = SizeToContent.Height; MaxHeight = 290;
+        BuddyTheme.Ensure();
+        Title = "Buddy · voice overlay"; Width = 360; SizeToContent = SizeToContent.Height; MaxHeight = 400;
         WindowStyle = WindowStyle.None; ResizeMode = ResizeMode.NoResize; AllowsTransparency = true; Background = Brushes.Transparent;
         Topmost = true; ShowInTaskbar = false; ShowActivated = false; FontFamily = new("Segoe UI Variable");
         var p = new StackPanel { Margin = new(14) }; p.Children.Add(state); p.Children.Add(level); p.Children.Add(transcript);
@@ -59,7 +60,7 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
         void Add(string title, Action click) { var b = new Button { Content = title, Margin = new(0,0,5,4), Padding = new(7,4,7,4) }; b.Click += (_, _) => click(); row.Children.Add(b); }
         Add("Talk", () => Open(false)); Add("Finish", Finish); Add("Stop", Cancel); Add("Type", () => { Dismiss(); openChat(); });
         Add("Guide", () => StartWorkflow("guide")); Add("Do it", () => StartWorkflow("agent")); Add("×", Dismiss);
-        p.Children.Add(row); Content = new Border { Background = new SolidColorBrush(Color.FromArgb(240,18,34,38)), BorderBrush = Brushes.Turquoise, BorderThickness = new(1), CornerRadius = new(16), Child = p };
+        p.Children.Add(row); Content = new Border { Background = BuddyTheme.Surface, BorderBrush = BuddyTheme.Line, BorderThickness = new(1), CornerRadius = new(12), Child = p };
         AutomationProperties.SetLiveSetting(state, AutomationLiveSetting.Polite);
         AutomationProperties.SetName(level, "Microphone level");
         SourceInitialized += (_, _) => OverlayNative.Configure(new WindowInteropHelper(this).Handle, false);

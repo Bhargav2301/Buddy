@@ -77,18 +77,18 @@ internal static class Program
                 Check(home.IsVisible && home.WindowState == WindowState.Normal, "A repeat launch restores hidden Home");
                 home.WindowState = WindowState.Minimized;
                 Check(await DesktopActivation.Redirect(LaunchDestination.Settings, channel), "Running app acknowledges a Settings launch");
-                var settings = app.Windows.Cast<Window>().Single(w => w.Title == "Buddy · Settings");
-                Check(home.WindowState == WindowState.Normal && settings.IsVisible, "Settings opens with its minimized owner restored");
-                Check(settings.Height <= SystemParameters.WorkArea.Height, "Settings fits the available desktop height");
+                Check(home.WindowState == WindowState.Normal && home.VisibleHomeSection == "Settings", "Settings restores the minimized Home and navigates directly");
+                Check(home.OwnedWindows.Count == 0, "Settings is embedded in Home without a separate dialog");
                 await DesktopActivation.Redirect(LaunchDestination.Settings, channel);
-                Check(app.Windows.Cast<Window>().Count(w => w.Title == "Buddy · Settings") == 1, "Repeated Settings launches reuse one window");
-                var content = (StackPanel)((ScrollViewer)settings.Content).Content;
-                var assistant = content.Children.OfType<Button>().Single(b => (string)b.Content == "Assistant & internet");
-                assistant.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-                Check(app.Windows.Cast<Window>().Any(w => w.Title == "Buddy · Assistant settings" && w.IsVisible), "Settings reaches the Agent and internet preferences without changing them");
-                foreach (var child in home.OwnedWindows.Cast<Window>().ToArray()) child.Close();
+                Check(app.Windows.Cast<Window>().Count() == 1, "Repeated Settings activation reuses Home");
+                foreach (var section in MainWindow.SettingsSections) {
+                    home.OpenSettingsSection(section);
+                    Check(home.VisibleHomeSection == "Settings" && home.VisibleSettingsSection == section, "Unified Settings reaches " + section);
+                }
+                home.Hide();
                 home.OpenFromLaunch(LaunchDestination.Settings);
-                Check(app.Windows.Cast<Window>().Any(w => w.Title == "Buddy · Settings" && w.IsVisible), "Settings can reopen after being closed");
+                Check(home.IsVisible && home.VisibleHomeSection == "Settings", "Settings reopens after Home was hidden");
+                VisualChecks.Run(home, Check);
                 Console.WriteLine($"ALL {checks} SETTINGS WINDOW CHECKS PASSED"); exit = 0;
             } catch (Exception ex) { Console.Error.WriteLine(ex); }
             finally { await home.Quit(); }

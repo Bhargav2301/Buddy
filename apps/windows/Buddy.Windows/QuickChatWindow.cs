@@ -18,9 +18,9 @@ internal sealed class QuickChatWindow : Window, IDisposable
     private readonly Action<string,string> workflow;
     private readonly Func<CancellationToken,Task<string?>> screen;
     private readonly TextBox draft = new() { AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MaxLength = 4000, Height = 65, Padding = new(10) };
-    private readonly TextBox answer = new() { IsReadOnly = true, TextWrapping = TextWrapping.Wrap, Background = Brushes.Transparent, Foreground = Brushes.White, BorderThickness = new(0), VerticalScrollBarVisibility = ScrollBarVisibility.Auto, FontSize = 14, Text = "Ask Buddy, choose Guide to learn, or Agent to do a task." };
-    private readonly TextBlock status = new() { Foreground = Brushes.Turquoise, FontSize = 12, TextWrapping = TextWrapping.Wrap };
-    private readonly CheckBox includeScreen = new() { Content = "Screen", Foreground = Brushes.White, Margin = new(5) };
+    private readonly TextBox answer = new() { IsReadOnly = true, TextWrapping = TextWrapping.Wrap, Background = Brushes.Transparent, Foreground = BuddyTheme.Ink, BorderThickness = new(0), VerticalScrollBarVisibility = ScrollBarVisibility.Auto, FontSize = 14, Text = "Ask Buddy, choose Guide to learn, or Agent to do a task." };
+    private readonly TextBlock status = new() { Foreground = BuddyTheme.Deep, FontSize = 12, TextWrapping = TextWrapping.Wrap };
+    private readonly CheckBox includeScreen = new() { Content = "Screen", Foreground = BuddyTheme.Ink, Margin = new(5) };
     private readonly Button send;
     private CancellationTokenSource? request;
     private bool closed;
@@ -31,15 +31,16 @@ internal sealed class QuickChatWindow : Window, IDisposable
         Action<CompanionMood> mood, Action openHome, Action openSettings, Action openVoice, Action<string,string> workflow, Func<CancellationToken,Task<string?>> screen)
     {
         this.service = service; this.conversation = conversation; this.preferences = preferences; this.mood = mood; this.workflow = workflow; this.screen = screen;
-        Title = "Buddy · quick chat"; Width = 480; Height = 380; WindowStyle = WindowStyle.None; ResizeMode = ResizeMode.NoResize;
-        AllowsTransparency = true; Background = Brushes.Transparent; Topmost = true; ShowInTaskbar = false; FontFamily = new("Segoe UI");
+        BuddyTheme.Ensure();
+        Title = "Buddy · quick chat"; Width = 420; Height = 430; WindowStyle = WindowStyle.None; ResizeMode = ResizeMode.NoResize;
+        AllowsTransparency = true; Background = Brushes.Transparent; Topmost = true; ShowInTaskbar = false; FontFamily = BuddyTheme.Font;
         var grid = new Grid { Margin = new(16) }; grid.RowDefinitions.Add(new() { Height = GridLength.Auto }); grid.RowDefinitions.Add(new()); grid.RowDefinitions.Add(new() { Height = GridLength.Auto }); grid.RowDefinitions.Add(new() { Height = GridLength.Auto });
         Button Add(string name, Action action, Panel parent) { var b = new Button { Content = name, Margin = new(0,0,5,5), Padding = new(9,5,9,5) }; b.Click += (_,_) => action(); parent.Children.Add(b); return b; }
         var header = new WrapPanel(); Add("Home", () => { Dismiss(); openHome(); }, header); Add("Settings", () => { Dismiss(); openSettings(); }, header); Add("Voice", () => { Dismiss(); openVoice(); }, header); Add("×", Dismiss, header); grid.Children.Add(header);
         Grid.SetRow(answer, 1); grid.Children.Add(answer); Grid.SetRow(draft, 2); grid.Children.Add(draft);
         var footer = new StackPanel(); var tools = new WrapPanel { Margin = new(0,8,0,0) };
         send = Add("Send", () => _ = Send(), tools); Add("Guide", () => BeginWorkflow("guide"), tools); Add("Agent", () => BeginWorkflow("agent"), tools); Add("Stop", Cancel, tools); tools.Children.Add(includeScreen); footer.Children.Add(tools); footer.Children.Add(status); Grid.SetRow(footer, 3); grid.Children.Add(footer);
-        Content = new Border { Background = new SolidColorBrush(Color.FromRgb(18,30,36)), BorderBrush = Brushes.Turquoise, BorderThickness = new(1), CornerRadius = new(18), Child = grid };
+        Content = new Border { Background = BuddyTheme.Surface, BorderBrush = BuddyTheme.Line, BorderThickness = new(1), CornerRadius = new(20), Child = grid };
         SourceInitialized += (_,_) => OverlayNative.Configure(new WindowInteropHelper(this).Handle, false);
         PreviewKeyDown += (_,e) => { if (e.Key == Key.Escape) { e.Handled = true; Dismiss(); } else if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.None && draft.IsKeyboardFocusWithin) { e.Handled = true; _ = Send(); } };
         Closing += (_,e) => { if (!closed) { e.Cancel = true; Dismiss(); } };

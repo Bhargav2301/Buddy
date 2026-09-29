@@ -10,7 +10,6 @@ namespace Buddy.Windows;
 public sealed partial class MainWindow
 {
     private PracticeWindow? practice;
-    private Window? settingsWindow;
     private bool keepHomeOpen = true;
     internal void ConfigureLaunch(LaunchDestination destination) => keepHomeOpen = destination != LaunchDestination.Background;
     internal void OpenFromLaunch(LaunchDestination destination)
@@ -21,20 +20,7 @@ public sealed partial class MainWindow
     }
     private void OpenSettings()
     {
-        Summon();
-        if (settingsWindow is not null) { settingsWindow.Show(); settingsWindow.WindowState = WindowState.Normal; settingsWindow.Activate(); return; }
-        var p = new StackPanel(); p.Children.Add(Text("Settings", 28));
-        p.Children.Add(Text("Choose what you want to change.", 14, Muted));
-        p.Children.Add(Btn("Assistant & internet", AssistantSettings, true));
-        p.Children.Add(Text("Agent mode, web research, privacy and activity log", 13, Muted));
-        p.Children.Add(Btn("Cursor, shortcuts & voice", CursorSettings));
-        p.Children.Add(Text("Keyboard shortcuts, microphone context and spoken answers", 13, Muted));
-        p.Children.Add(Btn("PC setup & models", () => _ = Setup()));
-        p.Children.Add(Text("Local AI connection and model downloads", 13, Muted));
-        p.Children.Add(Btn("Paired phones", Pair));
-        settingsWindow = Dialog("Buddy · Settings", p, 560, 550);
-        settingsWindow.Closed += (_, _) => settingsWindow = null;
-        settingsWindow.Activate();
+        Summon(); NavigateHome("Settings");
     }
     private void StartWorkflow(string mode, string text)
     {
@@ -58,28 +44,7 @@ public sealed partial class MainWindow
         } else shortcut?.TrySet(choice);
         UpdateShortcutHint();
     }
-    private void AssistantSettings()
-    {
-        var p = new StackPanel(); p.Children.Add(Text("Assistant & privacy", 25));
-        var web = new CheckBox { Content = "Allow internet research", Foreground = Ink, IsChecked = desktop.AllowWebResearch, Margin = new(0,15,0,8) }; p.Children.Add(web);
-        p.Children.Add(Text("Queries go to DuckDuckGo; public HTTPS pages are read without browser cookies. Screenshots stay local. Web access is optional; local chat works offline.", 13, Muted));
-        var agent = new CheckBox { Content = "Enable Agent mode on this PC", Foreground = Ink, IsChecked = desktop.AgentEnabled, Margin = new(0,12,0,8) }; p.Children.Add(agent);
-        p.Children.Add(Text("Review a plan before running it. Verified reversible actions can continue; consequential and uncertain actions ask again. Esc, Ctrl+Alt+Esc or moving the mouse stops the run. Passwords, elevated apps, terminals and blocked apps are refused.", 13, Muted));
-        var strict = new CheckBox { Content = "Ask before every Agent change", Foreground = Ink, IsChecked = desktop.StrictAgentConfirmations, Margin = new(0,8,0,8) }; p.Children.Add(strict);
-        var advance = new CheckBox { Content = "Advance Guide when its expected result stays visible", Foreground = Ink, IsChecked = desktop.GuideAutoAdvance, Margin = new(0,8,0,8) }; p.Children.Add(advance);
-        p.Children.Add(Text("Additional blocked process names (comma separated)", 14)); var blocked = new TextBox { Text = desktop.BlockedApps }; StyleBox(blocked); p.Children.Add(blocked);
-        var notice = Text("", 12, Accent); p.Children.Add(notice);
-        p.Children.Add(Btn("Save assistant settings", () => {
-            try {
-                Cancel(); var next = desktop with { AllowWebResearch = web.IsChecked == true, AgentEnabled = agent.IsChecked == true, BlockedApps = blocked.Text.Trim(), StrictAgentConfirmations = strict.IsChecked == true, GuideAutoAdvance = advance.IsChecked == true };
-                next.Save(); desktop = next; if (host is not null) { host.Service.WebEnabled = desktop.AllowWebResearch; host.Service.AgentEnabled = desktop.AgentEnabled; }
-                notice.Text = "Saved. Use Guide for directions or Agent for a task plan.";
-            } catch (Exception ex) { notice.Text = ex.Message; }
-        }, true));
-        p.Children.Add(Btn("Recent capture and action log", () => _ = ShowAudit()));
-        p.Children.Add(Btn("Clear capture and action log", () => { if (host is not null) _ = host.Service.Store.Update(s => { s.Audit.Clear(); return true; }); notice.Text = "Log cleared."; }));
-        Dialog("Buddy · Assistant settings", p, 620, 640);
-    }
+    private void AssistantSettings() => OpenSettingsSection("Guide & Agent");
     private async Task ShowAudit()
     {
         if (host is null) return;

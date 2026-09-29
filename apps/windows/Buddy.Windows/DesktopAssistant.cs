@@ -26,10 +26,12 @@ internal sealed class DesktopAssistant : IDisposable
     private readonly DispatcherTimer stopMonitor = new() { Interval = TimeSpan.FromMilliseconds(25) };
     private readonly DispatcherTimer guideMonitor = new() { Interval = TimeSpan.FromMilliseconds(700) };
     private Window? panel;
-    private readonly TextBlock state = new() { Foreground = Brushes.Turquoise, TextWrapping = TextWrapping.Wrap, FontSize = 15 };
+    private readonly TextBlock state = new() { Foreground = BuddyTheme.Deep, TextWrapping = TextWrapping.Wrap, FontSize = 12 };
     private readonly TextBox goal = new() { TextWrapping = TextWrapping.Wrap, AcceptsReturn = true, Height = 66, MaxLength = 4000 };
-    private readonly TextBox planText = new() { IsReadOnly = true, TextWrapping = TextWrapping.Wrap, Background = Brushes.Transparent, Foreground = Brushes.White, BorderThickness = new(0), VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Height = 190 };
-    private readonly TextBlock stepText = new() { Foreground = Brushes.White, FontSize = 15, TextWrapping = TextWrapping.Wrap, Margin = new(0,8,0,8) };
+    private readonly TextBox planText = new() { IsReadOnly = true, TextWrapping = TextWrapping.Wrap, Background = Brushes.Transparent, Foreground = BuddyTheme.Ink, BorderThickness = new(0), VerticalScrollBarVisibility = ScrollBarVisibility.Auto, MaxHeight = 190 };
+    private readonly StackPanel planCards = new();
+    private readonly TextBlock stepText = new() { Foreground = BuddyTheme.Ink, FontSize = 14, TextWrapping = TextWrapping.Wrap, Margin = new(0,8,0,8) };
+    private ExecutionBanner? executionBanner;
     private Button? run, next, back, skip, approve, undo;
     private CancellationTokenSource? operation;
     private CancellationTokenSource? guideCheck;
@@ -61,7 +63,7 @@ internal sealed class DesktopAssistant : IDisposable
     {
         if (executing) { Cancel(); return; }
         Cancel(); mode = requestedMode; sourceWindow = target(); plan = null; guide = null; guideReplans = guideMisses = 0;
-        EnsurePanel(); goal.Text = query; planText.Clear(); stepText.Text = ""; panel!.Title = mode == "agent" ? "Buddy · Agent plan" : "Buddy · Guide";
+        EnsurePanel(); goal.Text = query; planText.Clear(); planCards.Children.Clear(); stepText.Text = ""; panel!.Title = mode == "agent" ? "Buddy · Agent plan" : "Buddy · Guide"; panel.Width = mode == "agent" ? 420 : 360;
         run!.Visibility = mode == "agent" ? Visibility.Visible : Visibility.Collapsed; run.IsEnabled = false;
         back!.Visibility = next!.Visibility = mode == "guide" ? Visibility.Visible : Visibility.Collapsed;
         skip!.Visibility = back.Visibility; skip.IsEnabled = false;
@@ -72,11 +74,12 @@ internal sealed class DesktopAssistant : IDisposable
     private void EnsurePanel()
     {
         if (panel is not null) return;
-        panel = new Window { Width = 470, Height = 550, Topmost = true, ShowInTaskbar = false, Background = new SolidColorBrush(Color.FromRgb(18,30,36)), Foreground = Brushes.White, FontFamily = new("Segoe UI"), WindowStartupLocation = WindowStartupLocation.CenterScreen };
+        BuddyTheme.Ensure();
+        panel = new Window { Width = 420, Height = Math.Min(620, SystemParameters.WorkArea.Height), Topmost = true, ShowInTaskbar = false, Background = BuddyTheme.Surface, Foreground = BuddyTheme.Ink, FontFamily = BuddyTheme.Font, WindowStartupLocation = WindowStartupLocation.CenterScreen };
         var p = new StackPanel { Margin = new(20) }; p.Children.Add(state); p.Children.Add(goal);
         Button Add(string label, Action action, Panel parent) { var b = new Button { Content = label, Padding = new(10,6,10,6), Margin = new(0,8,6,0) }; b.Click += (_, _) => action(); parent.Children.Add(b); return b; }
         var commands = new WrapPanel(); Add("Make plan", () => _ = Plan(), commands); run = Add("Run this plan", () => _ = Execute(), commands); Add("Stop", Cancel, commands); p.Children.Add(commands);
-        p.Children.Add(planText); p.Children.Add(stepText);
+        p.Children.Add(planText); p.Children.Add(planCards); p.Children.Add(stepText);
         var navigation = new WrapPanel(); back = Add("Back", () => _ = GuideStep(-1), navigation); next = Add("Next", () => _ = GuideStep(1), navigation);
         skip = Add("Skip", () => _ = GuideStep(1), navigation);
         approve = Add("Allow this step", () => approval?.TrySetResult(true), navigation); approve.Visibility = Visibility.Collapsed;
@@ -102,6 +105,7 @@ internal sealed class DesktopAssistant : IDisposable
             if (mode == "agent") {
                 plan = await host.PlanAgent(new(task, context), cts.Token); cts.Token.ThrowIfCancellationRequested();
                 planText.Text = plan.Summary + "\n\n" + string.Join("\n", plan.Actions!.Select((a,i) => $"{i+1}. [{a.Risk.ToUpperInvariant()} · {a.Kind}] {a.Description}\n    {a.Target} {a.Value}"));
+                ShowPlanCards(plan.Actions!); planText.Text = plan.Summary;
                 run.IsEnabled = true; state.Text = "Review the plan. Consequential or uncertain actions pause for approval.";
             } else {
                 guide = await host.PlanGuide(new(task, context, preferences().AllowWebResearch), cts.Token); cts.Token.ThrowIfCancellationRequested(); guideId = Guid.NewGuid().ToString(); index = 0;
@@ -196,6 +200,7 @@ internal sealed class DesktopAssistant : IDisposable
     }
     private async Task<bool> Confirm(string text, CancellationToken ct)
     {
+        executionBanner?.Hide();
         movingGuard = false; state.Text = "Approval needed · " + text; approve!.Visibility = Visibility.Visible;
         var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously); approval = completion;
         using var registration = ct.Register(() => completion.TrySetCanceled(ct));
@@ -216,7 +221,7 @@ internal sealed class DesktopAssistant : IDisposable
                 if (action.Kind == "open") {
                     if ((preferences().StrictAgentConfirmations || ActionPolicy.LiveRisk(action, null) == "high") && !await Confirm(action.Description + "\n" + action.Value, cts.Token)) break;
                     if (OverlayNative.GetCursorPos(out pointer)) movingGuard = true;
-                    await Task.Delay(600, cts.Token); sourceWindow = await OpenApp(action.Value, cts.Token);
+                    ShowExecutionBanner(); await Task.Delay(600, cts.Token); sourceWindow = await OpenApp(action.Value, cts.Token);
                     results.Add(new(results.Count + 1, action, true, "Opened " + action.Value + "; verified foreground application"));
                 } else {
                     Perception.Check(sourceWindow, true);
@@ -242,12 +247,12 @@ internal sealed class DesktopAssistant : IDisposable
                         if (!InputNative.SetForegroundWindow(sourceWindow)) throw new InvalidOperationException("Activate the target app before continuing.");
                         if (OverlayNative.GetCursorPos(out pointer)) movingGuard = true;
                         if (element is not null) Draw(snapshot, element, "ring", action.Description);
-                        await Task.Delay(600, cts.Token);
+                        ShowExecutionBanner(); await Task.Delay(600, cts.Token);
                         var result = await BoundedAction(token => Apply(action, snapshot, element, token), cts.Token);
                         results.Add(new(results.Count + 1, action, true, result));
                     }
                 }
-                movingGuard = false; overlay.Clear(); await host.Audit(action.Kind, action.Target, results[^1].Success ? "completed" : "not executed: target unavailable");
+                executionBanner?.Hide(); movingGuard = false; overlay.Clear(); await host.Audit(action.Kind, action.Target, results[^1].Success ? "completed" : "not executed: target unavailable");
                 // Observe actual state before completing a batch or proposing its replacement.
                 var observed = await Perception.Capture(sourceWindow, cts.Token);
                 if (pending.Count == 0) {
@@ -257,6 +262,7 @@ internal sealed class DesktopAssistant : IDisposable
                     if (decision.Status == "clarify" || replans >= 3) { state.Text = "Review needed · " + decision.Summary; break; }
                     replans++;
                     planText.Text = decision.Summary + "\n\n" + string.Join("\n", decision.Actions!.Select((a,i) => $"{i+1}. {a.Description} · {a.Kind} {a.Target} {a.Value}"));
+                    ShowPlanCards(decision.Actions!); planText.Text = decision.Summary;
                     if (!await Confirm("Review the updated plan, then allow it to continue.", cts.Token)) break;
                     pending = new(decision.Actions!);
                 }
@@ -265,7 +271,7 @@ internal sealed class DesktopAssistant : IDisposable
             if (edit is not null) undo!.Visibility = Visibility.Visible;
         } catch (OperationCanceledException) { state.Text = "Stopped. No further actions will run."; await host.Audit("stop", "agent", "cancelled"); }
         catch (Exception ex) { cts.Cancel(); state.Text = "Stopped · " + ex.Message; await host.Audit("stop", "agent", ex is TimeoutException ? "provider timeout; verify the last action" : "action failed"); }
-        finally { executing = movingGuard = false; overlay.Clear(); mood(CompanionMood.Idle); if (ReferenceEquals(operation, cts)) operation = null; cts.Dispose(); run.IsEnabled = false; }
+        finally { executionBanner?.Hide(); executing = movingGuard = false; overlay.Clear(); mood(CompanionMood.Idle); if (ReferenceEquals(operation, cts)) operation = null; cts.Dispose(); run.IsEnabled = false; }
     }
     private async Task<T> BoundedAction<T>(Func<CancellationToken, T> action, CancellationToken ct)
     {
@@ -335,13 +341,31 @@ internal sealed class DesktopAssistant : IDisposable
             state.Text = "Previous field value restored."; edit = null; undo!.Visibility = Visibility.Collapsed;
         } catch (Exception ex) { state.Text = ex.Message; }
     }
-    internal void Cancel() { guideRevision++; guideCheck?.Cancel(); guideMonitor.Stop(); operation?.Cancel(); approval?.TrySetCanceled(); movingGuard = false; overlay.Clear(); state.Text = "Stopped"; mood(CompanionMood.Idle); }
+    internal void Cancel() { executionBanner?.Hide(); guideRevision++; guideCheck?.Cancel(); guideMonitor.Stop(); operation?.Cancel(); approval?.TrySetCanceled(); movingGuard = false; overlay.Clear(); state.Text = "Stopped"; mood(CompanionMood.Idle); }
     internal async Task ResumeLatest()
     {
         var saved = await service()!.Store.Read(s => s.Guides.LastOrDefault(g => !g.Completed));
         if (saved is null) { await Open("guide", ""); state.Text = "No saved walkthrough yet."; return; }
-        await Open("guide", ""); goal.Text = saved.Query; guide = saved.Plan; guideId = saved.Id; index = saved.Index;
+        await Resume(saved.Id);
+    }
+    internal async Task Resume(string id)
+    {
+        var saved = await service()!.Store.Read(s => s.Guides.FirstOrDefault(g => g.Id == id));
+        if (saved is null) { await Open("guide", ""); state.Text = "This walkthrough is no longer available."; return; }
+        await Open("guide", ""); goal.Text = saved.Query; guide = saved.Plan; guideId = saved.Id; index = saved.Completed ? 0 : saved.Index;
         planText.Text = guide.Summary; await GuideStep(0);
     }
-    public void Dispose() { Cancel(); stopMonitor.Stop(); overlay.Dispose(); panel?.Hide(); }
+    private void ShowPlanCards(IReadOnlyList<AssistantAction> actions)
+    {
+        planCards.Children.Clear();
+        for (int i = 0; i < actions.Count; i++) {
+            var action = actions[i]; bool needsReview = ActionPolicy.LiveRisk(action, null) == "high";
+            var p = new StackPanel();
+            p.Children.Add(new TextBlock { Text = $"{i + 1} · {action.Kind} · " + (needsReview ? "verify / approve" : "navigation / read"), Foreground = needsReview ? BuddyTheme.Risk : BuddyTheme.Deep, FontSize = 12, FontWeight = FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap });
+            p.Children.Add(new TextBlock { Text = action.Description, Foreground = BuddyTheme.Ink, FontSize = 14, TextWrapping = TextWrapping.Wrap, Margin = new(0, 6, 0, 0) });
+            var card = BuddyTheme.Card(p, 16); card.Background = needsReview ? BuddyTheme.RiskSoft : BuddyTheme.Canvas; planCards.Children.Add(card);
+        }
+    }
+    private void ShowExecutionBanner() { executionBanner ??= new ExecutionBanner(); executionBanner.Open(); }
+    public void Dispose() { Cancel(); stopMonitor.Stop(); overlay.Dispose(); executionBanner?.Close(); panel?.Hide(); }
 }
