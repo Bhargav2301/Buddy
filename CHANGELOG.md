@@ -4,6 +4,13 @@ Versions follow `major.minor.patch`; Git tags use `v` plus the version.
 The root [VERSION](VERSION) file controls both applications. See
 [Versioning](docs/Versioning.md) for the release process.
 
+## [0.3.1] - 2026-09-29
+
+- Launching Buddy again brings the running app's Home window forward instead of showing an “already running” message. Normal launches keep Home visible; `--background` explicitly requests companion startup.
+- Add a central Settings window reachable from a pinned Home button, quick chat, the tray, `--settings`, and new Buddy Settings desktop/Start menu shortcuts.
+- Reuse an existing Settings window, restore minimized Home, and fit settings dialogs to the available desktop height.
+- Validation: 32 desktop logic/activation checks, including real second-process navigation, and eight isolated WPF Settings-window checks passed. These do not claim microphone or computer-action acceptance.
+
 ## [0.3.0] - 2026-09-28
 
 - Separate 360 px voice overlay for Ctrl+Shift+Space, with transcript, microphone level, sentence-based speech and cancellation. Optional tap/hold main shortcut.

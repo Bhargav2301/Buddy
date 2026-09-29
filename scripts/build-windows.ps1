@@ -10,6 +10,8 @@ dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Tests') -c Release -r wi
 if ($LASTEXITCODE -ne 0) { throw 'Service tests failed.' }
 dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Desktop.Tests') -c Release -r win-x64 --self-contained true
 if ($LASTEXITCODE -ne 0) { throw 'Desktop logic tests failed.' }
+dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Windows.IntegrationTests') -c Release -- --settings-navigation
+if ($LASTEXITCODE -ne 0) { throw 'Settings window navigation tests failed.' }
 dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Assistant.Tests') -c Release -r win-x64 --self-contained true
 if ($LASTEXITCODE -ne 0) { throw 'Assistant safety and tool tests failed.' }
 dotnet publish (Join-Path $buddyRoot 'apps\windows\Buddy.Windows\Buddy.Windows.csproj') -c Release -r win-x64 --self-contained true -o $buddyOutput
@@ -19,7 +21,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Windows package validation failed.' }
 $buddyProbe = Start-Process -FilePath (Join-Path $buddyOutput 'Buddy.exe') -ArgumentList '--check-package' -WindowStyle Hidden -PassThru
 if (-not $buddyProbe.WaitForExit(30000)) { $buddyProbe.Kill(); throw 'Native apphost probe timed out.' }
 if ($buddyProbe.ExitCode -ne 0) { throw "Native apphost failed with exit code $($buddyProbe.ExitCode)." }
-Copy-Item (Join-Path $buddyRoot 'scripts\Install-Buddy.cmd'), (Join-Path $buddyRoot 'scripts\Run-Buddy.cmd'), (Join-Path $buddyRoot 'scripts\Install-Buddy.ps1'), (Join-Path $buddyRoot 'scripts\Enable-Phone-Access.ps1'), (Join-Path $buddyRoot 'scripts\Setup-Local-AI.ps1') $buddyOutput
+Copy-Item (Join-Path $buddyRoot 'scripts\Install-Buddy.cmd'), (Join-Path $buddyRoot 'scripts\Run-Buddy.cmd'), (Join-Path $buddyRoot 'scripts\Open-Buddy-Settings.cmd'), (Join-Path $buddyRoot 'scripts\Install-Buddy.ps1'), (Join-Path $buddyRoot 'scripts\Enable-Phone-Access.ps1'), (Join-Path $buddyRoot 'scripts\Setup-Local-AI.ps1') $buddyOutput
 Set-Content -Path (Join-Path $buddyOutput 'Windows-Repair.txt') -Value "Buddy $buddyVersion - Windows Desktop runtime packaging repair included"
 Set-Content -Path (Join-Path $buddyOutput 'Cursor-Companion.txt') -Value "Buddy $buddyVersion - Ctrl+Space for chat; Ctrl+Shift+Space for voice"
 $buddyCommit = 'source-archive'

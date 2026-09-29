@@ -10,6 +10,8 @@ This is a first installable alpha, not the full year-long platform in the Nexa s
 
 ## Cursor companion: start here
 
+**Settings access (0.3.1):** Double-click **Buddy** to open Home, including when it is already running. Choose the pinned **Settings** button, or open the new **Buddy Settings** desktop/Start menu shortcut directly. Quick chat and the tray also have **Settings**. The Settings window links to **Assistant & internet**, **Cursor, shortcuts & voice**, models and phone pairing. A portable installation includes `Open-Buddy-Settings.cmd`.
+
 Use **`Buddy-Windows-v<version>.zip`** for the Windows application. Extract all files, quit any running Buddy instance from its tray menu, and run **Install-Buddy.cmd** from the extracted folder containing **Buddy.exe**. The source ZIP is for development. The Windows package contains **Cursor-Companion.txt** and **Build-Info.json**, which identifies its version and source commit.
 
 Buddy now includes a small mint pointer with eyes that follows beside your Windows pointer. It is designed to let clicks pass through and leave your original pointer available. The companion runs while Buddy is running; this version does not add Windows login autostart.
@@ -28,7 +30,7 @@ The voice shortcut opens a separate 360 px bubble and starts one utterance. Spea
 
 **Windows + Space normally switches keyboard layouts.** It appears in the shortcut picker as **if available**. If Windows rejects it, Buddy keeps the previous working shortcut. Ctrl + Space is the default, and Ctrl + Alt + Space or Alt + Shift + Space are alternatives. The dedicated voice shortcut is Ctrl + Shift + Space; if another application owns it, use Voice in the bar or tray menu.
 
-When the configured AI model is ready, Buddy can start in companion mode with Home hidden. If Ollama/model setup is incomplete, Home stays open. Turn this behavior off in Cursor & shortcuts if you prefer Home at launch. The companion follows monitor work areas and is designed for different display scales; native monitor/DPI behavior still needs a Windows device check.
+Normal launches open Home so settings are always reachable. Use `Buddy.exe --background` for a companion-only launch; the background-launch preference in Cursor & shortcuts controls whether Home hides once the AI model is ready. An explicit Home or Settings request keeps the window open, even during startup. The companion follows monitor work areas and is designed for different display scales; native monitor/DPI behavior still needs a Windows device check.
 
 The compact bar streams real answers and saves completed turns to the selected conversation. Failed or stopped replies restore your draft. Typed chat captures context only when **Screen** is checked. Voice captures active-window accessibility text and, when safe and available, a redacted memory-only frame; turn this off with **Include active-window context when talking** in Cursor & shortcuts. Frames stay on this PC and never enter stored chat history or web queries. Microphone support depends on an installed Windows speech language and audio device.
 

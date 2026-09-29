@@ -30,6 +30,8 @@ internal static class Installer
         {
             CreateShortcut(Environment.GetFolderPath(Environment.SpecialFolder.Programs), target);
             CreateShortcut(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), target);
+            CreateShortcut(Environment.GetFolderPath(Environment.SpecialFolder.Programs), target, "Buddy Settings", "--settings");
+            CreateShortcut(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), target, "Buddy Settings", "--settings");
         }
         catch (Exception ex)
         {
@@ -44,7 +46,7 @@ internal static class Installer
         return 0;
     }
 
-    private static void CreateShortcut(string folder, string target)
+    private static void CreateShortcut(string folder, string target, string name = "Buddy", string arguments = "--home")
     {
         if (string.IsNullOrWhiteSpace(folder)) return;
         Directory.CreateDirectory(folder);
@@ -52,10 +54,11 @@ internal static class Installer
         object? shortcut = null;
         try
         {
-            shortcut = shell.CreateShortcut(Path.Combine(folder, "Buddy.lnk"));
+            shortcut = shell.CreateShortcut(Path.Combine(folder, name + ".lnk"));
             dynamic link = shortcut;
             link.TargetPath = Path.Combine(target, "Buddy.exe");
             link.WorkingDirectory = target;
+            link.Arguments = arguments;
             link.Description = "Buddy - your local AI companion";
             link.Save();
         }

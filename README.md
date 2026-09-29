@@ -14,6 +14,8 @@ Read [the setup guide](docs/Buddy-Setup-Guide.md). The Windows download contains
 
 **Windows assistant preview (0.3.0):** Ctrl+Space opens typed chat; Ctrl+Shift+Space opens a separate voice overlay. Guide draws arrows and highlights around accessible controls. Agent creates a local action plan and executes supported Windows actions after review. Internet research reads public HTTPS pages and cites its sources. Enable Agent and Internet research in Home → Assistant settings; both default off. See [the preview guide and limitations](docs/Windows-Assistant-Preview.md). Existing history and pairing are preserved. Native Windows interaction still needs device acceptance.
 
+**Settings access (0.3.1):** Open Buddy again to bring up Home, then choose its pinned **Settings** button. **Buddy Settings** is also available as a desktop/Start menu shortcut, in quick chat and in the tray. Portable users can run `Open-Buddy-Settings.cmd`. Normal launches show Home; `--background` explicitly requests companion startup.
+
 ## Project map
 
 | Path | Purpose |

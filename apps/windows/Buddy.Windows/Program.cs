@@ -24,11 +24,11 @@ public static class Program
             using var single = new Mutex(true, "Local\\Buddy.Desktop.v1", out bool first);
             if (!first)
             {
-                ShowMessage("Buddy is already running. Use your configured shortcut for quick chat, or its tray icon for Buddy Home.");
-                return 0;
+                if (DesktopActivation.Redirect(DesktopLaunch.Parse(args)).GetAwaiter().GetResult()) return 0;
+                throw new InvalidOperationException("The running Buddy did not respond. If it is an older version, quit it from the tray and install this update, then open Buddy again.");
             }
             PackageVerifier.Verify(AppContext.BaseDirectory);
-            RunDesktop();
+            RunDesktop(DesktopLaunch.Parse(args));
             return 0;
         }
         catch (Exception ex)
@@ -42,7 +42,7 @@ public static class Program
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void RunDesktop() => DesktopApplication.Run();
+    private static void RunDesktop(LaunchDestination destination) => DesktopApplication.Run(destination);
 
     internal static void ShowMessage(string message) => MessageBoxW(IntPtr.Zero, message, "Buddy", 0x00000040);
 

@@ -10,8 +10,9 @@ internal static class Program
 {
     [DllImport("user32.dll", EntryPoint="GetWindowLongPtrW")] private static extern IntPtr GetWindowLongPtr(IntPtr window, int index);
     [DllImport("user32.dll")] private static extern bool GetWindowDisplayAffinity(IntPtr window, out uint affinity);
-    [STAThread] private static int Main()
+    [STAThread] private static int Main(string[] args)
     {
+        if (args.Contains("--settings-navigation")) return SettingsNavigation();
         var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown }; int exit = 1, count = 0;
         void Check(bool value, string message) { if (!value) throw new Exception("FAIL: " + message); count++; Console.WriteLine("PASS: " + message); }
         var fixture = new Window { Title = "Buddy isolated integration fixture", Width = 600, Height = 400 };
@@ -52,5 +53,36 @@ internal static class Program
             finally { ScreenPerception.PracticeHandle = IntPtr.Zero; fixture.Close(); app.Shutdown(); }
         };
         app.Run(fixture); return exit;
+    }
+    private static int SettingsNavigation()
+    {
+        var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown }; int exit = 1, checks = 0;
+        void Check(bool value, string message) { if (!value) throw new Exception("FAIL: " + message); checks++; Console.WriteLine("PASS: " + message); }
+        var home = new MainWindow(startService: false); home.ConfigureLaunch(LaunchDestination.Background);
+        home.Loaded += async (_, _) => {
+            try {
+                home.Hide(); var channel = "Buddy.Settings.Fixture." + Guid.NewGuid();
+                using var activation = new DesktopActivation(target => app.Dispatcher.InvokeAsync(() => home.OpenFromLaunch(target)).Task, channel);
+                Check(await DesktopActivation.Redirect(LaunchDestination.Home, channel), "Running app acknowledges a Home launch");
+                Check(home.IsVisible && home.WindowState == WindowState.Normal, "A repeat launch restores hidden Home");
+                home.WindowState = WindowState.Minimized;
+                Check(await DesktopActivation.Redirect(LaunchDestination.Settings, channel), "Running app acknowledges a Settings launch");
+                var settings = app.Windows.Cast<Window>().Single(w => w.Title == "Buddy · Settings");
+                Check(home.WindowState == WindowState.Normal && settings.IsVisible, "Settings opens with its minimized owner restored");
+                Check(settings.Height <= SystemParameters.WorkArea.Height, "Settings fits the available desktop height");
+                await DesktopActivation.Redirect(LaunchDestination.Settings, channel);
+                Check(app.Windows.Cast<Window>().Count(w => w.Title == "Buddy · Settings") == 1, "Repeated Settings launches reuse one window");
+                var content = (StackPanel)((ScrollViewer)settings.Content).Content;
+                var assistant = content.Children.OfType<Button>().Single(b => (string)b.Content == "Assistant & internet");
+                assistant.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Check(app.Windows.Cast<Window>().Any(w => w.Title == "Buddy · Assistant settings" && w.IsVisible), "Settings reaches the Agent and internet preferences without changing them");
+                foreach (var child in home.OwnedWindows.Cast<Window>().ToArray()) child.Close();
+                home.OpenFromLaunch(LaunchDestination.Settings);
+                Check(app.Windows.Cast<Window>().Any(w => w.Title == "Buddy · Settings" && w.IsVisible), "Settings can reopen after being closed");
+                Console.WriteLine($"ALL {checks} SETTINGS WINDOW CHECKS PASSED"); exit = 0;
+            } catch (Exception ex) { Console.Error.WriteLine(ex); }
+            finally { await home.Quit(); }
+        };
+        app.Run(home); return exit;
     }
 }

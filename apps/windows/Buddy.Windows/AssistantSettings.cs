@@ -10,6 +10,32 @@ namespace Buddy.Windows;
 public sealed partial class MainWindow
 {
     private PracticeWindow? practice;
+    private Window? settingsWindow;
+    private bool keepHomeOpen = true;
+    internal void ConfigureLaunch(LaunchDestination destination) => keepHomeOpen = destination != LaunchDestination.Background;
+    internal void OpenFromLaunch(LaunchDestination destination)
+    {
+        if (destination == LaunchDestination.Settings) OpenSettings();
+        else if (destination == LaunchDestination.Home) Summon();
+        Diagnostics.Write("Desktop navigation: " + destination);
+    }
+    private void OpenSettings()
+    {
+        Summon();
+        if (settingsWindow is not null) { settingsWindow.Show(); settingsWindow.WindowState = WindowState.Normal; settingsWindow.Activate(); return; }
+        var p = new StackPanel(); p.Children.Add(Text("Settings", 28));
+        p.Children.Add(Text("Choose what you want to change.", 14, Muted));
+        p.Children.Add(Btn("Assistant & internet", AssistantSettings, true));
+        p.Children.Add(Text("Agent mode, web research, privacy and activity log", 13, Muted));
+        p.Children.Add(Btn("Cursor, shortcuts & voice", CursorSettings));
+        p.Children.Add(Text("Keyboard shortcuts, microphone context and spoken answers", 13, Muted));
+        p.Children.Add(Btn("PC setup & models", () => _ = Setup()));
+        p.Children.Add(Text("Local AI connection and model downloads", 13, Muted));
+        p.Children.Add(Btn("Paired phones", Pair));
+        settingsWindow = Dialog("Buddy · Settings", p, 560, 550);
+        settingsWindow.Closed += (_, _) => settingsWindow = null;
+        settingsWindow.Activate();
+    }
     private void StartWorkflow(string mode, string text)
     {
         var active = Native.GetForegroundWindow(); if (active != IntPtr.Zero && !Native.IsOwnWindow(active)) previousWindow = active;

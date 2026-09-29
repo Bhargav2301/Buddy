@@ -1,5 +1,11 @@
 # Buddy validation record
 
+## Settings access repair — 29 September 2026, version 0.3.1
+
+32 desktop checks pass, including second-process Home/Settings delivery through a current-user named pipe, a startup race, invalid-command recovery and bounded connection failure. Eight isolated WPF checks pass: restoring hidden Home, restoring a minimized owner, opening and reusing Settings, fitting the desktop height, reaching Assistant & internet without changing preferences, and reopening a closed Settings window. The fixture does not start the user store/service or register global hotkeys. `build-windows.ps1` now runs it in CI with `--settings-navigation`.
+
+These validate Settings navigation only. Earlier microphone/action/overlay acceptance limitations below remain unchanged.
+
 ## Windows assistant preview — 28 September 2026
 
 29 service checks, 22 desktop logic checks and 54 assistant checks passed on the Windows development host, including four live checks against the installed Gemma 3 4B model and real public HTTPS. The checks cover actual structured action and guide planning, fetched evidence passed back to inference, citations, ambiguous/stale targets, allowlisted actions, web-off isolation, blocked URLs/IP ranges/redirects, HTML extraction, size limits, encrypted audit metadata, and global cancellation. The self-contained Windows package also passed PE/dependency validation and the native apphost integrity probe.

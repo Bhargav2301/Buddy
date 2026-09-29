@@ -6,6 +6,11 @@ BUDDY - WINDOWS CURSOR COMPANION
 4. If prompted in Buddy Home, finish PC setup: install/start Ollama and
    download the chat model. No cloud API key is required.
 
+SETTINGS: Double-click Buddy to open Home, even when Buddy is already running.
+Use the pinned Settings button or the new Buddy Settings desktop/Start menu shortcut.
+The tray and quick chat also have Settings. Portable: Open-Buddy-Settings.cmd.
+Only Buddy.exe --background requests startup with Home hidden.
+
 Ctrl + Space          Open the compact chat bar beside your pointer
 Ctrl + Shift + Space  Open the separate voice overlay; speak, then pause
 Enter                 Send typed text (Shift + Enter adds a line)
