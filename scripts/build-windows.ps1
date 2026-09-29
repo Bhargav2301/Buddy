@@ -14,6 +14,8 @@ dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Windows.IntegrationTests
 if ($LASTEXITCODE -ne 0) { throw 'Settings window navigation tests failed.' }
 dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Assistant.Tests') -c Release -r win-x64 --self-contained true
 if ($LASTEXITCODE -ne 0) { throw 'Assistant safety and tool tests failed.' }
+dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Mvp.Tests') -c Release -r win-x64 --self-contained true
+if ($LASTEXITCODE -ne 0) { throw 'MVP workflow tests failed.' }
 dotnet publish (Join-Path $buddyRoot 'apps\windows\Buddy.Windows\Buddy.Windows.csproj') -c Release -r win-x64 --self-contained true -o $buddyOutput
 if ($LASTEXITCODE -ne 0) { throw 'Windows build failed.' }
 dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Windows.PackageChecks') -c Release -r win-x64 --self-contained true -- $buddyOutput

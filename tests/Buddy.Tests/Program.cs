@@ -68,6 +68,11 @@ try
     var pairJson = await pairResponse.Content.ReadFromJsonAsync<JsonElement>(); tls.DefaultRequestHeaders.Authorization = new("Bearer", pairJson.GetProperty("token").GetString());
     var created = await tls.PostAsJsonAsync("/v1/conversations", new NoteRequest("Across devices", "")); created.EnsureSuccessStatusCode();
     Assert((await tls.PostAsJsonAsync("/v1/agent/plan", new PlanningRequest("Open Notepad", new("example", "Example", [])))).StatusCode == HttpStatusCode.Forbidden, "paired phones cannot request PC action plans");
+    Assert((await tls.PostAsJsonAsync("/v1/agent/continue", new AgentContinuation("Task", new("example", "Example", []), [new(1, new("wait"), true, "Waited")], 24))).StatusCode == HttpStatusCode.Forbidden, "paired phones cannot continue a desktop action run");
+    Assert((await tls.GetAsync("/v1/privacy/log")).StatusCode == HttpStatusCode.Forbidden, "paired phones cannot read desktop privacy history");
+    var listed = await tls.GetFromJsonAsync<JsonElement>("/v1/conversations"); var sharedId = listed[0].GetProperty("id").GetString();
+    var patch = await tls.PatchAsJsonAsync("/v1/conversations/" + sharedId, new ConversationUpdate(Pinned:true)); patch.EnsureSuccessStatusCode();
+    Assert((await tls.GetFromJsonAsync<JsonElement>("/v1/conversations"))[0].GetProperty("pinned").GetBoolean(), "conversation organization updates through the authenticated compatible API");
     Assert((await tls.GetFromJsonAsync<JsonElement>("/v1/conversations")).GetArrayLength() == 1, "paired phone sees shared conversation store through pinned HTTPS");
     Assert((await tls.PostAsJsonAsync("/v1/pair", new PairRequest(code, "Other phone"))).StatusCode == HttpStatusCode.Forbidden, "HTTP pairing code replay is rejected");
     await host.Service.Store.Update(s => s.Devices.ClearResult()); Assert((await tls.GetAsync("/v1/conversations")).StatusCode == HttpStatusCode.Unauthorized, "revoked phone loses API access");
@@ -87,6 +92,9 @@ sealed class StubOllama : HttpMessageHandler
         if (request.RequestUri!.AbsolutePath == "/api/tags") return new(HttpStatusCode.OK) { Content = new StringContent("{\"models\":[{\"name\":\"qwen3:4b-instruct-2507-q4_K_M\"},{\"name\":\"gemma3:4b\"}]}") };
         Calls++; LastPayload = await request.Content!.ReadAsStringAsync(ct);
         if (Delay) { Started.TrySetResult(); await Task.Delay(Timeout.InfiniteTimeSpan, ct); }
+        if (request.RequestUri.AbsolutePath == "/api/embed") return new(HttpStatusCode.OK) { Content = new StringContent("{\"embeddings\":[[1,0],[1,0]]}") };
+        using var payload = JsonDocument.Parse(LastPayload);
+        if (!payload.RootElement.GetProperty("stream").GetBoolean()) return new(HttpStatusCode.OK) { Content = new StringContent(JsonSerializer.Serialize(new { message = new { content = "{\"preserved\":true,\"scoreBefore\":40,\"scoreAfter\":60,\"changes\":[]}" }, done = true })) };
         return new(HttpStatusCode.OK) { Content = new StringContent(string.Join("\n", Fragments.Select(content => JsonSerializer.Serialize(new { message = new { content }, done = false }))) + "\n{\"message\":{\"content\":\"\"},\"done\":true}\n") };
     }
 }

@@ -68,6 +68,20 @@ try {
     try { await pending; } catch (OperationCanceledException) { stopped = true; } Check(stopped, "Global stop cancels planning inference"); model.Delay = false;
     model.Replies.Enqueue(JsonSerializer.Serialize(new AssistantPlan("Wait", [new("wait")]), StateStore.Json));
     Check((await service.PlanAgent(planning, default)).Actions!.Count == 1, "Cancelled planning releases the inference lock");
+    var continuation = new AgentContinuation("Click Export", planning.Context, [new(1, new("click", Ref:"a"), true, "Activated Export")], 24);
+    model.Replies.Enqueue("{\"status\":\"done\",\"summary\":\"Export dialog is visible\",\"actions\":[]}");
+    Check((await service.ContinueAgent(continuation, default)).Status == "done", "Continuation verifies completion using a fresh screen and actual results");
+    Check(model.Payloads.Last().Contains("Activated Export") && model.Payloads.Last().Contains("untrustedActionResults"), "Verification receives execution evidence as untrusted data");
+    model.Replies.Enqueue("{\"status\":\"continue\",\"summary\":\"Next\",\"actions\":[{\"kind\":\"wait\"},{\"kind\":\"wait\"}]}");
+    await Reject(async () => await service.ContinueAgent(continuation with { RemainingActions = 1 }, default), "INVALID_PLAN", "Continuation cannot exceed the remaining action budget");
+    model.Replies.Enqueue("{\"status\":\"done\",\"summary\":\"Done\",\"actions\":[{\"kind\":\"wait\"}]}");
+    await Reject(async () => await service.ContinueAgent(continuation, default), "INVALID_PLAN", "A completed decision cannot smuggle another action");
+    await Reject(async () => await service.ContinueAgent(continuation with { Results = [new(7, new("wait"), true, "Waited")] }, default), "INVALID_RUN", "Out-of-order results are refused before inference");
+    model.Replies.Enqueue("{\"tool\":\"done\",\"input\":\"\"}");
+    model.Replies.Enqueue("{\"summary\":\"Export\",\"steps\":[{\"instruction\":\"Select Export\",\"ref\":\"a\",\"target\":\"Export\",\"role\":\"Button\",\"primitive\":\"ring\",\"expect\":{\"kind\":\"manual\",\"target\":\"\",\"role\":\"\"}}]}");
+    int guidePayload = model.Payloads.Count;
+    await service.PlanGuide(planning with { UseWeb = true, Context = planning.Context with { Title = "screen-private-marker" } }, default);
+    Check(!model.Payloads[guidePayload].Contains("screen-private-marker") && model.Payloads.Last().Contains("screen-private-marker"), "Guide research never includes the screen in web-tool decisions");
     await service.Audit("type", "Example field", "completed");
     Check(!Encoding.UTF8.GetString(File.ReadAllBytes(Path.Combine(directory,"buddy.v1.encrypted"))).Contains("Example field"), "Activity metadata remains encrypted at rest");
 

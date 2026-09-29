@@ -17,6 +17,8 @@ public sealed class StateStore
         protector = provider.CreateProtector("Buddy.State.v1");
         // Fail closed on corruption: never silently overwrite a user's history.
         state = File.Exists(path) ? JsonSerializer.Deserialize<BuddyState>(protector.Unprotect(File.ReadAllBytes(path)), Json)! : new();
+        if (state is null || state.SchemaVersion > 2) throw new InvalidOperationException("This Buddy data was created by a newer version. Update Buddy before opening it.");
+        state.SchemaVersion = 2;
     }
     public async Task<T> Read<T>(Func<BuddyState, T> fn)
     {

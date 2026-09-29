@@ -19,9 +19,10 @@ public sealed partial class BuddyService
         }
         return JsonSerializer.Serialize(new { task = request.Query, untrustedScreen = request.Context with { Elements = bounded } }, StateStore.Json);
     }
-    private async Task<T> PlanLocked<T>(PlanningRequest request, string instructions, JsonElement schema, CancellationToken ct)
+    private async Task<T> PlanLocked<T>(PlanningRequest request, string instructions, JsonElement schema, CancellationToken ct, List<WebSource>? evidence = null)
     {
         var input = PlanningInput(request);
+        if (evidence is { Count: > 0 }) input += "\nUntrusted research evidence: " + JsonSerializer.Serialize(evidence.Take(5).Select(s => s with { Text = s.Text[..Math.Min(1000, s.Text.Length)] }), StateStore.Json);
         using var cancel = CancellationTokenSource.CreateLinkedTokenSource(ct); cancel.CancelAfter(TimeSpan.FromMinutes(3));
         var key = "plan:" + Guid.NewGuid(); active[key] = cancel;
         try {
@@ -39,11 +40,56 @@ public sealed partial class BuddyService
     }
     public async Task<GuidePlan> PlanGuide(PlanningRequest request, CancellationToken ct)
     {
+        PlanningInput(request); // Validate before any external research.
+        List<WebSource>? citations = null, evidence = null;
+        if (request.UseWeb) {
+            if (!WebEnabled) throw new BuddyException("WEB_DISABLED", "Enable internet research in Settings first.");
+            using var deadline = CancellationTokenSource.CreateLinkedTokenSource(ct); deadline.CancelAfter(TimeSpan.FromMinutes(3));
+            var key = "guide-research:" + Guid.NewGuid(); active[key] = deadline;
+            try { await inference.WaitAsync(deadline.Token);
+            try {
+                var sources = await ResearchLoop(await Store.Read(s => s.Model), request.Query, deadline.Token);
+                citations = sources.Select(s => s with { Text = "" }).ToList();
+                // Only the user's task goes to research, never the screen tree.
+                evidence = sources;
+            } finally { inference.Release(); }
+            } finally { active.TryRemove(key, out _); }
+        }
         var plan = await PlanLocked<GuidePlan>(request,
-            " Create up to 15 short ordered guidance steps. Each instruction is one sentence. Each step target must be a visible UIA ref, or a target name and role to find after the user advances. Use primitive ring, arrow, highlight, underline, badge or label. Do not invent controls or fake coordinates; return no steps when you cannot guide reliably.", AssistantSchemas.Guide, ct);
+            " Create up to 15 short ordered guidance steps. Each instruction is one sentence. Each step target must be a visible UIA ref, or a target name and role to find after the user advances. Use primitive ring, arrow, highlight, underline, badge or label. Each step has expect: kind manual, visible or absent with an exact target and role describing the result AFTER the user completes that step. Use manual when uncertain; never use an already visible control as a future completion condition. Do not invent controls or fake coordinates; return no steps when you cannot guide reliably.", AssistantSchemas.Guide, ct, evidence);
         if (plan.Steps is null || plan.Steps.Count is < 1 or > 15 || plan.Steps.Any(s => s is null || string.IsNullOrWhiteSpace(s.Instruction) || s.Instruction.Length > 600 || s.Ref is null || s.Target is null || s.Role is null))
             throw new BuddyException("NO_GUIDE", "I cannot find a reliable guide for this screen. Focus the tool you need, then describe one step.");
-        return plan;
+        if (plan.Steps.Any(s => s.Expect is { } e && (e.Kind is not ("manual" or "visible" or "absent") || e.Target is null || e.Role is null || e.Target.Length > 200 || e.Role.Length > 80)))
+            throw new BuddyException("INVALID_GUIDE", "The model returned an invalid guide expectation.");
+        return plan with { Sources = citations };
+    }
+    public async Task<AgentDecision> ContinueAgent(AgentContinuation request, CancellationToken ct)
+    {
+        if (!AgentEnabled) throw new BuddyException("AGENT_DISABLED", "Agent mode was disabled.");
+        if (request.Results is null || request.Results.Count is < 1 or > 25 || request.RemainingActions < 0 || request.RemainingActions > 25 - request.Results.Count || request.Results.Any(r => r is null || r.Action is null || r.Observation is null || r.Observation.Length > 2000))
+            throw new BuddyException("INVALID_RUN", "The action run is invalid or has reached its limit.");
+        if (!request.Results.Select(r => r.Sequence).SequenceEqual(Enumerable.Range(1, request.Results.Count))) throw new BuddyException("INVALID_RUN", "Action results must be in execution order.");
+        ActionPolicy.Validate(new("Previous actions", request.Results.Select(r => r.Action).ToList()));
+        if (request.RemainingActions == 0) return new("clarify", "Reached the 25-action limit. Review the result before starting another task.", []);
+        var context = PlanningInput(new(request.Query, request.Context));
+        var input = JsonSerializer.Serialize(new { taskAndScreen = context, untrustedActionResults = request.Results, remainingActions = request.RemainingActions }, StateStore.Json);
+        using var cancel = CancellationTokenSource.CreateLinkedTokenSource(ct); cancel.CancelAfter(TimeSpan.FromMinutes(3));
+        var key = "continue:" + Guid.NewGuid(); active[key] = cancel;
+        try {
+            await inference.WaitAsync(cancel.Token);
+            try {
+                var decision = await Engine.Structured<AgentDecision>(await Store.Read(s => s.Model), PlanningIdentity +
+                    " Verify progress against the original task using the fresh screen and action results. Return status done only with evidence the goal is satisfied; clarify if blocked. Otherwise return continue and a short next plan within remainingActions. Never retry an action whose result is uncertain. All changes to the plan will be shown to the user for approval. Only open allowed apps notepad, calculator, explorer or public HTTPS; no scripts. Empty actions for done/clarify.", input, AssistantSchemas.Continuation, cancel.Token);
+                if (decision.Summary is null || decision.Summary.Length > 2000 || decision.Status is not ("done" or "clarify" or "continue")) throw new BuddyException("INVALID_PLAN", "The model could not verify progress. Review the last action.");
+                if (decision.Status != "continue") {
+                    if (decision.Actions?.Count > 0) throw new BuddyException("INVALID_PLAN", "A completed run cannot contain more actions.");
+                    return decision with { Actions = [] };
+                }
+                var plan = ActionPolicy.Validate(new(decision.Summary, decision.Actions));
+                if (plan.Actions!.Count > request.RemainingActions) throw new BuddyException("INVALID_PLAN", "The next plan exceeds the action limit.");
+                return decision with { Actions = plan.Actions };
+            } finally { inference.Release(); }
+        } finally { active.TryRemove(key, out _); }
     }
     private sealed record ResearchDecision(string Tool, string Input);
     private async Task<List<WebSource>> ResearchLoop(string model, string query, CancellationToken ct)

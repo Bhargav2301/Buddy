@@ -89,7 +89,8 @@ public sealed class BuddyHost : IAsyncDisposable
             return new { token, deviceId = id, name };
         });
         app.MapGet("/v1/status", async (CancellationToken ct) => { var s = await store.Read(s => s); return await service.Engine.Status(s.Model, s.VisionModel, ct); });
-        app.MapGet("/v1/conversations", async () => await store.Read(s => s.Conversations.OrderByDescending(c => c.UpdatedAt).Select(c => new { c.Id, c.Title, c.UpdatedAt }).ToList()));
+        app.MapGet("/v1/conversations", async () => await store.Read(s => s.Conversations.OrderByDescending(c => c.Pinned).ThenByDescending(c => c.UpdatedAt).Select(c => new { c.Id, c.Title, c.UpdatedAt, c.Pinned, c.Archived }).ToList()));
+        app.MapPatch("/v1/conversations/{id}", (string id, ConversationUpdate input) => service.UpdateConversation(id, input));
         app.MapPost("/v1/conversations", (NoteRequest input) => service.CreateConversation(input.Title));
         app.MapGet("/v1/conversations/{id}", async (string id) => await store.Read(s => s.Conversations.FirstOrDefault(c => c.Id == Security.Id(id))) ?? throw new BuddyException("NOT_FOUND", "Conversation not found.", 404));
         app.MapDelete("/v1/conversations/{id}", async (string id) => { await service.DeleteConversation(id); return Results.NoContent(); });
@@ -100,12 +101,31 @@ public sealed class BuddyHost : IAsyncDisposable
             catch (BuddyException ex) { await ctx.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new StreamEvent("error", ex.Message, ex.Code), StateStore.Json) + "\n"); }
             catch (Exception) when (!ctx.RequestAborted.IsCancellationRequested) { await ctx.Response.WriteAsync("{\"type\":\"error\",\"code\":\"ENGINE_ERROR\",\"text\":\"The local AI connection failed. Check PC setup.\"}\n"); }
         });
-        app.MapPost("/v1/refine", async (RefineRequest input, CancellationToken ct) => new { refinedPrompt = await service.Refine(input.Prompt, ct), engine = "buddy_local" });
+        app.MapPost("/v1/refine", (RefineRequest input, CancellationToken ct) => service.RefineDetailed(input, ct));
+        app.MapPost("/v1/refine/stream", async (RefineRequest input, HttpContext ctx) => {
+            RefinementPolicy.Validate(input);
+            ctx.Response.ContentType = "application/x-ndjson";
+            try { await foreach (var item in service.RefineStream(input, ctx.RequestAborted)) {
+                await ctx.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(item, StateStore.Json) + "\n", ctx.RequestAborted);
+                await ctx.Response.Body.FlushAsync(ctx.RequestAborted);
+            } }
+            catch (OperationCanceledException) when (!ctx.RequestAborted.IsCancellationRequested) { await ctx.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new RefinementEvent("error", "Refinement stopped. Your original is unchanged."), StateStore.Json) + "\n"); }
+            catch (BuddyException ex) { await ctx.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new RefinementEvent("error", ex.Message), StateStore.Json) + "\n", ctx.RequestAborted); }
+            catch (Exception) when (!ctx.RequestAborted.IsCancellationRequested) { await ctx.Response.WriteAsync("{\"type\":\"error\",\"text\":\"Local refinement failed. Your original is unchanged.\"}\n", ctx.RequestAborted); }
+        });
         app.MapPost("/v1/agent/plan", (PlanningRequest input, HttpContext ctx, CancellationToken ct) => {
             if (ctx.Items["device"] as string != "desktop") throw new BuddyException("PC_ONLY", "Create computer-control plans on the PC.", 403);
             return service.PlanAgent(input, ct);
         });
         app.MapPost("/v1/guide/start", (PlanningRequest input, CancellationToken ct) => service.PlanGuide(input, ct));
+        app.MapPost("/v1/agent/continue", (AgentContinuation input, HttpContext ctx, CancellationToken ct) => {
+            if (ctx.Items["device"] as string != "desktop") throw new BuddyException("PC_ONLY", "Continue computer-control tasks on the PC.", 403);
+            return service.ContinueAgent(input, ct);
+        });
+        app.MapGet("/v1/privacy/log", (Func<HttpContext, Task<List<AuditEntry>>>)(ctx => {
+            if (ctx.Items["device"] as string != "desktop") throw new BuddyException("PC_ONLY", "Open Privacy Center on the PC.", 403);
+            return store.Read(s => s.Audit.TakeLast(20).Reverse().ToList());
+        }));
         app.MapGet("/v1/memories", () => store.Read(s => s.Memories));
         app.MapGet("/v1/prompts", () => store.Read(s => s.Prompts));
         foreach (var kind in new[] { "memories", "prompts" })

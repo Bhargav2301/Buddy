@@ -7,11 +7,16 @@ public record ScreenElement(string Ref, string Name, string Role, double X, doub
 public record ScreenContext(string App, string Title, List<ScreenElement> Elements);
 public record AssistantAction(string Kind = "", string Ref = "", string Target = "", string Role = "", string Value = "", string Description = "", string Risk = "high");
 public record AssistantPlan(string Summary = "", List<AssistantAction>? Actions = null);
-public record GuideStep(string Instruction = "", string Ref = "", string Target = "", string Role = "", string Primitive = "ring");
-public record GuidePlan(string Summary = "", List<GuideStep>? Steps = null);
-public record PlanningRequest(string Query, ScreenContext Context);
+public record GuideExpectation(string Kind = "manual", string Target = "", string Role = "");
+public record GuideStep(string Instruction = "", string Ref = "", string Target = "", string Role = "", string Primitive = "ring", GuideExpectation? Expect = null);
+public record GuidePlan(string Summary = "", List<GuideStep>? Steps = null, List<WebSource>? Sources = null);
+public record PlanningRequest(string Query, ScreenContext Context, bool UseWeb = false);
+public record ActionResult(int Sequence, AssistantAction Action, bool Success, string Observation);
+public record AgentContinuation(string Query, ScreenContext Context, List<ActionResult> Results, int RemainingActions);
+public record AgentDecision(string Status, string Summary, List<AssistantAction>? Actions);
+public record GroundedTarget(ScreenElement Element, string Provenance, double Confidence, bool CanExecute);
 public record AuditEntry(DateTimeOffset At, string Kind, string Target, string Result);
-public record SavedGuide(string Id, string Query, GuidePlan Plan, int Index, DateTimeOffset UpdatedAt);
+public record SavedGuide(string Id, string Query, GuidePlan Plan, int Index, DateTimeOffset UpdatedAt, bool Completed = false);
 public record WebSource(string Title, string Url, string Text);
 
 public static class ActionPolicy
@@ -24,11 +29,25 @@ public static class ActionPolicy
             "send|submit|delete|remove|pay|buy|purchase|install|confirm|transfer|publish|share|allow|accept|approve|sign|permission|execute|run", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100))
         || action.Kind is "click" or "invoke" ? "high" : "low";
 
+    // The evidence comes from fresh desktop UIA inspection, never from model output or a phone.
+    public static string LiveRisk(AssistantAction action, ScreenElement? element, bool reversibleEdit = false, bool navigationPattern = false)
+    {
+        var text = string.Join(" ", action.Target, element?.Name, action.Description);
+        if (Regex.IsMatch(text, @"\b(send|submit|delete|remove|pay|buy|purchase|install|transfer|publish|share|allow|accept|approve|confirm|save|sign|permission|execute|run|password|secret|credential)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100))) return "high";
+        if (action.Kind is "read" or "wait") return "low";
+        if (action.Kind == "open") return Apps.Contains(action.Value) ? "low" : "high";
+        if (action.Kind == "keys") return action.Value is "Tab" or "Shift+Tab" or "Escape" or "Up" or "Down" or "Left" or "Right" ? "low" : "high";
+        if (element is null || !element.Enabled) return "high";
+        if (action.Kind == "type" && element.Role == "Edit" && reversibleEdit) return "low";
+        if (action.Kind is "click" or "invoke" && navigationPattern) return "low";
+        return "high";
+    }
+
     public static AssistantPlan Validate(AssistantPlan plan)
     {
-        if (plan.Actions is null || plan.Actions.Count is < 1 or > 25) throw new BuddyException("INVALID_PLAN", "The model could not make a bounded action plan. Try one smaller task.");
+        if (plan.Summary is null || plan.Summary.Length > 2000 || plan.Actions is null || plan.Actions.Count is < 1 or > 25) throw new BuddyException("INVALID_PLAN", "The model could not make a bounded action plan. Try one smaller task.");
         var actions = plan.Actions.Select(a => {
-            if (a is null || !Kinds.Contains(a.Kind) || a.Value is null || a.Target is null || a.Role is null || a.Ref is null || a.Description is null || a.Value.Length > 4000 || a.Target.Length > 200 || a.Description.Length > 500)
+            if (a is null || !Kinds.Contains(a.Kind) || a.Value is null || a.Target is null || a.Role is null || a.Ref is null || a.Description is null || a.Value.Length > 4000 || a.Target.Length > 200 || a.Description.Length > 500 || a.Ref.Length > 100 || a.Role.Length > 80)
                 throw new BuddyException("INVALID_PLAN", "The model returned an unsupported action. Nothing was executed.");
             if (a.Kind == "open" && !Apps.Contains(a.Value)) WebResearch.ValidateUrl(a.Value);
             if (a.Kind == "keys" && !Keys.Contains(a.Value)) throw new BuddyException("INVALID_PLAN", "The requested keyboard shortcut is not allowed.");
@@ -72,8 +91,29 @@ public static class AssistantSchemas
                 properties = fields.Split(',').ToDictionary(k => k, k => (object)(k == "kind" ? new { type = "string", @enum = ActionPolicy.Kinds } : (object)new { type = "string" })),
                 required = fields.Split(','), additionalProperties = false } } }, required = new[] { "summary", array }, additionalProperties = false });
     public static readonly JsonElement Agent = Schema("action", "actions", "kind,ref,target,role,value,description,risk");
-    public static readonly JsonElement Guide = Schema("step", "steps", "instruction,ref,target,role,primitive");
+    public static readonly JsonElement Guide = GuideSchema();
+    private static JsonElement GuideSchema()
+    {
+        var node = System.Text.Json.Nodes.JsonNode.Parse(Schema("step", "steps", "instruction,ref,target,role,primitive,expect").GetRawText())!;
+        node["properties"]!["steps"]!["items"]!["properties"]!["expect"] = System.Text.Json.Nodes.JsonNode.Parse(JsonSerializer.Serialize(new { type = "object", properties = new {
+            kind = new { type = "string", @enum = new[] { "manual", "visible", "absent" } }, target = new { type = "string" }, role = new { type = "string" }
+        }, required = new[] { "kind", "target", "role" }, additionalProperties = false }));
+        return JsonSerializer.SerializeToElement(node);
+    }
     public static readonly JsonElement Research = JsonSerializer.SerializeToElement(new { type = "object", properties = new {
         tool = new { type = "string", @enum = new[] { "web.search", "web.fetch", "done" } }, input = new { type = "string" }
     }, required = new[] { "tool", "input" }, additionalProperties = false });
+    public static readonly JsonElement Continuation = JsonSerializer.SerializeToElement(new { type = "object", properties = new {
+        status = new { type = "string", @enum = new[] { "continue", "done", "clarify" } }, summary = new { type = "string" },
+        actions = Agent.GetProperty("properties").GetProperty("actions")
+    }, required = new[] { "status", "summary", "actions" }, additionalProperties = false });
+}
+
+public static class GuideExpectations
+{
+    public static bool Matches(GuideExpectation? expected, ScreenContext context) => expected?.Kind switch {
+        "visible" => GroundingResolver.Resolve(context.Elements, "", expected.Target, expected.Role) is not null,
+        "absent" => expected.Target.Length > 0 && !context.Elements.Any(e => e.Name.Equals(expected.Target, StringComparison.OrdinalIgnoreCase) && (expected.Role.Length == 0 || e.Role.Equals(expected.Role, StringComparison.OrdinalIgnoreCase))),
+        _ => false
+    };
 }
