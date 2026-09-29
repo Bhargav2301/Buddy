@@ -27,9 +27,8 @@ if ($LASTEXITCODE -ne 0) { throw 'Windows publish failed.' }
 dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Windows.PackageChecks') -c Release -r win-x64 --self-contained true -- $buddyOutput |
     Tee-Object -FilePath (Join-Path $buddyValidation 'Package.txt')
 if ($LASTEXITCODE -ne 0) { throw 'Package validation failed.' }
-$buddyProbe = Start-Process -FilePath (Join-Path $buddyOutput 'Buddy.exe') -ArgumentList '--check-package' -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $buddyValidation 'Native-dependencies.txt') -RedirectStandardError (Join-Path $buddyValidation 'Native-dependencies-errors.txt')
-if (-not $buddyProbe.WaitForExit(30000)) { $buddyProbe.Kill(); throw 'Dependency probe timed out.' }
-if ($buddyProbe.ExitCode -ne 0) { throw 'Native dependency probe failed.' }
+. (Join-Path $buddyRoot 'scripts\Invoke-PackageProbe.ps1')
+Invoke-BuddyPackageProbe -Directory $buddyOutput -LogDirectory $buddyValidation
 foreach ($buddyScript in @('Install-Buddy.cmd', 'Rollback-Buddy.cmd', 'Run-Buddy.cmd', 'Open-Buddy-Settings.cmd', 'Install-Buddy.ps1', 'Enable-Phone-Access.ps1', 'Setup-Local-AI.ps1', 'Install-Prerequisites.cmd', 'Install-Prerequisites.ps1')) {
     Copy-Item -LiteralPath (Join-Path $buddyRoot ('scripts\' + $buddyScript)) -Destination $buddyOutput
 }
