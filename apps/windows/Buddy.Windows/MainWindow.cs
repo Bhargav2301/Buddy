@@ -290,9 +290,20 @@ public sealed partial class MainWindow : Window
         if (host is null || busy || string.IsNullOrWhiteSpace(input.Text)) return; var original = input.Text; request = new(); SetBusy(true); status.Text = "Refining with local AI…";
         try
         {
-            var improved = await host.Service.Refine(original, request.Token); var p = new StackPanel(); p.Children.Add(Text("Review your refined prompt", 23)); p.Children.Add(Text("Apply replaces your draft. You decide when to send it.", 13, Muted));
-            var editor = new TextBox { Text = improved, AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 260 }; StyleBox(editor); p.Children.Add(editor); Window? w = null;
-            p.Children.Add(Btn("Apply to draft", () => { input.Text = editor.Text; w?.Close(); status.Text = "Refined prompt applied — not sent."; }, true)); p.Children.Add(Btn("Keep original", () => w?.Close())); w = Dialog("Buddy · Refine", p);
+            var result = await host.Service.RefineDetailed(new(original), request.Token); var p = new StackPanel(); p.Children.Add(Text("Review your refined prompt · on this PC", 23));
+            var notice = Text(result.Message, 13, Muted); p.Children.Add(notice);
+            var editor = new TextBox { Text = result.RefinedPrompt, IsReadOnly = true, AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 260 }; StyleBox(editor); p.Children.Add(editor); Window? w = null;
+            DateTimeOffset? applied = null;
+            var apply = Btn("Apply to draft", () => {
+                if (input.Text != original || applied is not null) { notice.Text = "The draft changed. Copy the rewrite instead."; return; }
+                input.Text = result.RefinedPrompt; applied = DateTimeOffset.UtcNow; notice.Text = "Applied without sending. Undo is available for 30 seconds.";
+            }, true); apply.IsEnabled = result.Accepted; p.Children.Add(apply);
+            p.Children.Add(Btn("Undo", () => {
+                if (applied is null || DateTimeOffset.UtcNow - applied > TimeSpan.FromSeconds(30) || input.Text != result.RefinedPrompt) { notice.Text = "Undo unavailable: the field changed or 30 seconds elapsed."; return; }
+                input.Text = original; applied = null; notice.Text = "Exact original restored.";
+            }));
+            p.Children.Add(Btn("Copy", () => System.Windows.Clipboard.SetText(editor.Text)));
+            p.Children.Add(Btn("Close", () => w?.Close())); w = Dialog("Buddy · Refine", p);
         }
         catch (Exception ex) { status.Text = ex is OperationCanceledException ? "Refinement stopped." : ex.Message; }
         finally { request?.Dispose(); request = null; SetBusy(false); }
@@ -318,8 +329,16 @@ public sealed partial class MainWindow : Window
         {
             var s = await host.Service.Store.Read(s => s); var available = await host.Service.Engine.Status(s.Model, s.VisionModel);
             if (!available.Installed.Contains(s.VisionModel)) { status.Text = "Download the optional vision model in PC setup first."; return; }
-            Native.CheckWindow(previousWindow); Hide(); await Task.Delay(250); byte[] bytes; try { bytes = Native.Capture(previousWindow); } finally { Summon(); }
-            var p = new StackPanel(); p.Children.Add(Text("Check this image before sharing", 23)); p.Children.Add(Text("Only this capture is shared with the local vision model. It is not saved in chat history. Image redaction is manual; cancel if private data is visible.", 13, Muted));
+            Native.CheckWindow(previousWindow); Hide(); byte[] bytes;
+            using var captureTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(8));
+            try {
+                if (!InputNative.SetForegroundWindow(previousWindow)) throw new InvalidOperationException("Activate the window you want to capture first.");
+                await Task.Delay(150, captureTimeout.Token);
+                var perception = assistant?.Perception ?? new ScreenPerception(() => desktop);
+                var snapshot = await perception.Capture(previousWindow, captureTimeout.Token);
+                bytes = await perception.Image(snapshot, captureTimeout.Token) ?? throw new InvalidOperationException("Buddy could not establish a private capture scope for this window. Use reviewed screen text instead.");
+            } finally { Summon(); }
+            var p = new StackPanel(); p.Children.Add(Text("Check this image before sharing", 23)); p.Children.Add(Text("Detected private fields are masked. Review the image and cancel if anything private remains. This capture stays on this PC and is not saved in chat history.", 13, Muted));
             p.Children.Add(new System.Windows.Controls.Image { Source = Bitmap(bytes), MaxHeight = 390 }); Window? w = null; bool retained = false;
             p.Children.Add(Btn("Attach image", () => { ClearContext(); image = bytes; retained = true; contextLabel.Text = "Window image attached · sent with your next message"; w?.Close(); }, true)); p.Children.Add(Btn("Discard", () => w?.Close()));
             w = Dialog("Buddy · Capture preview", p, 720); w.Closed += (_, _) => { if (!retained) Array.Clear(bytes); };
@@ -347,7 +366,9 @@ public sealed partial class MainWindow : Window
             finally { download.Dispose(); download = null; }
         }
         p.Children.Add(Btn("Download & use chat model", () => _ = Pull(model.SelectedItem?.ToString() ?? "qwen3:4b-instruct-2507-q4_K_M", true), true));
-        p.Children.Add(Btn("Download vision model (optional)", () => _ = Pull("gemma3:4b", false))); p.Children.Add(Btn("Pause download", () => download?.Cancel()));
+        p.Children.Add(Btn("Download vision model (optional)", () => _ = Pull("gemma3:4b", false)));
+        p.Children.Add(Btn("Download local Refine intent-check model", () => _ = Pull(s.EmbeddingModel, false)));
+        p.Children.Add(Btn("Pause download", () => download?.Cancel()));
         async Task Check() { var st = await host.Service.Store.Read(st => st); var result = await host.Service.Engine.Status(st.Model, st.VisionModel); info.Text = result.Message + "\nSelected: " + st.Model + "\nInstalled: " + string.Join(", ", result.Installed); }
         p.Children.Add(Btn("Check connection", () => _ = Check())); p.Children.Add(Text("Closing Buddy to the tray keeps phone access available. Quit stops it. No cloud API key is needed.", 13, Muted));
         var w = Dialog("Buddy · PC setup", p); w.Closed += (_, _) => download?.Cancel(); await Check();

@@ -4,6 +4,9 @@ namespace Buddy.Windows;
 
 internal sealed record DesktopPreferences
 {
+    public int SchemaVersion { get; init; } = 2;
+    public bool GuideAutoAdvance { get; init; }
+    public bool StrictAgentConfirmations { get; init; }
     public bool ShowCompanion { get; init; } = true;
     public bool StartInCompanionMode { get; init; } = true;
     public string Shortcut { get; init; } = "Ctrl + Space";

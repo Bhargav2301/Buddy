@@ -1,6 +1,7 @@
 using Buddy.Server;
 using Buddy.Windows;
 using System.Runtime.InteropServices;
+using System.IO;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
@@ -31,6 +32,14 @@ internal static class Program
                 var export = GroundingResolver.Resolve(snapshot.Context.Elements,"","Export example","Button");
                 Check(field is not null && export is not null,"Production UIA capture finds real WPF controls");
                 Check(snapshot.PrivateRects.Count > 0 && !snapshot.Context.Elements.Any(e => e.Name.Contains("private-test-marker") || e.Name == "Private test field"),"Password controls are omitted and their bounds are redacted");
+                var captured = await assistant.Perception.Frame(snapshot, timeout.Token);
+                Check(captured is not null, "Windows Graphics Capture returns a frame for a verified fixture scope");
+                using (var capturedStream = new MemoryStream(captured!.Image)) using (var capturedBitmap = new System.Drawing.Bitmap(capturedStream)) {
+                    var secret = snapshot.PrivateRects[0]; int x = (int)(secret.X + secret.Width / 2 - captured.Bounds.X), y = (int)(secret.Y + secret.Height / 2 - captured.Bounds.Y);
+                    var pixel = capturedBitmap.GetPixel(x, y);
+                    Check(pixel.R == 0 && pixel.G == 0 && pixel.B == 0, "Captured password pixels are masked at physical window coordinates");
+                }
+                captured.Dispose(); Check(captured.Image.All(b => b == 0), "Disposing the capture clears its encoded image buffer");
                 var changed = await Task.Run(() => assistant.Apply(new("type", Ref:field!.Ref, Value:"Buddy test text"),snapshot,field,timeout.Token));
                 Check(editor.Text == "Buddy test text" && changed.StartsWith("Updated"),"Production action runner edits a real field through ValuePattern");
                 await Task.Run(() => assistant.Apply(new("invoke", Ref:export!.Ref),snapshot,export,timeout.Token)); await Task.Delay(100);

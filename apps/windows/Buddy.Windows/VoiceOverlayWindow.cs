@@ -88,7 +88,7 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
         if (!preferences().CaptureOnVoice) return null;
         try {
             transcript.Text = "● Looking at the active window"; var s = await perception.Capture(sourceWindow, ct); ct.ThrowIfCancellationRequested();
-            var image = perception.Image(s); // Redacted active-window frame, held only in memory.
+            var image = await perception.Image(s, ct); // Redacted active-window frame, held only in memory.
             await service()!.Audit("capture", s.Context.App, image is null ? "UIA text only; screenshot skipped" : "UIA and redacted memory-only frame");
             return new(s, image);
         }

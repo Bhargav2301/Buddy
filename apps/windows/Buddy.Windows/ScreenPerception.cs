@@ -19,9 +19,13 @@ internal sealed class ScreenPerception(Func<DesktopPreferences> preferences)
     internal async Task<ScreenSnapshot> Capture(IntPtr window, CancellationToken ct)
     {
         // One outstanding UIA worker: a hung provider cannot create unlimited workers.
-        await gate.WaitAsync(ct);
-        var worker = Task.Run(() => { try { return Read(window, ct); } finally { gate.Release(); } }, CancellationToken.None);
-        return await worker.WaitAsync(TimeSpan.FromSeconds(2), ct);
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(ct); deadline.CancelAfter(TimeSpan.FromSeconds(2));
+        var token = deadline.Token;
+        try {
+            await gate.WaitAsync(token);
+            var worker = Task.Run(() => { try { return Read(window, token); } finally { gate.Release(); } }, CancellationToken.None);
+            return await worker.WaitAsync(token);
+        } catch (OperationCanceledException) when (!ct.IsCancellationRequested) { throw new TimeoutException("The app's accessibility provider did not respond. Capture was stopped."); }
     }
     internal void Check(IntPtr window, bool agent = false)
     {
@@ -60,11 +64,23 @@ internal sealed class ScreenPerception(Func<DesktopPreferences> preferences)
         }
         return new(window, new(InputNative.ProcessName(window), Security.Redact(Native.Label(window)), elements), nodes, redactions, complete && queue.Count == 0);
     }
-    internal byte[]? Image(ScreenSnapshot snapshot)
+    internal async Task<CapturedWindow?> Frame(ScreenSnapshot snapshot, CancellationToken ct)
     {
         // If accessibility could not enumerate all controls, do not risk capturing unknown password fields.
         if (!snapshot.Complete || Native.GetForegroundWindow() != snapshot.Window) return null;
         Check(snapshot.Window);
-        return Native.Capture(snapshot.Window, snapshot.PrivateRects);
+        var frame = await WindowCapture.Capture(snapshot.Window, snapshot.PrivateRects, ct);
+        try {
+            var current = await Capture(snapshot.Window, ct);
+            if (!current.Complete || Native.GetForegroundWindow() != snapshot.Window || !snapshot.PrivateRects.SequenceEqual(current.PrivateRects) || current.Context.Title != snapshot.Context.Title || WindowCapture.Bounds(snapshot.Window) != frame.Bounds) {
+                frame.Dispose(); return null;
+            }
+            return frame;
+        } catch { frame.Dispose(); throw; }
+    }
+    internal async Task<byte[]?> Image(ScreenSnapshot snapshot, CancellationToken ct)
+    {
+        using var frame = await Frame(snapshot, ct);
+        return frame?.ForVision();
     }
 }

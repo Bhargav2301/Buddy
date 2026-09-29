@@ -91,4 +91,30 @@ if (OperatingSystem.IsWindows()) {
     using var startup = new DesktopActivation(_ => Task.CompletedTask, startupChannel);
     Check(await pendingLaunch, "A launch arriving before the listener starts is delivered");
 }
+var field = new TestField { Value = "  Original\r\nCafe\u0301 \U0001F600\t" };
+var exactOriginal = field.Value; var edit = new GuardedEdit(field, exactOriginal); var now = DateTimeOffset.UtcNow;
+edit.Apply("Replacement", now, default); Check(field.Value == "Replacement" && field.Writes == 1, "Refine replaces the verified field exactly once");
+edit.Undo(now.AddSeconds(29), default); Check(field.Value == exactOriginal, "Undo preserves whitespace, newline and Unicode code units exactly");
+void Reject(Action action, string name) { bool refused = false; try { action(); } catch (InvalidOperationException) { refused = true; } Check(refused, name); }
+field.Value = "Original"; edit = new GuardedEdit(field, field.Value); field.Value = "User edit"; int writes = field.Writes;
+Reject(() => edit.Apply("Replacement", now, default), "A changed original cannot be overwritten"); Check(field.Value == "User edit" && field.Writes == writes, "Changed-field rejection dispatches no write");
+field.Value = "Original"; edit = new GuardedEdit(field, field.Value); edit.Apply("Replacement", now, default); field.Value = "Edited replacement";
+Reject(() => edit.Undo(now.AddSeconds(5), default), "Undo refuses to overwrite edits made after applying");
+field.Value = "Original"; edit = new GuardedEdit(field, field.Value); edit.Apply("Replacement", now, default);
+Reject(() => edit.Undo(now.AddSeconds(31), default), "Undo expires after thirty seconds");
+field.Value = "Original"; edit = new GuardedEdit(field, field.Value); field.Identity = "another-field";
+Reject(() => edit.Apply("Replacement", now, default), "A replaced field identity cannot receive the rewrite");
+field.Identity = "field"; edit = new GuardedEdit(field, field.Value); using var cancelled = new CancellationTokenSource(); field.OnRead = cancelled.Cancel; writes = field.Writes;
+bool cancelledBeforeWrite = false; try { edit.Apply("Replacement", now, cancelled.Token); } catch (OperationCanceledException) { cancelledBeforeWrite = true; }
+Check(cancelledBeforeWrite && field.Writes == writes, "Cancellation during validation prevents the subsequent write"); field.OnRead = null;
+field.Transform = true; edit = new GuardedEdit(field, field.Value);
+Reject(() => edit.Apply("Replacement", now, default), "A host that transforms text cannot be reported as a successful replacement");
 Console.WriteLine($"{assertions} desktop logic assertions passed. Native Windows interaction is a separate acceptance check.");
+
+sealed class TestField : IVerifiedTextField
+{
+    public string Identity { get; set; } = "field";
+    public string Value = ""; public int Writes; public bool Transform; public Action? OnRead;
+    public string Read() { OnRead?.Invoke(); return Value; }
+    public void Write(string expected, string value, CancellationToken ct) { ct.ThrowIfCancellationRequested(); if (Value != expected) throw new InvalidOperationException(); Writes++; Value = Transform ? value + " changed" : value; }
+}

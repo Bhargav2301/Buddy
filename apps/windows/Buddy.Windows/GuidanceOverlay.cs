@@ -17,6 +17,7 @@ internal sealed class GuidanceOverlay : IDisposable
     private Func<bool>? stillValid;
     private bool validating;
     private int revision;
+    internal bool IsVisible => windows.Count > 0;
     internal GuidanceOverlay() { expiry.Tick += async (_, _) => {
         if (DateTimeOffset.UtcNow > expires || Native.GetForegroundWindow() != target && !Native.IsOwnWindow(Native.GetForegroundWindow()) || (InputNative.GetAsyncKeyState(1) & 0x8000) != 0) { Clear(); return; }
         if (validating || stillValid is not { } validate) return;

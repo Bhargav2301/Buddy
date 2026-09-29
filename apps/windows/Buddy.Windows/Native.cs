@@ -11,9 +11,7 @@ internal static class Native
     [DllImport("user32.dll")] internal static extern IntPtr GetForegroundWindow();
     [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr handle, out uint pid);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int GetWindowText(IntPtr handle, System.Text.StringBuilder text, int count);
-    [DllImport("user32.dll")] private static extern bool GetWindowRect(IntPtr handle, out Rect rect);
     [DllImport("user32.dll")] internal static extern bool SetWindowDisplayAffinity(IntPtr handle, uint affinity);
-    private struct Rect { public int Left, Top, Right, Bottom; }
     internal static string Label(IntPtr window)
     { var b = new System.Text.StringBuilder(1024); GetWindowText(window, b, b.Capacity); return b.ToString(); }
     internal static bool IsOwnWindow(IntPtr window) { GetWindowThreadProcessId(window, out var pid); return pid == Environment.ProcessId; }
@@ -50,20 +48,5 @@ internal static class Native
             catch (ElementNotAvailableException) { }
         }
         return Buddy.Server.Security.Redact(result.ToString());
-    }
-    internal static byte[] Capture(IntPtr window, IReadOnlyList<System.Windows.Rect>? privateRects = null)
-    {
-        CheckWindow(window);
-        if (!GetWindowRect(window, out var rect)) throw new InvalidOperationException("That window is no longer available.");
-        var bounds = System.Drawing.Rectangle.Intersect(new(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top), System.Windows.Forms.SystemInformation.VirtualScreen);
-        if (bounds.Width < 1 || bounds.Height < 1) throw new InvalidOperationException("Restore the target window before capturing it.");
-        using var bitmap = new System.Drawing.Bitmap(bounds.Width, bounds.Height);
-        using (var graphics = System.Drawing.Graphics.FromImage(bitmap)) {
-            graphics.CopyFromScreen(bounds.Location, System.Drawing.Point.Empty, bounds.Size);
-            if (privateRects is not null) foreach (var r in privateRects) graphics.FillRectangle(System.Drawing.Brushes.Black, (float)r.X - bounds.X, (float)r.Y - bounds.Y, (float)r.Width, (float)r.Height);
-        }
-        var scale = Math.Min(1, 1280.0 / Math.Max(bounds.Width, bounds.Height));
-        using var resized = new System.Drawing.Bitmap(bitmap, (int)(bounds.Width * scale), (int)(bounds.Height * scale));
-        using var buffer = new MemoryStream(); resized.Save(buffer, System.Drawing.Imaging.ImageFormat.Jpeg); return buffer.ToArray();
     }
 }

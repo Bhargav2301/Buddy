@@ -6,5 +6,6 @@
     <Compile Include="../../apps/windows/Buddy.Windows/AssistantInteraction.cs" Link="AssistantInteraction.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/DesktopLaunch.cs" Link="DesktopLaunch.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/DesktopActivation.cs" Link="DesktopActivation.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/GuardedEdit.cs" Link="GuardedEdit.cs" />
   </ItemGroup>
 </Project>
