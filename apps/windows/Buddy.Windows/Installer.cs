@@ -5,7 +5,7 @@ namespace Buddy.Windows;
 
 internal static class Installer
 {
-    internal static int Run(bool quiet = false, bool launch = true)
+    internal static int Run(bool quiet = false, bool launch = true, bool rollback = false)
     {
         var source = Path.GetFullPath(AppContext.BaseDirectory).TrimEnd(Path.DirectorySeparatorChar);
         var target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "Buddy");
@@ -14,17 +14,11 @@ internal static class Installer
         if (!first)
             throw new InvalidOperationException("Quit Buddy using its tray icon, then run Install-Buddy.cmd again.");
         var alreadyInstalled = string.Equals(source, Path.GetFullPath(target), StringComparison.OrdinalIgnoreCase);
-        if (!alreadyInstalled)
-        {
-            Directory.CreateDirectory(target);
-            foreach (var file in Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories))
-            {
-                var destination = Path.Combine(target, Path.GetRelativePath(source, file));
-                Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
-                File.Copy(file, destination, true);
-            }
-        }
-        PackageVerifier.Verify(target);
+        if (rollback && alreadyInstalled) throw new InvalidOperationException("Quit Buddy, then run Rollback-Buddy.cmd from the extracted Windows package folder.");
+        var transaction = new InstallationTransaction(Path.GetDirectoryName(target)!, folder => { PackageVerifier.Verify(folder); Probe(folder); }, Probe);
+        if (rollback) transaction.Rollback(Probe);
+        else if (!alreadyInstalled) transaction.Install(source);
+        else { PackageVerifier.Verify(target); Probe(target); }
         var shortcutWarning = "";
         try
         {
@@ -39,11 +33,18 @@ internal static class Installer
             shortcutWarning = "\nShortcuts could not be created. Open Buddy.exe from that folder.";
         }
         Diagnostics.Write("Installed to " + target);
-        if (!quiet) Program.ShowMessage("Buddy is installed in:\n" + target + "\n\nClick OK to open Buddy." + shortcutWarning);
+        if (!quiet) Program.ShowMessage((rollback ? "Buddy's previous version was restored in:\n" : "Buddy is installed in:\n") + target + "\n\nYour local data and model choices are preserved.\nClick OK to open Buddy." + shortcutWarning);
         single.ReleaseMutex();
         single.Dispose();
         if (launch) Process.Start(new ProcessStartInfo(Path.Combine(target, "Buddy.exe")) { WorkingDirectory = target, UseShellExecute = true });
         return 0;
+    }
+    private static void Probe(string folder)
+    {
+        using var process = Process.Start(new ProcessStartInfo(Path.Combine(folder, "Buddy.exe"), "--check-package") { WorkingDirectory = folder, UseShellExecute = false, CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden })
+            ?? throw new InvalidOperationException("Could not start the package dependency check.");
+        if (!process.WaitForExit(30000)) { process.Kill(); throw new InvalidOperationException("The package dependency check timed out. Your previous installation is unchanged."); }
+        if (process.ExitCode != 0) throw new InvalidOperationException("The package dependency check failed. Check Buddy's startup log; your previous installation is unchanged.");
     }
 
     private static void CreateShortcut(string folder, string target, string name = "Buddy", string arguments = "--home")

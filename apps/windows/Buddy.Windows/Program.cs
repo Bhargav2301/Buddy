@@ -22,6 +22,7 @@ public static class Program
             AppDomain.CurrentDomain.UnhandledException += (_, e) =>
                 Diagnostics.Write("Unhandled exception", e.ExceptionObject as Exception);
             if (args.Contains("--install")) return Installer.Run(args.Contains("--quiet"), !args.Contains("--no-launch"));
+            if (args.Contains("--rollback")) return Installer.Run(args.Contains("--quiet"), !args.Contains("--no-launch"), rollback: true);
             using var single = new Mutex(true, "Local\\Buddy.Desktop.v1", out bool first);
             if (!first)
             {

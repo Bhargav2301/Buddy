@@ -109,6 +109,7 @@ bool cancelledBeforeWrite = false; try { edit.Apply("Replacement", now, cancelle
 Check(cancelledBeforeWrite && field.Writes == writes, "Cancellation during validation prevents the subsequent write"); field.OnRead = null;
 field.Transform = true; edit = new GuardedEdit(field, field.Value);
 Reject(() => edit.Apply("Replacement", now, default), "A host that transforms text cannot be reported as a successful replacement");
+InstallationTests.Run(Check);
 Console.WriteLine($"{assertions} desktop logic assertions passed. Native Windows interaction is a separate acceptance check.");
 
 sealed class TestField : IVerifiedTextField

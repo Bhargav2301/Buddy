@@ -54,6 +54,8 @@ This build has no publisher certificate. Windows may show an unknown-publisher p
 
 ### Repairing the original Windows download
 
+Development builds with `Rollback-Buddy.cmd` validate both the extracted package and a staged copy before replacing installed files. They retain the previous application directory under `%LOCALAPPDATA%\Programs\.Buddy-backup-*`. To restore it, quit Buddy and run **Rollback-Buddy.cmd from the extracted package**. Rollback preserves current conversations, pairing and preferences; it does not rewind data migrations. Keep the extracted package until the upgrade is validated. Clean-machine upgrade and rollback acceptance for the MVP is still pending.
+
 The original ZIP included the wrong `WindowsBase.dll`: a small .NET compatibility facade instead of the Windows Desktop implementation. That could prevent the window from opening with either of the original launch methods. **Windows repair 1** supplies the Desktop implementation and checks required WPF types before starting. Read-aloud now initializes only when requested, so a missing Windows voice cannot prevent the chat window from opening.
 
 Use the updated ZIP and the steps above. Do not mix files from the old and new extracted folders. The native installer replaces the existing installation; you do not need to remove your saved data or reinstall Android.
