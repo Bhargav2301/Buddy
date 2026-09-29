@@ -61,6 +61,7 @@ public sealed partial class MainWindow
             p.Children.Add(Text("Blocked process names (comma separated)", 14)); var blocked = new TextBox { Text = desktop.BlockedApps }; StyleBox(blocked); AutomationProperties.SetName(blocked, "Blocked applications"); p.Children.Add(blocked);
             Save(() => desktop with { CaptureOnVoice = screen.IsChecked == true, BlockedApps = blocked.Text.Trim() });
             p.Children.Add(Btn("Activity history", () => _ = ShowPrivacyHistory(p)));
+            p.Children.Add(Btn("Delete all local Buddy data…", () => ConfirmLocalDeletion(p)));
         } else if (section == "Internet") {
             var web = Toggle("Allow internet research", desktop.AllowWebResearch);
             p.Children.Add(Text("Search queries go to DuckDuckGo. Public HTTPS pages are fetched without your browser cookies. Sources appear beside answers; local chat remains available with research off.", 14, Muted));
@@ -103,5 +104,25 @@ public sealed partial class MainWindow
         foreach (var row in rows) history.Children.Add(Text($"{row.At.ToLocalTime():g} · {row.Kind} · {row.Target}\n{row.Result}", 14));
         if (rows.Count == 0) history.Children.Add(Text("No recorded activity.", 14, Muted));
         p.Children.Add(BuddyTheme.Card(history));
+    }
+    private void ConfirmLocalDeletion(StackPanel parent)
+    {
+        var p = new StackPanel();
+        p.Children.Add(Text("Delete all local Buddy data", 20));
+        p.Children.Add(Text("This permanently removes conversations, memories, prompts, walkthroughs, paired devices, settings, encryption keys and logs on this PC. Paired phones will need pairing again. Buddy will quit before deletion. Downloaded Ollama models and the installed app remain.", 14));
+        p.Children.Add(Text("Type DELETE to confirm.", 14));
+        var confirmation = new TextBox(); StyleBox(confirmation); AutomationProperties.SetName(confirmation, "Type DELETE to confirm local data deletion"); p.Children.Add(confirmation);
+        var notice = Text("", 14, Muted); p.Children.Add(notice);
+        var erase = Btn("Delete data and quit", () => { }); erase.IsEnabled = false;
+        confirmation.TextChanged += (_, _) => erase.IsEnabled = confirmation.Text == "DELETE";
+        erase.Click += async (_, _) => {
+            if (confirmation.Text != "DELETE" || shuttingDown) return;
+            erase.IsEnabled = confirmation.IsEnabled = false;
+            try { await LocalDataDeletion.Prepare(); await Quit(); }
+            catch (Exception e) { notice.Text = e.Message; confirmation.IsEnabled = true; erase.IsEnabled = true; }
+        };
+        p.Children.Add(erase);
+        var card = BuddyTheme.Card(p); p.Children.Add(Btn("Keep my data", () => parent.Children.Remove(card)));
+        parent.Children.Add(card); confirmation.Focus();
     }
 }

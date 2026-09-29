@@ -9,5 +9,6 @@
     <Compile Include="../../apps/windows/Buddy.Windows/GuardedEdit.cs" Link="GuardedEdit.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/InstallationTransaction.cs" Link="InstallationTransaction.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/CompanionState.cs" Link="CompanionState.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/LocalDataTree.cs" Link="LocalDataTree.cs" />
   </ItemGroup>
 </Project>

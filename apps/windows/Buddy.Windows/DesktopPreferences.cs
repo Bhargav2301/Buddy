@@ -25,21 +25,23 @@ internal sealed record DesktopPreferences
     public string BlockedApps { get; init; } = "keepass,1password,bitwarden,lastpass";
 
     private static string FilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Buddy", "desktop.json");
-    internal static DesktopPreferences Load()
+    internal static DesktopPreferences Load(string? path = null)
     {
-        if (!File.Exists(FilePath)) return new();
-        var json = File.ReadAllText(FilePath);
+        path ??= FilePath;
+        if (!File.Exists(path)) return new();
+        var json = File.ReadAllText(path);
         var value = JsonSerializer.Deserialize<DesktopPreferences>(json) ?? throw new InvalidDataException("Buddy preferences are empty; the existing file has been preserved.");
         if (value.SchemaVersion > 2) throw new InvalidDataException("These preferences need a newer Buddy version. The existing file has been preserved.");
         using var fields = JsonDocument.Parse(json);
         return value with { SchemaVersion = 2, OnboardingCompleted = fields.RootElement.TryGetProperty(nameof(OnboardingCompleted), out _) ? value.OnboardingCompleted : true };
     }
-    internal void Save()
+    internal void Save(string? path = null)
     {
-        if (File.Exists(FilePath)) _ = Load(); // Never overwrite a corrupt or newer preference file.
-        Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
-        File.WriteAllText(FilePath + ".tmp", JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
-        File.Move(FilePath + ".tmp", FilePath, true);
+        path ??= FilePath;
+        if (File.Exists(path)) _ = Load(path); // Never overwrite a corrupt or newer preference file.
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        File.WriteAllText(path + ".tmp", JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
+        File.Move(path + ".tmp", path, true);
     }
 }
 

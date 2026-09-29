@@ -110,6 +110,7 @@ Check(cancelledBeforeWrite && field.Writes == writes, "Cancellation during valid
 field.Transform = true; edit = new GuardedEdit(field, field.Value);
 Reject(() => edit.Apply("Replacement", now, default), "A host that transforms text cannot be reported as a successful replacement");
 InstallationTests.Run(Check);
+LocalDataTests.Run(Check);
 var activity = new CompanionState();
 activity.Set("guide", CompanionMood.Pointing); activity.Set("voice", CompanionMood.Listening); activity.Set("chat", CompanionMood.Idle);
 Check(activity.Current == CompanionMood.Listening, "An idle chat cannot erase the microphone's active companion state");
