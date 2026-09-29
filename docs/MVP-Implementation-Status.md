@@ -34,6 +34,7 @@ This is an unreleased implementation increment toward the accepted Windows MVP p
 | Desktop logic, exact field restoration, dictation selection, interruption, preference migration and isolated installer recovery | 86 checks passed |
 | Assistant planning, grounding, continuation, research metadata and vision evidence policy | 71 checks passed |
 | Local refinement and MVP policy | 36 checks passed |
+| Android build compatibility | App and instrumentation APK compiled; unit task has no sources; phone instrumentation pending |
 | Native already-running/minimized Settings navigation and isolated layout/vector fixtures | 21 checks passed |
 | Native UIA/capture fixture | Blocked at initial foreground assertion; subsequent capture/action checks did not run |
 | Native OCR fixture recognition/redaction/cancellation and control boundaries | 7 checks passed; synthetic fixtures only |

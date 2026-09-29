@@ -25,6 +25,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Windows package validation failed.' }
 . (Join-Path $buddyRoot 'scripts\Invoke-PackageProbe.ps1')
 Invoke-BuddyPackageProbe -Directory $buddyOutput
 Copy-Item (Join-Path $buddyRoot 'scripts\Install-Buddy.cmd'), (Join-Path $buddyRoot 'scripts\Rollback-Buddy.cmd'), (Join-Path $buddyRoot 'scripts\Run-Buddy.cmd'), (Join-Path $buddyRoot 'scripts\Open-Buddy-Settings.cmd'), (Join-Path $buddyRoot 'scripts\Install-Buddy.ps1'), (Join-Path $buddyRoot 'scripts\Enable-Phone-Access.ps1'), (Join-Path $buddyRoot 'scripts\Setup-Local-AI.ps1') $buddyOutput
+Copy-Item (Join-Path $buddyRoot 'scripts\Install-Prerequisites.cmd'), (Join-Path $buddyRoot 'scripts\Install-Prerequisites.ps1') $buddyOutput
 Set-Content -Path (Join-Path $buddyOutput 'Windows-Repair.txt') -Value "Buddy $buddyVersion - Windows Desktop runtime packaging repair included"
 Set-Content -Path (Join-Path $buddyOutput 'Cursor-Companion.txt') -Value "Buddy $buddyVersion - Ctrl+Space for chat; Ctrl+Shift+Space for voice"
 $buddyCommit = 'source-archive'
@@ -37,6 +38,7 @@ if (Test-Path (Join-Path $buddyRoot '.git')) {
 Copy-Item (Join-Path $buddyRoot 'CHANGELOG.md'), (Join-Path $buddyRoot 'VERSION') $buddyOutput
 Copy-Item (Join-Path $buddyRoot 'docs\Buddy-Setup-Guide.md') $buddyOutput
 Copy-Item (Join-Path $buddyRoot 'docs\Windows-Assistant-Preview.md') $buddyOutput
+Copy-Item (Join-Path $buddyRoot 'docs\Windows-MVP-Preview.md'), (Join-Path $buddyRoot 'docs\MVP-Implementation-Status.md') $buddyOutput
 Copy-Item (Join-Path $buddyRoot 'docs\Windows-Quick-Start.txt') (Join-Path $buddyOutput 'START-HERE.txt')
 Copy-Item (Join-Path $buddyRoot 'docs\licenses') $buddyOutput -Recurse -Force
 Compress-Archive -Path (Join-Path $buddyOutput '*') -DestinationPath (Join-Path $buddyRoot "dist\Buddy-Windows-v$buddyVersion.zip") -Force

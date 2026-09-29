@@ -106,9 +106,11 @@ internal static class Program
     {
         try {
             using var fixture = new System.Drawing.Bitmap(1000, 380);
-            using (var g = System.Drawing.Graphics.FromImage(fixture)) using (var font = new System.Drawing.Font("Arial", 38)) {
+            // Pixel units keep label/border geometry identical on 100–200% runner displays.
+            fixture.SetResolution(96, 96);
+            using (var g = System.Drawing.Graphics.FromImage(fixture)) using (var font = new System.Drawing.Font("Arial", 57, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel)) {
                 g.Clear(System.Drawing.Color.White); g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
-                g.DrawRectangle(System.Drawing.Pens.Black, 35, 20, 600, 110);
+                g.DrawRectangle(System.Drawing.Pens.Black, 35, 20, 540, 100);
                 g.DrawString("Export Project", font, System.Drawing.Brushes.Black, 50, 35);
                 g.DrawString("Save Project", font, System.Drawing.Brushes.Black, 50, 130);
                 g.DrawString("password: secret-test", font, System.Drawing.Brushes.Black, 50, 230);
