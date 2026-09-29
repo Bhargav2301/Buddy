@@ -10,6 +10,18 @@ namespace Buddy.Windows;
 
 internal sealed record CapturedWindow(byte[] Image, System.Windows.Rect Bounds, int PixelWidth, int PixelHeight) : IDisposable
 {
+    internal List<OcrText> Text { get; init; } = [];
+    internal CapturedWindow Mask(OcrObservation observation)
+    {
+        using var input = new MemoryStream(Image); using var bitmap = new System.Drawing.Bitmap(input);
+        using (var graphics = System.Drawing.Graphics.FromImage(bitmap)) foreach (var mask in observation.PrivateBounds) {
+            float x = (float)((mask.X - Bounds.X) * PixelWidth / Bounds.Width), y = (float)((mask.Y - Bounds.Y) * PixelHeight / Bounds.Height);
+            float width = (float)(mask.Width * PixelWidth / Bounds.Width), height = (float)(mask.Height * PixelHeight / Bounds.Height);
+            graphics.FillRectangle(System.Drawing.Brushes.Black, x - 2, y - 2, width + 4, height + 4);
+        }
+        using var output = new MemoryStream(); bitmap.Save(output, System.Drawing.Imaging.ImageFormat.Png);
+        return new(output.ToArray(), Bounds, PixelWidth, PixelHeight) { Text = observation.Text };
+    }
     internal byte[] ForVision()
     {
         using var input = new MemoryStream(Image); using var full = System.Drawing.Image.FromStream(input);

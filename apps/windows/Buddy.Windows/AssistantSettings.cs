@@ -64,12 +64,14 @@ public sealed partial class MainWindow
         var web = new CheckBox { Content = "Allow internet research", Foreground = Ink, IsChecked = desktop.AllowWebResearch, Margin = new(0,15,0,8) }; p.Children.Add(web);
         p.Children.Add(Text("Queries go to DuckDuckGo; public HTTPS pages are read without browser cookies. Screenshots stay local. Web access is optional; local chat works offline.", 13, Muted));
         var agent = new CheckBox { Content = "Enable Agent mode on this PC", Foreground = Ink, IsChecked = desktop.AgentEnabled, Margin = new(0,12,0,8) }; p.Children.Add(agent);
-        p.Children.Add(Text("Buddy can open allowed apps and work with accessible controls. Review a plan before running it. Each change asks for approval. Esc, Ctrl+Alt+Esc or moving the mouse stops the run. Passwords, elevated apps, terminals and blocked apps are refused.", 13, Muted));
+        p.Children.Add(Text("Review a plan before running it. Verified reversible actions can continue; consequential and uncertain actions ask again. Esc, Ctrl+Alt+Esc or moving the mouse stops the run. Passwords, elevated apps, terminals and blocked apps are refused.", 13, Muted));
+        var strict = new CheckBox { Content = "Ask before every Agent change", Foreground = Ink, IsChecked = desktop.StrictAgentConfirmations, Margin = new(0,8,0,8) }; p.Children.Add(strict);
+        var advance = new CheckBox { Content = "Advance Guide when its expected result stays visible", Foreground = Ink, IsChecked = desktop.GuideAutoAdvance, Margin = new(0,8,0,8) }; p.Children.Add(advance);
         p.Children.Add(Text("Additional blocked process names (comma separated)", 14)); var blocked = new TextBox { Text = desktop.BlockedApps }; StyleBox(blocked); p.Children.Add(blocked);
         var notice = Text("", 12, Accent); p.Children.Add(notice);
         p.Children.Add(Btn("Save assistant settings", () => {
             try {
-                Cancel(); var next = desktop with { AllowWebResearch = web.IsChecked == true, AgentEnabled = agent.IsChecked == true, BlockedApps = blocked.Text.Trim() };
+                Cancel(); var next = desktop with { AllowWebResearch = web.IsChecked == true, AgentEnabled = agent.IsChecked == true, BlockedApps = blocked.Text.Trim(), StrictAgentConfirmations = strict.IsChecked == true, GuideAutoAdvance = advance.IsChecked == true };
                 next.Save(); desktop = next; if (host is not null) { host.Service.WebEnabled = desktop.AllowWebResearch; host.Service.AgentEnabled = desktop.AgentEnabled; }
                 notice.Text = "Saved. Use Guide for directions or Agent for a task plan.";
             } catch (Exception ex) { notice.Text = ex.Message; }

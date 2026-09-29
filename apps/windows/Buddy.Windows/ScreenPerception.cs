@@ -71,6 +71,8 @@ internal sealed class ScreenPerception(Func<DesktopPreferences> preferences)
         Check(snapshot.Window);
         var frame = await WindowCapture.Capture(snapshot.Window, snapshot.PrivateRects, ct);
         try {
+            var ocr = await LocalOcr.Read(frame, ct);
+            var masked = frame.Mask(ocr); frame.Dispose(); frame = masked;
             var current = await Capture(snapshot.Window, ct);
             if (!current.Complete || Native.GetForegroundWindow() != snapshot.Window || !snapshot.PrivateRects.SequenceEqual(current.PrivateRects) || current.Context.Title != snapshot.Context.Title || WindowCapture.Bounds(snapshot.Window) != frame.Bounds) {
                 frame.Dispose(); return null;

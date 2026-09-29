@@ -9,9 +9,10 @@ internal static class PackageVerifier
     {
         string[] required = ["Buddy.exe", "Buddy.dll", "Buddy.Server.dll", "Buddy.runtimeconfig.json", "Buddy.deps.json",
             "hostfxr.dll", "hostpolicy.dll", "coreclr.dll", "System.Private.CoreLib.dll",
-            "PresentationNative_cor3.dll", "wpfgfx_cor3.dll", "D3DCompiler_47_cor3.dll", "vcruntime140_cor3.dll", "clrjit.dll"];
+            "PresentationNative_cor3.dll", "wpfgfx_cor3.dll", "D3DCompiler_47_cor3.dll", "vcruntime140_cor3.dll", "clrjit.dll",
+            "Tesseract.dll", "x64/tesseract50.dll", "x64/leptonica-1.82.0.dll", "tessdata/eng.traineddata"];
         foreach (var name in required) RequireFile(folder, name);
-        foreach (var name in new[] { "Buddy.exe", "hostfxr.dll", "hostpolicy.dll", "coreclr.dll", "PresentationNative_cor3.dll", "wpfgfx_cor3.dll" })
+        foreach (var name in new[] { "Buddy.exe", "hostfxr.dll", "hostpolicy.dll", "coreclr.dll", "PresentationNative_cor3.dll", "wpfgfx_cor3.dll", "x64/tesseract50.dll", "x64/leptonica-1.82.0.dll" })
         {
             using var stream = File.OpenRead(Path.Combine(folder, name));
             using var pe = new PEReader(stream);
@@ -21,6 +22,9 @@ internal static class PackageVerifier
         RequireType(folder, "WindowsBase.dll", "System.Windows", "DependencyObject");
         RequireType(folder, "PresentationFramework.dll", "System.Windows", "Application");
         RequireType(folder, "PresentationCore.dll", "System.Windows", "UIElement");
+        using (var ocrData = File.OpenRead(Path.Combine(folder, "tessdata", "eng.traineddata")))
+            if (Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ocrData)) != "7D4322BD2A7749724879683FC3912CB542F19906C83BCC1A52132556427170B2")
+                throw new InvalidDataException("The bundled OCR model is incomplete or has changed. Extract a verified Buddy package.");
 
         var pending = new Queue<string>(new[] { "Buddy.dll", "Buddy.Server.dll", "QRCoder.dll", "System.Speech.dll" });
         var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

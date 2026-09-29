@@ -82,6 +82,15 @@ try {
     int guidePayload = model.Payloads.Count;
     await service.PlanGuide(planning with { UseWeb = true, Context = planning.Context with { Title = "screen-private-marker" } }, default);
     Check(!model.Payloads[guidePayload].Contains("screen-private-marker") && model.Payloads.Last().Contains("screen-private-marker"), "Guide research never includes the screen in web-tool decisions");
+    var visual = new VisionGroundingRequest("Export", "Button", "example", "Example", "fixture-image-marker", [new("ocr1", "Export", .95, 10, 10, 80, 30)]);
+    model.Replies.Enqueue("{\"ref\":\"ocr1\",\"matches\":true,\"confidence\":0.92,\"reason\":\"Visible Export control\"}");
+    Check((await service.ConfirmVisualTarget(visual, default))?.Ref == "ocr1", "Local vision can corroborate a unique OCR label");
+    Check(model.Payloads.Last().Contains("fixture-image-marker") && model.Payloads.Last().Contains("images"), "Vision receives the local image with bounded OCR evidence");
+    model.Replies.Enqueue("{\"ref\":\"invented\",\"matches\":true,\"confidence\":1,\"reason\":\"Guess\"}");
+    Check(await service.ConfirmVisualTarget(visual, default) is null, "A model cannot invent a visual target reference");
+    int visionCalls = model.Payloads.Count;
+    Check(await service.ConfirmVisualTarget(visual with { Evidence = [visual.Evidence[0] with { Confidence = .5 }] }, default) is null && model.Payloads.Count == visionCalls, "Low-confidence OCR abstains before invoking vision");
+    await Reject(async () => await service.ConfirmVisualTarget(visual with { Evidence = [visual.Evidence[0], visual.Evidence[0] with { Ref = "duplicate" }] }, default), "INVALID_VISION_CONTEXT", "Ambiguous visual evidence cannot produce a pointing target");
     await service.Audit("type", "Example field", "completed");
     Check(!Encoding.UTF8.GetString(File.ReadAllBytes(Path.Combine(directory,"buddy.v1.encrypted"))).Contains("Example field"), "Activity metadata remains encrypted at rest");
 

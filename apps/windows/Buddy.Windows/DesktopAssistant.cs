@@ -19,6 +19,9 @@ internal sealed class DesktopAssistant : IDisposable
     private readonly Func<IntPtr> target;
     private readonly Action<CompanionMood> mood;
     internal ScreenPerception Perception { get; }
+    private readonly VisualGrounding visualGrounding;
+    private bool visualGuide;
+    private int visualAttempts;
     private readonly GuidanceOverlay overlay = new();
     private readonly DispatcherTimer stopMonitor = new() { Interval = TimeSpan.FromMilliseconds(25) };
     private readonly DispatcherTimer guideMonitor = new() { Interval = TimeSpan.FromMilliseconds(700) };
@@ -47,7 +50,7 @@ internal sealed class DesktopAssistant : IDisposable
 
     internal DesktopAssistant(Func<BuddyService?> service, Func<DesktopPreferences> preferences, Func<IntPtr> target, Action<CompanionMood> mood)
     {
-        this.service = service; this.preferences = preferences; this.target = target; this.mood = mood; Perception = new(preferences);
+        this.service = service; this.preferences = preferences; this.target = target; this.mood = mood; Perception = new(preferences); visualGrounding = new(Perception, service);
         guideMonitor.Tick += async (_, _) => await CheckGuideProgress();
         stopMonitor.Tick += (_, _) => {
             if ((InputNative.GetAsyncKeyState(27) & 0x8000) != 0) Cancel();
@@ -113,7 +116,7 @@ internal sealed class DesktopAssistant : IDisposable
     private async Task GuideStep(int direction)
     {
         if (guide?.Steps is null || operation is not null) return;
-        guideRevision++; expectationArmed = false; expectationMatches = 0;
+        guideRevision++; guideCheck?.Cancel(); expectationArmed = false; expectationMatches = 0;
         if (index + direction >= guide.Steps.Count) { await FinishGuide(); return; }
         index = Math.Clamp(index + direction, 0, guide.Steps.Count - 1);
         var cts = new CancellationTokenSource(); operation = cts;
@@ -122,15 +125,15 @@ internal sealed class DesktopAssistant : IDisposable
     }
     private async Task DrawStep(CancellationToken ct)
     {
-        var step = guide!.Steps![index]; overlay.Clear(); stepText.Text = step.Instruction;
+        var step = guide!.Steps![index]; overlay.Clear(); visualGuide = false; visualAttempts = 0; stepText.Text = step.Instruction;
         state.Text = $"Guide · step {index+1} of {guide.Steps.Count}"; back!.IsEnabled = index > 0; next!.IsEnabled = skip!.IsEnabled = true; next.Content = index + 1 == guide.Steps.Count ? "Done" : "Next";
         var foreground = Native.GetForegroundWindow(); if (!Native.IsOwnWindow(foreground) && foreground != IntPtr.Zero) sourceWindow = foreground;
         var snapshot = await Perception.Capture(sourceWindow, ct); ct.ThrowIfCancellationRequested();
         var element = GroundingResolver.Resolve(snapshot.Context.Elements, step.Ref, step.Target, step.Role)
             ?? GroundingResolver.Resolve(snapshot.Context.Elements, "", step.Target, step.Role);
         expectationArmed = snapshot.Complete && !GuideExpectations.Matches(step.Expect, snapshot.Context); expectationMatches = 0;
-        if (element is null) { guideMisses++; state.Text += " · target not visible; focus or scroll the app, then choose Make plan."; mood(CompanionMood.Unsure); }
-        else { guideMisses = 0; Draw(snapshot, element, step.Primitive, step.Instruction); mood(CompanionMood.Pointing); }
+        if (element is null && !await DrawVisualStep(snapshot, step, ct)) { guideMisses++; state.Text += " · target not verified; focus or scroll the app, then choose Make plan."; mood(CompanionMood.Unsure); }
+        else if (element is not null) { guideMisses = 0; Draw(snapshot, element, step.Primitive, step.Instruction); mood(CompanionMood.Pointing); }
         guideMonitor.Start();
         if (service() is { } host) await host.Store.Update(s => { s.Guides.RemoveAll(g => g.Id == guideId); s.Guides.Add(new(guideId, goal.Text, guide, index, DateTimeOffset.UtcNow)); if (s.Guides.Count > 20) s.Guides.RemoveAt(0); return true; });
     }
@@ -152,7 +155,9 @@ internal sealed class DesktopAssistant : IDisposable
             expectationMatches = expectationArmed && matches ? expectationMatches + 1 : 0;
             if (preferences().GuideAutoAdvance && expectationMatches >= 2) { await GuideStep(1); return; }
             var element = GroundingResolver.Resolve(snapshot.Context.Elements, step.Ref, step.Target, step.Role) ?? GroundingResolver.Resolve(snapshot.Context.Elements, "", step.Target, step.Role);
-            if (element is not null) { guideMisses = 0; if (!overlay.IsVisible || drawnGuideTarget != element) Draw(snapshot, element, step.Primitive, step.Instruction); }
+            if (element is not null) { visualGuide = false; guideMisses = 0; if (!overlay.IsVisible || drawnGuideTarget != element) Draw(snapshot, element, step.Primitive, step.Instruction); }
+            else if (visualGuide && overlay.IsVisible) { return; }
+            else if (await DrawVisualStep(snapshot, step, timeout.Token)) { return; }
             else {
                 overlay.Clear(); mood(CompanionMood.Unsure);
                 if (++guideMisses >= 2 && guideReplans < 3 && service() is { } host) {
@@ -172,6 +177,22 @@ internal sealed class DesktopAssistant : IDisposable
         drawnGuideTarget = element;
         var node = snapshot.Nodes[element.Ref]; var original = new Rect(element.X, element.Y, element.Width, element.Height);
         overlay.Draw(snapshot.Window, element, primitive, label, () => { try { return !node.Current.IsOffscreen && node.Current.BoundingRectangle == original; } catch { return false; } });
+    }
+    private async Task<bool> DrawVisualStep(ScreenSnapshot snapshot, GuideStep step, CancellationToken ct)
+    {
+        if (!snapshot.Complete || Native.GetForegroundWindow() != snapshot.Window || string.IsNullOrWhiteSpace(step.Target) || visualAttempts >= 3) return false;
+        int revision = guideRevision; visualAttempts++;
+        state.Text = "Looking for a verified visual label on this PC…"; mood(CompanionMood.Looking);
+        var grounded = await visualGrounding.Resolve(snapshot, step, ct); ct.ThrowIfCancellationRequested();
+        if (revision != guideRevision) throw new OperationCanceledException("The guide changed while grounding the target.");
+        if (grounded is null || grounded.CanExecute) return false;
+        var bounds = WindowCapture.Bounds(snapshot.Window); var title = snapshot.Context.Title;
+        overlay.Draw(snapshot.Window, grounded.Element, step.Primitive, step.Instruction, () => {
+            try { return WindowCapture.Bounds(snapshot.Window) == bounds && Security.Redact(Native.Label(snapshot.Window)) == title; } catch { return false; }
+        });
+        visualGuide = true; guideMisses = 0; mood(CompanionMood.Pointing);
+        state.Text = $"Guide · step {index+1} of {guide!.Steps!.Count} · visual label, manual action";
+        return true;
     }
     private async Task<bool> Confirm(string text, CancellationToken ct)
     {

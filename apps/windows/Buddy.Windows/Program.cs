@@ -14,7 +14,8 @@ public static class Program
             if (args.Contains("--check-package"))
             {
                 PackageVerifier.Verify(AppContext.BaseDirectory);
-                Console.WriteLine("PASS: Windows package integrity and assembly dependencies");
+                ProbeOcrDependencies();
+                Console.WriteLine("PASS: Windows package integrity, assembly dependencies and native OCR");
                 return 0;
             }
             Diagnostics.Start();
@@ -43,6 +44,8 @@ public static class Program
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void RunDesktop(LaunchDestination destination) => DesktopApplication.Run(destination);
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ProbeOcrDependencies() => LocalOcr.ProbeDependencies();
 
     internal static void ShowMessage(string message) => MessageBoxW(IntPtr.Zero, message, "Buddy", 0x00000040);
 

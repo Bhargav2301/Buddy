@@ -17,6 +17,7 @@ internal sealed class GuidanceOverlay : IDisposable
     private Func<bool>? stillValid;
     private bool validating;
     private int revision;
+    private GuideInputInvalidation? input;
     internal bool IsVisible => windows.Count > 0;
     internal GuidanceOverlay() { expiry.Tick += async (_, _) => {
         if (DateTimeOffset.UtcNow > expires || Native.GetForegroundWindow() != target && !Native.IsOwnWindow(Native.GetForegroundWindow()) || (InputNative.GetAsyncKeyState(1) & 0x8000) != 0) { Clear(); return; }
@@ -32,7 +33,7 @@ internal sealed class GuidanceOverlay : IDisposable
     }; }
     internal void Draw(IntPtr window, ScreenElement element, string primitive, string label, Func<bool>? valid = null)
     {
-        Clear(); target = window; stillValid = valid; expires = DateTimeOffset.UtcNow.AddSeconds(15);
+        Clear(); input = new GuideInputInvalidation(Clear); target = window; stillValid = valid; expires = DateTimeOffset.UtcNow.AddSeconds(15);
         foreach (var monitor in System.Windows.Forms.Screen.AllScreens) {
             var bounds = monitor.Bounds;
             if (!bounds.IntersectsWith(new((int)element.X, (int)element.Y, (int)element.Width, (int)element.Height))) continue;
@@ -40,7 +41,7 @@ internal sealed class GuidanceOverlay : IDisposable
         }
         expiry.Start();
     }
-    internal void Clear() { revision++; expiry.Stop(); foreach (var window in windows) window.Close(); windows.Clear(); stillValid = null; }
+    internal void Clear() { revision++; input?.Dispose(); input = null; expiry.Stop(); foreach (var window in windows) window.Close(); windows.Clear(); stillValid = null; }
     public void Dispose() => Clear();
 
     private sealed class InkWindow : Window

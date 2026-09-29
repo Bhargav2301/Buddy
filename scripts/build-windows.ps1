@@ -12,6 +12,8 @@ dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Desktop.Tests') -c Relea
 if ($LASTEXITCODE -ne 0) { throw 'Desktop logic tests failed.' }
 dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Windows.IntegrationTests') -c Release -- --settings-navigation
 if ($LASTEXITCODE -ne 0) { throw 'Settings window navigation tests failed.' }
+dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Windows.IntegrationTests') -c Release -- --ocr
+if ($LASTEXITCODE -ne 0) { throw 'Native OCR dependency or fixture tests failed.' }
 dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Assistant.Tests') -c Release -r win-x64 --self-contained true
 if ($LASTEXITCODE -ne 0) { throw 'Assistant safety and tool tests failed.' }
 dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Mvp.Tests') -c Release -r win-x64 --self-contained true

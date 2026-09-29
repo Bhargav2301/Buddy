@@ -14,6 +14,7 @@ internal static class Program
     [STAThread] private static int Main(string[] args)
     {
         if (args.Contains("--settings-navigation")) return SettingsNavigation();
+        if (args.Contains("--ocr")) return OcrChecks().GetAwaiter().GetResult();
         var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown }; int exit = 1, count = 0;
         void Check(bool value, string message) { if (!value) throw new Exception("FAIL: " + message); count++; Console.WriteLine("PASS: " + message); }
         var fixture = new Window { Title = "Buddy isolated integration fixture", Width = 600, Height = 400 };
@@ -93,5 +94,35 @@ internal static class Program
             finally { await home.Quit(); }
         };
         app.Run(home); return exit;
+    }
+    private static async Task<int> OcrChecks()
+    {
+        try {
+            using var fixture = new System.Drawing.Bitmap(1000, 380);
+            using (var g = System.Drawing.Graphics.FromImage(fixture)) using (var font = new System.Drawing.Font("Arial", 38)) {
+                g.Clear(System.Drawing.Color.White); g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+                g.DrawString("Export Project", font, System.Drawing.Brushes.Black, 50, 35);
+                g.DrawString("Save Project", font, System.Drawing.Brushes.Black, 50, 130);
+                g.DrawString("password: secret-test", font, System.Drawing.Brushes.Black, 50, 230);
+            }
+            using var buffer = new MemoryStream(); fixture.Save(buffer, System.Drawing.Imaging.ImageFormat.Png);
+            using var frame = new CapturedWindow(buffer.ToArray(), new Rect(-1200, 100, 1000, 380), 1000, 380);
+            var text = await LocalOcr.Read(frame, default);
+            if (!text.Text.Any(t => t.Text.Contains("Export Project") && t.Confidence > .8)) throw new Exception("Bundled OCR did not recognize the fixture label.");
+            Console.WriteLine("PASS: Bundled native OCR recognizes fixture text offline");
+            if (text.Text.Any(t => t.Text.Contains("secret")) || text.PrivateBounds.Count != 1) throw new Exception("Sensitive OCR line was not separated for redaction.");
+            Console.WriteLine("PASS: Sensitive OCR text is omitted from grounding evidence");
+            if (!text.Text.All(t => t.Bounds.X < 0 && t.Bounds.Y > 100)) throw new Exception("OCR coordinates lost the negative monitor origin.");
+            Console.WriteLine("PASS: OCR coordinates preserve physical bounds and negative monitor origins");
+            using var masked = frame.Mask(text); using var png = new MemoryStream(masked.Image); using var bitmap = new System.Drawing.Bitmap(png);
+            var secret = text.PrivateBounds[0]; var pixel = bitmap.GetPixel((int)(secret.X + secret.Width / 2 - frame.Bounds.X), (int)(secret.Y + secret.Height / 2 - frame.Bounds.Y));
+            if (pixel.R != 0 || pixel.G != 0 || pixel.B != 0) throw new Exception("OCR region was not masked.");
+            Console.WriteLine("PASS: OCR-detected private regions are blacked out before vision");
+            using var cancelled = new CancellationTokenSource(); cancelled.Cancel(); bool stopped = false;
+            try { await LocalOcr.Read(frame, cancelled.Token); } catch (OperationCanceledException) { stopped = true; }
+            if (!stopped) throw new Exception("Cancelled OCR was dispatched.");
+            Console.WriteLine("PASS: Cancelled OCR requests are not dispatched");
+            Console.WriteLine("ALL 5 NATIVE OCR CHECKS PASSED; this synthetic fixture does not measure grounding acceptance"); return 0;
+        } catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
     }
 }
