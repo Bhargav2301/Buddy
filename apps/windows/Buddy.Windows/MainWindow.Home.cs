@@ -62,6 +62,8 @@ public sealed partial class MainWindow
             foreach (var c in items) {
                 var card = new StackPanel(); var title = Text((c.Pinned ? "Pinned · " : "") + c.Title, 16); title.FontWeight = FontWeights.SemiBold; card.Children.Add(title);
                 card.Children.Add(Text(c.UpdatedAt.ToLocalTime().ToString("g") + " · on this PC" + (c.Messages.Any(m => m.Mode == "voice") ? " · voice" : ""), 12, Accent));
+                var badges = c.Messages.Select(m => SourceLinks.Badge(m.Evidence)).Where(b => b.Length > 0).Distinct().Take(3);
+                card.Children.Add(Text(string.Join(" | ", badges), 12, Muted));
                 var preview = c.Messages.LastOrDefault()?.Text ?? "No messages yet";
                 card.Children.Add(Text(preview.Length > 220 ? preview[..220] + "…" : preview, 14, Muted));
                 var buttons = new WrapPanel();

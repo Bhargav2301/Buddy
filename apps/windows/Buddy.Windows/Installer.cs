@@ -41,10 +41,15 @@ internal static class Installer
     }
     private static void Probe(string folder)
     {
-        using var process = Process.Start(new ProcessStartInfo(Path.Combine(folder, "Buddy.exe"), "--check-package") { WorkingDirectory = folder, UseShellExecute = false, CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden })
+        using var process = Process.Start(new ProcessStartInfo(Path.Combine(folder, "Buddy.exe"), "--check-package") { WorkingDirectory = folder, UseShellExecute = false, CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden, RedirectStandardOutput = true, RedirectStandardError = true })
             ?? throw new InvalidOperationException("Could not start the package dependency check.");
+        var error = process.StandardError.ReadToEndAsync(); var output = process.StandardOutput.ReadToEndAsync();
         if (!process.WaitForExit(30000)) { process.Kill(); throw new InvalidOperationException("The package dependency check timed out. Your previous installation is unchanged."); }
-        if (process.ExitCode != 0) throw new InvalidOperationException("The package dependency check failed. Check Buddy's startup log; your previous installation is unchanged.");
+        if (process.ExitCode != 0) {
+            var details = error.GetAwaiter().GetResult(); if (string.IsNullOrWhiteSpace(details)) details = output.GetAwaiter().GetResult();
+            throw new InvalidOperationException("The package dependency check failed. Your previous installation is unchanged.\n\n" +
+                details[..Math.Min(details.Length, 1600)] + "\nIf the Microsoft Visual C++ x64 Runtime is missing, run Install-Prerequisites.cmd from the extracted preview, then retry.");
+        }
     }
 
     private static void CreateShortcut(string folder, string target, string name = "Buddy", string arguments = "--home")

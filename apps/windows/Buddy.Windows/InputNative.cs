@@ -34,17 +34,14 @@ internal static class InputNative
             finally { CloseHandle(token); }
         } finally { CloseHandle(process); }
     }
-    internal static void Type(string text, CancellationToken ct)
-    {
-        foreach (var c in text) { ct.ThrowIfCancellationRequested(); Send([new() { Type = 1, Scan = c, Flags = 4 }, new() { Type = 1, Scan = c, Flags = 6 }]); }
-    }
     internal static void Keys(string chord, CancellationToken ct)
     {
         if (!ActionPolicy.Keys.Contains(chord)) throw new InvalidOperationException("Unsupported key chord.");
         var map = new Dictionary<string, ushort> { ["Ctrl"] = 0x11, ["Shift"] = 0x10, ["Tab"] = 9, ["Enter"] = 13, ["Escape"] = 27, ["A"] = 65, ["C"] = 67, ["Z"] = 90, ["Up"] = 38, ["Down"] = 40, ["Left"] = 37, ["Right"] = 39 };
         var keys = chord.Split('+').Select(s => map[s]).ToArray(); ct.ThrowIfCancellationRequested();
-        try { foreach (var key in keys) Send([new() { Type = 1, Key = key }]); }
-        finally { foreach (var key in keys.Reverse()) Send([new() { Type = 1, Key = key, Flags = 2 }]); }
+        var pressed = new List<ushort>();
+        try { foreach (var key in keys) { ct.ThrowIfCancellationRequested(); Send([new() { Type = 1, Key = key }]); pressed.Add(key); } }
+        finally { foreach (var key in pressed.AsEnumerable().Reverse()) Send([new() { Type = 1, Key = key, Flags = 2 }]); }
     }
     private static void Send(Input[] inputs) { if (SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<Input>()) != inputs.Length) throw new InvalidOperationException("Windows refused input. The run has stopped."); }
 }

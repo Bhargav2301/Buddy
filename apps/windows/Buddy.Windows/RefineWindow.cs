@@ -24,10 +24,12 @@ internal sealed class RefineWindow : Window
     private RefinementResult? result;
     private bool applied, closed, applying;
     private int generation;
+    private readonly Action<CompanionMood>? mood;
+    private readonly Action? starting;
 
-    internal RefineWindow(BuddyService service, string original, Func<string, CancellationToken, Task> applyEdit, Func<CancellationToken, Task> undoEdit, string source)
+    internal RefineWindow(BuddyService service, string original, Func<string, CancellationToken, Task> applyEdit, Func<CancellationToken, Task> undoEdit, string source, Action<CompanionMood>? mood = null, Action? starting = null)
     {
-        BuddyTheme.Ensure(); this.service = service; this.original = original; this.applyEdit = applyEdit; this.undoEdit = undoEdit;
+        BuddyTheme.Ensure(); this.service = service; this.original = original; this.applyEdit = applyEdit; this.undoEdit = undoEdit; this.mood = mood; this.starting = starting;
         Title = "Buddy · Refine"; Width = 400; Height = 620; MinHeight = 420; MaxHeight = SystemParameters.WorkArea.Height; FontFamily = BuddyTheme.Font; Foreground = BuddyTheme.Ink;
         Background = BuddyTheme.Surface; ResizeMode = ResizeMode.CanResize; WindowStartupLocation = WindowStartupLocation.CenterOwner;
         var panel = new StackPanel { Margin = new(20) }; var title = Label("Refine · on this PC", 13); title.Foreground = BuddyTheme.Deep; title.FontWeight = FontWeights.SemiBold; panel.Children.Add(title);
@@ -56,7 +58,9 @@ internal sealed class RefineWindow : Window
     internal async Task Refine(string mode)
     {
         if (applied || applying) return;
+        starting?.Invoke();
         Cancel(); int current = ++generation; var cts = new CancellationTokenSource(); operation = cts;
+        mood?.Invoke(CompanionMood.Thinking);
         apply.IsEnabled = false; result = null; after.Text = ""; score.Text = ""; changes.Text = "";
         try {
             await foreach (var item in service.RefineStream(new(original, mode, technique.SelectedItem?.ToString() ?? "auto"), cts.Token)) {
@@ -72,12 +76,13 @@ internal sealed class RefineWindow : Window
             }
         } catch (Exception e) {
             if (generation == current && !closed) progress.Text = e is OperationCanceledException ? "Stopped. Original unchanged." : e.Message;
-        } finally { if (ReferenceEquals(operation, cts)) operation = null; cts.Dispose(); }
+        } finally { if (ReferenceEquals(operation, cts)) { operation = null; mood?.Invoke(CompanionMood.Idle); } cts.Dispose(); }
     }
     internal void Cancel()
     {
         generation++; operation?.Cancel(); apply.IsEnabled = false;
-        if (!closed) progress.Text = "Stopped. Use Copy or choose a mode to try again.";
+        mood?.Invoke(CompanionMood.Idle);
+        if (!closed) progress.Text = applied ? "Stopped. Undo remains available for 30 seconds after applying." : "Stopped. Use Copy or choose a mode to try again.";
     }
     private async Task Apply()
     {

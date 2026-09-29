@@ -2,6 +2,9 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using System.Windows.Controls;
+using System.Windows.Automation;
+using Buddy.Server;
 
 namespace Buddy.Windows;
 
@@ -15,22 +18,32 @@ internal sealed class CursorCompanionWindow : Window, IDisposable
     private long snoozedUntil;
     private bool docked;
     private OverlayNative.Point dockPoint;
+    private ScreenElement? groundedTarget;
+    private PixelPosition flightFrom;
+    private long flightStarted;
+    private CompanionMood currentMood;
+    private readonly ContextMenu menu = new();
 
-    internal CursorCompanionWindow(Func<bool> suppressed)
+    internal CursorCompanionWindow(Func<bool> suppressed, Action<string>? action = null)
     {
         this.suppressed = suppressed;
         Title = "Buddy companion"; Width = 72; Height = 72;
         WindowStyle = WindowStyle.None; ResizeMode = ResizeMode.NoResize;
         AllowsTransparency = true; Background = Brushes.Transparent;
-        Topmost = true; ShowInTaskbar = false; ShowActivated = false; Focusable = false; IsHitTestVisible = false;
-        Content = glyph;
+        Topmost = true; ShowInTaskbar = false; ShowActivated = false;
+        var button = new System.Windows.Controls.Button { Content = glyph, Padding = new(0), Background = Brushes.Transparent, BorderThickness = new(0), ToolTip = "Open Buddy companion menu" };
+        AutomationProperties.SetName(button, "Open Buddy companion menu");
+        void Add(string label, Action click) { var item = new MenuItem { Header = label, MinHeight = 44 }; item.Click += (_, _) => click(); menu.Items.Add(item); }
+        foreach (var label in new[] { "Talk", "Voice", "Guide", "Agent", "Refine", "Dictate", "Home", "Settings", "Stop" }) Add(label, () => action?.Invoke(label));
+        Add("Dock", () => SetDocked(true)); Add("Follow pointer", () => SetDocked(false)); Add("Snooze 15 minutes", Snooze);
+        button.ContextMenu = menu; button.Click += (_, _) => { menu.PlacementTarget = button; menu.IsOpen = true; };
+        Content = button;
         SourceInitialized += (_, _) =>
         {
             var handle = new WindowInteropHelper(this).Handle;
-            OverlayNative.Configure(handle, true);
+            OverlayNative.Configure(handle, false, noActivate: true);
             HwndSource.FromHwnd(handle).AddHook((IntPtr h, int msg, IntPtr w, IntPtr l, ref bool handled) =>
             {
-                if (msg == 0x0084) { handled = true; return new IntPtr(-1); } // HTTRANSPARENT
                 if (msg == 0x0021) { handled = true; return new IntPtr(3); } // MA_NOACTIVATE
                 return IntPtr.Zero;
             });
@@ -44,16 +57,30 @@ internal sealed class CursorCompanionWindow : Window, IDisposable
         if (enabled) { timer.Start(); Follow(); }
         else { timer.Stop(); Hide(); }
     }
-    internal void SetMood(CompanionMood mood) => glyph.SetMood(mood);
+    internal void SetMood(CompanionMood mood) { currentMood = mood; glyph.SetMood(mood); }
+    internal void PointTo(ScreenElement? target)
+    {
+        groundedTarget = target; flightFrom = spring.Position; flightStarted = Environment.TickCount64;
+        if (target is null) spring.Reset();
+    }
     internal void Snooze() { snoozedUntil = Environment.TickCount64 + 15 * 60 * 1000; Hide(); spring.Reset(); }
     internal void SetDocked(bool value) { docked = value; if (OverlayNative.GetCursorPos(out var point)) dockPoint = point; spring.Reset(); }
     private void Follow()
     {
         if (disposed || !enabled) return;
         if (Environment.TickCount64 < snoozedUntil || suppressed() || OverlayNative.IsFullscreenForeground() || !OverlayNative.GetCursorPos(out var point)) { if (IsVisible) Hide(); spring.Reset(); return; }
-        if (docked) { point = dockPoint; var work = OverlayNative.WorkArea(point); point.X = (int)(work.Left + work.Width - 16); point.Y = (int)(work.Top + work.Height - 16); }
+        if (menu.IsOpen || IsMouseOver) return;
+        bool pointing = groundedTarget is not null && currentMood == CompanionMood.Pointing;
+        if (pointing) point = new() { X = (int)(groundedTarget!.X + groundedTarget.Width), Y = (int)(groundedTarget.Y + groundedTarget.Height / 2) };
+        else if (docked) { point = dockPoint; var work = OverlayNative.WorkArea(point); point.X = (int)(work.Left + work.Width - 16); point.Y = (int)(work.Top + work.Height - 16); }
         if (!IsVisible) { new WindowInteropHelper(this).EnsureHandle(); OverlayNative.Place(this, point); Show(); spring.Reset(); }
-        OverlayNative.Move(this, spring.Step(OverlayNative.Position(this, point), .033, BuddyTheme.Animate));
+        var destination = OverlayNative.Position(this, point);
+        if (pointing) {
+            double t = BuddyTheme.Animate ? Math.Clamp((Environment.TickCount64 - flightStarted) / 300.0, 0, 1) : 1;
+            double eased = 1 - Math.Pow(1 - t, 3);
+            var flight = new PixelPosition(flightFrom.X + (destination.X - flightFrom.X) * eased, flightFrom.Y + (destination.Y - flightFrom.Y) * eased);
+            OverlayNative.Move(this, spring.Step(flight, .033, false));
+        } else OverlayNative.Move(this, spring.Step(destination, .033, BuddyTheme.Animate));
     }
-    public void Dispose() { if (disposed) return; disposed = true; timer.Stop(); Close(); }
+    public void Dispose() { if (disposed) return; disposed = true; menu.IsOpen = false; timer.Stop(); Close(); }
 }

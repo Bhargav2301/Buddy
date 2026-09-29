@@ -1,10 +1,14 @@
 using System.Text.Json;
 using System.Windows.Automation;
+using System.Windows.Automation.Text;
+using System.Windows;
 
 namespace Buddy.Windows;
 
 internal sealed record FieldRule(string[] Processes, string[] Titles, string[] Fields);
-internal sealed record FocusedDraft(GuardedEdit Edit, string App, string FieldName);
+internal sealed record FieldAnchor(IntPtr Window, string Identity, Rect Bounds);
+internal sealed record FocusedDraft(GuardedEdit Edit, string App, string FieldName, FieldAnchor Anchor,
+    DictationInsertion? Insertion = null, Action? VerifySelection = null);
 
 // No background text reading. Capture is called only for an explicit Refine/dictation invocation.
 internal sealed class FocusedFieldEditor(ScreenPerception perception)
@@ -15,24 +19,85 @@ internal sealed class FocusedFieldEditor(ScreenPerception perception)
         return JsonSerializer.Deserialize<FieldRule[]>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
     });
 
-    internal Task<FocusedDraft> Capture(IntPtr window, CancellationToken ct) => Run(token => {
+    // Eligibility checks only role/name/bounds/pattern support; never Value or text ranges.
+    internal Task<FieldAnchor?> Probe(IntPtr window, CancellationToken ct) => Run(token => {
+        perception.Check(window);
+        if (Native.GetForegroundWindow() != window) return null;
+        var node = AutomationElement.FocusedElement;
+        if (!Supported(node, window)) return null;
+        var adapter = new AutomationTextField(node, window, perception);
+        adapter.Validate(); token.ThrowIfCancellationRequested();
+        return Anchor(node, window, adapter.Identity);
+    }, ct);
+
+    private static bool Supported(AutomationElement node, IntPtr window)
+    {
+        var c = node.Current;
+        return !c.IsPassword && c.IsEnabled && c.HasKeyboardFocus && !c.IsOffscreen && c.ControlType == ControlType.Edit &&
+            Rules.Value.Any(r => r.Processes.Contains(InputNative.ProcessName(window), StringComparer.OrdinalIgnoreCase) &&
+                r.Titles.Any(t => Native.Label(window).Contains(t, StringComparison.OrdinalIgnoreCase)) &&
+                r.Fields.Any(f => (c.Name ?? "").Contains(f, StringComparison.OrdinalIgnoreCase)));
+    }
+    private static FieldAnchor Anchor(AutomationElement node, IntPtr window, string identity)
+    {
+        var bounds = node.Current.BoundingRectangle;
+        if (bounds.IsEmpty || bounds.Width <= 0 || bounds.Height <= 0 || !double.IsFinite(bounds.X + bounds.Y + bounds.Width + bounds.Height) ||
+            !WindowCapture.Bounds(window).Contains(bounds))
+            throw new InvalidOperationException("The field is not visibly inside the selected app.");
+        return new(window, identity, bounds);
+    }
+
+    internal Task<FocusedDraft> Capture(IntPtr window, CancellationToken ct, bool dictation = false, string? expectedIdentity = null) => Run(token => {
         perception.Check(window);
         if (Native.GetForegroundWindow() != window) throw new InvalidOperationException("Focus an AI prompt field and press Ctrl+Alt+R.");
         var node = AutomationElement.FocusedElement;
         var current = node.Current;
-        string app = InputNative.ProcessName(window), title = Native.Label(window), name = current.Name ?? "";
-        if (!Rules.Value.Any(r => r.Processes.Contains(app, StringComparer.OrdinalIgnoreCase) &&
-                r.Titles.Any(t => title.Contains(t, StringComparison.OrdinalIgnoreCase)) &&
-                r.Fields.Any(f => name.Contains(f, StringComparison.OrdinalIgnoreCase))))
+        string app = InputNative.ProcessName(window), name = current.Name ?? "";
+        if (!dictation && !Supported(node, window))
             throw new InvalidOperationException("This field is not in Buddy's supported AI-chat rules. Paste your prompt into Buddy to refine it.");
         var adapter = new AutomationTextField(node, window, perception);
+        if (expectedIdentity is not null && adapter.Identity != expectedIdentity) throw new InvalidOperationException("The focused field changed. Invoke Buddy again in the intended field.");
         token.ThrowIfCancellationRequested();
         var original = adapter.Read();
-        if (string.IsNullOrWhiteSpace(original) || original.Length > 20000) throw new InvalidOperationException("Enter a prompt of up to 20,000 characters first.");
-        return new FocusedDraft(new GuardedEdit(adapter, original), app, name);
+        if ((!dictation && string.IsNullOrWhiteSpace(original)) || original.Length > 20000) throw new InvalidOperationException("Use a field of up to 20,000 characters.");
+        var anchor = Anchor(node, window, adapter.Identity);
+        if (Native.GetForegroundWindow() != window || !node.Current.HasKeyboardFocus) throw new InvalidOperationException("Focus changed while reading the field. Invoke Buddy again.");
+        if (!dictation) return new FocusedDraft(new GuardedEdit(adapter, original), app, name, anchor);
+        perception.Check(window, agent: true);
+        if (!node.TryGetCurrentPattern(TextPattern.Pattern, out var raw) || raw is not TextPattern pattern)
+            throw new InvalidOperationException("The app does not expose its caret safely. Use Buddy's draft or voice instead.");
+        var range = Selection(pattern);
+        var insertion = Insertion(pattern, range, original);
+        // Degenerate UIA ranges have no rectangles. The enclosing character gives a
+        // verified nearby anchor; empty or invisible text refuses caret placement.
+        // https://learn.microsoft.com/dotnet/api/system.windows.automation.text.textpatternrange.getboundingrectangles
+        var visible = range.Clone(); visible.ExpandToEnclosingUnit(TextUnit.Character);
+        var boxes = visible.GetBoundingRectangles();
+        if (boxes.Length == 0 || boxes[0].IsEmpty || !anchor.Bounds.Contains(boxes[0]))
+            throw new InvalidOperationException("The caret is not visibly exposed. Use Buddy's draft or voice instead.");
+        var rect = boxes[0];
+        anchor = anchor with { Bounds = new Rect(insertion.Start == original.Length ? rect.Right : rect.Left, rect.Top, 1, rect.Height) };
+        token.ThrowIfCancellationRequested();
+        if (Native.GetForegroundWindow() != window || !node.Current.HasKeyboardFocus) throw new InvalidOperationException("Focus changed while reading the caret.");
+        return new FocusedDraft(new GuardedEdit(adapter, original), app, name, anchor, insertion, () => {
+            var foreground = Native.GetForegroundWindow();
+            if (foreground != window && !Native.IsOwnWindow(foreground)) throw new InvalidOperationException("Focus changed. Copy the transcript instead.");
+            if (Insertion(pattern, Selection(pattern), original) != insertion) throw new InvalidOperationException("The caret or selection changed. Copy the transcript instead.");
+        });
     }, ct);
 
-    internal Task Apply(FocusedDraft draft, string text, CancellationToken ct) => Run(token => { draft.Edit.Apply(text, DateTimeOffset.UtcNow, token); return true; }, ct);
+    private static TextPatternRange Selection(TextPattern pattern)
+    {
+        var selection = pattern.GetSelection();
+        if (selection.Length != 1) throw new InvalidOperationException("Select a single insertion point first.");
+        return selection[0];
+    }
+    private static DictationInsertion Insertion(TextPattern pattern, TextPatternRange range, string original)
+    {
+        var prefix = pattern.DocumentRange.Clone(); prefix.MoveEndpointByRange(TextPatternRangeEndpoint.End, range, TextPatternRangeEndpoint.Start);
+        return DictationInsertion.Verify(original, pattern.DocumentRange.GetText(20001), prefix.GetText(20001), range.GetText(20001));
+    }
+    internal Task Apply(FocusedDraft draft, string text, CancellationToken ct) => Run(token => { draft.VerifySelection?.Invoke(); token.ThrowIfCancellationRequested(); draft.Edit.Apply(text, DateTimeOffset.UtcNow, token); return true; }, ct);
     internal Task Undo(FocusedDraft draft, CancellationToken ct) => Run(token => { draft.Edit.Undo(DateTimeOffset.UtcNow, token); return true; }, ct);
 
     private async Task<T> Run<T>(Func<CancellationToken, T> action, CancellationToken ct)
@@ -61,7 +126,7 @@ internal sealed class FocusedFieldEditor(ScreenPerception perception)
             identity = string.Join('.', node.GetRuntimeId()); processId = node.Current.ProcessId;
         }
         public string Identity => window + ":" + string.Join('.', node.GetRuntimeId());
-        private ValuePattern Validate()
+        internal ValuePattern Validate()
         {
             perception.Check(window);
             var current = node.Current;

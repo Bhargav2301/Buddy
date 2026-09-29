@@ -19,6 +19,7 @@ internal sealed class GuidanceOverlay : IDisposable
     private int revision;
     private GuideInputInvalidation? input;
     internal bool IsVisible => windows.Count > 0;
+    internal event Action<ScreenElement?>? TargetChanged;
     internal GuidanceOverlay() { expiry.Tick += async (_, _) => {
         if (DateTimeOffset.UtcNow > expires || Native.GetForegroundWindow() != target && !Native.IsOwnWindow(Native.GetForegroundWindow()) || (InputNative.GetAsyncKeyState(1) & 0x8000) != 0) { Clear(); return; }
         if (validating || stillValid is not { } validate) return;
@@ -40,8 +41,9 @@ internal sealed class GuidanceOverlay : IDisposable
             var ink = new InkWindow(bounds, element, primitive, label); windows.Add(ink); ink.Show(); ink.Place();
         }
         expiry.Start();
+        TargetChanged?.Invoke(IsVisible ? element : null);
     }
-    internal void Clear() { revision++; input?.Dispose(); input = null; expiry.Stop(); foreach (var window in windows) window.Close(); windows.Clear(); stillValid = null; }
+    internal void Clear() { revision++; input?.Dispose(); input = null; expiry.Stop(); foreach (var window in windows) window.Close(); windows.Clear(); stillValid = null; TargetChanged?.Invoke(null); }
     public void Dispose() => Clear();
 
     private sealed class InkWindow : Window
@@ -53,7 +55,7 @@ internal sealed class GuidanceOverlay : IDisposable
             AllowsTransparency = true; Background = Brushes.Transparent; Topmost = true; ShowInTaskbar = false; ShowActivated = false; Focusable = false; IsHitTestVisible = false;
             Content = new Ink(screen, target, primitive, label);
             SourceInitialized += (_, _) => { OverlayNative.Configure(new WindowInteropHelper(this).Handle, true); Place(); };
-            if (SystemParameters.ClientAreaAnimation) BeginAnimation(OpacityProperty, new DoubleAnimation(.3, 1, TimeSpan.FromMilliseconds(350)));
+            if (BuddyTheme.Animate) BeginAnimation(OpacityProperty, new DoubleAnimation(.3, 1, TimeSpan.FromMilliseconds(350)));
         }
         internal void Place() => OverlayNative.SetBounds(this, screen.X, screen.Y, screen.Width, screen.Height);
     }

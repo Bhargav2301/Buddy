@@ -58,6 +58,14 @@ try {
     Check(research.Calls == 1 && events.Any(e => e.Type == "tool_result"), "The structured loop executes a real tool adapter and emits its result");
     Check(model.Payloads[1].Contains("web-evidence-marker") && !model.Payloads[0].Contains("screen-private-marker"), "Web decisions see evidence without sending screen context to research");
     Check(model.Payloads.Last().Contains("web-evidence-marker") && events.Any(e => e.Text?.Contains("https://example.com") == true), "The final answer receives fetched evidence and actual source citations");
+    var recorded = await store.Read(s => s.Conversations.Single().Messages);
+    Check(recorded.Last().Evidence is { Screen: true, Image: false, Sources.Count: 1 } && recorded.Last().Evidence!.Sources![0].Url == "https://example.com",
+        "Screen-use and actual source links are stored as bounded conversation metadata");
+    Check(!JsonSerializer.Serialize(recorded).Contains("screen-private-marker") && !JsonSerializer.Serialize(recorded).Contains("web-evidence-marker"),
+        "Conversation metadata persists neither screen context nor retrieved page bodies");
+    var replay = await Collect(service.Chat(req, default));
+    Check(research.Calls == 1 && replay.Any(e => e.Type == "evidence" && e.Evidence?.Sources?.Count == 1),
+        "Idempotent answer replay retains source metadata without new research");
     service.AgentEnabled = true;
     model.Replies.Enqueue(JsonSerializer.Serialize(new AssistantPlan("Click", [new("click", Ref:"a", Description:"Click Export", Risk:"low")]), StateStore.Json));
     var plan = await service.PlanAgent(planning, default);
@@ -82,13 +90,19 @@ try {
     int guidePayload = model.Payloads.Count;
     await service.PlanGuide(planning with { UseWeb = true, Context = planning.Context with { Title = "screen-private-marker" } }, default);
     Check(!model.Payloads[guidePayload].Contains("screen-private-marker") && model.Payloads.Last().Contains("screen-private-marker"), "Guide research never includes the screen in web-tool decisions");
-    var visual = new VisionGroundingRequest("Export", "Button", "example", "Example", "fixture-image-marker", [new("ocr1", "Export", .95, 10, 10, 80, 30)]);
-    model.Replies.Enqueue("{\"ref\":\"ocr1\",\"matches\":true,\"confidence\":0.92,\"reason\":\"Visible Export control\"}");
+    var visual = new VisionGroundingRequest("Export", "Button", "example", "Example", "fixture-image-marker", [new("ocr1", "Export", .95, 10, 10, 80, 30, true)]);
+    model.Replies.Enqueue("{\"ref\":\"ocr1\",\"matches\":true,\"confidence\":0.92,\"reason\":\"Visible Export control\",\"kind\":\"control\"}");
     Check((await service.ConfirmVisualTarget(visual, default))?.Ref == "ocr1", "Local vision can corroborate a unique OCR label");
     Check(model.Payloads.Last().Contains("fixture-image-marker") && model.Payloads.Last().Contains("images"), "Vision receives the local image with bounded OCR evidence");
-    model.Replies.Enqueue("{\"ref\":\"invented\",\"matches\":true,\"confidence\":1,\"reason\":\"Guess\"}");
+    Check(!model.Payloads.Last().Contains("\"confidence\":0.95"), "OCR accuracy is not supplied as visual-role confidence");
+    model.Replies.Enqueue("{\"ref\":\"invented\",\"matches\":true,\"confidence\":1,\"reason\":\"Guess\",\"kind\":\"control\"}");
     Check(await service.ConfirmVisualTarget(visual, default) is null, "A model cannot invent a visual target reference");
+    model.Replies.Enqueue("{\"ref\":\"ocr1\",\"matches\":true,\"confidence\":0.99,\"reason\":\"Label in notes\",\"kind\":\"document-text\"}");
+    Check(await service.ConfirmVisualTarget(visual, default) is null, "A readable document mention cannot establish a button");
+    model.Replies.Enqueue("{\"ref\":\"ocr1\",\"matches\":true,\"confidence\":0.99,\"reason\":\"Role unknown\"}");
+    Check(await service.ConfirmVisualTarget(visual, default) is null, "Missing visual role evidence abstains even at high claimed confidence");
     int visionCalls = model.Payloads.Count;
+    Check(await service.ConfirmVisualTarget(visual with { Evidence = [visual.Evidence[0] with { ControlBoundary = false }] }, default) is null && model.Payloads.Count == visionCalls, "Control guidance without independent visual boundary evidence abstains before inference");
     Check(await service.ConfirmVisualTarget(visual with { Evidence = [visual.Evidence[0] with { Confidence = .5 }] }, default) is null && model.Payloads.Count == visionCalls, "Low-confidence OCR abstains before invoking vision");
     await Reject(async () => await service.ConfirmVisualTarget(visual with { Evidence = [visual.Evidence[0], visual.Evidence[0] with { Ref = "duplicate" }] }, default), "INVALID_VISION_CONTEXT", "Ambiguous visual evidence cannot produce a pointing target");
     await service.Audit("type", "Example field", "completed");

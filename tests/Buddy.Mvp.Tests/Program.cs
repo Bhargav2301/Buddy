@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.DataProtection;
 using System.Net;
 using System.Text.Json;
 
+if (args.Length == 2 && args[0] == "--real-local") { Environment.ExitCode = await RealLocalChecks.Run(args[1]); return; }
+
 int count = 0;
 void Check(bool condition, string name) { if (!condition) throw new Exception("FAIL: " + name); count++; Console.WriteLine("PASS: " + name); }
 var folder = Path.Combine(Path.GetTempPath(), "buddy-mvp-" + Guid.NewGuid());

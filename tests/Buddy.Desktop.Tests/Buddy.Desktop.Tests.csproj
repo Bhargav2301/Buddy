@@ -10,5 +10,7 @@
     <Compile Include="../../apps/windows/Buddy.Windows/InstallationTransaction.cs" Link="InstallationTransaction.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/CompanionState.cs" Link="CompanionState.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/LocalDataTree.cs" Link="LocalDataTree.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/DictationInsertion.cs" Link="DictationInsertion.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/DispatchInterruption.cs" Link="DispatchInterruption.cs" />
   </ItemGroup>
 </Project>

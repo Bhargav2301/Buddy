@@ -25,7 +25,7 @@ public sealed partial class MainWindow
     private void StartWorkflow(string mode, string text)
     {
         var active = Native.GetForegroundWindow(); if (active != IntPtr.Zero && !Native.IsOwnWindow(active)) previousWindow = active;
-        quick?.Dismiss(); voiceOverlay?.Dismiss();
+        PrepareDesktopActivity("assistant"); quick?.Dismiss(); voiceOverlay?.Dismiss();
         if (assistant is not null) _ = assistant.Open(mode, text);
     }
     private void ConfigurePtt()
@@ -37,7 +37,7 @@ public sealed partial class MainWindow
                 ptt = new PushToTalkHook(choice.Modifiers, () => Dispatcher.BeginInvoke(new Action(() => OpenQuick(false))),
                     () => {
                         var active = Native.GetForegroundWindow(); if (active != IntPtr.Zero && !Native.IsOwnWindow(active)) previousWindow = active;
-                        quick?.Dismiss(); tts?.SpeakAsyncCancelAll(); voiceOverlay?.Open(true);
+                        PrepareDesktopActivity("voice"); quick?.Dismiss(); voiceOverlay?.Open(true);
                     }, () => Dispatcher.BeginInvoke(new Action(() => voiceOverlay?.Finish())));
                 shortcut?.Dispose();
             } catch (Exception ex) { status.Text = ex.Message; shortcut?.TrySet(choice); }

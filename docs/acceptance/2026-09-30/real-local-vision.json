@@ -1,0 +1,28 @@
+{
+  "at": "2026-09-29T21:04:44.8328962+00:00",
+  "fixtureOnly": true,
+  "results": [
+    {
+      "scenario": "button",
+      "ocrConfidence": 0.9667761993408203,
+      "boundary": true,
+      "result": {
+        "Ref": "fixture-label",
+        "Matches": true,
+        "Confidence": 0.9,
+        "Reason": "The label is contained within a white rectangular background with a black border, suggesting a button or control element.",
+        "Kind": "control"
+      },
+      "modelObservation": "{\u0022reason\u0022:\u0022The label is contained within a white rectangular background with a black border, suggesting a button or control element.\u0022,\u0022kind\u0022:\u0022control\u0022,\u0022matches\u0022:true,\u0022ref\u0022:\u0022fixture-label\u0022,\u0022confidence\u0022:0.9}",
+      "passed": true
+    },
+    {
+      "scenario": "document-mention",
+      "ocrConfidence": 0.9667852020263672,
+      "boundary": false,
+      "result": null,
+      "modelObservation": null,
+      "passed": true
+    }
+  ]
+}

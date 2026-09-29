@@ -27,9 +27,10 @@ internal static class OverlayNative
         return new(fallback.Left, fallback.Top, fallback.Width, fallback.Height);
     }
     internal static double Scale(IntPtr window) => Math.Max(96, GetDpiForWindow(window)) / 96.0;
-    internal static void Configure(IntPtr window, bool clickThrough)
+    internal static void Configure(IntPtr window, bool clickThrough, bool noActivate = false)
     {
         long style = GetWindowLongPtr(window, -20).ToInt64() | 0x80; // tool window
+        if (noActivate) style |= 0x08000000;
         if (clickThrough) style |= 0x08000000 | 0x20 | 0x80000; // no-activate, transparent, layered
         SetWindowLongPtr(window, -20, new IntPtr(style));
         Native.SetWindowDisplayAffinity(window, 0x11);

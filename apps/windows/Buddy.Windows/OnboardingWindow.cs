@@ -19,6 +19,7 @@ internal sealed class OnboardingWindow : Window
     private bool closed;
     private int namingGeneration;
     private bool namingActive;
+    private CancellationTokenSource? namingRequest;
     private Button? nameVoice;
     internal OnboardingWindow(string initialName, Action<string> completed, Action setup, Action tutorial, Action testChat, Action testVoice, Func<Task<string>> modelStatus)
     {
@@ -48,26 +49,24 @@ internal sealed class OnboardingWindow : Window
     private async Task SpeakName()
     {
         StopNaming(); int generation = namingGeneration; namingActive = true; if (nameVoice is not null) nameVoice.Content = "Stop"; notice.Text = "Preparing microphone…";
+        var cts = new CancellationTokenSource(); namingRequest = cts;
         SpeechRecognitionEngine? prepared = null;
         try {
-            prepared = await Task.Run(() => {
-                var installed = SpeechRecognitionEngine.InstalledRecognizers(); if (installed.Count == 0) throw new InvalidOperationException("No Windows speech language is installed. Type a name instead.");
-                var r = new SpeechRecognitionEngine(installed[0]);
-                try { r.LoadGrammar(new DictationGrammar()); r.SetInputToDefaultAudioDevice(); return r; } catch { r.Dispose(); throw; }
-            });
-            if (closed || generation != namingGeneration) { prepared.Dispose(); return; }
+            prepared = await LocalSpeechInput.Create(cts.Token);
+            if (closed || generation != namingGeneration) { LocalSpeechInput.Stop(prepared); return; }
             recognizer = prepared; var active = prepared;
             active.SpeechRecognized += (_, e) => Dispatcher.BeginInvoke(new Action(() => { if (ReferenceEquals(recognizer, active)) name.Text = e.Result.Text.Trim()[..Math.Min(40, e.Result.Text.Trim().Length)]; }));
             active.RecognizeCompleted += (_, e) => Dispatcher.BeginInvoke(new Action(() => { if (ReferenceEquals(recognizer, active)) { notice.Text = e.Error?.Message ?? "Check the name, then choose That is me."; StopNaming(); } }));
             active.RecognizeAsync(RecognizeMode.Single); notice.Text = "Listening for a name…";
-        } catch (Exception e) { prepared?.Dispose(); StopNaming(); notice.Text = e.Message; }
+        } catch (Exception e) { LocalSpeechInput.Stop(prepared); if (!closed && generation == namingGeneration) { StopNaming(); notice.Text = e.Message; } }
     }
     private void StopNaming()
     {
         namingGeneration++;
+        namingRequest?.Cancel(); namingRequest?.Dispose(); namingRequest = null;
         namingActive = false; if (nameVoice is not null) nameVoice.Content = "Speak it";
         var current = recognizer; recognizer = null;
-        if (current is not null) { try { current.RecognizeAsyncCancel(); } catch (InvalidOperationException) { } current.Dispose(); notice.Text = "Microphone stopped."; }
+        LocalSpeechInput.Stop(current); notice.Text = "Microphone stopped.";
     }
     internal void Cancel() => StopNaming();
     private void Privacy()

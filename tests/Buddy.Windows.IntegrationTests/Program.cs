@@ -15,6 +15,7 @@ internal static class Program
     {
         if (args.Contains("--settings-navigation")) return SettingsNavigation();
         if (args.Contains("--ocr")) return OcrChecks().GetAwaiter().GetResult();
+        if (args.Length == 2 && args[0] == "--real-vision") return RealVisionChecks.Run(args[1]).GetAwaiter().GetResult();
         var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown }; int exit = 1, count = 0;
         void Check(bool value, string message) { if (!value) throw new Exception("FAIL: " + message); count++; Console.WriteLine("PASS: " + message); }
         var fixture = new Window { Title = "Buddy isolated integration fixture", Width = 600, Height = 400 };
@@ -22,7 +23,7 @@ internal static class Program
         var password = new PasswordBox { Password = "private-test-marker", Height = 30 }; AutomationProperties.SetName(password,"Private test field");
         var button = new Button { Content = "Export example", Height = 50 }; int clicks = 0; button.Click += (_,_) => clicks++;
         var stack = new StackPanel { Margin = new(20) }; stack.Children.Add(editor); stack.Children.Add(button); stack.Children.Add(password); fixture.Content = stack;
-        fixture.Loaded += async (_,_) => {
+        async Task RunNative() {
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             try {
                 var window = new WindowInteropHelper(fixture).Handle; ScreenPerception.PracticeHandle = window;
@@ -61,7 +62,13 @@ internal static class Program
                 Console.WriteLine($"ALL {count} NATIVE FIXTURE CHECKS PASSED (microphone and multi-monitor acceptance remain manual)"); exit = 0;
             } catch (Exception ex) { Console.Error.WriteLine(ex); }
             finally { ScreenPerception.PracticeHandle = IntPtr.Zero; fixture.Close(); app.Shutdown(); }
-        };
+        }
+        if (args.Contains("--interactive-fixture")) {
+            var run = new Button { Content = "Run native checks", MinHeight = 44 };
+            stack.Children.Insert(0, new TextBlock { Text = "Disposable Buddy fixture. Click below to give this window focus and verify native capture and controls.", TextWrapping = TextWrapping.Wrap });
+            stack.Children.Insert(1, run);
+            run.Click += async (_, _) => { run.IsEnabled = false; await RunNative(); };
+        } else fixture.Loaded += async (_, _) => await RunNative();
         app.Run(fixture); return exit;
     }
     private static int SettingsNavigation()
@@ -101,6 +108,7 @@ internal static class Program
             using var fixture = new System.Drawing.Bitmap(1000, 380);
             using (var g = System.Drawing.Graphics.FromImage(fixture)) using (var font = new System.Drawing.Font("Arial", 38)) {
                 g.Clear(System.Drawing.Color.White); g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+                g.DrawRectangle(System.Drawing.Pens.Black, 35, 20, 600, 110);
                 g.DrawString("Export Project", font, System.Drawing.Brushes.Black, 50, 35);
                 g.DrawString("Save Project", font, System.Drawing.Brushes.Black, 50, 130);
                 g.DrawString("password: secret-test", font, System.Drawing.Brushes.Black, 50, 230);
@@ -114,6 +122,12 @@ internal static class Program
             Console.WriteLine("PASS: Sensitive OCR text is omitted from grounding evidence");
             if (!text.Text.All(t => t.Bounds.X < 0 && t.Bounds.Y > 100)) throw new Exception("OCR coordinates lost the negative monitor origin.");
             Console.WriteLine("PASS: OCR coordinates preserve physical bounds and negative monitor origins");
+            var exportLabel = text.Text.Single(t => t.Text.Contains("Export Project"));
+            if (!VisualControlBoundary.HasBoundary(frame, exportLabel, default)) throw new Exception("A bordered control lost its independent boundary evidence: " + exportLabel.Bounds);
+            Console.WriteLine("PASS: Control-boundary evidence preserves negative monitor coordinates");
+            var plainLabel = text.Text.Single(t => t.Text.Contains("Save Project"));
+            if (VisualControlBoundary.HasBoundary(frame, plainLabel, default)) throw new Exception("Plain text was treated as a bordered control.");
+            Console.WriteLine("PASS: Readable plain text does not establish a control boundary");
             using var masked = frame.Mask(text); using var png = new MemoryStream(masked.Image); using var bitmap = new System.Drawing.Bitmap(png);
             var secret = text.PrivateBounds[0]; var pixel = bitmap.GetPixel((int)(secret.X + secret.Width / 2 - frame.Bounds.X), (int)(secret.Y + secret.Height / 2 - frame.Bounds.Y));
             if (pixel.R != 0 || pixel.G != 0 || pixel.B != 0) throw new Exception("OCR region was not masked.");
@@ -122,7 +136,7 @@ internal static class Program
             try { await LocalOcr.Read(frame, cancelled.Token); } catch (OperationCanceledException) { stopped = true; }
             if (!stopped) throw new Exception("Cancelled OCR was dispatched.");
             Console.WriteLine("PASS: Cancelled OCR requests are not dispatched");
-            Console.WriteLine("ALL 5 NATIVE OCR CHECKS PASSED; this synthetic fixture does not measure grounding acceptance"); return 0;
+            Console.WriteLine("ALL 7 NATIVE OCR CHECKS PASSED; this synthetic fixture does not measure grounding acceptance"); return 0;
         } catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
     }
 }

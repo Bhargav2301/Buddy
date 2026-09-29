@@ -24,9 +24,11 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
     private readonly Func<IntPtr> target;
     private readonly ScreenPerception perception;
     private readonly Action<string, string> workflow;
-    private readonly TextBlock state = new() { Foreground = BuddyTheme.Deep, FontSize = 12, Text = "Listening · preparing microphone…" };
+    private readonly Action? starting;
+    private readonly TextBlock state = new() { Foreground = BuddyTheme.Deep, FontSize = 12, Text = "Voice · microphone off" };
     private readonly TextBlock transcript = new() { Foreground = BuddyTheme.Muted, FontSize = 14, TextWrapping = TextWrapping.Wrap, MaxHeight = 54 };
     private readonly TextBlock answer = new() { Foreground = BuddyTheme.Ink, FontSize = 14, TextWrapping = TextWrapping.Wrap };
+    private readonly StackPanel sources = new();
     private readonly ProgressBar level = new() { Minimum = 0, Maximum = 100, Height = 4, Margin = new(0, 8, 0, 8), Foreground = Brushes.Turquoise };
     private readonly DispatcherTimer monitor = new() { Interval = TimeSpan.FromMilliseconds(25) };
     private readonly DispatcherTimer collapse = new() { Interval = TimeSpan.FromSeconds(6) };
@@ -47,20 +49,24 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
     internal bool IsListening => listening;
     internal bool IsBusy => request is not null;
     internal VoiceOverlayWindow(Func<BuddyService?> service, Func<Task<string?>> conversation, Func<DesktopPreferences> preferences,
-        Action<CompanionMood> mood, Func<IntPtr> target, ScreenPerception perception, Action<string,string> workflow, Action openChat)
+        Action<CompanionMood> mood, Func<IntPtr> target, ScreenPerception perception, Action<string,string> workflow, Action openChat, Action<string>? refine = null, Action? openHome = null, Action? starting = null)
     {
         this.service = service; this.conversation = conversation; this.preferences = preferences; this.mood = mood; this.target = target; this.perception = perception; this.workflow = workflow;
-        BuddyTheme.Ensure();
+        this.starting = starting; BuddyTheme.Ensure();
         Title = "Buddy · voice overlay"; Width = 360; SizeToContent = SizeToContent.Height; MaxHeight = 400;
         WindowStyle = WindowStyle.None; ResizeMode = ResizeMode.NoResize; AllowsTransparency = true; Background = Brushes.Transparent;
         Topmost = true; ShowInTaskbar = false; ShowActivated = false; FontFamily = new("Segoe UI Variable");
         var p = new StackPanel { Margin = new(14) }; p.Children.Add(state); p.Children.Add(level); p.Children.Add(transcript);
-        p.Children.Add(new ScrollViewer { Content = answer, MaxHeight = 112, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
+        var result = new StackPanel(); result.Children.Add(answer); result.Children.Add(sources);
+        p.Children.Add(new ScrollViewer { Content = result, MaxHeight = 150, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
         var row = new WrapPanel { Margin = new(0,8,0,0) };
         void Add(string title, Action click) { var b = new Button { Content = title, Margin = new(0,0,5,4), Padding = new(7,4,7,4) }; b.Click += (_, _) => click(); row.Children.Add(b); }
         Add("Talk", () => Open(false)); Add("Finish", Finish); Add("Stop", Cancel); Add("Type", () => { Dismiss(); openChat(); });
         Add("Guide", () => StartWorkflow("guide")); Add("Do it", () => StartWorkflow("agent")); Add("×", Dismiss);
-        p.Children.Add(row); Content = new Border { Background = BuddyTheme.Surface, BorderBrush = BuddyTheme.Line, BorderThickness = new(1), CornerRadius = new(12), Child = p };
+        Add("Copy", () => { if (answer.Text.Length > 0) System.Windows.Clipboard.SetText(answer.Text); });
+        Add("Refine", () => { if (lastText.Length > 0) { Dismiss(); refine?.Invoke(lastText); } });
+        Add("Open in Buddy", () => { Dismiss(); openHome?.Invoke(); });
+        p.Children.Add(row); Content = new Border { Background = BuddyTheme.Surface, BorderBrush = BuddyTheme.Line, BorderThickness = new(1), CornerRadius = new(12), Child = new ScrollViewer { Content = p, MaxHeight = 380, VerticalScrollBarVisibility = ScrollBarVisibility.Auto } };
         AutomationProperties.SetLiveSetting(state, AutomationLiveSetting.Polite);
         AutomationProperties.SetName(level, "Microphone level");
         SourceInitialized += (_, _) => OverlayNative.Configure(new WindowInteropHelper(this).Handle, false);
@@ -77,7 +83,8 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
     private void StartWorkflow(string mode) { var text = lastText; Dismiss(); if (text.Length > 0) workflow(mode, text); }
     internal void Open(bool hold)
     {
-        Cancel(); held = hold; sourceWindow = target(); utterance.Clear(); transcript.Text = ""; answer.Text = ""; level.Value = 0;
+        starting?.Invoke();
+        Cancel(); held = hold; sourceWindow = target(); utterance.Clear(); transcript.Text = ""; answer.Text = ""; sources.Children.Clear(); level.Value = 0;
         if (OverlayNative.GetCursorPos(out var point)) { anchor = point; new WindowInteropHelper(this).EnsureHandle(); Height = 220; OverlayNative.Place(this, point); }
         Show(); monitor.Start(); collapse.Stop(); listening = true; int token = ++generation;
         Status("● Listening · preparing microphone…", CompanionMood.Listening);
@@ -99,12 +106,9 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
     {
         SpeechRecognitionEngine? created = null;
         try {
-            created = await Task.Run(() => {
-                var all = SpeechRecognitionEngine.InstalledRecognizers(); if (all.Count == 0) throw new InvalidOperationException("Install a Windows speech language, or choose Type.");
-                var r = new SpeechRecognitionEngine(all.FirstOrDefault(r => r.Culture.Name == System.Globalization.CultureInfo.CurrentUICulture.Name) ?? all[0]);
-                try { r.LoadGrammar(new DictationGrammar()); r.SetInputToDefaultAudioDevice(); return r; } catch { r.Dispose(); throw; }
-            });
-            if (closed || generation != token || !listening) { created.Dispose(); return; }
+            if (closed || generation != token || !listening || request is null) return;
+            created = await LocalSpeechInput.Create(request.Token);
+            if (closed || generation != token || !listening) { LocalSpeechInput.Stop(created); return; }
             recognizer = created; created = null; var engine = recognizer;
             engine.InitialSilenceTimeout = TimeSpan.FromSeconds(8); engine.EndSilenceTimeout = TimeSpan.FromMilliseconds(650);
             engine.AudioLevelUpdated += (_, e) => Dispatcher.BeginInvoke(new Action(() => { if (generation == token) level.Value = e.AudioLevel; }));
@@ -146,9 +150,11 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
                 var available = await host.Engine.Status(settings.Model, settings.VisionModel, source.Token);
                 if (available.Installed.Contains(settings.VisionModel)) image = Convert.ToBase64String(frame);
             }
-            await foreach (var item in host.Chat(new(id, text, Guid.NewGuid().ToString(), "voice", context?.Screen.PromptText, image, preferences().AllowWebResearch), source.Token)) {
+            await foreach (var item in host.Chat(new(id, text, Guid.NewGuid().ToString(), "voice", context?.Screen.PromptText, image, preferences().AllowWebResearch, context?.Screen.Context.App), source.Token)) {
+                source.Token.ThrowIfCancellationRequested(); if (generation != token) return;
                 if (item.Type == "status") Status(item.Text ?? "Thinking…", item.Text?.StartsWith("Research") == true ? CompanionMood.Researching : CompanionMood.Thinking);
                 if (item.Type == "delta") { answer.Text += item.Text; foreach (var sentence in sentences.Add(item.Text ?? "")) Speak(sentence); }
+                if (item.Type == "evidence") SourceLinks.Fill(sources, item.Evidence);
             }
             foreach (var sentence in sentences.Flush()) Speak(sentence);
             if (pendingSpeech == 0) { Status("Microphone off · Talk to follow up", CompanionMood.Idle); collapse.Start(); }
@@ -165,7 +171,7 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
         } catch { pendingSpeech = 0; Status("Answer shown · read-aloud unavailable", CompanionMood.Idle); }
     }
     private void Status(string value, CompanionMood valueMood) { state.Text = value; AutomationProperties.SetName(state, value); mood(valueMood); }
-    private void StopMic() { listening = false; ++generation; var old = recognizer; recognizer = null; if (old is not null) { try { old.RecognizeAsyncCancel(); } catch (InvalidOperationException) { } old.Dispose(); } level.Value = 0; }
+    private void StopMic() { listening = false; ++generation; var old = recognizer; recognizer = null; LocalSpeechInput.Stop(old); level.Value = 0; }
     internal void Cancel() {
         StopMic(); var old = request; var capture = snapshot; request = null; snapshot = null;
         old?.Cancel();

@@ -111,6 +111,25 @@ field.Transform = true; edit = new GuardedEdit(field, field.Value);
 Reject(() => edit.Apply("Replacement", now, default), "A host that transforms text cannot be reported as a successful replacement");
 InstallationTests.Run(Check);
 LocalDataTests.Run(Check);
+var insertion = DictationInsertion.Verify("Hi world", "Hi world", "Hi ", "world");
+Check(insertion.Replace("Hi world", "Buddy") == "Hi Buddy", "Dictation replaces only the explicitly captured selection");
+Check(new DictationInsertion(2, 0).Replace("ab\r\n😀 ", "c") == "abc\r\n😀 ", "Caret insertion preserves surrounding line endings and Unicode exactly");
+Reject(() => DictationInsertion.Verify("Original", "Different", "", ""), "Mismatched UIA document and writable value cannot define an insertion");
+Reject(() => DictationInsertion.Verify("Original", "Original", "Orig", "changed"), "An inconsistent selected range is refused");
+Reject(() => new DictationInsertion(99, 0).Replace("Original", "words"), "Out-of-range insertion is refused before editing");
+int pointerX = 0; var trip = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+using (var interrupt = new DispatchInterruption(() => new(Volatile.Read(ref pointerX), 0, false), reason => trip.TrySetResult(reason))) {
+    interrupt.ArmPointer(); var latency = Stopwatch.StartNew(); Volatile.Write(ref pointerX, 1);
+    Thread.Sleep(150); // Deliberately block the caller, as a busy UI might.
+    Check(trip.Task.IsCompleted && (await trip.Task).Contains("pointer"), "One-pixel movement cancels independently of a blocked presentation thread");
+}
+int esc = 0; trip = new(TaskCreationOptions.RunContinuationsAsynchronously);
+using (var interrupt = new DispatchInterruption(() => new(0, 0, Volatile.Read(ref esc) == 1), reason => trip.TrySetResult(reason))) {
+    var latency = Stopwatch.StartNew(); Volatile.Write(ref esc, 1);
+    await trip.Task.WaitAsync(TimeSpan.FromSeconds(1));
+    Check(latency.ElapsedMilliseconds < 100, "Injected input fixture reaches the dispatch-stop fence within 100 ms (native measurement still required)");
+    Console.WriteLine("Fixture interruption latency: " + latency.Elapsed.TotalMilliseconds.ToString("F1") + " ms");
+}
 var activity = new CompanionState();
 activity.Set("guide", CompanionMood.Pointing); activity.Set("voice", CompanionMood.Listening); activity.Set("chat", CompanionMood.Idle);
 Check(activity.Current == CompanionMood.Listening, "An idle chat cannot erase the microphone's active companion state");

@@ -18,6 +18,7 @@ internal sealed class DesktopAssistant : IDisposable
     private readonly Func<DesktopPreferences> preferences;
     private readonly Func<IntPtr> target;
     private readonly Action<CompanionMood> mood;
+    private readonly Action? starting;
     internal ScreenPerception Perception { get; }
     private readonly VisualGrounding visualGrounding;
     private bool visualGuide;
@@ -32,6 +33,7 @@ internal sealed class DesktopAssistant : IDisposable
     private readonly StackPanel planCards = new();
     private readonly TextBlock stepText = new() { Foreground = BuddyTheme.Ink, FontSize = 14, TextWrapping = TextWrapping.Wrap, Margin = new(0,8,0,8) };
     private ExecutionBanner? executionBanner;
+    private readonly StackPanel sourceLinks = new();
     private Button? run, next, back, skip, approve, undo;
     private CancellationTokenSource? operation;
     private CancellationTokenSource? guideCheck;
@@ -45,25 +47,26 @@ internal sealed class DesktopAssistant : IDisposable
     private bool checkingGuide, expectationArmed;
     private ScreenElement? drawnGuideTarget;
     private IntPtr sourceWindow;
-    private bool executing, movingGuard;
-    private OverlayNative.Point pointer;
+    private bool executing;
+    private DispatchInterruption? interruption;
     private (AutomationElement Node, string Before, string After, DateTimeOffset At, IntPtr Window)? edit;
     internal bool IsActive => panel?.IsVisible == true;
 
-    internal DesktopAssistant(Func<BuddyService?> service, Func<DesktopPreferences> preferences, Func<IntPtr> target, Action<CompanionMood> mood)
+    internal DesktopAssistant(Func<BuddyService?> service, Func<DesktopPreferences> preferences, Func<IntPtr> target, Action<CompanionMood> mood, Action<ScreenElement?>? pointing = null, Action? starting = null)
     {
         this.service = service; this.preferences = preferences; this.target = target; this.mood = mood; Perception = new(preferences); visualGrounding = new(Perception, service);
+        this.starting = starting; if (pointing is not null) overlay.TargetChanged += pointing;
         guideMonitor.Tick += async (_, _) => await CheckGuideProgress();
         stopMonitor.Tick += (_, _) => {
             if ((InputNative.GetAsyncKeyState(27) & 0x8000) != 0) Cancel();
-            if (movingGuard && OverlayNative.GetCursorPos(out var p) && Math.Pow(p.X - pointer.X, 2) + Math.Pow(p.Y - pointer.Y, 2) > 1600) { Cancel(); state.Text = "Paused because you moved the mouse. Review and plan again."; }
         };
     }
     internal async Task Open(string requestedMode, string query)
     {
         if (executing) { Cancel(); return; }
+        starting?.Invoke();
         Cancel(); mode = requestedMode; sourceWindow = target(); plan = null; guide = null; guideReplans = guideMisses = 0;
-        EnsurePanel(); goal.Text = query; planText.Clear(); planCards.Children.Clear(); stepText.Text = ""; panel!.Title = mode == "agent" ? "Buddy · Agent plan" : "Buddy · Guide"; panel.Width = mode == "agent" ? 420 : 360;
+        EnsurePanel(); goal.Text = query; planText.Clear(); planCards.Children.Clear(); sourceLinks.Children.Clear(); stepText.Text = ""; panel!.Title = mode == "agent" ? "Buddy · Agent plan" : "Buddy · Guide"; panel.Width = mode == "agent" ? 420 : 360;
         run!.Visibility = mode == "agent" ? Visibility.Visible : Visibility.Collapsed; run.IsEnabled = false;
         back!.Visibility = next!.Visibility = mode == "guide" ? Visibility.Visible : Visibility.Collapsed;
         skip!.Visibility = back.Visibility; skip.IsEnabled = false;
@@ -79,7 +82,7 @@ internal sealed class DesktopAssistant : IDisposable
         var p = new StackPanel { Margin = new(20) }; p.Children.Add(state); p.Children.Add(goal);
         Button Add(string label, Action action, Panel parent) { var b = new Button { Content = label, Padding = new(10,6,10,6), Margin = new(0,8,6,0) }; b.Click += (_, _) => action(); parent.Children.Add(b); return b; }
         var commands = new WrapPanel(); Add("Make plan", () => _ = Plan(), commands); run = Add("Run this plan", () => _ = Execute(), commands); Add("Stop", Cancel, commands); p.Children.Add(commands);
-        p.Children.Add(planText); p.Children.Add(planCards); p.Children.Add(stepText);
+        p.Children.Add(planText); p.Children.Add(planCards); p.Children.Add(sourceLinks); p.Children.Add(stepText);
         var navigation = new WrapPanel(); back = Add("Back", () => _ = GuideStep(-1), navigation); next = Add("Next", () => _ = GuideStep(1), navigation);
         skip = Add("Skip", () => _ = GuideStep(1), navigation);
         approve = Add("Allow this step", () => approval?.TrySetResult(true), navigation); approve.Visibility = Visibility.Collapsed;
@@ -92,6 +95,7 @@ internal sealed class DesktopAssistant : IDisposable
     private async Task Plan()
     {
         if (executing) return; Cancel(); var host = service(); if (host is null) return;
+        starting?.Invoke();
         var task = goal.Text.Trim(); if (task.Length == 0) { state.Text = "Describe the task first."; return; }
         plan = null; guide = null; run!.IsEnabled = false; next!.IsEnabled = back!.IsEnabled = false;
         var cts = new CancellationTokenSource(); operation = cts;
@@ -112,7 +116,7 @@ internal sealed class DesktopAssistant : IDisposable
                 planText.Text = guide.Summary + "\n\n" + string.Join("\n", guide.Steps!.Select((s,i) => $"{i+1}. {s.Instruction}"));
                 next.IsEnabled = true; await DrawStep(cts.Token);
             }
-            mood(CompanionMood.Idle);
+            if (mode == "agent") mood(CompanionMood.Idle);
         } catch (OperationCanceledException) { state.Text = "Stopped"; }
         catch (Exception ex) { state.Text = ex.Message; mood(CompanionMood.Unsure); }
         finally { if (ReferenceEquals(operation, cts)) operation = null; cts.Dispose(); }
@@ -129,6 +133,7 @@ internal sealed class DesktopAssistant : IDisposable
     }
     private async Task DrawStep(CancellationToken ct)
     {
+        SourceLinks.Fill(sourceLinks, new MessageEvidence(Sources: guide?.Sources?.Select(s => new SourceLink(s.Title, s.Url)).ToList()));
         var step = guide!.Steps![index]; overlay.Clear(); visualGuide = false; visualAttempts = 0; stepText.Text = step.Instruction;
         state.Text = $"Guide · step {index+1} of {guide.Steps.Count}"; back!.IsEnabled = index > 0; next!.IsEnabled = skip!.IsEnabled = true; next.Content = index + 1 == guide.Steps.Count ? "Done" : "Next";
         var foreground = Native.GetForegroundWindow(); if (!Native.IsOwnWindow(foreground) && foreground != IntPtr.Zero) sourceWindow = foreground;
@@ -143,7 +148,7 @@ internal sealed class DesktopAssistant : IDisposable
     }
     private async Task FinishGuide()
     {
-        guideMonitor.Stop(); overlay.Clear(); state.Text = "Walkthrough complete"; next!.IsEnabled = skip!.IsEnabled = false;
+        guideMonitor.Stop(); overlay.Clear(); mood(CompanionMood.Idle); state.Text = "Walkthrough complete"; next!.IsEnabled = skip!.IsEnabled = false;
         if (service() is { } host) await host.Store.Update(s => { int i = s.Guides.FindIndex(g => g.Id == guideId); if (i >= 0) s.Guides[i] = s.Guides[i] with { Completed = true, UpdatedAt = DateTimeOffset.UtcNow }; return true; });
     }
     private async Task CheckGuideProgress()
@@ -160,7 +165,7 @@ internal sealed class DesktopAssistant : IDisposable
             if (preferences().GuideAutoAdvance && expectationMatches >= 2) { await GuideStep(1); return; }
             var element = GroundingResolver.Resolve(snapshot.Context.Elements, step.Ref, step.Target, step.Role) ?? GroundingResolver.Resolve(snapshot.Context.Elements, "", step.Target, step.Role);
             if (element is not null) { visualGuide = false; guideMisses = 0; if (!overlay.IsVisible || drawnGuideTarget != element) Draw(snapshot, element, step.Primitive, step.Instruction); }
-            else if (visualGuide && overlay.IsVisible) { return; }
+            else if (visualGuide && overlay.IsVisible && drawnGuideTarget is { } visual && await visualGrounding.StillVisible(snapshot, visual, step.Role, timeout.Token)) { return; }
             else if (await DrawVisualStep(snapshot, step, timeout.Token)) { return; }
             else {
                 overlay.Clear(); mood(CompanionMood.Unsure);
@@ -172,8 +177,8 @@ internal sealed class DesktopAssistant : IDisposable
                     guide = updated; index = 0; guideRevision++; await DrawStep(timeout.Token);
                 } else state.Text = "I cannot identify the next control. Focus or scroll the app, or use Next / Skip.";
             }
-        } catch (OperationCanceledException) { }
-        catch (Exception ex) { state.Text = ex.Message; }
+        } catch (OperationCanceledException) { overlay.Clear(); }
+        catch (Exception ex) { overlay.Clear(); state.Text = ex.Message; }
         finally { if (ReferenceEquals(guideCheck, timeout)) guideCheck = null; checkingGuide = false; }
     }
     private void Draw(ScreenSnapshot snapshot, ScreenElement element, string primitive, string label)
@@ -185,6 +190,7 @@ internal sealed class DesktopAssistant : IDisposable
     private async Task<bool> DrawVisualStep(ScreenSnapshot snapshot, GuideStep step, CancellationToken ct)
     {
         if (!snapshot.Complete || Native.GetForegroundWindow() != snapshot.Window || string.IsNullOrWhiteSpace(step.Target) || visualAttempts >= 3) return false;
+        overlay.Clear();
         int revision = guideRevision; visualAttempts++;
         state.Text = "Looking for a verified visual label on this PC…"; mood(CompanionMood.Looking);
         var grounded = await visualGrounding.Resolve(snapshot, step, ct); ct.ThrowIfCancellationRequested();
@@ -195,13 +201,14 @@ internal sealed class DesktopAssistant : IDisposable
             try { return WindowCapture.Bounds(snapshot.Window) == bounds && Security.Redact(Native.Label(snapshot.Window)) == title; } catch { return false; }
         });
         visualGuide = true; guideMisses = 0; mood(CompanionMood.Pointing);
+        drawnGuideTarget = grounded.Element;
         state.Text = $"Guide · step {index+1} of {guide!.Steps!.Count} · visual label, manual action";
         return true;
     }
     private async Task<bool> Confirm(string text, CancellationToken ct)
     {
         executionBanner?.Hide();
-        movingGuard = false; state.Text = "Approval needed · " + text; approve!.Visibility = Visibility.Visible;
+        interruption?.DisarmPointer(); state.Text = "Approval needed · " + text; approve!.Visibility = Visibility.Visible;
         var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously); approval = completion;
         using var registration = ct.Register(() => completion.TrySetCanceled(ct));
         try { return await completion.Task; } finally { if (ReferenceEquals(approval, completion)) approval = null; approve.Visibility = Visibility.Collapsed; }
@@ -209,18 +216,21 @@ internal sealed class DesktopAssistant : IDisposable
     private async Task Execute()
     {
         if (plan?.Actions is null || executing || operation is not null) return;
+        starting?.Invoke();
         var host = service()!; var approvedPlan = ActionPolicy.Validate(plan); var cts = new CancellationTokenSource(); operation = cts; executing = true; run!.IsEnabled = false;
         var results = new List<ActionResult>(); int replans = 0;
+        interruption = new DispatchInterruption(() => {
+            if (!OverlayNative.GetCursorPos(out var position)) throw new InvalidOperationException("Pointer unavailable.");
+            return new(position.X, position.Y, (InputNative.GetAsyncKeyState(27) & 0x8000) != 0);
+        }, reason => { cts.Cancel(); panel!.Dispatcher.BeginInvoke(new Action(() => { executionBanner?.Hide(); state.Text = reason; })); });
         try {
             var pending = new Queue<AssistantAction>(approvedPlan.Actions!);
             while (pending.Count > 0 && results.Count < 25) {
                 cts.Token.ThrowIfCancellationRequested(); if (!preferences().AgentEnabled) throw new InvalidOperationException("Agent mode was disabled.");
                 var action = pending.Dequeue(); state.Text = $"Buddy is controlling — Esc to stop · action {results.Count+1}/25"; stepText.Text = action.Description; mood(CompanionMood.AgentWorking);
                 state.Text = "Buddy is controlling — Esc to stop · " + action.Description;
-                if (OverlayNative.GetCursorPos(out pointer)) movingGuard = true;
                 if (action.Kind == "open") {
                     if ((preferences().StrictAgentConfirmations || ActionPolicy.LiveRisk(action, null) == "high") && !await Confirm(action.Description + "\n" + action.Value, cts.Token)) break;
-                    if (OverlayNative.GetCursorPos(out pointer)) movingGuard = true;
                     ShowExecutionBanner(); await Task.Delay(600, cts.Token); sourceWindow = await OpenApp(action.Value, cts.Token);
                     results.Add(new(results.Count + 1, action, true, "Opened " + action.Value + "; verified foreground application"));
                 } else {
@@ -245,14 +255,13 @@ internal sealed class DesktopAssistant : IDisposable
                         if ((preferences().StrictAgentConfirmations && action.Kind is not ("read" or "wait") || risk == "high") && !await Confirm(action.Description + "\n" + action.Target + " " + action.Value, cts.Token)) break;
                         cts.Token.ThrowIfCancellationRequested();
                         if (!InputNative.SetForegroundWindow(sourceWindow)) throw new InvalidOperationException("Activate the target app before continuing.");
-                        if (OverlayNative.GetCursorPos(out pointer)) movingGuard = true;
                         if (element is not null) Draw(snapshot, element, "ring", action.Description);
                         ShowExecutionBanner(); await Task.Delay(600, cts.Token);
-                        var result = await BoundedAction(token => Apply(action, snapshot, element, token), cts.Token);
+                        var result = await BoundedAction(token => Apply(action, snapshot, element, token, risk), cts.Token);
                         results.Add(new(results.Count + 1, action, true, result));
                     }
                 }
-                executionBanner?.Hide(); movingGuard = false; overlay.Clear(); await host.Audit(action.Kind, action.Target, results[^1].Success ? "completed" : "not executed: target unavailable");
+                executionBanner?.Hide(); interruption.DisarmPointer(); overlay.Clear(); await host.Audit(action.Kind, action.Target, results[^1].Success ? "completed" : "not executed: target unavailable");
                 // Observe actual state before completing a batch or proposing its replacement.
                 var observed = await Perception.Capture(sourceWindow, cts.Token);
                 if (pending.Count == 0) {
@@ -271,7 +280,7 @@ internal sealed class DesktopAssistant : IDisposable
             if (edit is not null) undo!.Visibility = Visibility.Visible;
         } catch (OperationCanceledException) { state.Text = "Stopped. No further actions will run."; await host.Audit("stop", "agent", "cancelled"); }
         catch (Exception ex) { cts.Cancel(); state.Text = "Stopped · " + ex.Message; await host.Audit("stop", "agent", ex is TimeoutException ? "provider timeout; verify the last action" : "action failed"); }
-        finally { executionBanner?.Hide(); executing = movingGuard = false; overlay.Clear(); mood(CompanionMood.Idle); if (ReferenceEquals(operation, cts)) operation = null; cts.Dispose(); run.IsEnabled = false; }
+        finally { interruption?.Dispose(); interruption = null; executionBanner?.Hide(); executing = false; overlay.Clear(); mood(CompanionMood.Idle); if (ReferenceEquals(operation, cts)) operation = null; cts.Dispose(); run.IsEnabled = false; }
     }
     private async Task<T> BoundedAction<T>(Func<CancellationToken, T> action, CancellationToken ct)
     {
@@ -283,7 +292,7 @@ internal sealed class DesktopAssistant : IDisposable
             return await worker.WaitAsync(token);
         } catch (OperationCanceledException) when (!ct.IsCancellationRequested) { throw new TimeoutException("The app's accessibility provider timed out. Verify the last action before continuing."); }
     }
-    internal string Apply(AssistantAction action, ScreenSnapshot snapshot, ScreenElement? targetElement, CancellationToken ct)
+    internal string Apply(AssistantAction action, ScreenSnapshot snapshot, ScreenElement? targetElement, CancellationToken ct, string authorizedRisk = "high")
     {
         ct.ThrowIfCancellationRequested(); Perception.Check(snapshot.Window, true);
         if (Native.GetForegroundWindow() != snapshot.Window) throw new InvalidOperationException("Focus changed before the action.");
@@ -292,6 +301,11 @@ internal sealed class DesktopAssistant : IDisposable
         var node = snapshot.Nodes[targetElement!.Ref]; var current = node.Current;
         var liveName = Security.Redact(current.Name ?? ""); liveName = liveName[..Math.Min(120, liveName.Length)];
         if (!current.IsEnabled || current.IsOffscreen || current.IsPassword || liveName != targetElement.Name || current.ControlType.ProgrammaticName != "ControlType." + targetElement.Role || current.BoundingRectangle != new Rect(targetElement.X,targetElement.Y,targetElement.Width,targetElement.Height)) throw new InvalidOperationException("The target is no longer safe or in the expected position.");
+        if (authorizedRisk == "low") {
+            bool reversible = InputNative.ProcessName(snapshot.Window).Equals("notepad", StringComparison.OrdinalIgnoreCase) && node.TryGetCurrentPattern(ValuePattern.Pattern, out var editable) && editable is ValuePattern value && !value.Current.IsReadOnly;
+            bool navigation = node.TryGetCurrentPattern(SelectionItemPattern.Pattern, out _) || node.TryGetCurrentPattern(ExpandCollapsePattern.Pattern, out _);
+            if (ActionPolicy.LiveRisk(action, targetElement, reversible, navigation) != "low") throw new InvalidOperationException("The target's action effects changed. Review a fresh plan before proceeding.");
+        }
         ct.ThrowIfCancellationRequested();
         if (action.Kind == "read") return "Read " + Security.Redact(current.Name ?? "");
         if (action.Kind == "type") {
@@ -341,7 +355,7 @@ internal sealed class DesktopAssistant : IDisposable
             state.Text = "Previous field value restored."; edit = null; undo!.Visibility = Visibility.Collapsed;
         } catch (Exception ex) { state.Text = ex.Message; }
     }
-    internal void Cancel() { executionBanner?.Hide(); guideRevision++; guideCheck?.Cancel(); guideMonitor.Stop(); operation?.Cancel(); approval?.TrySetCanceled(); movingGuard = false; overlay.Clear(); state.Text = "Stopped"; mood(CompanionMood.Idle); }
+    internal void Cancel() { executionBanner?.Hide(); guideRevision++; guideCheck?.Cancel(); guideMonitor.Stop(); operation?.Cancel(); approval?.TrySetCanceled(); interruption?.DisarmPointer(); overlay.Clear(); state.Text = "Stopped"; mood(CompanionMood.Idle); }
     internal async Task ResumeLatest()
     {
         var saved = await service()!.Store.Read(s => s.Guides.LastOrDefault(g => !g.Completed));
@@ -366,6 +380,6 @@ internal sealed class DesktopAssistant : IDisposable
             var card = BuddyTheme.Card(p, 16); card.Background = needsReview ? BuddyTheme.RiskSoft : BuddyTheme.Canvas; planCards.Children.Add(card);
         }
     }
-    private void ShowExecutionBanner() { executionBanner ??= new ExecutionBanner(); executionBanner.Open(); }
+    private void ShowExecutionBanner() { interruption?.ArmPointer(); executionBanner ??= new ExecutionBanner(); executionBanner.Open(); }
     public void Dispose() { Cancel(); stopMonitor.Stop(); overlay.Dispose(); executionBanner?.Close(); panel?.Hide(); }
 }

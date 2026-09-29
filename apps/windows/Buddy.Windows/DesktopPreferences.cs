@@ -9,6 +9,7 @@ internal sealed record DesktopPreferences
     public bool ReduceMotion { get; init; }
     public string CompanionName { get; init; } = "Buddy";
     public bool OnboardingCompleted { get; init; }
+    public bool ShowFieldBadge { get; init; } = true;
     [System.Text.Json.Serialization.JsonExtensionData]
     public Dictionary<string, JsonElement>? AdditionalSettings { get; init; }
     public bool GuideAutoAdvance { get; init; }

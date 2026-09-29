@@ -38,11 +38,12 @@ public sealed partial class MainWindow
         CheckBox Toggle(string label, bool value) { var box = new CheckBox { Content = new TextBlock { Text = label, TextWrapping = TextWrapping.Wrap }, IsChecked = value, Margin = new(0, 4, 0, 8) }; AutomationProperties.SetName(box, label); p.Children.Add(box); return box; }
         void Save(Func<DesktopPreferences> next) { p.Children.Add(notice); p.Children.Add(Btn("Save changes", () => { try { SavePreferences(next()); notice.Text = "Saved on this PC."; } catch (Exception e) { notice.Text = e.Message; } }, true)); }
         if (section == "General") {
+            p.Children.Add(Text("Companion name", 14)); var name = new TextBox { Text = desktop.CompanionName, MaxLength = 40 }; StyleBox(name); AutomationProperties.SetName(name, "Companion name"); p.Children.Add(name);
             p.Children.Add(Text("Appearance", 14)); var theme = new ComboBox { ItemsSource = new[] { "System", "Light", "Dark" }, SelectedItem = desktop.Appearance }; AutomationProperties.SetName(theme, "Appearance"); p.Children.Add(theme);
             var motion = Toggle("Reduce motion", desktop.ReduceMotion); var companionEnabled = Toggle("Show companion", desktop.ShowCompanion);
             var background = Toggle("Hide Home after an explicit background launch", desktop.StartInCompanionMode);
             p.Children.Add(Text("Closing Home keeps Buddy in the tray. Quit stops Buddy and phone access. Windows high contrast and reduced animation settings are respected.", 14, Muted));
-            Save(() => desktop with { Appearance = theme.SelectedItem?.ToString() ?? "System", ReduceMotion = motion.IsChecked == true, ShowCompanion = companionEnabled.IsChecked == true, StartInCompanionMode = background.IsChecked == true });
+            Save(() => desktop with { CompanionName = string.IsNullOrWhiteSpace(name.Text) ? "Buddy" : name.Text.Trim(), Appearance = theme.SelectedItem?.ToString() ?? "System", ReduceMotion = motion.IsChecked == true, ShowCompanion = companionEnabled.IsChecked == true, StartInCompanionMode = background.IsChecked == true });
             p.Children.Add(Btn("Try pointing tutorial", ShowPractice));
         } else if (section == "Shortcuts") {
             p.Children.Add(Text("Main shortcut", 14)); var keys = new ComboBox { ItemsSource = ShortcutChoice.Choices, SelectedItem = ShortcutChoice.Choices.FirstOrDefault(c => c.Label == desktop.Shortcut) ?? ShortcutChoice.Choices[0] }; AutomationProperties.SetName(keys, "Main shortcut"); p.Children.Add(keys);
@@ -75,7 +76,10 @@ public sealed partial class MainWindow
             Save(() => desktop with { AgentEnabled = enabled.IsChecked == true, StrictAgentConfirmations = strict.IsChecked == true, GuideAutoAdvance = advance.IsChecked == true });
             p.Children.Add(Btn("Try pointing tutorial", ShowPractice));
         } else if (section == "Prompts") {
+            var badge = Toggle("Show the Refine badge beside supported AI-chat fields", desktop.ShowFieldBadge);
             p.Children.Add(Text("Quick, Guided and Council refine locally. Facts and constraints are checked before a rewrite can replace your draft. Automatic suggestions are off.", 14, Muted));
+            p.Children.Add(Text("The badge checks field names and roles without reading your text. Ctrl+Alt+R reads a prompt only when invoked. Ctrl+Alt+D dictates into a field with a verified caret; review the transcript before Insert.", 14, Muted));
+            Save(() => desktop with { ShowFieldBadge = badge.IsChecked == true });
             p.Children.Add(Btn("Open saved prompts", () => NavigateHome("Prompts")));
         } else if (section == "Devices") {
             p.Children.Add(Text("Paired phones use an encrypted connection to this PC.", 14, Muted));
@@ -91,10 +95,21 @@ public sealed partial class MainWindow
         }
         try { next.Save(); } catch { if (binding is not null) shortcut?.TrySet(binding); throw; }
         desktop = next; BuddyTheme.Apply(next.Appearance, next.ReduceMotion); companion?.SetEnabled(next.ShowCompanion);
+        ApplyDisplayName();
+        fieldBadge?.SetEnabled(next.ShowFieldBadge);
         if (old.Shortcut != next.Shortcut || old.HoldToTalk != next.HoldToTalk) ConfigurePtt();
         if (old.CaptureOnVoice != next.CaptureOnVoice || old.AgentEnabled != next.AgentEnabled || old.AllowWebResearch != next.AllowWebResearch || old.BlockedApps != next.BlockedApps) Cancel();
         if (host is not null) { host.Service.WebEnabled = next.AllowWebResearch; host.Service.AgentEnabled = next.AgentEnabled; }
         UpdateShortcutHint();
+    }
+    private void ApplyDisplayName()
+    {
+        var name = string.IsNullOrWhiteSpace(desktop.CompanionName) ? "Buddy" : desktop.CompanionName.Trim();
+        name = name[..Math.Min(40, name.Length)];
+        companionBrand.Text = name; talkHeading.Text = "Talk with " + name; Title = name + " · Buddy Home";
+        tray.Text = name + " · Buddy local AI";
+        if (companion is not null) { companion.Title = name + " · Buddy companion"; AutomationProperties.SetName(companion, name + " companion menu"); }
+        if (host is not null) host.Service.DisplayName = name;
     }
     private async Task ShowPrivacyHistory(StackPanel p)
     {
