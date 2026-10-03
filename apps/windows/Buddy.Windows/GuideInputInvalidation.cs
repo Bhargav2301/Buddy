@@ -9,12 +9,13 @@ internal sealed class GuideInputInvalidation : IDisposable
     private delegate IntPtr HookProc(int code, IntPtr message, IntPtr data);
     private readonly HookProc mouseCallback, keyCallback;
     private readonly Action changed;
+    private readonly Func<bool>? interested;
     private readonly Dispatcher dispatcher = Dispatcher.CurrentDispatcher;
     private IntPtr mouse, keyboard;
     private bool pending, disposed;
-    internal GuideInputInvalidation(Action changed)
+    internal GuideInputInvalidation(Action changed, Func<bool>? interested = null)
     {
-        this.changed = changed;
+        this.changed = changed; this.interested = interested;
         mouseCallback = (code, message, data) => {
             if (code >= 0 && message.ToInt64() is 0x201 or 0x204 or 0x207 or 0x20A or 0x20E) Notify();
             return CallNextHookEx(mouse, code, message, data);
@@ -29,6 +30,7 @@ internal sealed class GuideInputInvalidation : IDisposable
     }
     private void Notify()
     {
+        if (interested is not null && !interested()) return;
         if (pending || disposed) return; pending = true;
         dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => { if (!disposed) changed(); }));
     }

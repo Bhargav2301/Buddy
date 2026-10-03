@@ -14,6 +14,7 @@ internal sealed class GuardedEdit(IVerifiedTextField field, string original)
     private string? replacement;
     private DateTimeOffset appliedAt;
     internal string Original => original;
+    internal bool Matches(string expected){try{return field.Identity==identity&&field.Read()==expected;}catch{return false;}}
     internal bool CanUndo(DateTimeOffset now) => replacement is not null && now >= appliedAt && now - appliedAt <= TimeSpan.FromSeconds(30);
 
     internal void Apply(string text, DateTimeOffset now, CancellationToken ct)

@@ -42,7 +42,7 @@ using var shortcut = new ShortcutRegistration((id, mods) => { nativeCalls++; if 
 Check(shortcut.TrySet(ShortcutChoice.Choices[0]) && registered.Count == 1, "Initial shortcut is registered");
 int oldId = shortcut.ActiveId;
 conflict = true;
-Check(!shortcut.TrySet(ShortcutChoice.Choices[3]) && shortcut.ActiveId == oldId && registered.ContainsKey(oldId), "Reserved Windows shortcut failure preserves the working shortcut");
+Check(!shortcut.TrySet(ShortcutChoice.Choices[3]) && shortcut.ActiveId == oldId && registered.ContainsKey(oldId), "Competing-app shortcut failure preserves the working shortcut");
 conflict = false;
 Check(shortcut.TrySet(ShortcutChoice.Choices[1]) && shortcut.ActiveId != oldId && !registered.ContainsKey(oldId) && registered.Count == 1,
     "Successful replacement removes only the previous shortcut");
@@ -141,6 +141,7 @@ var spring = new CompanionSpring(); spring.Step(new(-500, 100), .033, true);
 for (int i = 0; i < 180; i++) spring.Step(new(-200, 500), .033, true);
 Check(Math.Abs(spring.Position.X + 200) + Math.Abs(spring.Position.Y - 500) < 1, "Companion spring converges across negative screen coordinates");
 Check(spring.Step(new(10, 20), .033, false) == new PixelPosition(10, 20), "Reduced motion places the companion immediately");
+RegionShapeChecks.Run(Check);
 Console.WriteLine($"{assertions} desktop logic assertions passed. Native Windows interaction is a separate acceptance check.");
 
 sealed class TestField : IVerifiedTextField

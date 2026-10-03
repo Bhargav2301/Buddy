@@ -9,6 +9,8 @@ public static class Program
     public static int Main(string[] args)
     {
         if (args.Length > 0 && args[0] == "--delete-local-data-after") return LocalDataDeletion.Run(args);
+        PreviewEnvironment.Configure(args);
+        if (PreviewEnvironment.Enabled && args.Any(a => a is "--install" or "--rollback" or "--delete-local-data-after")) return 1;
         bool logErrors = false;
         // No desktop types here: catch load failures before WPF is JIT-compiled.
         try
@@ -21,8 +23,12 @@ public static class Program
                 return 0;
             }
             if (args.Contains("--install")) return Installer.Run(args.Contains("--quiet"), !args.Contains("--no-launch"));
+            if (args.Contains("--check-voice")) { LocalPackageChecks.Voice().GetAwaiter().GetResult(); return 0; }
+            if (args.Length>=3&&args[0]=="--compare-saved-data") { LocalPackageChecks.CompareSavedData(args[1],args[2]);return 0; }
+            if (args.Contains("--check-branding")) { LocalPackageChecks.Branding(); return 0; }
+            if (args.Contains("--inspect-running-branding")) { BrandingDiagnostics.InspectRunning(); return 0; }
             if (args.Contains("--rollback")) return Installer.Run(args.Contains("--quiet"), !args.Contains("--no-launch"), rollback: true);
-            using var single = new Mutex(true, "Local\\Buddy.Desktop.v1", out bool first);
+            using var single = new Mutex(true, "Local\\Buddy.Desktop.v1" + PreviewEnvironment.Suffix, out bool first);
             if (!first)
             {
                 if (DesktopActivation.Redirect(DesktopLaunch.Parse(args)).GetAwaiter().GetResult()) return 0;

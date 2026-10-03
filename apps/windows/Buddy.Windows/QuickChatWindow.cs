@@ -44,7 +44,7 @@ internal sealed class QuickChatWindow : Window, IDisposable
         var footer = new StackPanel(); var tools = new WrapPanel { Margin = new(0,8,0,0) };
         send = Add("Send", () => _ = Send(), tools); Add("Guide", () => BeginWorkflow("guide"), tools); Add("Agent", () => BeginWorkflow("agent"), tools); Add("Stop", Cancel, tools); tools.Children.Add(includeScreen); footer.Children.Add(tools); footer.Children.Add(status); Grid.SetRow(footer, 3); grid.Children.Add(footer);
         Add("Copy", () => { if (answer.Text.Length > 0) System.Windows.Clipboard.SetText(answer.Text); }, tools);
-        Add("Refine", () => { if (!IsBusy && !string.IsNullOrWhiteSpace(draft.Text)) refine?.Invoke(draft); }, tools);
+        Add("Refine source field", () => { if (!IsBusy) refine?.Invoke(draft); }, tools);
         Add("Follow up", () => draft.Focus(), tools);
         Content = new Border { Background = BuddyTheme.Surface, BorderBrush = BuddyTheme.Line, BorderThickness = new(1), CornerRadius = new(20), Child = grid };
         SourceInitialized += (_,_) => OverlayNative.Configure(new WindowInteropHelper(this).Handle, false);
@@ -54,7 +54,7 @@ internal sealed class QuickChatWindow : Window, IDisposable
     internal void Open(string? conversationId)
     {
         if (closed) return;
-        if (displayedConversation != conversationId) { Cancel(); displayedConversation = conversationId; answer.Clear(); sources.Children.Clear(); }
+        Cancel(); displayedConversation = conversationId; answer.Clear(); sources.Children.Clear(); includeScreen.IsChecked=false;
         if (OverlayNative.GetCursorPos(out var point)) { new WindowInteropHelper(this).EnsureHandle(); OverlayNative.Place(this, point); }
         Show(); Activate(); draft.Focus(); status.Text = preferences().AllowWebResearch ? "Internet research enabled · Enter to send" : "Local AI · Enter to send · Esc to close";
     }
@@ -64,10 +64,11 @@ internal sealed class QuickChatWindow : Window, IDisposable
         if (IsBusy || string.IsNullOrWhiteSpace(draft.Text) || service() is not { } host) return;
         starting?.Invoke();
         var text = draft.Text.Trim(); var route = AssistantIntent.Mode(text);
-        if (route is "guide" or "agent") { BeginWorkflow(route); return; }
+        if (route is "guide" or "agent" or "knowledge") { BeginWorkflow(route); return; }
         var cts = new CancellationTokenSource(); request = cts; send.IsEnabled = false; draft.IsReadOnly = true; mood(CompanionMood.Thinking);
         try {
             var id = await conversation() ?? throw new InvalidOperationException("Open Home to finish setup.");
+            answer.Clear();sources.Children.Clear();
             status.Text = includeScreen.IsChecked == true ? "● Looking at the selected window…" : "Thinking on your PC…";
             var context = includeScreen.IsChecked == true ? await screen(cts.Token) : null; cts.Token.ThrowIfCancellationRequested(); answer.Clear(); draft.Clear(); sources.Children.Clear();
             await foreach (var item in host.Chat(new(id,text,Guid.NewGuid().ToString(),Context:context?.PromptText,UseWeb:preferences().AllowWebResearch,ScreenApp:context?.Context.App),cts.Token)) {

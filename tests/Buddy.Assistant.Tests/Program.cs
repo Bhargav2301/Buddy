@@ -22,7 +22,7 @@ Check(GroundingResolver.Resolve(controls, "", "", "Edit")?.Ref == "b", "The sole
 Check(GroundingResolver.Resolve([controls[0] with { Enabled = false }], "a", "", "") is null, "Disabled targets are excluded");
 Check(ActionPolicy.Validate(new("Example", [new("click", Target: "Send", Risk: "low")])).Actions![0].Risk == "high", "A model cannot lower the risk of a mutating action");
 foreach (var action in new[] { new AssistantAction("shell", Value:"echo bad"), new AssistantAction("keys", Value:"Win+R"), new AssistantAction("open", Value:"cmd.exe /c anything"), new AssistantAction("type") })
-    await Reject(() => { ActionPolicy.Validate(new("Invalid", [action])); return Task.CompletedTask; }, action.Kind == "open" ? "WEB_URL_BLOCKED" : "INVALID_PLAN", "Unsupported action blocked: " + action.Kind);
+    await Reject(() => { ActionPolicy.Validate(new("Invalid", [action])); return Task.CompletedTask; }, "INVALID_PLAN", "Unsupported action blocked: " + action.Kind);
 await Reject(() => { ActionPolicy.Validate(new("Too long", Enumerable.Repeat(new AssistantAction("wait"), 26).ToList())); return Task.CompletedTask; }, "INVALID_PLAN", "Action count is capped at 25");
 foreach (var url in new[] { "http://example.com", "https://127.0.0.1", "https://10.0.0.1", "https://169.254.169.254/latest", "https://user:secret@example.com", "https://example.com:444", "https://test.local", "file:///C:/private" })
     await Reject(() => { WebResearch.ValidateUrl(url); return Task.CompletedTask; }, "WEB_URL_BLOCKED", "Web URL blocked: " + url);
@@ -53,13 +53,12 @@ try {
     var planning = new PlanningRequest("Click Export", new("example", "Example", controls));
     await Reject(async () => await service.PlanAgent(planning, default), "AGENT_DISABLED", "Agent-off rejects planning");
     service.WebEnabled = true;
-    model.Replies.Enqueue("{\"tool\":\"web.fetch\",\"input\":\"https://example.com\"}"); model.Replies.Enqueue("{\"tool\":\"done\",\"input\":\"\"}");
     var events = await Collect(service.Chat(req, default));
     Check(research.Calls == 1 && events.Any(e => e.Type == "tool_result"), "The structured loop executes a real tool adapter and emits its result");
-    Check(model.Payloads[1].Contains("web-evidence-marker") && !model.Payloads[0].Contains("screen-private-marker"), "Web decisions see evidence without sending screen context to research");
-    Check(model.Payloads.Last().Contains("web-evidence-marker") && events.Any(e => e.Text?.Contains("https://example.com") == true), "The final answer receives fetched evidence and actual source citations");
+    Check(research.Calls == 1 && model.Payloads[0].Contains("web-evidence-marker"), "Deterministic direct fetch supplies actual evidence to local inference");
+    Check(model.Payloads.Last().Contains("web-evidence-marker") && events.Any(e => e.Evidence?.Sources?.Any(s => s.Url == "https://example.com/") == true), "The final answer receives fetched evidence and actual source citations");
     var recorded = await store.Read(s => s.Conversations.Single().Messages);
-    Check(recorded.Last().Evidence is { Screen: true, Image: false, Sources.Count: 1 } && recorded.Last().Evidence!.Sources![0].Url == "https://example.com",
+    Check(recorded.Last().Evidence is { Screen: true, Image: false, Sources.Count: 1 } && recorded.Last().Evidence!.Sources![0].Url == "https://example.com/",
         "Screen-use and actual source links are stored as bounded conversation metadata");
     Check(!JsonSerializer.Serialize(recorded).Contains("screen-private-marker") && !JsonSerializer.Serialize(recorded).Contains("web-evidence-marker"),
         "Conversation metadata persists neither screen context nor retrieved page bodies");
@@ -85,11 +84,10 @@ try {
     model.Replies.Enqueue("{\"status\":\"done\",\"summary\":\"Done\",\"actions\":[{\"kind\":\"wait\"}]}");
     await Reject(async () => await service.ContinueAgent(continuation, default), "INVALID_PLAN", "A completed decision cannot smuggle another action");
     await Reject(async () => await service.ContinueAgent(continuation with { Results = [new(7, new("wait"), true, "Waited")] }, default), "INVALID_RUN", "Out-of-order results are refused before inference");
-    model.Replies.Enqueue("{\"tool\":\"done\",\"input\":\"\"}");
     model.Replies.Enqueue("{\"summary\":\"Export\",\"steps\":[{\"instruction\":\"Select Export\",\"ref\":\"a\",\"target\":\"Export\",\"role\":\"Button\",\"primitive\":\"ring\",\"expect\":{\"kind\":\"manual\",\"target\":\"\",\"role\":\"\"}}]}");
     int guidePayload = model.Payloads.Count;
     await service.PlanGuide(planning with { UseWeb = true, Context = planning.Context with { Title = "screen-private-marker" } }, default);
-    Check(!model.Payloads[guidePayload].Contains("screen-private-marker") && model.Payloads.Last().Contains("screen-private-marker"), "Guide research never includes the screen in web-tool decisions");
+    Check(research.Calls == 1 && model.Payloads[guidePayload].Contains("screen-private-marker"), "Local on-screen guide does not trigger unnecessary external research");
     var visual = new VisionGroundingRequest("Export", "Button", "example", "Example", "fixture-image-marker", [new("ocr1", "Export", .95, 10, 10, 80, 30, true)]);
     model.Replies.Enqueue("{\"ref\":\"ocr1\",\"matches\":true,\"confidence\":0.92,\"reason\":\"Visible Export control\",\"kind\":\"control\"}");
     Check((await service.ConfirmVisualTarget(visual, default))?.Ref == "ocr1", "Local vision can corroborate a unique OCR label");
@@ -120,7 +118,7 @@ try {
         Check(liveSource.Text.Contains("Example Domain"), "LIVE public HTTPS fetch and extraction work");
         var chat = await live.CreateConversation("Live research test");
         var answer = await Collect(live.Chat(new(chat.Id,"Fetch https://example.com and explain what the page is for in one sentence.",Guid.NewGuid().ToString(),UseWeb:true), default));
-        Check(answer.Any(e => e.Type == "tool_result" && !e.Text!.StartsWith("Read 0")) && answer.Any(e => e.Text?.Contains("https://example.com") == true), "LIVE model uses fetched evidence and returns a cited answer");
+        Check(answer.Any(e => e.Type == "tool_result" && !e.Text!.StartsWith("Read 0")) && answer.Any(e => e.Evidence?.Sources?.Any(s => s.Url == "https://example.com/") == true), "LIVE model uses fetched evidence and returns a cited answer");
     }
     Console.WriteLine($"ALL {count} ASSISTANT CHECKS PASSED");
 } finally { Directory.Delete(directory, true); }

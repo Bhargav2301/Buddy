@@ -9,7 +9,7 @@ internal static class Native
     [DllImport("user32.dll")] internal static extern bool RegisterHotKey(IntPtr handle, int id, uint modifiers, uint key);
     [DllImport("user32.dll")] internal static extern bool UnregisterHotKey(IntPtr handle, int id);
     [DllImport("user32.dll")] internal static extern IntPtr GetForegroundWindow();
-    [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr handle, out uint pid);
+    [DllImport("user32.dll")] internal static extern uint GetWindowThreadProcessId(IntPtr handle, out uint pid);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int GetWindowText(IntPtr handle, System.Text.StringBuilder text, int count);
     [DllImport("user32.dll")] internal static extern bool SetWindowDisplayAffinity(IntPtr handle, uint affinity);
     internal static string Label(IntPtr window)
@@ -17,7 +17,7 @@ internal static class Native
     internal static bool IsOwnWindow(IntPtr window) { GetWindowThreadProcessId(window, out var pid); return pid == Environment.ProcessId; }
     internal static void CheckWindow(IntPtr window)
     {
-        if (window == IntPtr.Zero) throw new InvalidOperationException("Focus the app you want help with, then press Ctrl+Space.");
+        if (window == IntPtr.Zero) throw new InvalidOperationException("Focus the app you want help with, then invoke Buddy using your configured shortcut.");
         GetWindowThreadProcessId(window, out uint pid);
         var name = Process.GetProcessById((int)pid).ProcessName.ToLowerInvariant();
         var title = Label(window).ToLowerInvariant();

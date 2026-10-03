@@ -4,7 +4,7 @@ Native Windows and Android applications backed by an AI model running on the use
 
 **Current version:** [VERSION](VERSION) · testing prerelease. [Changes](CHANGELOG.md) · [Downloads](https://github.com/Bhargav2301/Buddy/releases) · [Build status](https://github.com/Bhargav2301/Buddy/actions/workflows/build.yml).
 
-This repository implements a usable local-PC subset of the supplied Nexa technical specification. It does not claim completion of the specification's multi-phase cloud, agent, and automation platform.
+Buddy is a local-first cursor companion for voice, screen-aware teaching and reviewed prompt refinement. Home holds settings/history; closing it keeps the configured companion running. Optional action agents, local knowledge and Android access retain explicit privacy and approval boundaries. See [the current Windows workflow and acceptance limits](docs/Windows-0.3.9.md).
 
 ## Start using it
 
@@ -12,9 +12,9 @@ Read [the setup guide](docs/Buddy-Setup-Guide.md). The Windows download contains
 
 **Windows installation:** the updated Windows ZIP corrects the `WindowsBase.dll` packaging collision. Extract it into a fresh folder, then run `Install-Buddy.cmd` to install, or `Run-Buddy.cmd` to launch with startup diagnostics. Logs are in `%LOCALAPPDATA%\Buddy\Logs`. Windows voice initialization is deferred until read-aloud is used. The native installer keeps PC conversations and pairing state in the user profile.
 
-**Windows assistant preview (0.3.0):** Ctrl+Space opens typed chat; Ctrl+Shift+Space opens a separate voice overlay. Guide draws arrows and highlights around accessible controls. Agent creates a local action plan and executes supported Windows actions after review. Internet research reads public HTTPS pages and cites its sources. Enable Agent and Internet research in Home → Assistant settings; both default off. See [the preview guide and limitations](docs/Windows-Assistant-Preview.md). Existing history and pairing are preserved. Native Windows interaction still needs device acceptance.
+**Windows companion (0.3.9):** Use your configured voice/chat shortcuts or click the companion to talk. Right-click for Type, Guide and optional tools. **Refine source field** captures the original supported AI composer before Buddy takes focus, then offers a field-anchored diff, Accept and Undo without sending. **Refine Buddy draft** is a separate local action. **Hide Home - keep Buddy running** preserves the tray service; **Exit Buddy (stops companion)** exits. Current settings and voices survive local upgrades. See [current behavior, tests and limits](docs/Windows-0.3.9.md).
 
-**Settings access (0.3.1):** Open Buddy again to bring up Home, then choose its pinned **Settings** button. **Buddy Settings** is also available as a desktop/Start menu shortcut, in quick chat and in the tray. Portable users can run `Open-Buddy-Settings.cmd`. Normal launches show Home; `--background` explicitly requests companion startup.
+**Settings:** Open Buddy again to show Home and select Settings, use the tray or Buddy Settings shortcut, or run `Open-Buddy-Settings.cmd` in a portable folder. `--background` requests companion startup. Offline Piper voice setup is optional and separate; model weights and user profiles are never committed.
 
 ## Project map
 

@@ -4,6 +4,14 @@ Versions follow `major.minor.patch`; Git tags use `v` plus the version.
 The root [VERSION](VERSION) file controls both applications. See
 [Versioning](docs/Versioning.md) for the release process.
 
+## [0.3.9] - 2026-10-04
+
+- Keep source-field refinement bound to the external HWND and UIA field selected before summoning Buddy. Review a field-anchored diff, then explicitly Accept or Undo without submitting; changed text, focus, title or an expired lease refuses the edit. Buddy-draft refinement is labelled separately.
+- Closing Home keeps the tray service and configured companion running; Exit Buddy stops them. Desktop shell and ordinary maximized windows no longer suppress the companion as fullscreen. The companion opens Voice directly and groups optional tools separately.
+- Clear stale summon output and failed replacement captures; creative writing stays local unless research is requested.
+- Include the locally tested 0.3.2–0.3.8 work: configurable chat/voice shortcuts, local recognition review, speech cleanup and concise replies, capture/headphone policies, optional offline voices, owner-supplied branding and expressions, scoped teaching/region input, approved execution specialists, inline refinement, local knowledge and job history. Account grants remain disabled.
+- Keep user profiles, recordings, model weights and local build/recovery archives out of the repository. See docs/Windows-0.3.9.md for validation scope and remaining physical/third-party acceptance.
+
 ## [0.3.1] - 2026-09-29
 
 - Launching Buddy again brings the running app's Home window forward instead of showing an “already running” message. Normal launches keep Home visible; `--background` explicitly requests companion startup.

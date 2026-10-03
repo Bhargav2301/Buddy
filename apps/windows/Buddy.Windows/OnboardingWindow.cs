@@ -26,6 +26,7 @@ internal sealed class OnboardingWindow : Window
         BuddyTheme.Ensure(); this.completed = completed; this.setup = setup; this.tutorial = tutorial; this.testChat = testChat; this.testVoice = testVoice; this.modelStatus = modelStatus;
         Title = "Welcome to Buddy"; Width = 420; SizeToContent = SizeToContent.Height; MaxHeight = SystemParameters.WorkArea.Height; ResizeMode = ResizeMode.NoResize; Background = BuddyTheme.Surface; Foreground = BuddyTheme.Ink; FontFamily = BuddyTheme.Font; WindowStartupLocation = WindowStartupLocation.CenterOwner;
         name.Text = initialName; AutomationProperties.SetName(name, "Companion name"); name.ToolTip = "Rename me, or keep Buddy";
+        SourceInitialized += (_, _) => CaptureProtection.Apply(new System.Windows.Interop.WindowInteropHelper(this).Handle);
         Closed += (_, _) => { closed = true; StopNaming(); };
         Hatch();
     }
@@ -85,7 +86,7 @@ internal sealed class OnboardingWindow : Window
         _ = Check();
         p.Children.Add(BuddyTheme.Button("Set up or download a model", setup, true));
         p.Children.Add(BuddyTheme.Button("Check model readiness", () => _ = Check()));
-        p.Children.Add(Label("Test your configured shortcut for chat. Ctrl+Shift+Space opens the separate voice bubble. Ctrl+Alt+Esc stops Buddy.", 14));
+        p.Children.Add(Label("Test your configured chat and voice shortcuts in Settings. Ctrl+Alt+Esc stops Buddy when available; you can also use Stop.", 14));
         var actions = new WrapPanel(); actions.Children.Add(BuddyTheme.Button("Try chat", testChat)); actions.Children.Add(BuddyTheme.Button("Try voice", testVoice)); p.Children.Add(actions);
         p.Children.Add(BuddyTheme.Button("Finish", () => { try { completed(name.Text.Trim()); Close(); } catch (Exception e) { status.Text = e.Message; } }, true));
     }

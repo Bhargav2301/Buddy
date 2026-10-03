@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework></PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../services/Buddy.Server/WorkflowIntent.cs" Link="WorkflowIntent.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/PreviewEnvironment.cs" Link="PreviewEnvironment.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/OverlayPlacement.cs" Link="OverlayPlacement.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/RegionShape.cs" Link="RegionShape.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/DesktopPreferences.cs" Link="DesktopPreferences.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/AssistantInteraction.cs" Link="AssistantInteraction.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/DesktopLaunch.cs" Link="DesktopLaunch.cs" />

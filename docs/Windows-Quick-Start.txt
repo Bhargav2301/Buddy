@@ -1,37 +1,29 @@
 BUDDY - WINDOWS CURSOR COMPANION
 
-1. Keep every extracted file together. This folder must contain Buddy.exe.
-2. If Buddy is running, choose Quit from its tray menu.
-3. Double-click Install-Buddy.cmd. Or use Run-Buddy.cmd without installing.
-4. If prompted in Buddy Home, finish PC setup: install/start Ollama and
-   download the chat model. No cloud API key is required.
+Keep every extracted file together. Run Install-Buddy.cmd to install or
+Run-Buddy.cmd to use the portable build. Finish local Ollama setup in Home.
+No cloud speech service or API key is needed.
 
-SETTINGS: Double-click Buddy to open Home, even when Buddy is already running.
-Use the pinned Settings button or the new Buddy Settings desktop/Start menu shortcut.
-The tray and quick chat also have Settings. Portable: Open-Buddy-Settings.cmd.
-Only Buddy.exe --background requests startup with Home hidden.
+Click the companion for Voice. Right-click for Type, Guide, area selection
+and optional tools. Use your configured shortcuts from Settings > Shortcuts;
+existing bindings are preserved. Windows+Space belongs to Windows.
 
-Ctrl + Space          Open the compact chat bar beside your pointer
-Ctrl + Shift + Space  Open the separate voice overlay; speak, then pause
-Enter                 Send typed text (Shift + Enter adds a line)
-Esc                   Stop and dismiss the compact bar
-Ctrl + Alt + Esc      Stop listening, generation, guidance and Agent actions
+Closing Home, or Hide Home - keep Buddy running, leaves the configured
+companion and tray service available. Exit Buddy (stops companion) exits.
+Reopen Home/Settings from the tray or desktop/Start menu shortcuts.
+Buddy.exe --background starts with Home hidden after setup.
 
-Home > Cursor & shortcuts changes the main shortcut and cursor visibility.
-It also enables optional tap-for-chat / hold-to-talk and voice screen context.
-Home > Assistant settings enables internet research and Agent mode (off by default).
-Focus a tool, summon Buddy, and choose Guide or Agent after entering your task.
-Home > Try pointing tutorial opens a harmless practice window.
-Agent shows a plan before running and asks approval for each change.
-Windows + Space is normally used by Windows to switch keyboard layouts.
-Use Home or Buddy's tray icon for models, history, screen context and pairing.
+REFINE THE ORIGINAL FIELD
+Focus a supported AI prompt field before summoning Buddy, then choose
+Refine source field; or press Ctrl+Alt+R directly in the field. Review the
+anchored diff, Accept or reject, and use Undo within 30 seconds. No prompt
+is sent automatically. Changed/expired/unsupported targets are refused.
+Refine Buddy draft is explicitly separate and affects Buddy's composer only.
 
-The cursor companion does not replace or move your original pointer.
-Microphone and screen input activate only through explicit controls.
-Read Buddy-Setup-Guide.md for the full workflow and device requirements.
-Read Windows-Assistant-Preview.md for supported actions and current limits.
+Esc dismisses a review; Ctrl+Alt+Esc stops active Buddy work when available.
+Guide points; you click. Optional Agent actions require a reviewed plan and
+their applicable separate approvals. Account grants remain disabled.
 
-If launch fails, run Run-Buddy.cmd and inspect:
-  %LOCALAPPDATA%\Buddy\Logs
-
-This is a testing build. Native Windows interactions require device testing.
+Read Windows-0.3.9.md for supported fields, privacy limits and remaining
+physical microphone/headphone and real-application acceptance checks.
+Logs: %LOCALAPPDATA%/Buddy/Logs

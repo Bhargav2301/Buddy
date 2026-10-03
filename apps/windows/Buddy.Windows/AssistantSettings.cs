@@ -10,6 +10,8 @@ namespace Buddy.Windows;
 public sealed partial class MainWindow
 {
     private PracticeWindow? practice;
+    private TaskCenter? tasks;
+    private void OpenTasks() => tasks?.Open(InputNative.ProcessName(previousWindow));
     private bool keepHomeOpen = true;
     internal void ConfigureLaunch(LaunchDestination destination) => keepHomeOpen = destination != LaunchDestination.Background;
     internal void OpenFromLaunch(LaunchDestination destination)
@@ -25,23 +27,24 @@ public sealed partial class MainWindow
     private void StartWorkflow(string mode, string text)
     {
         var active = Native.GetForegroundWindow(); if (active != IntPtr.Zero && !Native.IsOwnWindow(active)) previousWindow = active;
-        PrepareDesktopActivity("assistant"); quick?.Dismiss(); voiceOverlay?.Dismiss();
+        PrepareDesktopActivity(mode=="knowledge"?"jobs":"assistant"); quick?.Dismiss(); voiceOverlay?.Dismiss();
+        if(mode=="knowledge"){if(tasks is not null)_=tasks.Search(InputNative.ProcessName(previousWindow),AssistantIntent.KnowledgeQuery(text));return;}
+        text=AssistantIntent.ActionQuery(text);
         if (assistant is not null) _ = assistant.Open(mode, text);
     }
     private void ConfigurePtt()
     {
         voiceOverlay?.Cancel(); ptt?.Dispose(); ptt = null;
-        var choice = ShortcutChoice.Choices.FirstOrDefault(c => c.Label == desktop.Shortcut) ?? ShortcutChoice.Choices[0];
-        if (desktop.HoldToTalk) {
+        // Keep the registered voice chord reserved while the optional hook handles holds.
+        // Never install a hook if Windows rejected that chord.
+        var choice = voiceShortcut?.Active;
+        if (desktop.HoldToTalk && choice is not null) {
             try {
-                ptt = new PushToTalkHook(choice.Modifiers, () => Dispatcher.BeginInvoke(new Action(() => OpenQuick(false))),
-                    () => {
-                        var active = Native.GetForegroundWindow(); if (active != IntPtr.Zero && !Native.IsOwnWindow(active)) previousWindow = active;
-                        PrepareDesktopActivity("voice"); quick?.Dismiss(); voiceOverlay?.Open(true);
-                    }, () => Dispatcher.BeginInvoke(new Action(() => voiceOverlay?.Finish())));
-                shortcut?.Dispose();
-            } catch (Exception ex) { status.Text = ex.Message; shortcut?.TrySet(choice); }
-        } else shortcut?.TrySet(choice);
+                ptt = new PushToTalkHook(choice.Modifiers, () => Dispatcher.BeginInvoke(new Action(() => OpenQuick(true))),
+                    () => { voiceHeld=true;OpenQuick(true,true); },
+                    () => Dispatcher.BeginInvoke(new Action(() => {voiceHeld=false;voiceOverlay?.Finish();})));
+            } catch (Exception ex) { status.Text = ex.Message; }
+        }
         UpdateShortcutHint();
     }
     private void AssistantSettings() => OpenSettingsSection("Guide & Agent");

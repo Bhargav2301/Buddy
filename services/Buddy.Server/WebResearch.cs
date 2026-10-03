@@ -78,10 +78,17 @@ public sealed class WebResearch : IWebResearch, IDisposable
     public async Task<WebSource> Fetch(string url, CancellationToken ct)
     {
         var page = await Download(url, ct); using var doc = new HtmlParser().ParseDocument(page.Text);
+        var links=new List<SourceLink>();
+        foreach(var link in doc.QuerySelectorAll("a[href]")) {
+            if(links.Count>=24)break;
+            try { var target=new Uri(ResearchCuration.PageAddress(new Uri(page.Url,link.GetAttribute("href")).AbsoluteUri));
+                if(target.Host==page.Url.Host&&ResearchCuration.DocumentationScore(target.AbsoluteUri)>0&&!links.Any(l=>l.Url==target.AbsoluteUri))links.Add(new(Security.Redact(link.TextContent.Trim())[..Math.Min(120,Security.Redact(link.TextContent.Trim()).Length)],target.AbsoluteUri));
+            }catch(Exception e) when(e is BuddyException or UriFormatException or ArgumentNullException){}
+        }
         foreach (var node in doc.QuerySelectorAll("script,style,noscript,iframe,svg,nav,footer,form")) node.Remove();
         var text = string.Join(' ', (doc.QuerySelector("main,article") ?? doc.Body)?.TextContent.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries) ?? []);
         var title = Security.Redact(string.IsNullOrWhiteSpace(doc.Title) ? page.Url.Host : doc.Title);
-        return new(title[..Math.Min(180, title.Length)], page.Url.AbsoluteUri, Security.Redact(text[..Math.Min(16000, text.Length)]));
+        return new(title[..Math.Min(180, title.Length)], page.Url.AbsoluteUri, Security.Redact(text[..Math.Min(16000, text.Length)]), Links:links);
     }
     public async Task<IReadOnlyList<WebSource>> Search(string query, CancellationToken ct)
     {
@@ -91,7 +98,7 @@ public sealed class WebResearch : IWebResearch, IDisposable
         foreach (var link in doc.QuerySelectorAll("a.result__a")) {
             var href = link.GetAttribute("href") ?? "";
             if (Uri.TryCreate(page.Url, href, out var redirect) && QueryHelpers.ParseQuery(redirect.Query).TryGetValue("uddg", out var destination)) href = destination.ToString();
-            try { var target = ValidateUrl(href); var snippet = link.Closest(".result")?.QuerySelector(".result__snippet")?.TextContent ?? ""; results.Add(new(link.TextContent.Trim(), target.AbsoluteUri, Security.Redact(snippet))); } catch (BuddyException) { }
+            try { var target = ValidateUrl(href); var snippet = link.Closest(".result")?.QuerySelector(".result__snippet")?.TextContent ?? ""; results.Add(new(link.TextContent.Trim(), target.AbsoluteUri, Security.Redact(snippet),"search snippet")); } catch (BuddyException) { }
             if (results.Count == 5) break;
         }
         if (results.Count == 0) throw new BuddyException("SEARCH_UNAVAILABLE", "Web search returned no readable results. The provider may be limiting requests; paste a public HTTPS page instead.");

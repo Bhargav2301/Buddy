@@ -8,11 +8,12 @@ namespace Buddy.Windows;
 internal sealed record FieldRule(string[] Processes, string[] Titles, string[] Fields);
 internal sealed record FieldAnchor(IntPtr Window, string Identity, Rect Bounds);
 internal sealed record FocusedDraft(GuardedEdit Edit, string App, string FieldName, FieldAnchor Anchor,
-    DictationInsertion? Insertion = null, Action? VerifySelection = null);
+    DictationInsertion? Insertion = null, Action? VerifySelection = null, Action? VerifyFocus = null);
 
-// No background text reading. Capture is called only for an explicit Refine/dictation invocation.
-internal sealed class FocusedFieldEditor(ScreenPerception perception)
+// Text capture requires an explicit invocation, or opt-in bounded focused-field events.
+internal sealed class FocusedFieldEditor(ScreenPerception perception,Func<AutomationElement,IntPtr,bool>? fixtureEligibility=null)
 {
+    private bool Eligible(AutomationElement node,IntPtr window)=>fixtureEligibility?.Invoke(node,window)??Supported(node,window);
     private readonly SemaphoreSlim gate = new(1, 1);
     private static readonly Lazy<FieldRule[]> Rules = new(() => {
         using var stream = typeof(FocusedFieldEditor).Assembly.GetManifestResourceStream("Buddy.Windows.refine-apps.json")!;
@@ -24,13 +25,13 @@ internal sealed class FocusedFieldEditor(ScreenPerception perception)
         perception.Check(window);
         if (Native.GetForegroundWindow() != window) return null;
         var node = AutomationElement.FocusedElement;
-        if (!Supported(node, window)) return null;
+        if (!Eligible(node, window)||Buddy.Server.PromptSuggestionPolicy.PrivateMetadata(Native.Label(window),node.Current.Name??"")) return null;
         var adapter = new AutomationTextField(node, window, perception);
         adapter.Validate(); token.ThrowIfCancellationRequested();
         return Anchor(node, window, adapter.Identity);
     }, ct);
 
-    private static bool Supported(AutomationElement node, IntPtr window)
+    internal static bool Supported(AutomationElement node, IntPtr window)
     {
         var c = node.Current;
         return !c.IsPassword && c.IsEnabled && c.HasKeyboardFocus && !c.IsOffscreen && c.ControlType == ControlType.Edit &&
@@ -47,13 +48,13 @@ internal sealed class FocusedFieldEditor(ScreenPerception perception)
         return new(window, identity, bounds);
     }
 
-    internal Task<FocusedDraft> Capture(IntPtr window, CancellationToken ct, bool dictation = false, string? expectedIdentity = null) => Run(token => {
+    internal Task<FocusedDraft> Capture(IntPtr window, CancellationToken ct, bool dictation = false, string? expectedIdentity = null, bool strictFocus = false) => Run(token => {
         perception.Check(window);
         if (Native.GetForegroundWindow() != window) throw new InvalidOperationException("Focus an AI prompt field and press Ctrl+Alt+R.");
         var node = AutomationElement.FocusedElement;
         var current = node.Current;
         string app = InputNative.ProcessName(window), name = current.Name ?? "";
-        if (!dictation && !Supported(node, window))
+        if (!dictation && !Eligible(node, window))
             throw new InvalidOperationException("This field is not in Buddy's supported AI-chat rules. Paste your prompt into Buddy to refine it.");
         var adapter = new AutomationTextField(node, window, perception);
         if (expectedIdentity is not null && adapter.Identity != expectedIdentity) throw new InvalidOperationException("The focused field changed. Invoke Buddy again in the intended field.");
@@ -62,7 +63,11 @@ internal sealed class FocusedFieldEditor(ScreenPerception perception)
         if ((!dictation && string.IsNullOrWhiteSpace(original)) || original.Length > 20000) throw new InvalidOperationException("Use a field of up to 20,000 characters.");
         var anchor = Anchor(node, window, adapter.Identity);
         if (Native.GetForegroundWindow() != window || !node.Current.HasKeyboardFocus) throw new InvalidOperationException("Focus changed while reading the field. Invoke Buddy again.");
-        if (!dictation) return new FocusedDraft(new GuardedEdit(adapter, original), app, name, anchor);
+        var originalTitle=Native.Label(window);
+        if (!dictation) return new FocusedDraft(new GuardedEdit(adapter, original), app, name, anchor,VerifyFocus:strictFocus?()=>{
+            if(Native.GetForegroundWindow()!=window||!node.Current.HasKeyboardFocus||Native.Label(window)!=originalTitle||!Eligible(node,window)||Buddy.Server.PromptSuggestionPolicy.PrivateMetadata(originalTitle,node.Current.Name??""))
+                throw new InvalidOperationException("The original prompt field lost focus or changed context. Dismiss this suggestion and continue in your intended field.");
+        }:null);
         perception.Check(window, agent: true);
         if (!node.TryGetCurrentPattern(TextPattern.Pattern, out var raw) || raw is not TextPattern pattern)
             throw new InvalidOperationException("The app does not expose its caret safely. Use Buddy's draft or voice instead.");
@@ -97,8 +102,22 @@ internal sealed class FocusedFieldEditor(ScreenPerception perception)
         var prefix = pattern.DocumentRange.Clone(); prefix.MoveEndpointByRange(TextPatternRangeEndpoint.End, range, TextPatternRangeEndpoint.Start);
         return DictationInsertion.Verify(original, pattern.DocumentRange.GetText(20001), prefix.GetText(20001), range.GetText(20001));
     }
-    internal Task Apply(FocusedDraft draft, string text, CancellationToken ct) => Run(token => { draft.VerifySelection?.Invoke(); token.ThrowIfCancellationRequested(); draft.Edit.Apply(text, DateTimeOffset.UtcNow, token); return true; }, ct);
-    internal Task Undo(FocusedDraft draft, CancellationToken ct) => Run(token => { draft.Edit.Undo(DateTimeOffset.UtcNow, token); return true; }, ct);
+    internal Task Apply(FocusedDraft draft, string text, CancellationToken ct) => Run(token => { draft.VerifyFocus?.Invoke(); draft.VerifySelection?.Invoke(); token.ThrowIfCancellationRequested(); draft.Edit.Apply(text, DateTimeOffset.UtcNow, token); return true; }, ct);
+    internal Task Undo(FocusedDraft draft, CancellationToken ct) => Run(token => { draft.VerifyFocus?.Invoke(); draft.Edit.Undo(DateTimeOffset.UtcNow, token); return true; }, ct);
+    internal Task<bool> Matches(FocusedDraft draft,string expected,CancellationToken ct)=>Run(token=>{draft.VerifyFocus?.Invoke();token.ThrowIfCancellationRequested();return draft.Edit.Matches(expected);},ct);
+    internal Task<IDisposable?> Watch(FieldAnchor anchor,Action changed,CancellationToken ct)=>Run<IDisposable?>(token=>{
+        perception.Check(anchor.Window);
+        if(Native.GetForegroundWindow()!=anchor.Window)return null;
+        var node=AutomationElement.FocusedElement;
+        if(!Eligible(node,anchor.Window)||Buddy.Server.PromptSuggestionPolicy.PrivateMetadata(Native.Label(anchor.Window),node.Current.Name??"")||new AutomationTextField(node,anchor.Window,perception).Identity!=anchor.Identity)return null;
+        token.ThrowIfCancellationRequested();return new FieldEvents(node,changed);
+    },ct);
+    private sealed class FieldEvents:IDisposable
+    {
+        private readonly AutomationElement node;private readonly AutomationEventHandler handler;
+        internal FieldEvents(AutomationElement node,Action changed){this.node=node;handler=(_,_)=>changed();Automation.AddAutomationEventHandler(TextPattern.TextChangedEvent,node,TreeScope.Element,handler);}
+        public void Dispose(){try{Automation.RemoveAutomationEventHandler(TextPattern.TextChangedEvent,node,handler);}catch{}}
+    }
 
     private async Task<T> Run<T>(Func<CancellationToken, T> action, CancellationToken ct)
     {

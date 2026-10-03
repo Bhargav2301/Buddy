@@ -50,11 +50,11 @@ try {
     var provider = DataProtectionProvider.Create(new DirectoryInfo(Path.Combine(folder, "keys")));
     Check((await new StateStore(folder, provider).Read(s => s.Conversations.Single())).Pinned, "Conversation organization survives encrypted reload");
     var editor = new ScreenElement("edit", "Draft", "Edit", 0,0,100,30);
-    Check(ActionPolicy.LiveRisk(new("type", Value:"Hello"), editor, reversibleEdit:true) == "low", "Verified reversible edits can run after plan approval");
+    Check(ActionPolicy.LiveRisk(new("type", Value:"Hello"), editor, reversibleEdit:true) == "high", "Reversible edits still require explicit confirmation under the JARVIS policy");
     Check(ActionPolicy.LiveRisk(new("type", Value:"Hello"), editor) == "high", "Unverified edits require confirmation");
     Check(ActionPolicy.LiveRisk(new("click", Description:"Send message"), editor, navigationPattern:true) == "high", "Consequential effects override navigation evidence");
     Check(ActionPolicy.LiveRisk(new("click"), editor) == "high", "Unknown click effects remain high risk");
-    Check(ActionPolicy.LiveRisk(new("open", Value:"notepad"), null) == "low" && ActionPolicy.LiveRisk(new("open", Value:"https://example.com"), null) == "high", "App allowlist and external navigation have distinct approval needs");
+    Check(ActionPolicy.LiveRisk(new("open", Value:"notepad"), null) == "high" && ActionPolicy.LiveRisk(new("open", Value:"https://example.com"), null) == "high", "Both allowlisted app launches and external navigation require approval");
     Check(ActionPolicy.LiveRisk(new("keys", Value:"Enter"), null) == "high", "Enter may submit and requires confirmation");
     var context = new ScreenContext("sample", "Sample", [editor]);
     Check(GuideExpectations.Matches(new("visible", "Draft", "Edit"), context), "Guide advances only for a matching observable condition");

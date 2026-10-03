@@ -14,6 +14,7 @@ internal static class OverlayNative
     [DllImport("user32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)] private static extern bool GetMonitorInfoW(IntPtr monitor, ref MonitorInfo info);
     [DllImport("user32.dll")] private static extern uint GetDpiForWindow(IntPtr window);
     [DllImport("user32.dll")] private static extern bool GetWindowRect(IntPtr window, out Rect rect);
+    [DllImport("user32.dll",CharSet=CharSet.Unicode)] private static extern int GetClassName(IntPtr window,System.Text.StringBuilder text,int length);
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")] private static extern IntPtr GetWindowLongPtr(IntPtr window, int index);
     [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW")] private static extern IntPtr SetWindowLongPtr(IntPtr window, int index, IntPtr value);
     [DllImport("user32.dll")] private static extern bool SetWindowPos(IntPtr window, IntPtr after, int x, int y, int width, int height, uint flags);
@@ -30,10 +31,11 @@ internal static class OverlayNative
     internal static void Configure(IntPtr window, bool clickThrough, bool noActivate = false)
     {
         long style = GetWindowLongPtr(window, -20).ToInt64() | 0x80; // tool window
+        style &= ~(0x20L | 0x08000000L); // Restore interactivity when a temporary visual pointer ends.
         if (noActivate) style |= 0x08000000;
         if (clickThrough) style |= 0x08000000 | 0x20 | 0x80000; // no-activate, transparent, layered
         SetWindowLongPtr(window, -20, new IntPtr(style));
-        Native.SetWindowDisplayAffinity(window, 0x11);
+        CaptureProtection.Apply(window);
     }
     internal static void Place(Window window, Point point)
         => Move(window, Position(window, point));
@@ -57,7 +59,8 @@ internal static class OverlayNative
         if (window == IntPtr.Zero || Native.IsOwnWindow(window) || !GetWindowRect(window, out var rect)) return false;
         var info = new MonitorInfo { Size = Marshal.SizeOf<MonitorInfo>() };
         if (!GetMonitorInfoW(MonitorFromPoint(new Point { X = (rect.Left + rect.Right) / 2, Y = (rect.Top + rect.Bottom) / 2 }, 2), ref info)) return false;
-        return rect.Left <= info.Monitor.Left && rect.Top <= info.Monitor.Top && rect.Right >= info.Monitor.Right && rect.Bottom >= info.Monitor.Bottom;
+        var name=new System.Text.StringBuilder(256);GetClassName(window,name,name.Capacity);
+        return FullscreenPolicy.Suppress(name.ToString(),GetWindowLongPtr(window,-16).ToInt64(),rect.Left <= info.Monitor.Left && rect.Top <= info.Monitor.Top && rect.Right >= info.Monitor.Right && rect.Bottom >= info.Monitor.Bottom);
     }
     internal static void SetBounds(Window window, int x, int y, int width, int height)
     {

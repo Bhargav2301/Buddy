@@ -13,6 +13,24 @@ internal static class Program
     [DllImport("user32.dll")] private static extern bool GetWindowDisplayAffinity(IntPtr window, out uint affinity);
     [STAThread] private static int Main(string[] args)
     {
+        PreviewEnvironment.Configure(["--preview"]);
+        if(args.Length==2&&args[0]=="--source39-target")return SourceFieldChecks.Target(args[1]);
+        if(args.Contains("--source39"))return SourceFieldChecks.Run();
+        if(args.Contains("--faces38"))return FacialRigChecks.Run();
+        if(args.Contains("--guide37"))return GuideLessonChecks.Run();
+        if (args.Contains("--qa-presentation")) return QaChecks.Run(true);
+        if (args.Contains("--qa")) return QaChecks.Run();
+        if (args.Contains("--teaching")) return TeachingChecks.Run();
+        if (args.Contains("--addons")) return AddonChecks.Run();
+        if (args.Contains("--jobs")) return JobChecks.Run();
+        if (args.Contains("--addons-real-model")) return AddonChecks.Run(true);
+        if (args.Contains("--region-model-synthetic")) return RegionalModelChecks.Run().GetAwaiter().GetResult();
+        if (args.Length == 2 && args[0] == "--f3-reload") return F3Checks.Reload(args[1]);
+        if (args.Length == 4 && args[0] == "--f3-checks") return F3Checks.Run(args[1], args[2], args[3]).GetAwaiter().GetResult();
+        if (args.Contains("--presence")) return PresenceChecks.Run();
+        if (args.Length == 3 && args[0] == "--neural-voice") return NeuralVoiceChecks.Run(args[1], args[2]).GetAwaiter().GetResult();
+        if (args.Contains("--tray-routing")) return TrayRoutingChecks.Run();
+        if (args.Contains("--preview-checks")) return PreviewChecks.Run();
         if (args.Contains("--settings-navigation")) return SettingsNavigation();
         if (args.Contains("--ocr")) return OcrChecks().GetAwaiter().GetResult();
         if (args.Length == 2 && args[0] == "--real-vision") return RealVisionChecks.Run(args[1]).GetAwaiter().GetResult();

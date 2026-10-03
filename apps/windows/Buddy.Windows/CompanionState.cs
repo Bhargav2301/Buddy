@@ -7,6 +7,7 @@ internal sealed class CompanionState
 {
     private readonly Dictionary<string, (CompanionMood Mood, long Sequence)> active = [];
     private long sequence;
+    internal string BrainLabel { get; private set; } = "on this PC";
     internal CompanionMood Current { get; private set; }
     internal event Action<CompanionMood>? Changed;
     internal void Set(string source, CompanionMood mood)

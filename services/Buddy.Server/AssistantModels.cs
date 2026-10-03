@@ -5,11 +5,12 @@ namespace Buddy.Server;
 
 public record ScreenElement(string Ref, string Name, string Role, double X, double Y, double Width, double Height, bool Enabled = true);
 public record ScreenContext(string App, string Title, List<ScreenElement> Elements);
-public record AssistantAction(string Kind = "", string Ref = "", string Target = "", string Role = "", string Value = "", string Description = "", string Risk = "high");
+public record AssistantAction(string Kind = "", string Ref = "", string Target = "", string Role = "", string Value = "", string Description = "", string Risk = "high", bool RequireEmpty = false);
 public record AssistantPlan(string Summary = "", List<AssistantAction>? Actions = null);
 public record GuideExpectation(string Kind = "manual", string Target = "", string Role = "");
 public record GuideStep(string Instruction = "", string Ref = "", string Target = "", string Role = "", string Primitive = "ring", GuideExpectation? Expect = null);
-public record GuidePlan(string Summary = "", List<GuideStep>? Steps = null, List<WebSource>? Sources = null);
+public record GuideLesson(string Instruction, string Target = "", string Role = "");
+public record GuidePlan(string Summary = "", List<GuideStep>? Steps = null, List<WebSource>? Sources = null, [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] List<GuideLesson>? Lessons = null);
 public record PlanningRequest(string Query, ScreenContext Context, bool UseWeb = false);
 public record ActionResult(int Sequence, AssistantAction Action, bool Success, string Observation);
 public record AgentContinuation(string Query, ScreenContext Context, List<ActionResult> Results, int RemainingActions);
@@ -17,12 +18,12 @@ public record AgentDecision(string Status, string Summary, List<AssistantAction>
 public record GroundedTarget(ScreenElement Element, string Provenance, double Confidence, bool CanExecute);
 public record AuditEntry(DateTimeOffset At, string Kind, string Target, string Result);
 public record SavedGuide(string Id, string Query, GuidePlan Plan, int Index, DateTimeOffset UpdatedAt, bool Completed = false);
-public record WebSource(string Title, string Url, string Text);
+public record WebSource(string Title, string Url, string Text, string EvidenceKind = "fetched page", List<SourceLink>? Links = null);
 
 public static class ActionPolicy
 {
     public static readonly string[] Kinds = ["open", "click", "invoke", "type", "keys", "read", "wait"];
-    public static readonly string[] Apps = ["notepad", "calculator", "explorer"];
+    public static readonly string[] Apps = ["notepad", "calculator", "explorer", "comet"];
     public static readonly string[] Keys = ["Tab", "Shift+Tab", "Enter", "Escape", "Ctrl+A", "Ctrl+C", "Ctrl+Z", "Up", "Down", "Left", "Right"];
     public static string Risk(AssistantAction action, string liveTarget = "") =>
         action.Kind is "type" or "keys" or "open" || Regex.IsMatch(action.Target + " " + liveTarget + " " + action.Description,
@@ -35,11 +36,11 @@ public static class ActionPolicy
         var text = string.Join(" ", action.Target, element?.Name, action.Description);
         if (Regex.IsMatch(text, @"\b(send|submit|delete|remove|pay|buy|purchase|install|transfer|publish|share|allow|accept|approve|confirm|save|sign|permission|execute|run|password|secret|credential)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100))) return "high";
         if (action.Kind is "read" or "wait") return "low";
-        if (action.Kind == "open") return Apps.Contains(action.Value) ? "low" : "high";
+        if (action.Kind is "open" or "type" or "click" or "invoke") return "high";
         if (action.Kind == "keys") return action.Value is "Tab" or "Shift+Tab" or "Escape" or "Up" or "Down" or "Left" or "Right" ? "low" : "high";
         if (element is null || !element.Enabled) return "high";
-        if (action.Kind == "type" && element.Role == "Edit" && reversibleEdit) return "low";
-        if (action.Kind is "click" or "invoke" && navigationPattern) return "low";
+
+
         return "high";
     }
 
@@ -49,7 +50,15 @@ public static class ActionPolicy
         var actions = plan.Actions.Select(a => {
             if (a is null || !Kinds.Contains(a.Kind) || a.Value is null || a.Target is null || a.Role is null || a.Ref is null || a.Description is null || a.Value.Length > 4000 || a.Target.Length > 200 || a.Description.Length > 500 || a.Ref.Length > 100 || a.Role.Length > 80)
                 throw new BuddyException("INVALID_PLAN", "The model returned an unsupported action. Nothing was executed.");
-            if (a.Kind == "open" && !Apps.Contains(a.Value)) WebResearch.ValidateUrl(a.Value);
+            if (a.Kind == "open") {
+                var value=a.Value.Trim();
+                var alias=value.EndsWith(".exe",StringComparison.OrdinalIgnoreCase)?value[..^4]:value;
+                if(Apps.Contains(alias.ToLowerInvariant()))a=a with{Value=alias.ToLowerInvariant()};
+                else {
+                    try { a=a with{Value=WebResearch.ValidateUrl(value).AbsoluteUri}; }
+                    catch(BuddyException){throw new BuddyException("INVALID_PLAN","The plan proposed an unsupported app launch. Use a named installed app or an explicit public HTTPS address; no action ran.");}
+                }
+            }
             if (a.Kind == "keys" && !Keys.Contains(a.Value)) throw new BuddyException("INVALID_PLAN", "The requested keyboard shortcut is not allowed.");
             if (a.Kind is "click" or "invoke" or "type" or "read" && a.Ref.Length == 0 && a.Target.Length == 0 && a.Role.Length == 0)
                 throw new BuddyException("INVALID_PLAN", "The action needs a specific visible target.");
@@ -92,6 +101,14 @@ public static class AssistantSchemas
                 required = fields.Split(','), additionalProperties = false } } }, required = new[] { "summary", array }, additionalProperties = false });
     public static readonly JsonElement Agent = Schema("action", "actions", "kind,ref,target,role,value,description,risk");
     public static readonly JsonElement Guide = GuideSchema();
+    public static readonly JsonElement Teaching = TeachingSchema();
+    private static JsonElement TeachingSchema()
+    {
+        var node = System.Text.Json.Nodes.JsonNode.Parse(Guide.GetRawText())!;
+        node["properties"]!["steps"]!["maxItems"] = 1;
+        node["properties"]!["steps"]!["items"]!["properties"]!["primitive"] = JsonSerializer.SerializeToNode(new { type = "string", @enum = TeachingPolicy.Primitives });
+        return JsonSerializer.SerializeToElement(node);
+    }
     private static JsonElement GuideSchema()
     {
         var node = System.Text.Json.Nodes.JsonNode.Parse(Schema("step", "steps", "instruction,ref,target,role,primitive,expect").GetRawText())!;

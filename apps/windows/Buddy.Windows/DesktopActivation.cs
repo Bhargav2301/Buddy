@@ -17,9 +17,10 @@ internal sealed class DesktopActivation : IDisposable
         get {
             if (!OperatingSystem.IsWindows()) throw new PlatformNotSupportedException();
             using var user = WindowsIdentity.GetCurrent(); using var process = Process.GetCurrentProcess();
-            return "Buddy.Desktop.Activation.v1." + user.User!.Value + "." + process.SessionId;
+            return "Buddy.Desktop.Activation.v1." + user.User!.Value + "." + process.SessionId + PreviewEnvironment.Suffix;
         }
     }
+    internal static string InstalledChannelName => ChannelName.EndsWith(".Preview", StringComparison.Ordinal) ? ChannelName[..^8] : ChannelName;
     [DllImport("kernel32.dll", SetLastError = true)] private static extern bool GetNamedPipeServerProcessId(SafePipeHandle pipe, out uint processId);
     [DllImport("user32.dll")] private static extern bool AllowSetForegroundWindow(uint processId);
 

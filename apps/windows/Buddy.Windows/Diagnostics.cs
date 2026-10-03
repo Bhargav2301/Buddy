@@ -6,7 +6,7 @@ internal static class Diagnostics
 {
     private static readonly object Gate = new();
     internal static string LogPath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Buddy", "Logs", "startup.log");
+        PreviewEnvironment.DataDirectory, "Logs", "startup.log");
 
     internal static void Start()
     {

@@ -7,10 +7,15 @@ internal static class AssistantIntent
     internal static string Mode(string text)
     {
         var t = text.Trim().ToLowerInvariant();
+        if(Buddy.Server.WorkflowIntent.NeedsSpecialists(text))return "agent";
+        if(t.StartsWith("search my app notes ")) return "knowledge";
+        if(t.StartsWith("start an agent ") || t.StartsWith("spawn an agent ") || t.StartsWith("start agent "))return "agent";
         if (t.StartsWith("buddy agent") || t.StartsWith("do it") || t.StartsWith("do this") || t.StartsWith("open ") || t.StartsWith("click ") || t.StartsWith("type ")) return "agent";
-        if (t.StartsWith("guide ") || t.StartsWith("show me ") || t.StartsWith("walk me ")) return "guide";
+        if (t.StartsWith("teach ") || t.StartsWith("help me learn ") || t.StartsWith("guide ") || t.StartsWith("show me ") || t.StartsWith("walk me ")) return "guide";
         return "talk";
     }
+    internal static string KnowledgeQuery(string text)=>text.Trim()["search my app notes ".Length..].Trim();
+    internal static string ActionQuery(string text) { foreach(var prefix in new[]{"start an agent to ","spawn an agent to ","start agent to ","buddy agent "})if(text.StartsWith(prefix,StringComparison.OrdinalIgnoreCase))return text[prefix.Length..];return text; }
 }
 internal sealed class SentenceBuffer
 {

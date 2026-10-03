@@ -65,8 +65,10 @@ internal static class Installer
             link.TargetPath = Path.Combine(target, "Buddy.exe");
             link.WorkingDirectory = target;
             link.Arguments = arguments;
+            link.IconLocation = Path.Combine(target, "Buddy.exe") + ",0";
             link.Description = "Buddy - your local AI companion";
             link.Save();
+            ShellIdentity.Shortcut(Path.Combine(folder, name + ".lnk"));
         }
         finally
         {

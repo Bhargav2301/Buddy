@@ -25,7 +25,7 @@ public sealed class BuddyHost : IAsyncDisposable
     private BuddyHost(WebApplication app, BuddyService service, X509Certificate2 cert, HttpClient client, int port)
     { this.app = app; Service = service; this.cert = cert; this.client = client; Port = port; Fingerprint = Convert.ToHexString(SHA256.HashData(cert.RawData)); }
 
-    public static async Task<BuddyHost> Start(string directory, int port = DefaultPort, Uri? engineAddress = null)
+    public static async Task<BuddyHost> Start(string directory, int port = DefaultPort, Uri? engineAddress = null, bool loopbackOnly = false)
     {
         var keyDir = Path.Combine(directory, "keys"); Directory.CreateDirectory(keyDir);
         var provider = DataProtectionProvider.Create(new DirectoryInfo(keyDir), setup => {
@@ -53,9 +53,9 @@ public sealed class BuddyHost : IAsyncDisposable
         var service = new BuddyService(store, new OllamaEngine(client));
         var builder = WebApplication.CreateSlimBuilder(); builder.Logging.ClearProviders();
         builder.WebHost.ConfigureKestrel(k => {
-            k.Limits.MaxRequestBodySize = 3_000_000;
+            k.Limits.MaxRequestBodySize = 4 * 1024 * 1024;
             k.Limits.MaxConcurrentConnections = 64;
-            k.Listen(IPAddress.Any, port, listen => listen.UseHttps(cert, https => https.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13));
+            k.Listen(loopbackOnly ? IPAddress.Loopback : IPAddress.Any, port, listen => listen.UseHttps(cert, https => https.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13));
         });
         builder.Services.AddRateLimiter(options => {
             options.RejectionStatusCode = 429;
@@ -88,6 +88,7 @@ public sealed class BuddyHost : IAsyncDisposable
             await store.Update(s => { s.Devices.Add(new(id, name, Security.Hash(token), DateTimeOffset.UtcNow)); return true; });
             return new { token, deviceId = id, name };
         });
+        app.MapGet("/v1/brains", () => service.Brains.Available);
         app.MapGet("/v1/status", async (CancellationToken ct) => { var s = await store.Read(s => s); return await service.Engine.Status(s.Model, s.VisionModel, ct); });
         app.MapGet("/v1/conversations", async () => await store.Read(s => s.Conversations.OrderByDescending(c => c.Pinned).ThenByDescending(c => c.UpdatedAt).Select(c => new { c.Id, c.Title, c.UpdatedAt, c.Pinned, c.Archived }).ToList()));
         app.MapPatch("/v1/conversations/{id}", (string id, ConversationUpdate input) => service.UpdateConversation(id, input));

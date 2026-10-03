@@ -5,11 +5,12 @@ namespace Buddy.Windows;
 
 internal sealed class VisualGrounding(ScreenPerception perception, Func<BuddyService?> service)
 {
-    internal async Task<GroundedTarget?> Resolve(ScreenSnapshot snapshot, GuideStep step, CancellationToken ct)
+    internal async Task<GroundedTarget?> Resolve(ScreenSnapshot snapshot, GuideStep step, CancellationToken ct, RegionLease? region = null)
     {
         if (string.IsNullOrWhiteSpace(step.Target) || service() is not { } host) return null;
-        using var frame = await perception.Frame(snapshot, ct);
-        if (frame is null) return null;
+        using var full = await perception.Frame(snapshot, ct);
+        if (full is null) return null;
+        using var cropped = region?.Crop(full); var frame=cropped??full;
         var candidates = frame.Text.Where(t => t.Confidence >= .85 && t.Text.Equals(step.Target, StringComparison.OrdinalIgnoreCase)).ToArray();
         if (candidates.Length != 1) return null;
         var candidate = candidates[0];
@@ -29,8 +30,10 @@ internal sealed class VisualGrounding(ScreenPerception perception, Func<BuddySer
         // A slow vision response is not permission to point at stale pixels.
         var current = await perception.Capture(snapshot.Window, ct);
         if (current.Context.App != snapshot.Context.App || current.Context.Title != snapshot.Context.Title) return null;
-        using var fresh = await perception.Frame(current, ct);
-        if (fresh is null || fresh.Bounds != frame.Bounds) return null;
+        using var freshFull = await perception.Frame(current, ct);
+        if (freshFull is null) return null;
+        using var freshCrop = region?.Crop(freshFull); var fresh=freshCrop??freshFull;
+        if (fresh.Bounds != frame.Bounds) return null;
         var matches = fresh.Text.Where(t => t.Confidence >= .85 && t.Text.Equals(candidate.Text, StringComparison.OrdinalIgnoreCase)).ToArray();
         if (matches.Length != 1 || matches[0].Bounds != candidate.Bounds) return null;
         if (!step.Role.Equals("Text", StringComparison.OrdinalIgnoreCase) && !await Task.Run(() => VisualControlBoundary.HasBoundary(fresh, matches[0], ct), ct)) return null;

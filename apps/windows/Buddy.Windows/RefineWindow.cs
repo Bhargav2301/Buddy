@@ -51,7 +51,7 @@ internal sealed class RefineWindow : Window
         panel.Children.Add(Label("Undo for 30 seconds · Buddy never submits the form", 12));
         panel.Children.Add(BuddyTheme.Button("Copy original", () => System.Windows.Clipboard.SetText(original)));
         Content = new ScrollViewer { Content = panel, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
-        SourceInitialized += (_, _) => Native.SetWindowDisplayAffinity(new WindowInteropHelper(this).Handle, 0x11);
+        SourceInitialized += (_, _) => CaptureProtection.Apply(new WindowInteropHelper(this).Handle);
         PreviewKeyDown += (_, e) => { if (e.Key == Key.Escape) { e.Handled = true; Cancel(); } };
         Closed += (_, _) => { closed = true; Cancel(); };
     }

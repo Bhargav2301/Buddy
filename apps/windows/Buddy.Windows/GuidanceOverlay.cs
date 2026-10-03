@@ -20,13 +20,15 @@ internal sealed class GuidanceOverlay : IDisposable
     private GuideInputInvalidation? input;
     internal bool IsVisible => windows.Count > 0;
     internal event Action<ScreenElement?>? TargetChanged;
+    internal event Action? Invalidated;
+    private void Invalidate() { Clear(); Invalidated?.Invoke(); }
     internal GuidanceOverlay() { expiry.Tick += async (_, _) => {
-        if (DateTimeOffset.UtcNow > expires || Native.GetForegroundWindow() != target && !Native.IsOwnWindow(Native.GetForegroundWindow()) || (InputNative.GetAsyncKeyState(1) & 0x8000) != 0) { Clear(); return; }
+        if (DateTimeOffset.UtcNow > expires || Native.GetForegroundWindow() != target && !Native.IsOwnWindow(Native.GetForegroundWindow()) || (InputNative.GetAsyncKeyState(1) & 0x8000) != 0) { Invalidate(); return; }
         if (validating || stillValid is not { } validate) return;
         validating = true; int current = revision;
         var check = Task.Run(validate);
-        try { if (!await check.WaitAsync(TimeSpan.FromMilliseconds(200)) && current == revision) Clear(); }
-        catch { if (current == revision) Clear(); }
+        try { if (!await check.WaitAsync(TimeSpan.FromMilliseconds(200)) && current == revision) Invalidate(); }
+        catch { if (current == revision) Invalidate(); }
         finally { // Keep a hung provider from creating an unbounded number of validation workers.
             if (check.IsCompleted) validating = false;
             else _ = check.ContinueWith(_ => expiry.Dispatcher.BeginInvoke(new Action(() => validating = false)), TaskScheduler.Default);
@@ -34,7 +36,7 @@ internal sealed class GuidanceOverlay : IDisposable
     }; }
     internal void Draw(IntPtr window, ScreenElement element, string primitive, string label, Func<bool>? valid = null)
     {
-        Clear(); input = new GuideInputInvalidation(Clear); target = window; stillValid = valid; expires = DateTimeOffset.UtcNow.AddSeconds(15);
+        Clear(); input = new GuideInputInvalidation(Invalidate); target = window; stillValid = valid; expires = DateTimeOffset.UtcNow.AddSeconds(15);
         foreach (var monitor in System.Windows.Forms.Screen.AllScreens) {
             var bounds = monitor.Bounds;
             if (!bounds.IntersectsWith(new((int)element.X, (int)element.Y, (int)element.Width, (int)element.Height))) continue;
@@ -69,7 +71,8 @@ internal sealed class GuidanceOverlay : IDisposable
             var white = new Pen(Brushes.White, 7); var pen = new Pen(accent, 3);
             if (primitive == "highlight") { var fill = accent.Clone(); fill.Opacity = .25; dc.DrawRoundedRectangle(fill, pen, r, 8, 8); }
             else if (primitive == "underline") { dc.DrawLine(white, r.BottomLeft, r.BottomRight); dc.DrawLine(pen, r.BottomLeft, r.BottomRight); }
-            else { dc.DrawRoundedRectangle(null, white, r, 12, 12); dc.DrawRoundedRectangle(null, pen, r, 12, 12); }
+            else if (primitive is "circle" or "ring") { var center = new Point(r.Left + r.Width / 2, r.Top + r.Height / 2); dc.DrawEllipse(null, white, center, r.Width / 2, r.Height / 2); dc.DrawEllipse(null, pen, center, r.Width / 2, r.Height / 2); }
+            else if (primitive is not "label" and not "arrow") { dc.DrawRoundedRectangle(null, white, r, 12, 12); dc.DrawRoundedRectangle(null, pen, r, 12, 12); }
             if (primitive is "arrow" or "ring") {
                 var end = new Point(r.Left, r.Top + r.Height / 2); var start = new Point(Math.Max(8, end.X - 80), Math.Max(8, end.Y - 55));
                 var path = new StreamGeometry(); using (var c = path.Open()) { c.BeginFigure(start, false, false); c.BezierTo(new(start.X, end.Y), new(end.X - 35, end.Y - 10), end, true, false); }
