@@ -4,6 +4,31 @@ Versions follow `major.minor.patch`; Git tags use `v` plus the version.
 The root [VERSION](VERSION) file controls both applications. See
 [Versioning](docs/Versioning.md) for the release process.
 
+## [0.3.9] - 2026-10-04
+
+- Keep source-field refinement bound to the external HWND and UIA field selected before summoning Buddy. Review a field-anchored diff, then explicitly Accept or Undo without submitting; changed text, focus, title or an expired lease refuses the edit. Buddy-draft refinement is labelled separately.
+- Closing Home keeps the tray service and configured companion running; Exit Buddy stops them. Desktop shell and ordinary maximized windows no longer suppress the companion as fullscreen. The companion opens Voice directly and groups optional tools separately.
+- Clear stale summon output and failed replacement captures; creative writing stays local unless research is requested.
+- Include the locally tested 0.3.2–0.3.8 work: configurable chat/voice shortcuts, local recognition review, speech cleanup and concise replies, capture/headphone policies, optional offline voices, owner-supplied branding and expressions, scoped teaching/region input, approved execution specialists, inline refinement, local knowledge and job history. Account grants remain disabled.
+- Keep user profiles, recordings, model weights and local build/recovery archives out of the repository. See docs/Windows-0.3.9.md for validation scope and remaining physical/third-party acceptance.
+
+## [0.3.1] - 2026-09-29
+
+- Launching Buddy again brings the running app's Home window forward instead of showing an “already running” message. Normal launches keep Home visible; `--background` explicitly requests companion startup.
+- Add a central Settings window reachable from a pinned Home button, quick chat, the tray, `--settings`, and new Buddy Settings desktop/Start menu shortcuts.
+- Reuse an existing Settings window, restore minimized Home, and fit settings dialogs to the available desktop height.
+- Validation: 32 desktop logic/activation checks, including real second-process navigation, and eight isolated WPF Settings-window checks passed. These do not claim microphone or computer-action acceptance.
+
+## [0.3.0] - 2026-09-28
+
+- Separate 360 px voice overlay for Ctrl+Shift+Space, with transcript, microphone level, sentence-based speech and cancellation. Optional tap/hold main shortcut.
+- Windows Guide and opt-in Agent preview: local structured plans, live UIA targets, click-through arrows/highlights, saved walkthrough progress, confirmed allowlisted actions, emergency stop, and guarded field undo.
+- Opt-in public HTTPS research with bounded search/fetch, source citations, redirect/DNS checks, and isolated untrusted page content.
+- Per-capture privacy checks, password redaction, encrypted activity metadata, and memory-only voice frames when accessibility enumeration is complete.
+- Require Buddy.deps.json and probe the native apphost during packaging; add noninteractive installer flags and self-contained regression tests.
+- If the original Qwen default is missing but Gemma 3 4B is installed, select Gemma on startup. Preserve installed or custom model selections.
+- Validation: live Gemma planning, grounding and cited research checks passed. Native foreground acquisition was blocked in this automation session; microphone, real app execution, monitor/DPI and guide accuracy acceptance remain manual. See docs/Windows-Assistant-Preview.md. Android feature work remains deferred.
+
 ## [0.2.0] - 2026-09-26
 
 First version tracked in this GitHub repository. This imports the latest Buddy

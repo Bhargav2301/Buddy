@@ -10,6 +10,8 @@ This is a first installable alpha, not the full year-long platform in the Nexa s
 
 ## Cursor companion: start here
 
+**Settings access (0.3.1):** Double-click **Buddy** to open Home, including when it is already running. Choose the pinned **Settings** button, or open the new **Buddy Settings** desktop/Start menu shortcut directly. Quick chat and the tray also have **Settings**. The Settings window links to **Assistant & internet**, **Cursor, shortcuts & voice**, models and phone pairing. A portable installation includes `Open-Buddy-Settings.cmd`.
+
 Use **`Buddy-Windows-v<version>.zip`** for the Windows application. Extract all files, quit any running Buddy instance from its tray menu, and run **Install-Buddy.cmd** from the extracted folder containing **Buddy.exe**. The source ZIP is for development. The Windows package contains **Cursor-Companion.txt** and **Build-Info.json**, which identifies its version and source commit.
 
 Buddy now includes a small mint pointer with eyes that follows beside your Windows pointer. It is designed to let clicks pass through and leave your original pointer available. The companion runs while Buddy is running; this version does not add Windows login autostart.
@@ -17,20 +19,24 @@ Buddy now includes a small mint pointer with eyes that follows beside your Windo
 | Action | Default control |
 |---|---|
 | Open a compact chat bar beside the pointer | **Ctrl + Space** |
-| Activate voice in the compact bar | **Ctrl + Shift + Space** |
+| Open the separate voice overlay | **Ctrl + Shift + Space** |
 | Send typed text / add a new line | **Enter** / **Shift + Enter** |
 | Dismiss the bar and cancel listening, speech and its unfinished reply | **Esc** or **×** |
 | Stop listening or an answer | **Stop**, or **Ctrl + Alt + Esc** |
 | Open history, models, pairing and screen-context tools | **Home** in the bar, or double-click Buddy's tray icon |
 | Change the main shortcut, choose chat/voice activation, hide the companion | **Home → Cursor & shortcuts** |
 
-The voice shortcut starts one utterance. Speak, then pause: Buddy turns the microphone off, sends the transcript to the PC's local AI, and reads the answer if **Read voice answers aloud** is enabled. Press the voice shortcut again while listening to cancel; the **Finish** button ends listening and submits recognized speech. Clicking outside the bar stops an active microphone. Press the voice shortcut again for your next turn. This is not a continuous or wake-word listener.
+The voice shortcut opens a separate 360 px bubble and starts one utterance. Speak, then pause: Buddy turns the microphone off, sends the transcript to the PC's local AI, and reads sentences as they arrive if **Read voice answers aloud** is enabled. Press the voice shortcut again while listening to cancel; **Finish** submits recognized speech. Changing to another application stops the microphone. Enable **Hold to talk** in Cursor & shortcuts for a short tap to chat and a hold of at least 250 ms to talk; release sends. Windows may need longer to prepare the microphone on its first use. This is not a continuous or wake-word listener.
 
 **Windows + Space normally switches keyboard layouts.** It appears in the shortcut picker as **if available**. If Windows rejects it, Buddy keeps the previous working shortcut. Ctrl + Space is the default, and Ctrl + Alt + Space or Alt + Shift + Space are alternatives. The dedicated voice shortcut is Ctrl + Shift + Space; if another application owns it, use Voice in the bar or tray menu.
 
-When the configured AI model is ready, Buddy can start in companion mode with Home hidden. If Ollama/model setup is incomplete, Home stays open. Turn this behavior off in Cursor & shortcuts if you prefer Home at launch. The companion follows monitor work areas and is designed for different display scales; native monitor/DPI behavior still needs a Windows device check.
+Normal launches open Home so settings are always reachable. Use `Buddy.exe --background` for a companion-only launch; the background-launch preference in Cursor & shortcuts controls whether Home hides once the AI model is ready. An explicit Home or Settings request keeps the window open, even during startup. The companion follows monitor work areas and is designed for different display scales; native monitor/DPI behavior still needs a Windows device check.
 
-The compact bar streams real answers through the same PC service and saves completed turns to the selected conversation, including Android history. Failed or stopped replies restore your draft. Opening the bar does **not** capture your screen: use Home's existing reviewed screen-context tools when you want to share it. Microphone support depends on an installed Windows speech language and available audio device. If unavailable, the bar remains usable for typing; Win+H can dictate into the text field using your Windows settings.
+The compact bar streams real answers and saves completed turns to the selected conversation. Failed or stopped replies restore your draft. Typed chat captures context only when **Screen** is checked. Voice captures active-window accessibility text and, when safe and available, a redacted memory-only frame; turn this off with **Include active-window context when talking** in Cursor & shortcuts. Frames stay on this PC and never enter stored chat history or web queries. Microphone support depends on an installed Windows speech language and audio device.
+
+## Guide, Agent and internet research (0.3.0 preview)
+
+Read [Windows-Assistant-Preview.md](Windows-Assistant-Preview.md) for supported actions and acceptance limits. Open **Home → Assistant settings** to enable **Internet research** or **Agent mode**; both are off by default. Focus the app you want help with, then summon Buddy. Type a task and choose **Guide** for on-screen directions or **Agent** for a reviewable action plan. Agent changes require **Run this plan** and **Allow this step**. **Esc**, **Ctrl+Alt+Esc**, **Stop**, or mouse movement during execution stops further actions. Try **Home → Try pointing tutorial** first.
 
 ## 1. Install on Windows
 
@@ -47,6 +53,8 @@ Alternative setup: run **Setup-Local-AI.ps1** from PowerShell. It installs Ollam
 This build has no publisher certificate. Windows may show an unknown-publisher prompt. Verify the supplied SHA-256 checksum before running files. If your PC's policy blocks unsigned applications or scripts, use your normal administrator-managed installation process; do not disable device protection.
 
 ### Repairing the original Windows download
+
+Development builds with `Rollback-Buddy.cmd` validate both the extracted package and a staged copy before replacing installed files. They retain the previous application directory under `%LOCALAPPDATA%\Programs\.Buddy-backup-*`. To restore it, quit Buddy and run **Rollback-Buddy.cmd from the extracted package**. Rollback preserves current conversations, pairing and preferences; it does not rewind data migrations. Keep the extracted package until the upgrade is validated. Clean-machine upgrade and rollback acceptance for the MVP is still pending.
 
 The original ZIP included the wrong `WindowsBase.dll`: a small .NET compatibility facade instead of the Windows Desktop implementation. That could prevent the window from opening with either of the original launch methods. **Windows repair 1** supplies the Desktop implementation and checks required WPF types before starting. Read-aloud now initializes only when requested, so a missing Windows voice cannot prevent the chat window from opening.
 

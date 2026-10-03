@@ -1,0 +1,54 @@
+Figma file JzvFxWvZqgP0d6fNYMgxHa, node 5:37. Extracted 2026-09-30.
+Reference only; native WPF adaptation is in apps/windows.
+
+const assetPathPrefix = "https://www.figma.com/api/mcp/asset/b9825c7a-ffd6-4f81-8c95-61b5d78620fe";
+const imgEllipse = `${assetPathPrefix}/1cced.svg`;
+
+export default function W1OnboardingHatch() {
+  return (
+    <a className="bg-[#1e293b] block cursor-pointer relative size-full" data-node-id="5:37" data-name="W1 Onboarding / Hatch">
+      <div className="absolute bg-[#0b1220] h-[40px] left-0 top-[860px] w-[1440px]" data-node-id="5:38" data-name="Rectangle" />
+      <div className="absolute bg-white h-[340px] left-[510px] overflow-clip rounded-[20px] top-[230px] w-[420px]" data-node-id="5:39" data-name="Frame">
+        <div className="absolute left-[190px] size-[40px] top-[20px]" data-node-id="5:40" data-name="Ellipse">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgEllipse} />
+        </div>
+        <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Bold'] font-bold h-[16px] leading-[normal] left-[210px] not-italic text-[10px] text-center text-white top-[32px] w-[40px]" data-node-id="5:41">
+          ^ - ^
+        </p>
+        <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[20px] leading-[normal] left-[210px] not-italic text-[#4b5563] text-[14px] text-center top-[76px] w-[340px]" data-node-id="5:42">
+          Hello, my name is
+        </p>
+        <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[normal] left-[210px] not-italic text-[#0f766e] text-[28px] text-center top-[100px] w-[340px]" data-node-id="5:43">
+          Buddy
+        </p>
+        <div className="absolute bg-[#f8fafc] h-[40px] left-[40px] rounded-[12px] top-[154px] w-[340px]" data-node-id="5:44" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[52px] not-italic text-[#9ca3af] text-[14px] text-left top-[164px] whitespace-nowrap" data-node-id="5:45">
+          Rename me, or keep Buddy
+        </p>
+        <div className="absolute bg-[#20b8a6] h-[44px] left-[40px] rounded-[12px] top-[220px] w-[160px]" data-node-id="5:46" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[70px] not-italic text-[14px] text-left text-white top-[232px] whitespace-nowrap" data-node-id="5:47">
+          That is me
+        </p>
+        <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[44px] left-[220px] rounded-[12px] top-[220px] w-[160px]" data-node-id="5:48" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[262px] not-italic text-[#111827] text-[14px] text-left top-[232px] whitespace-nowrap" data-node-id="5:49">
+          Speak it
+        </p>
+        <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[20px] leading-[normal] left-[210px] not-italic text-[#4b5563] text-[12px] text-center top-[284px] w-[340px]" data-node-id="5:50">
+          I only look while you hold the key.
+        </p>
+      </div>
+    </a>
+  );
+}
+
+SUPER CRITICAL: The generated React+Tailwind code MUST be converted to match the target project's technology stack and styling system.
+1. Analyze the target codebase to identify: technology stack, styling approach, component patterns, and design tokens
+2. Convert React syntax to the target framework/library
+3. Transform all Tailwind classes to the target styling system while preserving exact visual design
+4. Follow the project's existing patterns and conventions
+DO NOT install any Tailwind as a dependency unless the user instructs you to do so.
+
+
+Node ids have been added to the code as data attributes, e.g. `data-node-id="1:2"`.
+
+Images and SVGs will be stored as constants, e.g. const image = `${assetPathPrefix}/<asset file name>`, where assetPathPrefix is declared once at the top of the code and every asset URL interpolates it. These constants will be used in the code as the source for the image, ex: <img src={image} />. Image assets are stored on a remote server for 7 days and can be fetched using the provided URLs until they expire.

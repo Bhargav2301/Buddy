@@ -1,0 +1,63 @@
+Figma file JzvFxWvZqgP0d6fNYMgxHa, node 5:85. Extracted 2026-09-30.
+Reference only; native WPF adaptation is in apps/windows.
+
+const assetPathPrefix = "https://www.figma.com/api/mcp/asset/2a536d70-2572-4eab-b5f3-9e4011b1afc8";
+const imgEllipse = `${assetPathPrefix}/a9b00.svg`;
+const imgEllipse1 = `${assetPathPrefix}/1cced.svg`;
+
+export default function W4ClariftRefine() {
+  return (
+    <a className="bg-[#1e293b] block cursor-pointer relative size-full" data-node-id="5:85" data-name="W4 Clarift Refine">
+      <div className="absolute bg-[#0b1220] h-[40px] left-0 top-[860px] w-[1440px]" data-node-id="5:86" data-name="Rectangle" />
+      <div className="absolute bg-white h-[520px] left-[80px] rounded-[8px] top-[80px] w-[720px]" data-node-id="5:87" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[100px] not-italic text-[#111827] text-[13px] text-left top-[96px] whitespace-nowrap" data-node-id="5:88">
+        ChatGPT
+      </p>
+      <div className="absolute bg-[#f1f5f9] h-[160px] left-[100px] rounded-[12px] top-[130px] w-[680px]" data-node-id="5:89" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[116px] not-italic text-[#111827] text-[14px] text-left top-[146px] whitespace-nowrap" data-node-id="5:90">
+        write a resume summary for data science
+      </p>
+      <div className="absolute left-[736px] size-[28px] top-[250px]" data-node-id="5:91" data-name="Ellipse">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgEllipse} />
+      </div>
+      <div className="absolute bg-white h-[420px] left-[860px] overflow-clip rounded-[16px] top-[180px] w-[400px]" data-node-id="5:92" data-name="Refine card">
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[20px] not-italic text-[#0f766e] text-[13px] text-left top-[16px] whitespace-pre" data-node-id="5:93">{`Refine  -  on this PC`}</p>
+        <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[20px] not-italic text-[#4b5563] text-[12px] text-left top-[44px] whitespace-pre" data-node-id="5:94">{`Quick     Guided     Council`}</p>
+        <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[normal] left-[20px] not-italic text-[#20b8a6] text-[20px] text-left top-[76px] whitespace-pre" data-node-id="5:95">{`42  ->  86`}</p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[20px] not-italic text-[#4b5563] text-[12px] text-left top-[108px] whitespace-nowrap" data-node-id="5:96">
+          Added role, success criteria, format
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[100px] leading-[normal] left-[20px] not-italic text-[#111827] text-[14px] text-left top-[140px] w-[360px]" data-node-id="5:97">
+          You are a hiring manager. Write a 4-sentence resume summary for a data scientist targeting B2B SaaS. Include impact metrics.
+        </p>
+        <div className="absolute bg-[#20b8a6] h-[44px] left-[20px] rounded-[12px] top-[280px] w-[170px]" data-node-id="5:98" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[78px] not-italic text-[14px] text-left text-white top-[292px] whitespace-nowrap" data-node-id="5:99">
+          Apply
+        </p>
+        <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[44px] left-[200px] rounded-[12px] top-[280px] w-[90px]" data-node-id="5:100" data-name="Rectangle" />
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[222px] not-italic text-[#111827] text-[14px] text-left top-[292px] whitespace-nowrap" data-node-id="5:101">
+          Copy
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[20px] not-italic text-[#4b5563] text-[12px] text-left top-[344px] whitespace-pre" data-node-id="5:102">{`Undo 30s  -  I will not send it`}</p>
+      </div>
+      <div className="absolute left-[1288px] size-[40px] top-[700px]" data-node-id="5:103" data-name="Ellipse">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgEllipse1} />
+      </div>
+      <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Bold'] font-bold h-[16px] leading-[normal] left-[1308px] not-italic text-[10px] text-center text-white top-[712px] w-[40px]" data-node-id="5:104">
+        ^ v ^
+      </p>
+    </a>
+  );
+}
+
+SUPER CRITICAL: The generated React+Tailwind code MUST be converted to match the target project's technology stack and styling system.
+1. Analyze the target codebase to identify: technology stack, styling approach, component patterns, and design tokens
+2. Convert React syntax to the target framework/library
+3. Transform all Tailwind classes to the target styling system while preserving exact visual design
+4. Follow the project's existing patterns and conventions
+DO NOT install any Tailwind as a dependency unless the user instructs you to do so.
+
+
+Node ids have been added to the code as data attributes, e.g. `data-node-id="1:2"`.
+
+Images and SVGs will be stored as constants, e.g. const image = `${assetPathPrefix}/<asset file name>`, where assetPathPrefix is declared once at the top of the code and every asset URL interpolates it. These constants will be used in the code as the source for the image, ex: <img src={image} />. Image assets are stored on a remote server for 7 days and can be fetched using the provided URLs until they expire.
