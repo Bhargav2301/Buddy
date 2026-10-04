@@ -7,7 +7,7 @@ parser=argparse.ArgumentParser();parser.add_argument('--staged',action='store_tr
 git=['git','-c','safe.directory='+root.as_posix(),'-C',str(root)]
 names=subprocess.check_output(git+['ls-files','-z']).decode().split('\0')
 problems=[];checked=0;assets=[]
-blocked=re.compile(r'(^|/)(preview-data|local-voice|keys|logs|node_modules|bin|obj|baseline)(/|$)|\.(encrypted|pfx|p12|keystore|jks|onnx|gguf|safetensors|zip|exe|dll|wav|mp3|dmp)$|(^|/)(desktop\.json|\.buddy-rollback\.json|\.env)$',re.I)
+blocked=re.compile(r'(^|/)(preview-data|local-voice|SpeechModels|keys|logs|node_modules|bin|obj|baseline)(/|$)|\.(encrypted|pfx|p12|keystore|jks|onnx|gguf|safetensors|zip|exe|dll|wav|mp3|dmp)$|(^|/)ggml-[^/]+\.bin$|(^|/)(desktop\.json|\.buddy-rollback\.json|\.env)$',re.I)
 secrets=[re.compile(rb'gh[opusr]_[A-Za-z0-9]{25,}'),re.compile(rb'github_pat_[A-Za-z0-9_]{40,}'),re.compile(rb'AKIA[0-9A-Z]{16}'),re.compile(rb'sk-[A-Za-z0-9_-]{30,}'),re.compile(rb'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----')]
 for name in names:
     if not name:continue

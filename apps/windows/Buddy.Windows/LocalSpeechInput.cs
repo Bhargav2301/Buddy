@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 
 namespace Buddy.Windows;
 
-internal static class LocalSpeechInput
+internal static class WindowsSpeechInput
 {
     private static readonly SemaphoreSlim gate = new(1, 1);
     private static readonly ConcurrentDictionary<SpeechRecognitionEngine, MicrophoneStream> inputs = new();

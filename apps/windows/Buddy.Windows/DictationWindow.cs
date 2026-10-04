@@ -24,7 +24,7 @@ internal sealed class DictationWindow : Window
     private readonly StringBuilder recognized = new();
     private readonly DispatcherTimer monitor = new() { Interval = TimeSpan.FromMilliseconds(50) };
     private readonly Rect sourceBounds;
-    private SpeechRecognitionEngine? recognizer;
+    private LocalRecognizer? recognizer;
     private CancellationTokenSource? operation;
     private int generation;
     private bool closed, listening, applied, writing;

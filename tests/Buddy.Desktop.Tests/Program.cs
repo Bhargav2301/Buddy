@@ -141,6 +141,10 @@ var spring = new CompanionSpring(); spring.Step(new(-500, 100), .033, true);
 for (int i = 0; i < 180; i++) spring.Step(new(-200, 500), .033, true);
 Check(Math.Abs(spring.Position.X + 200) + Math.Abs(spring.Position.Y - 500) < 1, "Companion spring converges across negative screen coordinates");
 Check(spring.Step(new(10, 20), .033, false) == new PixelPosition(10, 20), "Reduced motion places the companion immediately");
+Check(!SpeechSignal.HasSpeech(new float[32000]),"Silence does not qualify as speech");
+Check(!SpeechSignal.HasSpeech(Enumerable.Range(0,32000).Select(i=>(float)Math.Sin(i*.08)*.1f).ToArray()),"Steady hum does not qualify as speech");
+Reject(()=>SpeechSignal.HasSpeech(new float[SpeechSignal.MaximumSamples+1]),"Recognition input cannot exceed thirty seconds");
+Check(new DesktopPreferences().RecognitionEngine=="whisper"&&new DesktopPreferences().WhisperModel=="base.en","Default recognition uses benchmark-selected local Whisper base English");
 RegionShapeChecks.Run(Check);
 Console.WriteLine($"{assertions} desktop logic assertions passed. Native Windows interaction is a separate acceptance check.");
 

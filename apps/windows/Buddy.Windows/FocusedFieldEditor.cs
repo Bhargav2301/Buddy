@@ -6,14 +6,15 @@ using System.Windows;
 namespace Buddy.Windows;
 
 internal sealed record FieldRule(string[] Processes, string[] Titles, string[] Fields);
-internal sealed record FieldAnchor(IntPtr Window, string Identity, Rect Bounds);
+internal sealed record FieldAnchor(IntPtr Window, string Identity, Rect Bounds, bool ExplicitInvocation = false);
 internal sealed record FocusedDraft(GuardedEdit Edit, string App, string FieldName, FieldAnchor Anchor,
     DictationInsertion? Insertion = null, Action? VerifySelection = null, Action? VerifyFocus = null);
 
 // Text capture requires an explicit invocation, or opt-in bounded focused-field events.
 internal sealed class FocusedFieldEditor(ScreenPerception perception,Func<AutomationElement,IntPtr,bool>? fixtureEligibility=null)
 {
-    private bool Eligible(AutomationElement node,IntPtr window)=>fixtureEligibility?.Invoke(node,window)??Supported(node,window);
+    private bool Eligible(AutomationElement node,IntPtr window,bool explicitInvocation=false)=>fixtureEligibility?.Invoke(node,window)??(explicitInvocation ? SafeRole(node) : Supported(node,window));
+    private static bool SafeRole(AutomationElement node) { var c=node.Current; return !c.IsPassword && c.IsEnabled && c.HasKeyboardFocus && !c.IsOffscreen && (c.ControlType==ControlType.Edit || c.ControlType==ControlType.Document); }
     private readonly SemaphoreSlim gate = new(1, 1);
     private static readonly Lazy<FieldRule[]> Rules = new(() => {
         using var stream = typeof(FocusedFieldEditor).Assembly.GetManifestResourceStream("Buddy.Windows.refine-apps.json")!;
@@ -21,14 +22,14 @@ internal sealed class FocusedFieldEditor(ScreenPerception perception,Func<Automa
     });
 
     // Eligibility checks only role/name/bounds/pattern support; never Value or text ranges.
-    internal Task<FieldAnchor?> Probe(IntPtr window, CancellationToken ct) => Run(token => {
-        perception.Check(window);
+    internal Task<FieldAnchor?> Probe(IntPtr window, CancellationToken ct, bool explicitInvocation = false) => Run(token => {
+        perception.Check(window, agent:true);
         if (Native.GetForegroundWindow() != window) return null;
         var node = AutomationElement.FocusedElement;
-        if (!Eligible(node, window)||Buddy.Server.PromptSuggestionPolicy.PrivateMetadata(Native.Label(window),node.Current.Name??"")) return null;
+        if (!Eligible(node, window,explicitInvocation)||Buddy.Server.PromptSuggestionPolicy.PrivateMetadata(Native.Label(window),node.Current.Name??"")) return null;
         var adapter = new AutomationTextField(node, window, perception);
         adapter.Validate(); token.ThrowIfCancellationRequested();
-        return Anchor(node, window, adapter.Identity);
+        return Anchor(node, window, adapter.Identity) with { ExplicitInvocation=explicitInvocation };
     }, ct);
 
     internal static bool Supported(AutomationElement node, IntPtr window)
@@ -48,24 +49,24 @@ internal sealed class FocusedFieldEditor(ScreenPerception perception,Func<Automa
         return new(window, identity, bounds);
     }
 
-    internal Task<FocusedDraft> Capture(IntPtr window, CancellationToken ct, bool dictation = false, string? expectedIdentity = null, bool strictFocus = false) => Run(token => {
-        perception.Check(window);
-        if (Native.GetForegroundWindow() != window) throw new InvalidOperationException("Focus an AI prompt field and press Ctrl+Alt+R.");
+    internal Task<FocusedDraft> Capture(IntPtr window, CancellationToken ct, bool dictation = false, string? expectedIdentity = null, bool strictFocus = false, bool explicitInvocation = false) => Run(token => {
+        perception.Check(window, agent:true);
+        if (Native.GetForegroundWindow() != window) throw new InvalidOperationException("Focus the original editable field and press Ctrl+Alt+R.");
         var node = AutomationElement.FocusedElement;
         var current = node.Current;
         string app = InputNative.ProcessName(window), name = current.Name ?? "";
-        if (!dictation && !Eligible(node, window))
-            throw new InvalidOperationException("This field is not in Buddy's supported AI-chat rules. Paste your prompt into Buddy to refine it.");
+        if (!Eligible(node, window,explicitInvocation || dictation) || Buddy.Server.PromptSuggestionPolicy.PrivateMetadata(Native.Label(window),name))
+            throw new InvalidOperationException("Select the original editable text field first. Private, hidden and non-text controls cannot be refined.");
         var adapter = new AutomationTextField(node, window, perception);
         if (expectedIdentity is not null && adapter.Identity != expectedIdentity) throw new InvalidOperationException("The focused field changed. Invoke Buddy again in the intended field.");
         token.ThrowIfCancellationRequested();
         var original = adapter.Read();
         if ((!dictation && string.IsNullOrWhiteSpace(original)) || original.Length > 20000) throw new InvalidOperationException("Use a field of up to 20,000 characters.");
-        var anchor = Anchor(node, window, adapter.Identity);
+        var anchor = Anchor(node, window, adapter.Identity) with { ExplicitInvocation=explicitInvocation || dictation };
         if (Native.GetForegroundWindow() != window || !node.Current.HasKeyboardFocus) throw new InvalidOperationException("Focus changed while reading the field. Invoke Buddy again.");
         var originalTitle=Native.Label(window);
         if (!dictation) return new FocusedDraft(new GuardedEdit(adapter, original), app, name, anchor,VerifyFocus:strictFocus?()=>{
-            if(Native.GetForegroundWindow()!=window||!node.Current.HasKeyboardFocus||Native.Label(window)!=originalTitle||!Eligible(node,window)||Buddy.Server.PromptSuggestionPolicy.PrivateMetadata(originalTitle,node.Current.Name??""))
+            if(Native.GetForegroundWindow()!=window||!node.Current.HasKeyboardFocus||Native.Label(window)!=originalTitle||!Eligible(node,window,explicitInvocation)||Buddy.Server.PromptSuggestionPolicy.PrivateMetadata(originalTitle,node.Current.Name??""))
                 throw new InvalidOperationException("The original prompt field lost focus or changed context. Dismiss this suggestion and continue in your intended field.");
         }:null);
         perception.Check(window, agent: true);
@@ -106,17 +107,23 @@ internal sealed class FocusedFieldEditor(ScreenPerception perception,Func<Automa
     internal Task Undo(FocusedDraft draft, CancellationToken ct) => Run(token => { draft.VerifyFocus?.Invoke(); draft.Edit.Undo(DateTimeOffset.UtcNow, token); return true; }, ct);
     internal Task<bool> Matches(FocusedDraft draft,string expected,CancellationToken ct)=>Run(token=>{draft.VerifyFocus?.Invoke();token.ThrowIfCancellationRequested();return draft.Edit.Matches(expected);},ct);
     internal Task<IDisposable?> Watch(FieldAnchor anchor,Action changed,CancellationToken ct)=>Run<IDisposable?>(token=>{
-        perception.Check(anchor.Window);
+        perception.Check(anchor.Window, agent:true);
         if(Native.GetForegroundWindow()!=anchor.Window)return null;
         var node=AutomationElement.FocusedElement;
-        if(!Eligible(node,anchor.Window)||Buddy.Server.PromptSuggestionPolicy.PrivateMetadata(Native.Label(anchor.Window),node.Current.Name??"")||new AutomationTextField(node,anchor.Window,perception).Identity!=anchor.Identity)return null;
+        if(!Eligible(node,anchor.Window,anchor.ExplicitInvocation)||Buddy.Server.PromptSuggestionPolicy.PrivateMetadata(Native.Label(anchor.Window),node.Current.Name??"")||new AutomationTextField(node,anchor.Window,perception).Identity!=anchor.Identity)return null;
         token.ThrowIfCancellationRequested();return new FieldEvents(node,changed);
     },ct);
     private sealed class FieldEvents:IDisposable
     {
-        private readonly AutomationElement node;private readonly AutomationEventHandler handler;
-        internal FieldEvents(AutomationElement node,Action changed){this.node=node;handler=(_,_)=>changed();Automation.AddAutomationEventHandler(TextPattern.TextChangedEvent,node,TreeScope.Element,handler);}
-        public void Dispose(){try{Automation.RemoveAutomationEventHandler(TextPattern.TextChangedEvent,node,handler);}catch{}}
+        private readonly AutomationElement node;private readonly AutomationEventHandler handler;private readonly AutomationPropertyChangedEventHandler valueHandler;private readonly bool textEvents;
+        internal FieldEvents(AutomationElement node,Action changed){
+            this.node=node;handler=(_,_)=>changed();valueHandler=(_,_)=>changed();
+            textEvents=node.TryGetCurrentPattern(TextPattern.Pattern,out _);
+            Automation.AddAutomationPropertyChangedEventHandler(node,TreeScope.Element,valueHandler,ValuePattern.ValueProperty);
+            try{if(textEvents)Automation.AddAutomationEventHandler(TextPattern.TextChangedEvent,node,TreeScope.Element,handler);}
+            catch{Automation.RemoveAutomationPropertyChangedEventHandler(node,valueHandler);throw;}
+        }
+        public void Dispose(){try{if(textEvents)Automation.RemoveAutomationEventHandler(TextPattern.TextChangedEvent,node,handler);}catch{}try{Automation.RemoveAutomationPropertyChangedEventHandler(node,valueHandler);}catch{}}
     }
 
     private async Task<T> Run<T>(Func<CancellationToken, T> action, CancellationToken ct)
@@ -147,9 +154,9 @@ internal sealed class FocusedFieldEditor(ScreenPerception perception,Func<Automa
         public string Identity => window + ":" + string.Join('.', node.GetRuntimeId());
         internal ValuePattern Validate()
         {
-            perception.Check(window);
+            perception.Check(window, agent:true);
             var current = node.Current;
-            if (current.ProcessId != processId || string.Join('.', node.GetRuntimeId()) != identity || current.IsPassword || current.IsOffscreen || !current.IsEnabled || current.ControlType != ControlType.Edit)
+            if (current.ProcessId != processId || string.Join('.', node.GetRuntimeId()) != identity || current.IsPassword || current.IsOffscreen || !current.IsEnabled || (current.ControlType != ControlType.Edit && current.ControlType != ControlType.Document) || Buddy.Server.PromptSuggestionPolicy.PrivateMetadata(Native.Label(window),current.Name??""))
                 throw new InvalidOperationException("The prompt field is no longer available or safe to edit.");
             // Runtime IDs alone are not enough: a tab or window can have been replaced.
             var root = AutomationElement.FromHandle(window); var ancestor = node; bool belongs = false;
@@ -158,7 +165,7 @@ internal sealed class FocusedFieldEditor(ScreenPerception perception,Func<Automa
                 ancestor = TreeWalker.RawViewWalker.GetParent(ancestor);
             }
             if (!belongs || !node.TryGetCurrentPattern(ValuePattern.Pattern, out var pattern) || pattern is not ValuePattern value || value.Current.IsReadOnly)
-                throw new InvalidOperationException("This field cannot be safely replaced. Use Copy instead.");
+                throw new InvalidOperationException("This editor does not expose a writable Windows accessibility value. Buddy cannot verify a replacement here; use Buddy's draft to review and copy text manually. No keys or clipboard paste will be sent.");
             return value;
         }
         public string Read() => Validate().Current.Value;

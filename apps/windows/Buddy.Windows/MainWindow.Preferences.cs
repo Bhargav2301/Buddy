@@ -11,6 +11,7 @@ public sealed partial class MainWindow
     internal static readonly string[] SettingsSections = ["General", "Shortcuts", "Voice", "Add-ons", "Connectors", "Screen & Privacy", "Internet", "AI", "Brains", "Skills", "Memory", "Channels", "Guide & Agent", "Prompts", "Devices"];
     private readonly Dictionary<string, System.Windows.Controls.Button> settingsButtons = [];
     private int settingsRevision;
+    private CancellationTokenSource? speechModelDownload;
     internal void OpenSettingsSection(string section)
     {
         settingsSection = SettingsSections.Contains(section) ? section : "General"; Summon(); NavigateHome("Settings");
@@ -86,6 +87,17 @@ public sealed partial class MainWindow
         } else if (section == "Voice") {
             var read = Toggle("Read voice answers aloud", desktop.ReadVoiceAnswers);
             ComboBox Select(string label, object[] items, object? selected) { p.Children.Add(Text(label, 14)); var box = new ComboBox { ItemsSource = items, SelectedItem = selected }; AutomationProperties.SetName(box, label); p.Children.Add(box); return box; }
+            var recognitionEngines = new[]{new AudioChoice("whisper","Whisper - local neural recognition"),new AudioChoice("windows","Windows speech - legacy")};
+            var recognitionEngine = Select("Speech recognition engine", recognitionEngines, recognitionEngines.FirstOrDefault(e=>e.Id==desktop.RecognitionEngine)??recognitionEngines[0]);
+            var whisperModel = Select("Whisper model",WhisperModels.Choices,WhisperModels.Choices.FirstOrDefault(m=>m.Id==desktop.WhisperModel)??WhisperModels.Choices[0]);
+            p.Children.Add(Text("Whisper processes up to 30 seconds on this PC and shows its words for review before a voice request. Audio stays in memory. English models need about 148-191 MB of local storage; use the multilingual model for other languages. Token probabilities cannot guarantee accuracy.",14,Muted));
+            var download = Btn("Download selected Whisper model",async()=>{
+                speechModelDownload?.Cancel();using var downloadRequest=new CancellationTokenSource();speechModelDownload=downloadRequest;
+                try{notice.Text="Downloading the pinned model from Hugging Face (no audio is sent).";await WhisperModels.Download((WhisperModel)whisperModel.SelectedItem,downloadRequest.Token);notice.Text="Local Whisper model verified and ready.";}
+                catch(OperationCanceledException){notice.Text="Model download stopped.";}catch(Exception ex){notice.Text=ex.Message;}
+                finally{if(ReferenceEquals(speechModelDownload,downloadRequest))speechModelDownload=null;}
+            });p.Children.Add(download);p.Children.Add(Btn("Stop model download",()=>speechModelDownload?.Cancel()));
+            p.Children.Add(Text("Model storage: "+WhisperModels.DirectoryPath,12,Muted));
             var microphones = new[] { new AudioChoice("", "Windows default microphone") }.Concat(MicrophoneStream.Devices()).ToArray();
             if (desktop.MicrophoneId.Length > 0 && !microphones.Any(m => m.Id == desktop.MicrophoneId)) microphones = microphones.Append(new AudioChoice(desktop.MicrophoneId, "Unavailable: " + desktop.MicrophoneId)).ToArray();
             var mic = Select("Microphone", microphones, microphones.First(m => m.Id == desktop.MicrophoneId));
@@ -110,7 +122,7 @@ public sealed partial class MainWindow
             var output = Select("Headphone output", outputs, outputs.First(o => o.Id == desktop.HeadphoneDeviceId));
             p.Children.Add(Text("Audio stays on this PC. Headphones-only speech stops on disconnect or default-output change and never switches to speakers. Windows must identify the endpoint as headphones or a headset; unverified devices stay muted.", 14, Muted));
             p.Children.Add(Text(NeuralSpeechSynthesizer.Available ? "Piper runs locally on this PC. Preview each voice to choose your preferred sound; the first phrase may take longer while the model loads. Stop releases the voice worker. Voice quality and pronunciation vary." : "Windows voices run locally. The optional Piper voice files are unavailable in this build; selecting Piper keeps speech muted until the approved files are restored.", 14, Muted));
-            DesktopPreferences VoiceSelection() => desktop with { ReadVoiceAnswers = read.IsChecked == true, MicrophoneId = ((AudioChoice)mic.SelectedItem).Id, RecognitionLanguage = language.SelectedItem?.ToString() ?? "", VoiceEngine = ((AudioChoice)engine.SelectedItem).Id, NeuralSpeakerId = ((NeuralVoiceChoice)neuralVoice.SelectedItem).Id, NeuralPreset = ((NeuralVoiceChoice)neuralVoice.SelectedItem).Preset, VoiceName = selectedVoice.SelectedIndex <= 0 ? "" : selectedVoice.SelectedItem.ToString()!, VoiceRate = ((NeuralVoiceChoice)rate.SelectedItem).Id, HeadphonesOnly = headphonesOnly.IsChecked == true, HeadphoneDeviceId = ((AudioChoice)output.SelectedItem).Id };
+            DesktopPreferences VoiceSelection() => desktop with { RecognitionEngine = ((AudioChoice)recognitionEngine.SelectedItem).Id, WhisperModel = ((WhisperModel)whisperModel.SelectedItem).Id, ReadVoiceAnswers = read.IsChecked == true, MicrophoneId = ((AudioChoice)mic.SelectedItem).Id, RecognitionLanguage = language.SelectedItem?.ToString() ?? "", VoiceEngine = ((AudioChoice)engine.SelectedItem).Id, NeuralSpeakerId = ((NeuralVoiceChoice)neuralVoice.SelectedItem).Id, NeuralPreset = ((NeuralVoiceChoice)neuralVoice.SelectedItem).Preset, VoiceName = selectedVoice.SelectedIndex <= 0 ? "" : selectedVoice.SelectedItem.ToString()!, VoiceRate = ((NeuralVoiceChoice)rate.SelectedItem).Id, HeadphonesOnly = headphonesOnly.IsChecked == true, HeadphoneDeviceId = ((AudioChoice)output.SelectedItem).Id };
             Save(VoiceSelection);
             voiceActions.Children.Add(Btn("Preview voice", async () => { try { tts ??= new LocalVoiceOutput(); await tts.SpeakAsync("I'm here. Tell me what you need, and we'll take it one step at a time.", VoiceSelection()); } catch (OperationCanceledException) { notice.Text = "Preview stopped."; } catch (Exception ex) { notice.Text = ex.Message; } }));
             voiceActions.Children.Add(Btn("Stop preview", () => tts?.Cancel())); p.Children.Add(Btn("Try voice", () => OpenQuick(true)));

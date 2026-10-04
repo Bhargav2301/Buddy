@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Automation;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Interop;
 
@@ -21,10 +22,14 @@ internal static class SourceFieldChecks
     static Task Call(object o,string name,params object[] args)=>(Task)o.GetType().GetMethod(name,BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public)!.Invoke(o,args)!;
     internal static int Target(string ready)
     {
-        var app=new Application();var window=new Window{Title="Buddy owned external prompt fixture",Width=680,Height=540};
-        var first=new TextBox{Text=Original,Height=270,AcceptsReturn=true};AutomationProperties.SetName(first,"Message fixture");
+        var app=new Application();var window=new Window{Title="Buddy owned external prompt fixture",Width=680,Height=740};
+        var first=new TextBox{Text=Original,Height=200,AcceptsReturn=true};AutomationProperties.SetName(first,"Message fixture");
         var second=new TextBox{Text="Other field must stay unchanged",Height=50};AutomationProperties.SetName(second,"Other fixture");
-        var stack=new StackPanel{Margin=new(30)};stack.Children.Add(first);stack.Children.Add(second);window.Content=stack;
+        var stack=new StackPanel{Margin=new(30)};stack.Children.Add(first);stack.Children.Add(second);
+        var document=new DocumentField{Text="Contenteditable fixture draft",Height=60};AutomationProperties.SetName(document,"Grok-like writable document");stack.Children.Add(document);
+        var rich=new RichTextBox{Height=60};rich.Document.Blocks.Add(new System.Windows.Documents.Paragraph(new System.Windows.Documents.Run("Text pattern without writable value")));AutomationProperties.SetName(rich,"Text-only contenteditable");stack.Children.Add(rich);
+        var readOnly=new TextBox{Text="Read-only draft",IsReadOnly=true,Height=40};AutomationProperties.SetName(readOnly,"Read-only fixture");stack.Children.Add(readOnly);
+        var secret=new PasswordBox{Height=40,Password="fixture-only-secret"};AutomationProperties.SetName(secret,"Password fixture");stack.Children.Add(secret);window.Content=stack;
         window.Loaded+=(_,_)=>{first.Focus();File.WriteAllText(ready,new WindowInteropHelper(window).Handle.ToInt64().ToString());};app.Run(window);return 0;
     }
     internal static int Run()
@@ -42,7 +47,7 @@ internal static class SourceFieldChecks
                 var hwnd=new IntPtr(long.Parse(File.ReadAllText(ready)));Native.GetWindowThreadProcessId(hwnd,out var owner);
                 Check(owner==child.Id&&!Native.IsOwnWindow(hwnd),"Source is a separate owned fixture process, never Buddy Home or a third-party app");
                 var perception=new ScreenPerception(()=>new());
-                var editor=new FocusedFieldEditor(perception,(node,window)=>window==hwnd&&node.Current.ProcessId==child.Id&&node.Current.ControlType==ControlType.Edit&&node.Current.HasKeyboardFocus&&!node.Current.IsPassword);
+                var editor=new FocusedFieldEditor(perception);
                 var assistant=new DesktopAssistant(()=>host.Service,()=>new(),()=>hwnd,_=>{});Set(home,"assistant",assistant);Set(home,"fieldEditor",editor);
                 var watcher=new LocalPromptWatcher(editor,()=>host.Service,()=>{},()=>"fixture shortcut");Set(home,"promptWatcher",watcher);
                 var companion=new CursorCompanionWindow(()=>false);Set(home,"companion",companion);companion.SetEnabled(true);
@@ -51,6 +56,19 @@ internal static class SourceFieldChecks
                 async Task Focus(){InputNative.SetForegroundWindow(hwnd);await Task.Run(()=>node.SetFocus());await Task.Delay(120);if(Native.GetForegroundWindow()!=hwnd)throw new Exception("Owned target foreground not granted");}
                 string Read()=>((ValuePattern)node.GetCurrentPattern(ValuePattern.Pattern)).Current.Value;
                 async Task Wait(Func<bool> predicate){for(int i=0;i<160&&!predicate();i++)await Task.Delay(50);if(!predicate())throw new TimeoutException("Expected review state did not arrive: "+((TextBlock)Get(home,"status")!).Text);}
+                await Focus();
+                Check(await editor.Probe(hwnd,default) is null,"Passive eligibility still excludes an unknown application");
+                Check(await editor.Probe(hwnd,default,explicitInvocation:true) is not null,"Production explicit eligibility accepts a verified writable field without an app/title/name allowlist");
+                foreach(var label in new[]{"Grok-like writable document","Text-only contenteditable","Read-only fixture","Password fixture"}){
+                    var candidate=await Task.Run(()=>AutomationElement.FromHandle(hwnd).FindFirst(TreeScope.Descendants,new PropertyCondition(AutomationElement.NameProperty,label)));
+                    await Task.Run(()=>candidate.SetFocus());await Task.Delay(100);
+                    if(label.StartsWith("Grok-like")){
+                        var draft=await editor.Capture(hwnd,default,strictFocus:true,explicitInvocation:true);
+                        Check(candidate.Current.ControlType==ControlType.Document,"Owned contenteditable capability fixture exposes Document role plus writable ValuePattern");
+                        await editor.Apply(draft,"Reviewed document replacement",default);Check(((ValuePattern)candidate.GetCurrentPattern(ValuePattern.Pattern)).Current.Value=="Reviewed document replacement","Document-role replacement is verified in the exact source field");
+                        await editor.Undo(draft,default);Check(((ValuePattern)candidate.GetCurrentPattern(ValuePattern.Pattern)).Current.Value=="Contenteditable fixture draft","Document-role Undo restores the exact original");
+                    }else{bool refused=false;try{refused=await editor.Probe(hwnd,default,explicitInvocation:true) is null;}catch(InvalidOperationException){refused=true;}Check(refused,"Unsupported/private field refused without keyboard or clipboard fallback: "+label);}
+                }
                 await Focus();await Call(home,"RememberSourceField");var pinned=(SummonedField)Get(home,"summonedField")!;
                 Check(pinned.Anchor.Window==hwnd&&pinned.Anchor.Identity.Length>0,"Summon captures the exact external HWND and field identity before Buddy takes focus");
                 Check(typeof(SummonedField).GetProperties().All(p=>p.Name is "Anchor" or "Title" or "CapturedAt"),"The summon lease contains metadata only; no cached prompt text");
@@ -91,6 +109,8 @@ internal static class SourceFieldChecks
             }
         };app.Run(home);return exit;
     }
+    sealed class DocumentField:TextBox { protected override AutomationPeer OnCreateAutomationPeer()=>new DocumentPeer(this); }
+    sealed class DocumentPeer(DocumentField owner):TextBoxAutomationPeer(owner) { protected override AutomationControlType GetAutomationControlTypeCore()=>AutomationControlType.Document; }
     static int FreePort(){var listener=new TcpListener(IPAddress.Loopback,0);listener.Start();int port=((IPEndPoint)listener.LocalEndpoint).Port;listener.Stop();return port;}
     sealed class Model:IDisposable
     {

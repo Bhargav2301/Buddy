@@ -24,6 +24,8 @@ internal sealed record DesktopPreferences
     public bool StartInCompanionMode { get; init; } = true;
     public string Shortcut { get; init; } = "Ctrl + Alt + Space";
     public string VoiceShortcut { get; init; } = "Ctrl + Shift + Space";
+    public string RecognitionEngine { get; init; } = "whisper";
+    public string WhisperModel { get; init; } = "base.en";
     public string RecognitionLanguage { get; init; } = "";
     public string MicrophoneId { get; init; } = "";
     public string VoiceName { get; init; } = "";

@@ -15,7 +15,7 @@ internal sealed class OnboardingWindow : Window
     private readonly Func<Task<string>> modelStatus;
     private readonly TextBox name = new() { MaxLength = 40, Margin = new(0, 12, 0, 20) };
     private readonly TextBlock notice = Label("", 12);
-    private SpeechRecognitionEngine? recognizer;
+    private LocalRecognizer? recognizer;
     private bool closed;
     private int namingGeneration;
     private bool namingActive;
@@ -51,7 +51,7 @@ internal sealed class OnboardingWindow : Window
     {
         StopNaming(); int generation = namingGeneration; namingActive = true; if (nameVoice is not null) nameVoice.Content = "Stop"; notice.Text = "Preparing microphone…";
         var cts = new CancellationTokenSource(); namingRequest = cts;
-        SpeechRecognitionEngine? prepared = null;
+        LocalRecognizer? prepared = null;
         try {
             prepared = await LocalSpeechInput.Create(cts.Token);
             if (closed || generation != namingGeneration) { LocalSpeechInput.Stop(prepared); return; }

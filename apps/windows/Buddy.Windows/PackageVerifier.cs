@@ -12,6 +12,16 @@ internal static class PackageVerifier
             "PresentationNative_cor3.dll", "wpfgfx_cor3.dll", "D3DCompiler_47_cor3.dll", "vcruntime140_cor3.dll", "clrjit.dll",
             "Tesseract.dll", "x64/tesseract50.dll", "x64/leptonica-1.82.0.dll", "tessdata/eng.traineddata", "Assets/Branding/Buddy.png", "Assets/Branding/Buddy.ico"];
         foreach (var name in required) RequireFile(folder, name);
+        foreach(var name in new[]{"whisper.dll","ggml-whisper.dll","ggml-base-whisper.dll","ggml-cpu-whisper.dll"}){
+            var relative="runtimes/win-x64/"+name;RequireFile(folder,relative);
+            using var native=File.OpenRead(Path.Combine(folder,relative));using var header=new PEReader(native);
+            if(header.PEHeaders.CoffHeader.Machine!=Machine.Amd64)throw new InvalidDataException("Invalid Whisper x64 runtime: "+name);
+        }
+        foreach(var name in new[]{"whisper.dll","ggml-whisper.dll","ggml-base-whisper.dll","ggml-cpu-whisper.dll"}){
+            var relative="runtimes/win-x64/"+name;RequireFile(folder,relative);
+            using var native=File.OpenRead(Path.Combine(folder,relative));using var header=new PEReader(native);
+            if(header.PEHeaders.CoffHeader.Machine!=Machine.Amd64)throw new InvalidDataException("Invalid Whisper x64 runtime: "+name);
+        }
         foreach (var asset in new[] { "1cced", "2f2b4", "5d71e", "785ba", "91dcc", "9a20f", "a9b00", "ab83a", "fc18a" })
         {
             var name = "Assets/Figma/" + asset + ".svg"; RequireFile(folder, name);

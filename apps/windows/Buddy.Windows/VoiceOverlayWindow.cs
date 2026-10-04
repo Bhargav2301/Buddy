@@ -36,7 +36,7 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
     private readonly DispatcherTimer monitor = new() { Interval = TimeSpan.FromMilliseconds(25) };
     private readonly DispatcherTimer collapse = new() { Interval = TimeSpan.FromSeconds(6) };
     private readonly DispatcherTimer regionalSpeechLimit = new() { Interval = TimeSpan.FromSeconds(30) };
-    private SpeechRecognitionEngine? recognizer;
+    private LocalRecognizer? recognizer;
     private LocalVoiceOutput? speaker;
     private readonly System.Windows.Controls.TextBox review = new() { Visibility = Visibility.Collapsed, TextWrapping = TextWrapping.Wrap, MinHeight = 48 };
     private readonly Button confirmTranscript = new() { Content = "Use these words", Visibility = Visibility.Collapsed };
@@ -118,20 +118,21 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
     private void RegionSpeechTimeout(object? sender,EventArgs e){regionalSpeechLimit.Stop();Finish();}
     private async Task StartRecognizer(int token)
     {
-        SpeechRecognitionEngine? created = null;
+        LocalRecognizer? created = null;
         try {
             if (closed || generation != token || !listening || request is null) return;
             created = await LocalSpeechInput.Create(request.Token, preferences());
             if (closed || generation != token || !listening) { LocalSpeechInput.Stop(created); return; }
             recognizer = created; created = null; var engine = recognizer;
+            engine.Processing += (_, _) => Dispatcher.BeginInvoke(new Action(() => { if (generation == token) Status("Microphone off - transcribing locally with Whisper", CompanionMood.Thinking); }));
             engine.InitialSilenceTimeout = TimeSpan.FromSeconds(8); engine.EndSilenceTimeout = TimeSpan.FromMilliseconds(650);
             engine.AudioLevelUpdated += (_, e) => Dispatcher.BeginInvoke(new Action(() => { if (generation == token) level.Value = e.AudioLevel; }));
             engine.SpeechHypothesized += (_, e) => Dispatcher.BeginInvoke(new Action(() => { if (generation == token) transcript.Text = utterance + e.Result.Text; }));
-            engine.SpeechRecognized += (_, e) => Dispatcher.BeginInvoke(new Action(() => { if (generation == token && listening) { uncertain |= SpeechReview.Required(e.Result.Confidence, e.Result.Alternates.Select(a => (a.Text, a.Confidence))); utterance.Append(e.Result.Text).Append(' '); transcript.Text = utterance.ToString(); } }));
+            engine.SpeechRecognized += (_, e) => Dispatcher.BeginInvoke(new Action(() => { if (generation == token && listening) { uncertain |= e.Result.RequiresReview || SpeechReview.Required(e.Result.Confidence, e.Result.Alternates.Select(a => (a.Text, a.Confidence))); utterance.Append(e.Result.Text).Append(' '); transcript.Text = utterance.ToString(); } }));
             engine.SpeechRecognitionRejected += (_, _) => Dispatcher.BeginInvoke(new Action(() => { if (generation == token) uncertain = true; }));
             engine.RecognizeCompleted += (_, e) => Dispatcher.BeginInvoke(new Action(() => {
                 if (generation != token || !listening) return;
-                var text = utterance.ToString().Trim(); if (text.Length == 0) { text = e.Result?.Text ?? ""; uncertain = e.Result is null || SpeechReview.Required(e.Result.Confidence, e.Result.Alternates.Select(a => (a.Text, a.Confidence))); }
+                var text = utterance.ToString().Trim(); if (text.Length == 0) { text = e.Result?.Text ?? ""; uncertain = e.Result is null || e.Result.RequiresReview || SpeechReview.Required(e.Result.Confidence, e.Result.Alternates.Select(a => (a.Text, a.Confidence))); }
                 StopMic();
                 if (e.Cancelled) { Cancel(); return; }
                 if (e.Error is not null || text.Length == 0) { Cancel(); Status(e.Error?.Message ?? "No speech heard · try Talk or Type", CompanionMood.Unsure); return; }

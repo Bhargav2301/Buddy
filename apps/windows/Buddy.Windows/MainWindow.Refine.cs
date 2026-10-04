@@ -22,7 +22,7 @@ public sealed partial class MainWindow
         if(previousWindow!=active)ClearContext();previousWindow=active;summonedField=null;
         summonCapture?.Cancel();using var cts=new CancellationTokenSource(TimeSpan.FromSeconds(3));summonCapture=cts;
         try {
-            if(fieldEditor is not null&&await fieldEditor.Probe(active,cts.Token) is {} anchor){
+            if(fieldEditor is not null&&await fieldEditor.Probe(active,cts.Token,explicitInvocation:true) is {} anchor){
                 cts.Token.ThrowIfCancellationRequested();summonedField=new(anchor,Native.Label(active),Environment.TickCount64);
             }
             return !cts.IsCancellationRequested;
@@ -60,7 +60,7 @@ public sealed partial class MainWindow
                 await Task.Delay(100, cts.Token);
             }
             fieldEditor ??= new FocusedFieldEditor(assistant.Perception);
-            var draft = await fieldEditor.Capture(window, cts.Token, dictation, expectedIdentity,strictFocus:!dictation); cts.Token.ThrowIfCancellationRequested();
+            var draft = await fieldEditor.Capture(window, cts.Token, dictation, expectedIdentity,strictFocus:!dictation,explicitInvocation:true); cts.Token.ThrowIfCancellationRequested();
             pinned?.Validate(window,Native.Label(window),Environment.TickCount64);
             if (dictation) {
                 quick?.Cancel(); voiceOverlay?.Cancel(); StopMainDictation(); tts?.Cancel(); dictationWindow?.Close();

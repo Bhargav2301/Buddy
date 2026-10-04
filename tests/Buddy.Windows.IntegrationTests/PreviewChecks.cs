@@ -62,12 +62,12 @@ internal static class PreviewChecks
                     Check(muted, "Headphones-only output with no selected endpoint stays silent instead of using speakers");
                 }
                 using (var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(10))) {
-                    var language = LocalSpeechInput.Languages().First();
+                    var language = WindowsSpeechInput.Languages().First();
                     var selectedMicrophone = MicrophoneStream.Devices().First();
-                    var recognition = await LocalSpeechInput.Create(deadline.Token, new() { RecognitionLanguage = language, MicrophoneId = selectedMicrophone.Id });
-                    Check(recognition.RecognizerInfo.Culture.Name == language, "Selected local recognizer and microphone stream initialize successfully");
+                    var recognition = await WindowsSpeechInput.Create(deadline.Token, new() { RecognitionLanguage = language, MicrophoneId = selectedMicrophone.Id });
+                    Check(recognition.RecognizerInfo.Culture.Name == language, "Explicit legacy Windows recognizer and microphone stream initialize successfully");
                     recognition.RecognizeAsync(RecognizeMode.Multiple);
-                    await Task.Delay(250); LocalSpeechInput.Stop(recognition);
+                    await Task.Delay(250); WindowsSpeechInput.Stop(recognition);
                     Check(true, "Microphone stream starts and Stop releases it without submitting a transcript");
                 }
                 using var voice = new VoiceOverlayWindow(() => null, () => Task.FromResult<string?>(null), () => new(), _ => { }, () => handle, new ScreenPerception(() => new()), (_, _) => { }, () => { });

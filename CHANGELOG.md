@@ -4,6 +4,13 @@ Versions follow `major.minor.patch`; Git tags use `v` plus the version.
 The root [VERSION](VERSION) file controls both applications. See
 [Versioning](docs/Versioning.md) for the release process.
 
+## [0.4.0] - 2026-10-04
+
+- Use local Whisper recognition with selectable, pinned/checksummed models, microphone/language settings, bounded in-memory capture and editable transcript review. Preserve Piper C/F3 speech output.
+- Isolate native inference in an owned local worker so Stop cancels promptly without late transcription; no cloud audio, shell or saved recording.
+- Broaden explicit refinement to verified writable Edit/Document fields across apps while keeping passive suggestions restricted. Preserve exact source identity, review, replacement readback, Undo and private/unsupported-field refusal.
+- Add native contenteditable-capability fixtures and synthetic recognition/noise/cancellation benchmarks. Actual browser and physical microphone acceptance remain distinct; see docs/Windows-0.4.0.md and docs/Whisper-local.md.
+
 ## [0.3.9] - 2026-10-04
 
 - Keep source-field refinement bound to the external HWND and UIA field selected before summoning Buddy. Review a field-anchored diff, then explicitly Accept or Undo without submitting; changed text, focus, title or an expired lease refuses the edit. Buddy-draft refinement is labelled separately.

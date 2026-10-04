@@ -34,7 +34,7 @@ internal sealed class LocalPromptWatcher:IDisposable
             if((InputNative.GetAsyncKeyState(27)&0x8000)!=0||foreground!=selected?.Window&&!Native.IsOwnWindow(foreground)){Suspend();return;}
             if(Native.IsOwnWindow(foreground)||card.IsMutating||selected is null)return;
             var reviewToken=review?.Token??enabled?.Token??default;
-            busy=true;try{var candidate=await editor.Probe(selected.Window,reviewToken);if(!ReferenceEquals(card,bubble))return;
+            busy=true;try{var candidate=await editor.Probe(selected.Window,reviewToken,selected.ExplicitInvocation);if(!ReferenceEquals(card,bubble))return;
                 if(candidate?.Identity!=selected.Identity){Suspend();return;}card.Reanchor(candidate.Bounds);
                 if(changedAt!=0){long stamp=changedAt;if(!await card.IsCurrent(reviewToken)){Suspend();return;}if(changedAt==stamp)changedAt=0;}
             }catch{Suspend();}finally{busy=false;}return;

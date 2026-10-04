@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework></PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../apps/windows/Buddy.Windows/SpeechSignal.cs" Link="SpeechSignal.cs" />
     <Compile Include="../../services/Buddy.Server/WorkflowIntent.cs" Link="WorkflowIntent.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/PreviewEnvironment.cs" Link="PreviewEnvironment.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/OverlayPlacement.cs" Link="OverlayPlacement.cs" />

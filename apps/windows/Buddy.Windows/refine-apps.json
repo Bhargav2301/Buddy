@@ -1,4 +1,4 @@
 [
-  { "processes": ["chrome", "msedge", "firefox", "comet"], "titles": ["ChatGPT", "Claude", "Gemini", "Open WebUI"], "fields": ["message", "prompt", "ask", "chat"] },
-  { "processes": ["ChatGPT", "Claude"], "titles": ["ChatGPT", "Claude"], "fields": ["message", "prompt", "ask", "chat"] }
+  { "processes": ["chrome", "msedge", "firefox", "comet"], "titles": ["ChatGPT", "Claude", "Gemini", "Open WebUI", "Grok", "Perplexity", "DeepSeek"], "fields": ["message", "prompt", "ask", "chat"] },
+  { "processes": ["ChatGPT", "Claude", "Codex"], "titles": ["ChatGPT", "Claude", "Codex"], "fields": ["message", "prompt", "ask", "chat"] }
 ]

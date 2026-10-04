@@ -34,3 +34,7 @@ dist/
 *.safetensors
 *.dmp
 .buddy-rollback.json
+
+**/SpeechModels/
+ggml-*.bin
+*.download

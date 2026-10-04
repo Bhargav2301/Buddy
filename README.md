@@ -92,3 +92,5 @@ Images and raw screen context are request-scoped and excluded from persisted con
 - [Android SpeechRecognizer](https://developer.android.com/reference/android/speech/SpeechRecognizer)
 
 Third-party dependencies remain under their respective licenses. The Windows runtime's license and notices are included with its distribution. Ollama and model weights are downloaded separately from their official sources.
+
+Current local Windows update: [0.4.0 behavior](docs/Windows-0.4.0.md), [local Whisper](docs/Whisper-local.md), and [pinned Clicky comparison](docs/Clicky-comparison-0.4.md).
