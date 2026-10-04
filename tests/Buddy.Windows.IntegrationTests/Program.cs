@@ -14,6 +14,7 @@ internal static class Program
     [STAThread] private static int Main(string[] args)
     {
         PreviewEnvironment.Configure(["--preview"]);
+        if(args.Contains("--feedback41"))return RecognitionFeedbackChecks.Run();
         if(args.Contains("--recognition40")){int n=0;RecognitionLifecycleChecks.Run((ok,note)=>{if(!ok)throw new Exception("FAIL: "+note);n++;Console.WriteLine("PASS: "+note);}).GetAwaiter().GetResult();Console.WriteLine($"ALL {n} RECOGNITION LIFECYCLE CHECKS PASSED");return 0;}
         if(args.Length==3&&args[0]=="--whisper40")return WhisperChecks.Run(args[1],args[2]).GetAwaiter().GetResult();
         if(args.Length==2&&args[0]=="--source39-target")return SourceFieldChecks.Target(args[1]);

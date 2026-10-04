@@ -6,6 +6,22 @@ namespace Buddy.Windows;
 
 internal sealed record WhisperTranscript(string Text,float Probability,float NoSpeechProbability,int Segments);
 
+internal sealed class WhisperSegments
+{
+    private readonly List<string> words=[];
+    private float probability=1,noSpeech;
+    private int segments;
+    internal void Add(string text,float confidence,float silence)
+    {
+        segments++;
+        // A trailing silent segment must not invalidate words from an earlier speech segment.
+        // Keep the same per-segment silence/confidence gates and mandatory transcript review.
+        if(string.IsNullOrWhiteSpace(text)||!float.IsFinite(confidence)||!float.IsFinite(silence)||silence>=.6f||confidence<.15f)return;
+        words.Add(text.Trim());probability=Math.Min(probability,confidence);noSpeech=Math.Max(noSpeech,silence);
+    }
+    internal WhisperTranscript Result()=>new(string.Join(" ",words),words.Count==0?0:probability,words.Count==0?1:noSpeech,segments);
+}
+
 // A single bounded local inference owner. No microphone audio is saved or sent over HTTP.
 internal static class WhisperNativeInference
 {
@@ -24,12 +40,11 @@ internal static class WhisperNativeInference
             ct.ThrowIfCancellationRequested();
             await using var processor=factory.CreateBuilder().WithLanguage(language).WithThreads(Math.Clamp(Environment.ProcessorCount/2,2,8))
                 .WithNoContext().WithPrompt("Names may include Buddy, Comet Browser, Grok, ChatGPT, Codex, Perplexity, DeepSeek, Notepad, Calculator.").WithTemperature(0).WithTemperatureInc(0).WithProbabilities().Build();
-            var words=new List<string>();float probability=1,noSpeech=0;int segments=0;
+            var segments=new WhisperSegments();
             await foreach(var segment in processor.ProcessAsync(samples,ct)){
-                ct.ThrowIfCancellationRequested();segments++;probability=Math.Min(probability,segment.Probability);noSpeech=Math.Max(noSpeech,segment.NoSpeechProbability);
-                if(segment.NoSpeechProbability<.6f&&!string.IsNullOrWhiteSpace(segment.Text))words.Add(segment.Text.Trim());
+                ct.ThrowIfCancellationRequested();segments.Add(segment.Text,segment.Probability,segment.NoSpeechProbability);
             }
-            return new(string.Join(" ",words),probability,noSpeech,segments);
+            return segments.Result();
         }finally{gate.Release();}
     }
 }

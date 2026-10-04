@@ -349,9 +349,9 @@ public sealed partial class MainWindow : Window
             engine.RecognizeCompleted += (_, e) => Dispatcher.BeginInvoke(new Action(() => {
                 if (!ReferenceEquals(recognizer, engine)) return;
                 StopMainDictation();
-                if (e.Error is not null || e.Result is null || e.Cancelled) { status.Text = e.Error?.Message ?? "No speech recognized."; return; }
+                if (e.Result is null || e.Cancelled) { status.Text = e.Error?.Message ?? "No speech recognized."; return; }
                 lastDictation = e.Result.Text; copyDictation.Visibility = Visibility.Visible;
-                if (SpeechReview.Required(e.Result.Confidence, e.Result.Alternates.Select(a => (a.Text, a.Confidence)))) { status.Text = "Uncertain transcript: " + lastDictation + ". Use Copy dictation and review before sending."; return; }
+                if (e.Error is not null || e.Result.RequiresReview || SpeechReview.Required(e.Result.Confidence, e.Result.Alternates.Select(a => (a.Text, a.Confidence)))) { status.Text = "Uncertain transcript: " + lastDictation + ". Use Copy dictation and review before sending."; return; }
                 try {
                     if (input.SelectionStart != insertion.Start || input.SelectionLength != insertion.Length) throw new InvalidOperationException("The caret changed. Use Copy dictation.");
                     edit.Apply(insertion.Replace(original, lastDictation), DateTimeOffset.UtcNow, default);

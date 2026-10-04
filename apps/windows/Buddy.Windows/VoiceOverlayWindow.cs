@@ -25,6 +25,7 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
     private readonly ScreenPerception perception;
     private readonly Action<string, string> workflow;
     private readonly Action? starting;
+    private readonly Func<CancellationToken,DesktopPreferences,Task<LocalRecognizer>> createRecognizer;
     private readonly VoiceTeaching teaching;
     private RegionLease? pendingRegion;
     private readonly Button nextTeaching = new() { Content = "Next step", Visibility = Visibility.Collapsed, Margin = new(0,0,5,4), Padding = new(7,4,7,4) };
@@ -54,10 +55,11 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
     internal bool IsListening => listening;
     internal bool IsBusy => request is not null;
     internal VoiceOverlayWindow(Func<BuddyService?> service, Func<Task<string?>> conversation, Func<DesktopPreferences> preferences,
-        Action<CompanionMood> mood, Func<IntPtr> target, ScreenPerception perception, Action<string,string> workflow, Action openChat, Action<string>? refine = null, Action? openHome = null, Action? starting = null, Action<ScreenElement?>? pointing = null)
+        Action<CompanionMood> mood, Func<IntPtr> target, ScreenPerception perception, Action<string,string> workflow, Action openChat, Action<string>? refine = null, Action? openHome = null, Action? starting = null, Action<ScreenElement?>? pointing = null, Func<CancellationToken,DesktopPreferences,Task<LocalRecognizer>>? createRecognizer = null)
     {
         this.service = service; this.conversation = conversation; this.preferences = preferences; this.mood = mood; this.target = target; this.perception = perception; this.workflow = workflow;
         this.starting = starting; BuddyTheme.Ensure();
+        this.createRecognizer=createRecognizer??((ct,p)=>LocalSpeechInput.Create(ct,p));
         teaching = new(perception, service, pointing, () => preferences().CaptureOnVoice, () => preferences().RegionSelectionEnabled);
         teaching.Invalidated += () => { speaker?.Cancel(); if (!teaching.CanContinue) { request?.Cancel(); nextTeaching.Visibility = Visibility.Collapsed; } Status(teaching.CanContinue ? "Screen changed - choose Next step for a fresh observation" : "Selected area changed - circle it again", CompanionMood.Idle); };
         Title = "Buddy · voice overlay"; Width = 360; SizeToContent = SizeToContent.Height; MaxHeight = 400;
@@ -121,7 +123,7 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
         LocalRecognizer? created = null;
         try {
             if (closed || generation != token || !listening || request is null) return;
-            created = await LocalSpeechInput.Create(request.Token, preferences());
+            created = await createRecognizer(request.Token, preferences());
             if (closed || generation != token || !listening) { LocalSpeechInput.Stop(created); return; }
             recognizer = created; created = null; var engine = recognizer;
             engine.Processing += (_, _) => Dispatcher.BeginInvoke(new Action(() => { if (generation == token) Status("Microphone off - transcribing locally with Whisper", CompanionMood.Thinking); }));
@@ -132,10 +134,12 @@ internal sealed class VoiceOverlayWindow : Window, IDisposable
             engine.SpeechRecognitionRejected += (_, _) => Dispatcher.BeginInvoke(new Action(() => { if (generation == token) uncertain = true; }));
             engine.RecognizeCompleted += (_, e) => Dispatcher.BeginInvoke(new Action(() => {
                 if (generation != token || !listening) return;
-                var text = utterance.ToString().Trim(); if (text.Length == 0) { text = e.Result?.Text ?? ""; uncertain = e.Result is null || e.Result.RequiresReview || SpeechReview.Required(e.Result.Confidence, e.Result.Alternates.Select(a => (a.Text, a.Confidence))); }
+                var text = e.Result?.Text ?? utterance.ToString().Trim();
+                uncertain |= e.Error is not null || e.Result is null || e.Result.RequiresReview || SpeechReview.Required(e.Result.Confidence, e.Result.Alternates.Select(a => (a.Text, a.Confidence)));
                 StopMic();
                 if (e.Cancelled) { Cancel(); return; }
-                if (e.Error is not null || text.Length == 0) { Cancel(); Status(e.Error?.Message ?? "No speech heard · try Talk or Type", CompanionMood.Unsure); return; }
+                if (text.Length == 0) { Cancel(); Status(e.Error?.Message ?? "No speech heard · try Talk or Type", CompanionMood.Unsure); return; }
+                transcript.Text = text;
                 if (uncertain || AssistantIntent.Mode(text) == "agent") { review.Text = text; review.Visibility = confirmTranscript.Visibility = Visibility.Visible; Status("Not sure I heard correctly — review, retry Talk, or Type", CompanionMood.Unsure); return; }
                 _ = Send(text);
             }));

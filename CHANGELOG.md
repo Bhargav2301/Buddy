@@ -4,6 +4,11 @@ Versions follow `major.minor.patch`; Git tags use `v` plus the version.
 The root [VERSION](VERSION) file controls both applications. See
 [Versioning](docs/Versioning.md) for the release process.
 
+## [0.4.1] - 2026-10-04
+
+- Preserve accepted or tentative words for explicit review when a local recognizer finishes with an empty result. Reject stale, duplicate and cancelled completions without submitting commands.
+- Keep valid Whisper speech segments when later segments contain silence; retain signal, confidence and no-speech gates. Add focused native overlay regressions for the reported contradictory status and restart/cancel paths.
+
 ## [0.4.0] - 2026-10-04
 
 - Use local Whisper recognition with selectable, pinned/checksummed models, microphone/language settings, bounded in-memory capture and editable transcript review. Preserve Piper C/F3 speech output.

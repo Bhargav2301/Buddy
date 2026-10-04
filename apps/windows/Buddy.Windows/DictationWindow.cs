@@ -78,8 +78,8 @@ internal sealed class DictationWindow : Window
             engine.SpeechRecognized += (_, e) => Dispatcher.BeginInvoke(new Action(() => { if (token == generation) { if (recognized.Length > 0) recognized.Append(' '); recognized.Append(e.Result.Text); transcript.Text = recognized.ToString(); } }));
             engine.RecognizeCompleted += (_, e) => Dispatcher.BeginInvoke(new Action(() => {
                 if (token != generation || closed) return;
-                string text = recognized.ToString(); Cancel(); transcript.Text = text;
-                if (e.Error is not null || e.Cancelled) { status.Text = e.Error?.Message ?? "Stopped."; return; }
+                string text = e.Cancelled ? "" : e.Result?.Text ?? recognized.ToString(); Cancel(); transcript.Text = text;
+                if (e.Cancelled || e.Error is not null && text.Length == 0) { status.Text = e.Error?.Message ?? "Stopped."; return; }
                 insert.IsEnabled = text.Length > 0; status.Text = text.Length > 0 ? "Microphone off · review your words, then Insert." : "No speech heard. Try Start again.";
             }));
             engine.RecognizeAsync(RecognizeMode.Multiple); status.Text = "Listening · choose Finish when ready.";
