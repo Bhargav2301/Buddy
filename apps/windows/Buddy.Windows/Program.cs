@@ -26,7 +26,6 @@ public static class Program
             if (args.Contains("--install")) return Installer.Run(args.Contains("--quiet"), !args.Contains("--no-launch"));
             if (args.Contains("--check-voice")) { LocalPackageChecks.Voice().GetAwaiter().GetResult(); return 0; }
             if(args.Length>=2&&args[0]=="--check-whisper-model"){LocalPackageChecks.Whisper(args[1]).GetAwaiter().GetResult();return 0;}
-            if(args.Length>=2&&args[0]=="--check-whisper-model"){LocalPackageChecks.Whisper(args[1]).GetAwaiter().GetResult();return 0;}
             if (args.Length>=3&&args[0]=="--compare-saved-data") { LocalPackageChecks.CompareSavedData(args[1],args[2]);return 0; }
             if (args.Contains("--check-branding")) { LocalPackageChecks.Branding(); return 0; }
             if (args.Contains("--inspect-running-branding")) { BrandingDiagnostics.InspectRunning(); return 0; }

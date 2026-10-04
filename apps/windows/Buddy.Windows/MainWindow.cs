@@ -23,7 +23,7 @@ public sealed partial class MainWindow : Window
 {
     private static readonly SolidColorBrush Bg = BuddyTheme.Canvas, Panel = BuddyTheme.Surface, Ink = BuddyTheme.Ink, Muted = BuddyTheme.Muted, Accent = BuddyTheme.Deep;
     private BuddyHost? host;
-    private readonly TextBlock status = Text("Starting Buddyâ€¦", 13, Muted), contextLabel = Text("", 12, Accent);
+    private readonly TextBlock status = Text("Starting Buddy…", 13, Muted), contextLabel = Text("", 12, Accent);
     private readonly TextBlock companionBrand = Text("Buddy", 18, Accent), talkHeading = Text("Talk with Buddy", 28);
     private readonly TextBox input = new() { AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 76, MaxHeight = 180, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
     private readonly StackPanel messages = new(), rail = new();
@@ -66,7 +66,7 @@ public sealed partial class MainWindow : Window
     private ShortcutRegistration? shortcut;
     private ShortcutRegistration? voiceShortcut;
     private bool stopShortcutReady;
-    private readonly TextBlock shortcutHint = Text("Starting shortcutsâ€¦", 11, Muted);
+    private readonly TextBlock shortcutHint = Text("Starting shortcuts…", 11, Muted);
     private static SolidColorBrush Brush(string hex) => new((System.Windows.Media.Color)ColorConverter.ConvertFromString(hex));
     private static TextBlock Text(string value, double size = 15, System.Windows.Media.Brush? color = null) => new() { Text = value, FontSize = size, Foreground = color ?? Ink, TextWrapping = TextWrapping.Wrap, Margin = new(0, 0, 0, 8) };
     private static Button Btn(string label, Action action, bool primary = false)
@@ -81,7 +81,7 @@ public sealed partial class MainWindow : Window
     {
         BuddyTheme.Apply(desktop.Appearance, desktop.ReduceMotion);
         AppBranding.Apply(this);
-        Title = "Buddy â€” your local AI companion"; Width = 1160; Height = 820; MinWidth = 760; MinHeight = 560; Background = Bg; Foreground = Ink; FontFamily = BuddyTheme.Font; WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        Title = "Buddy — your local AI companion"; Width = 1160; Height = 820; MinWidth = 760; MinHeight = 560; Background = Bg; Foreground = Ink; FontFamily = BuddyTheme.Font; WindowStartupLocation = WindowStartupLocation.CenterScreen;
         var layout = new Grid { Background = Bg }; layout.ColumnDefinitions.Add(new() { Width = new(240) }); layout.ColumnDefinitions.Add(new());
         var side = new DockPanel { Background = Panel, Margin = new(0) }; Grid.SetColumn(side, 0); layout.Children.Add(side);
         var brand = new StackPanel { Margin = new(24, 24, 16, 24), Orientation = Orientation.Horizontal }; companionBrand.FontWeight = FontWeights.Bold; var logo = AppBranding.Image(40); logo.Margin = new(0, 0, 10, 0); brand.Children.Add(logo); brand.Children.Add(companionBrand); DockPanel.SetDock(brand, Dock.Top); side.Children.Add(brand);
@@ -102,7 +102,7 @@ public sealed partial class MainWindow : Window
         scroller = new ScrollViewer { Content = messages, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Margin = new(0, 18, 0, 20) }; Grid.SetRow(scroller, 1); main.Children.Add(scroller);
         var composer = new StackPanel(); Grid.SetRow(composer, 2); main.Children.Add(composer); composer.Children.Add(contextLabel);
         StyleBox(input); composer.Children.Add(input);
-        send = Btn("Send  â†—", () => _ = Send(), true); stop = Btn("Stop", Cancel); stop.IsEnabled = false;
+        send = Btn("Send  ↗", () => _ = Send(), true); stop = Btn("Stop", Cancel); stop.IsEnabled = false;
         composer.Children.Add(Row(Btn("Dictate", Dictate), Btn("Refine Buddy draft", () => _ = Refine()), Btn("Refine source field", () => _ = RefineFocusedField(useSummonedField:true)), speak, stop, send, undoDictation, copyDictation));
         undoDictation.Click += (_, _) => { try { mainDictationEdit?.Undo(DateTimeOffset.UtcNow, default); status.Text = "Exact draft restored."; } catch (Exception e) { status.Text = e.Message; } undoDictation.Visibility = Visibility.Collapsed; };
         copyDictation.Click += (_, _) => { if (lastDictation.Length > 0) System.Windows.Clipboard.SetText(lastDictation); };
@@ -131,7 +131,7 @@ public sealed partial class MainWindow : Window
         };
         if (startService) Loaded += async (_, _) => await Start();
         Closing += (_, e) => { if (!shuttingDown) { e.Cancel = true; HideHome(); } };
-        Deactivated += (_, _) => { if (mainMicrophone is not null) { StopMainDictation(); status.Text = "Microphone off Â· focus changed."; } };
+        Deactivated += (_, _) => { if (mainMicrophone is not null) { StopMainDictation(); status.Text = "Microphone off · focus changed."; } };
         foreground.Tick += (_, _) => { var current = Native.GetForegroundWindow(); if (current != IntPtr.Zero && !Native.IsOwnWindow(current)) previousWindow = current; };
         refresh.Tick += async (_, _) => { if (!busy && host is not null && IsVisible) { await RefreshList(); if (currentId is not null) await ShowHistory(); } };
     }
@@ -236,9 +236,9 @@ public sealed partial class MainWindow : Window
     }
     private void UpdateShortcutHint()
     {
-        shortcutHint.Text = (shortcut?.Active?.Label ?? "Chat shortcut unavailable â€” use tray") + " for chat Â· " +
-            (voiceShortcut?.Active?.Label ?? "Voice shortcut unavailable â€” use tray") + (desktop.HoldToTalk ? " tap / hold for voice" : " for voice") +
-            (stopShortcutReady ? " Â· Ctrl+Alt+Esc stops" : " Â· Global Stop shortcut is in use: use the Stop buttons") + " Â· Windows+Space belongs to Windows";
+        shortcutHint.Text = (shortcut?.Active?.Label ?? "Chat shortcut unavailable — use tray") + " for chat · " +
+            (voiceShortcut?.Active?.Label ?? "Voice shortcut unavailable — use tray") + (desktop.HoldToTalk ? " tap / hold for voice" : " for voice") +
+            (stopShortcutReady ? " · Ctrl+Alt+Esc stops" : " · Global Stop shortcut is in use: use the Stop buttons") + " · Windows+Space belongs to Windows";
     }
     private void CursorSettings() => OpenSettingsSection("Shortcuts");
     private async Task RefreshList()
@@ -256,8 +256,8 @@ public sealed partial class MainWindow : Window
         foreach (var m in c.Messages) Bubble(m.Role, m.Text, m.Evidence);
         if (c.Messages.Count == 0)
         {
-            messages.Children.Add(Text("Less friction. More room to think.", 24)); messages.Children.Add(Text("Ask a question, untangle an idea, or bring the app youâ€™re using into the conversation.", 15, Muted));
-            foreach (var hint in new[] { "Help me plan a focused day", "Explain a concept with a simple example", "Turn my rough idea into a clear plan" }) messages.Children.Add(Btn(hint + "  â†—", () => { input.Text = hint; input.Focus(); }));
+            messages.Children.Add(Text("Less friction. More room to think.", 24)); messages.Children.Add(Text("Ask a question, untangle an idea, or bring the app you’re using into the conversation.", 15, Muted));
+            foreach (var hint in new[] { "Help me plan a focused day", "Explain a concept with a simple example", "Turn my rough idea into a clear plan" }) messages.Children.Add(Btn(hint + "  ↗", () => { input.Text = hint; input.Focus(); }));
             messages.Children.Add(Text("Your model runs on this PC. Start with PC setup & models.", 13, Accent));
         }
         scroller.ScrollToEnd();
@@ -283,11 +283,11 @@ public sealed partial class MainWindow : Window
         {
             await foreach (var item in host.Service.Chat(payload, request.Token)) { request.Token.ThrowIfCancellationRequested(); if (item.Type == "delta") { answer.Text += item.Text; scroller.ScrollToEnd(); } if (item.Type == "status") status.Text = item.Text; if (item.Type == "evidence") SourceLinks.Fill((StackPanel)answer.Tag, item.Evidence); }
             request.Token.ThrowIfCancellationRequested();
-            status.Text = "Answered on your PC Â· " + DateTime.Now.ToShortTimeString(); ClearContext();
+            status.Text = "Answered on your PC · " + DateTime.Now.ToShortTimeString(); ClearContext();
             if (speak.IsChecked == true) ReadAloud(answer.Text);
         }
-        catch (OperationCanceledException) { status.Text = "Stopped. Your draft has been restored."; input.Text = draft; answer.Text += "\n[Stopped â€” partial answer not saved]"; }
-        catch (Exception ex) { status.Text = ex.Message; input.Text = draft; answer.Text += "\n[Answer failed â€” not saved]"; }
+        catch (OperationCanceledException) { status.Text = "Stopped. Your draft has been restored."; input.Text = draft; answer.Text += "\n[Stopped — partial answer not saved]"; }
+        catch (Exception ex) { status.Text = ex.Message; input.Text = draft; answer.Text += "\n[Answer failed — not saved]"; }
         finally { request.Dispose(); request = null; SetBusy(false); await RefreshList(); }
     }
     private void Cancel() { summonCapture?.Cancel();summonedField=null;voiceHeld=false; promptWatcher?.Suspend(); tasks?.Cancel(); regionPicker?.Cancel(); request?.Cancel(); captureRequest?.Cancel(); fieldCapture?.Cancel(); refineWindow?.Cancel(); dictationWindow?.Cancel(); onboarding?.Cancel(); host?.Service.StopAll(); StopMainDictation(); tts?.Cancel(); quick?.Cancel(); voiceOverlay?.Cancel(); assistant?.Cancel(); }
@@ -319,7 +319,7 @@ public sealed partial class MainWindow : Window
         int token = ++homeSpeechGeneration; homeSpeaking = true; stop.IsEnabled = true;
         try { await tts!.SpeakAsync(ConversationalReply.PlainText(text), desktop); }
         catch (OperationCanceledException) { }
-        catch (Exception ex) { status.Text = "Answer shown â€” " + ex.Message; }
+        catch (Exception ex) { status.Text = "Answer shown — " + ex.Message; }
         finally { if (token == homeSpeechGeneration) { homeSpeaking = false; stop.IsEnabled = busy || mainMicrophone is not null; } }
     }
     private void ReadAloud(string text)
@@ -339,13 +339,13 @@ public sealed partial class MainWindow : Window
         var cts = new CancellationTokenSource(); mainMicrophone = cts;
         var original = input.Text; var edit = new GuardedEdit(new HomeDraftField(input), original);
         var insertion = new DictationInsertion(input.SelectionStart, input.SelectionLength);
-        status.Text = "Preparing microphoneâ€¦"; stop.IsEnabled = true; companionState.Set("home-dictation", CompanionMood.Listening);
+        status.Text = "Preparing microphone…"; stop.IsEnabled = true; companionState.Set("home-dictation", CompanionMood.Listening);
         try
         {
             var engine = await LocalSpeechInput.Create(cts.Token, desktop);
             if (!ReferenceEquals(mainMicrophone, cts)) { LocalSpeechInput.Stop(engine); return; }
             recognizer = engine;
-            engine.SpeechHypothesized += (_, e) => Dispatcher.BeginInvoke(new Action(() => { if (ReferenceEquals(recognizer, engine)) status.Text = "Listening Â· " + e.Result.Text; }));
+            engine.SpeechHypothesized += (_, e) => Dispatcher.BeginInvoke(new Action(() => { if (ReferenceEquals(recognizer, engine)) status.Text = "Listening · " + e.Result.Text; }));
             engine.RecognizeCompleted += (_, e) => Dispatcher.BeginInvoke(new Action(() => {
                 if (!ReferenceEquals(recognizer, engine)) return;
                 StopMainDictation();
@@ -358,7 +358,7 @@ public sealed partial class MainWindow : Window
                     mainDictationEdit = edit; undoDictation.Visibility = Visibility.Visible; status.Text = "Dictation inserted into your draft. Review before Send. Undo for 30 seconds.";
                 } catch (Exception error) { status.Text = error.Message; }
             }));
-            engine.RecognizeAsync(RecognizeMode.Single); status.Text = "Listeningâ€¦ Speak, then pause. Stop ends listening.";
+            engine.RecognizeAsync(RecognizeMode.Single); status.Text = "Listening… Speak, then pause. Stop ends listening.";
         }
         catch (Exception ex) { if (ReferenceEquals(mainMicrophone, cts)) { StopMainDictation(); status.Text = ex is OperationCanceledException ? "Microphone unavailable or stopped." : ex.Message; input.Focus(); } }
     }
@@ -377,14 +377,14 @@ public sealed partial class MainWindow : Window
         ClearContext();using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(8)); captureRequest = timeout;
         try
         {
-            status.Text = "Reading visible screen textâ€¦"; var target = previousWindow;
+            status.Text = "Reading visible screen text…"; var target = previousWindow;
             var perception = assistant?.Perception ?? new ScreenPerception(() => desktop);
             var snapshot = await perception.Capture(target, timeout.Token); timeout.Token.ThrowIfCancellationRequested();
             var text = snapshot.PromptText;
             if (host is not null) await host.Service.Audit("capture", snapshot.Context.App, "Explicit reviewed UIA text; no image stored");
             var p = new StackPanel(); p.Children.Add(Text("Review screen text before sharing", 23)); p.Children.Add(Text("Password fields and common sensitive tokens are omitted. Review the remaining text.", 13, Muted));
             var box = new TextBox { Text = text, AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, Height = 360, VerticalScrollBarVisibility = ScrollBarVisibility.Auto }; StyleBox(box); p.Children.Add(box); Window? w = null;
-            p.Children.Add(Btn("Use this context", () => { ClearContext(); context = box.Text; screenApp = snapshot.Context.App; contextLabel.Text = "Screen text attached Â· sent with your next message"; w?.Close(); }, true)); w = Dialog("Buddy Â· Screen text", p); status.Text = "Review the context, then ask your question.";
+            p.Children.Add(Btn("Use this context", () => { ClearContext(); context = box.Text; screenApp = snapshot.Context.App; contextLabel.Text = "Screen text attached · sent with your next message"; w?.Close(); }, true)); w = Dialog("Buddy · Screen text", p); status.Text = "Review the context, then ask your question.";
         }
         catch (Exception ex) { status.Text = ex is OperationCanceledException ? "Screen reading stopped." : ex.Message; }
         finally { if (ReferenceEquals(captureRequest, timeout)) captureRequest = null; }
@@ -407,8 +407,8 @@ public sealed partial class MainWindow : Window
             } finally { Summon(); }
             var p = new StackPanel(); p.Children.Add(Text("Check this image before sharing", 23)); p.Children.Add(Text("Detected private fields are masked. Review the image and cancel if anything private remains. This capture stays on this PC and is not saved in chat history.", 13, Muted));
             p.Children.Add(new System.Windows.Controls.Image { Source = Bitmap(bytes), MaxHeight = 390 }); Window? w = null; bool retained = false;
-            p.Children.Add(Btn("Attach image", () => { ClearContext(); image = bytes; screenApp = capturedApp; retained = true; contextLabel.Text = "Window image attached Â· sent with your next message"; w?.Close(); }, true)); p.Children.Add(Btn("Discard", () => w?.Close()));
-            w = Dialog("Buddy Â· Capture preview", p, 720); w.Closed += (_, _) => { if (!retained) Array.Clear(bytes); };
+            p.Children.Add(Btn("Attach image", () => { ClearContext(); image = bytes; screenApp = capturedApp; retained = true; contextLabel.Text = "Window image attached · sent with your next message"; w?.Close(); }, true)); p.Children.Add(Btn("Discard", () => w?.Close()));
+            w = Dialog("Buddy · Capture preview", p, 720); w.Closed += (_, _) => { if (!retained) Array.Clear(bytes); };
         }
         catch (Exception ex) { status.Text = ex.Message; }
         finally { if (ReferenceEquals(captureRequest, captureTimeout)) captureRequest = null; }
@@ -417,7 +417,7 @@ public sealed partial class MainWindow : Window
     private async Task Setup(bool embedded = false, int revision = 0)
     {
         if (host is null) return; var p = new StackPanel(); p.Children.Add(Text("Make Buddy yours", 27)); p.Children.Add(Text("1. Install or start Ollama\n2. Download the chat model\n3. Ask Buddy a question\n4. Pair your phone on the same Wi-Fi", 15, Muted));
-        var info = Text("Checkingâ€¦", 14, Accent); p.Children.Add(info);
+        var info = Text("Checking…", 14, Accent); p.Children.Add(info);
         p.Children.Add(Btn("Install Ollama (official installer)", () => Process.Start(new ProcessStartInfo("https://ollama.com/download/windows") { UseShellExecute = true })));
         p.Children.Add(Btn("Start installed Ollama", () => {
             var exe = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "Ollama", "ollama.exe");
@@ -440,14 +440,14 @@ public sealed partial class MainWindow : Window
         async Task Check() { var st = await host.Service.Store.Read(st => st); var result = await host.Service.Engine.Status(st.Model, st.VisionModel); info.Text = result.Message + "\nSelected: " + st.Model + "\nInstalled: " + string.Join(", ", result.Installed); }
         p.Children.Add(Btn("Check connection", () => _ = Check())); p.Children.Add(Text("Closing Buddy to the tray keeps phone access available. Quit stops it. No cloud API key is needed.", 13, Muted));
         if (embedded) { if (homeSection != "Settings" || settingsSection != "AI" || settingsRevision != revision) return; settingsBody.Content = p; p.Unloaded += (_, _) => download?.Cancel(); }
-        else { var w = Dialog("Buddy Â· PC setup", p); w.Closed += (_, _) => download?.Cancel(); }
+        else { var w = Dialog("Buddy · PC setup", p); w.Closed += (_, _) => download?.Cancel(); }
         await Check();
     }
     private void Pair()
     {
         if (host is null) return; var p = new StackPanel(); p.Children.Add(Text("Take Buddy with you", 26)); p.Children.Add(Text("Connect your phone and PC to the same Wi-Fi. In the Android app, tap Scan PC code. Each code works once and expires in 5 minutes.", 14, Muted));
         var ips = NetworkInterface.GetAllNetworkInterfaces().Where(n => n.OperationalStatus == OperationalStatus.Up).SelectMany(n => n.GetIPProperties().UnicastAddresses).Where(a => a.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && !IPAddress.IsLoopback(a.Address)).Select(a => a.Address.ToString()).Distinct().ToList();
-        if (ips.Count == 0) { p.Children.Add(Text("Connect the PC to Wi-Fi first.")); Dialog("Buddy Â· Pair phone", p); return; }
+        if (ips.Count == 0) { p.Children.Add(Text("Connect the PC to Wi-Fi first.")); Dialog("Buddy · Pair phone", p); return; }
         var addresses = new ComboBox { ItemsSource = ips, SelectedIndex = 0 }; p.Children.Add(addresses);
         var qr = new System.Windows.Controls.Image { Height = 260, Margin = new(0, 12, 0, 12) }; var codeText = Text("", 22, Accent); var manual = new TextBox { IsReadOnly = true, TextWrapping = TextWrapping.Wrap }; StyleBox(manual); p.Children.Add(qr); p.Children.Add(codeText); p.Children.Add(manual);
         void Renew()
@@ -456,12 +456,12 @@ public sealed partial class MainWindow : Window
             using var data = QRCodeGenerator.GenerateQrCode(url, QRCodeGenerator.ECCLevel.M); using var png = new PngByteQRCode(data); qr.Source = Bitmap(png.GetGraphic(5)); codeText.Text = "Pairing code  " + pairing.Code; manual.Text = url;
         }
         addresses.SelectionChanged += (_, _) => Renew(); Renew(); p.Children.Add(Btn("Refresh pairing code", Renew)); p.Children.Add(Text("If connection times out, allow Buddy through Windows Firewall on Private networks. The installation folder contains Enable-Phone-Access.ps1. Do not expose this port on your router.", 13, Muted));
-        p.Children.Add(Btn("Manage paired phones", () => _ = Devices())); Dialog("Buddy Â· Pair phone", p, 600, 760);
+        p.Children.Add(Btn("Manage paired phones", () => _ = Devices())); Dialog("Buddy · Pair phone", p, 600, 760);
     }
     private async Task Devices()
     {
         if (host is null) return; var p = new StackPanel(); p.Children.Add(Text("Paired phones", 24));
-        foreach (var device in await host.Service.Store.Read(s => s.Devices)) { var row = new StackPanel(); row.Children.Add(Text(device.Name)); row.Children.Add(Btn("Revoke access", async () => { await host.Service.Store.Update(s => s.Devices.RemoveAll(d => d.Id == device.Id)); row.IsEnabled = false; })); p.Children.Add(row); } Dialog("Buddy Â· Devices", p);
+        foreach (var device in await host.Service.Store.Read(s => s.Devices)) { var row = new StackPanel(); row.Children.Add(Text(device.Name)); row.Children.Add(Btn("Revoke access", async () => { await host.Service.Store.Update(s => s.Devices.RemoveAll(d => d.Id == device.Id)); row.IsEnabled = false; })); p.Children.Add(row); } Dialog("Buddy · Devices", p);
     }
     private async Task Notes(bool memory)
     {
@@ -471,7 +471,7 @@ public sealed partial class MainWindow : Window
         var title = new TextBox { Text = "New item", Margin = new(0, 14, 0, 8) }; StyleBox(title); var body = new TextBox { AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, Height = 100 }; StyleBox(body); p.Children.Add(title); p.Children.Add(body); var notice = Text("", 12, Accent); p.Children.Add(notice);
         p.Children.Add(Btn("Save", async () => {
             try { var note = new Note(Guid.NewGuid().ToString(), Security.Text(title.Text, 100, "Title"), Security.Text(body.Text, 2000, "Text")); await host.Service.Store.Update(s => { var list = memory ? s.Memories : s.Prompts; if (list.Count >= 50) throw new BuddyException("LIMIT", "Remove an old item first."); list.Add(note); return true; }); notice.Text = "Saved. Reopen this panel to view it."; body.Clear(); } catch (Exception ex) { notice.Text = ex.Message; }
-        }, true)); Dialog(memory ? "Buddy Â· Memory" : "Buddy Â· Prompts", p);
+        }, true)); Dialog(memory ? "Buddy · Memory" : "Buddy · Prompts", p);
     }
     private async Task Delete()
     {

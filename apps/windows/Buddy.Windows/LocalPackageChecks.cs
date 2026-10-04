@@ -20,19 +20,6 @@ internal static class LocalPackageChecks
             Console.WriteLine(JsonSerializer.Serialize(new{result="passed",engine="Whisper local CPU worker",model=model.Id,modelBytes=model.Size,elapsedMs=clock.ElapsedMilliseconds,playedAudio=false,recordedMicrophone=false,savedAudio=false}));
         }finally{WhisperInference.Stop();Array.Clear(samples);Array.Clear(bytes);}
     }
-    internal static async Task Whisper(string modelPath)
-    {
-        var model=WhisperModels.Choices.Single(m=>m.FileName==Path.GetFileName(modelPath));await WhisperModels.Verify(modelPath,model,default);
-        using var memory=new MemoryStream();using var synth=new System.Speech.Synthesis.SpeechSynthesizer();
-        synth.SetOutputToAudioStream(memory,new System.Speech.AudioFormat.SpeechAudioFormatInfo(16000,System.Speech.AudioFormat.AudioBitsPerSample.Sixteen,System.Speech.AudioFormat.AudioChannel.Mono));
-        synth.Speak("Open Comet Browser.");synth.SetOutputToNull();var bytes=memory.ToArray();var samples=new float[bytes.Length/2+3200];
-        try{
-            for(int i=0;i<bytes.Length/2;i++)samples[i]=(short)(bytes[i*2]|bytes[i*2+1]<<8)/32768f;
-            var clock=System.Diagnostics.Stopwatch.StartNew();var result=await WhisperInference.Transcribe(samples,modelPath,"en",default);
-            if(!result.Text.Contains("Comet",StringComparison.OrdinalIgnoreCase))throw new InvalidDataException("Packaged Whisper did not recognize its synthetic smoke phrase.");
-            Console.WriteLine(JsonSerializer.Serialize(new{result="passed",engine="Whisper local CPU worker",model=model.Id,modelBytes=model.Size,elapsedMs=clock.ElapsedMilliseconds,playedAudio=false,recordedMicrophone=false,savedAudio=false}));
-        }finally{WhisperInference.Stop();Array.Clear(samples);Array.Clear(bytes);}
-    }
     internal static void CompareSavedData(string before,string after)
     {
         JsonObject Read(string folder){

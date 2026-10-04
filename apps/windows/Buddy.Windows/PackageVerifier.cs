@@ -17,11 +17,6 @@ internal static class PackageVerifier
             using var native=File.OpenRead(Path.Combine(folder,relative));using var header=new PEReader(native);
             if(header.PEHeaders.CoffHeader.Machine!=Machine.Amd64)throw new InvalidDataException("Invalid Whisper x64 runtime: "+name);
         }
-        foreach(var name in new[]{"whisper.dll","ggml-whisper.dll","ggml-base-whisper.dll","ggml-cpu-whisper.dll"}){
-            var relative="runtimes/win-x64/"+name;RequireFile(folder,relative);
-            using var native=File.OpenRead(Path.Combine(folder,relative));using var header=new PEReader(native);
-            if(header.PEHeaders.CoffHeader.Machine!=Machine.Amd64)throw new InvalidDataException("Invalid Whisper x64 runtime: "+name);
-        }
         foreach (var asset in new[] { "1cced", "2f2b4", "5d71e", "785ba", "91dcc", "9a20f", "a9b00", "ab83a", "fc18a" })
         {
             var name = "Assets/Figma/" + asset + ".svg"; RequireFile(folder, name);
