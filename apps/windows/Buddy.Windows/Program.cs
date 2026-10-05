@@ -9,9 +9,9 @@ public static class Program
     public static int Main(string[] args)
     {
         if(args.Length==1&&args[0]=="--whisper-worker")return WhisperWorker.Run().GetAwaiter().GetResult();
-        if (args.Length > 0 && args[0] == "--delete-local-data-after") return LocalDataDeletion.Run(args);
         PreviewEnvironment.Configure(args);
         if (PreviewEnvironment.Enabled && args.Any(a => a is "--install" or "--rollback" or "--delete-local-data-after")) return 1;
+        if (args.Length > 0 && args[0] == "--delete-local-data-after") return LocalDataDeletion.Run(args);
         bool logErrors = false;
         // No desktop types here: catch load failures before WPF is JIT-compiled.
         try

@@ -8,11 +8,18 @@ namespace Buddy.Windows;
 
 internal static class SourceLinks
 {
-    internal static string Badge(MessageEvidence? evidence) => evidence is null ? "" :
-        (evidence.Screen ? "Screen" + (string.IsNullOrWhiteSpace(evidence.App) ? "" : " · " + evidence.App) + (evidence.Image ? " · local vision" : "") : "") +
-        (evidence.Sources?.Count > 0 ? (evidence.Screen ? " · " : "") + evidence.Sources.Count + " sources" : "");
-    internal static void Fill(Panel panel, MessageEvidence? evidence)
+    internal static string Badge(MessageEvidence? evidence)
     {
+        if (evidence is null) return "";
+        var parts = new List<string>();
+        if (evidence.Screen) parts.Add("Screen" + (string.IsNullOrWhiteSpace(evidence.App) ? "" : " · " + evidence.App) + (evidence.Image ? " · local vision" : ""));
+        if (evidence.File) parts.Add("Reviewed file text");
+        if (evidence.Sources?.Count > 0) parts.Add(evidence.Sources.Count + " sources");
+        return string.Join(" · ", parts);
+    }
+    internal static bool Fill(Panel panel, MessageEvidence? evidence)
+    {
+        bool attached = false;
         panel.Children.Clear();
         var badge = Badge(evidence);
         if (badge.Length > 0) panel.Children.Add(new TextBlock { Text = badge, Foreground = BuddyTheme.Deep, FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new(0, 4, 0, 4) });
@@ -23,7 +30,8 @@ internal static class SourceLinks
                 catch (Exception e) { panel.Children.Add(new TextBlock { Text = e.Message, Foreground = BuddyTheme.Risk, TextWrapping = TextWrapping.Wrap }); }
             });
             button.HorizontalContentAlignment = HorizontalAlignment.Left; button.ToolTip = source.Url;
-            AutomationProperties.SetName(button, "Open source: " + source.Title); panel.Children.Add(button);
+            AutomationProperties.SetName(button, "Open source: " + source.Title); panel.Children.Add(button); attached = true;
         }
+        return attached;
     }
 }

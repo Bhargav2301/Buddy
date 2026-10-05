@@ -60,8 +60,8 @@ internal static class GuideLessonChecks
                 var previewBounds=WindowCapture.Bounds(new WindowInteropHelper(card).Handle);
                 Check(card.IsInFieldPreview&&Math.Abs(previewBounds.X-editor.X)<=1&&Math.Abs(previewBounds.Y-editor.Y)<=1&&previewBounds.Width<=editor.Width+1&&previewBounds.Height<=editor.Height+1,"Native highlighted preview occupies the actual owned source field bounds without changing its contents");
                 card.Reanchor(new(editor.X,editor.Y,280*OverlayNative.Scale(new WindowInteropHelper(card).Handle),180*OverlayNative.Scale(new WindowInteropHelper(card).Handle)));card.UpdateLayout();
-                var viewport=(ScrollViewer)((Border)card.Content).Child;
-                Check(viewport.ExtentHeight<=viewport.ViewportHeight||viewport.ScrollableHeight>0,"Small in-field previews keep every review and approval control reachable by scrolling");card.Reanchor(draft.Anchor.Bounds);
+                var viewports=((DockPanel)((Border)card.Content).Child).Children.OfType<ScrollViewer>().ToArray();
+                Check(viewports.Length==2&&viewports.All(viewport=>viewport.ViewportHeight>0&&(viewport.ExtentHeight<=viewport.ViewportHeight||viewport.ScrollableHeight>0)),"Small in-field previews keep every review and approval control reachable by scrolling");card.Reanchor(draft.Anchor.Bounds);
                 await Call(card,"Apply");Check(field.Writes==1&&practice.Editor.Text.Contains("polite"),"Accept applies exactly one guarded edit to the original owned field");
                 await Call(card,"Undo");Check(field.Writes==2&&practice.Editor.Text==draft.Edit.Original,"Inline Undo restores the exact original text");card.Close();
                 var stale=new InlinePromptWindow(service,fieldEditor,draft,()=>{});stale.Show();typeof(InlinePromptWindow).GetMethod("ShowProposal",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(stale,["A different proposal."]);practice.Editor.Text="User's newer draft";
@@ -71,7 +71,7 @@ internal static class GuideLessonChecks
                 try{await fieldEditor.Apply(unfocused,"No write",default);}catch(InvalidOperationException){refused=true;}
                 Check(refused&&field.Writes==2,"Inline focus/context invalidation aborts before the edit dispatcher writes");
                 int voiceRequests=0;var voiceCard=new InlinePromptWindow(service,fieldEditor,draft,()=>voiceRequests++,"Ctrl+Alt+Space");voiceCard.Show();
-                var voiceButtons=((StackPanel)Field(voiceCard,"body")).Children.OfType<WrapPanel>().Single();
+                var voiceButtons=((StackPanel)((ScrollViewer)Field(voiceCard,"footerScroll")).Content).Children.OfType<WrapPanel>().Single();
                 voiceButtons.Children.OfType<Button>().Single(b=>b.Content.ToString()=="Voice reply").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 Check(voiceRequests==1&&field.Writes==2,"Permission bubble's Voice reply button requests the existing voice surface without editing");
                 using(var voice=new VoiceOverlayWindow(()=>service,()=>Task.FromResult<string?>(null),()=>new(),_=>{},()=>hwnd,perception,(_,_)=>{},()=>{})){

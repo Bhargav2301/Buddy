@@ -27,7 +27,7 @@ public sealed partial class MainWindow
             regionPicker=new(selected,selection=>{
                 regionPicker=null;
                 if(selection is null){InputNative.SetForegroundWindow(selected);return;}
-                try { var lease=new RegionLease(selection,explicitOnce); if(desktop.RegionVoiceAfterSelection)voiceOverlay.Open(false,lease);else voiceOverlay.OpenRegion(lease); }
+                try { var lease=new RegionLease(selection,explicitOnce); if(desktop.RegionVoiceAfterSelection)voiceOverlay.Open(false,lease);else voiceOverlay.OpenRegion(lease, autoExplain:true); }
                 catch(Exception ex){status.Text=ex.Message;}
             });
             regionPicker.Show();

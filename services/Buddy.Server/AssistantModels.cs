@@ -23,8 +23,55 @@ public record WebSource(string Title, string Url, string Text, string EvidenceKi
 public static class ActionPolicy
 {
     public static readonly string[] Kinds = ["open", "click", "invoke", "type", "keys", "read", "wait"];
-    public static readonly string[] Apps = ["notepad", "calculator", "explorer", "comet"];
+    public static readonly string[] Apps = ["notepad", "calculator", "explorer", "comet", "camera", "spotify"];
     public static readonly string[] Keys = ["Tab", "Shift+Tab", "Enter", "Escape", "Ctrl+A", "Ctrl+C", "Ctrl+Z", "Up", "Down", "Left", "Right"];
+
+    // Review can return a question without inventing an action. Execution must
+    // still call Validate, which requires at least one independently approved action.
+    public static AssistantPlan ValidateForReview(AssistantPlan plan)
+    {
+        if (plan is null || string.IsNullOrWhiteSpace(plan.Summary) || plan.Summary.Length > 2000 || plan.Actions is null || plan.Actions.Count > 25)
+            throw new BuddyException("INVALID_PLAN", "The planning response needs a bounded explanation and an action list.");
+        if (plan.Actions.Count == 0) return plan;
+        var normalized = plan.Actions.Select(action => {
+            ValidateFields(action);
+            if (action.Kind != "open") return action;
+            if (action.Ref.Length != 0 || action.Role.Length != 0 && !action.Role.Equals("Application", StringComparison.OrdinalIgnoreCase))
+                throw new BuddyException("INVALID_PLAN", "An app launch cannot refer to a screen control.");
+            var value = action.Value.Trim();
+            var target = action.Target.Trim();
+            var targetApp = CanonicalApp(target);
+            if (value.Length == 0) {
+                // Repair the measured target/value swap only for an exact known
+                // alias; never move a path, URL, command or guessed name here.
+                if (targetApp is null) throw new BuddyException("INVALID_PLAN", "Specify a supported app in the launch value.");
+                value = targetApp;
+            } else {
+                value = CanonicalApp(value) ?? value;
+                if (target.Length > 0 && (targetApp is null || targetApp != value))
+                    throw new BuddyException("INVALID_PLAN", "The app launch fields conflict; clarify which app to open.");
+            }
+            return action with { Value = value, Target = "", Role = "", Ref = "" };
+        }).ToList();
+        return Validate(plan with { Actions = normalized });
+    }
+
+    public static AssistantPlan ValidateForReview(AssistantPlan plan, string query) => AppLaunchIntent.Bind(query, ValidateForReview(plan));
+    public static AssistantPlan Validate(AssistantPlan plan, string query) => AppLaunchIntent.Bind(query, Validate(plan));
+
+    private static string? CanonicalApp(string value)
+    {
+        var alias = value.Trim().ToLowerInvariant();
+        if (alias.EndsWith(".exe", StringComparison.Ordinal)) alias = alias[..^4];
+        if (Apps.Contains(alias)) return alias;
+        return AppLaunchIntent.CanonicalApp(value);
+    }
+
+    private static void ValidateFields(AssistantAction action)
+    {
+        if (action is null || !Kinds.Contains(action.Kind) || action.Value is null || action.Target is null || action.Role is null || action.Ref is null || action.Description is null || action.Value.Length > 4000 || action.Target.Length > 200 || action.Description.Length > 500 || action.Ref.Length > 100 || action.Role.Length > 80)
+            throw new BuddyException("INVALID_PLAN", "The model returned an unsupported action. Nothing was executed.");
+    }
     public static string Risk(AssistantAction action, string liveTarget = "") =>
         action.Kind is "type" or "keys" or "open" || Regex.IsMatch(action.Target + " " + liveTarget + " " + action.Description,
             "send|submit|delete|remove|pay|buy|purchase|install|confirm|transfer|publish|share|allow|accept|approve|sign|permission|execute|run", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100))
@@ -46,13 +93,15 @@ public static class ActionPolicy
 
     public static AssistantPlan Validate(AssistantPlan plan)
     {
-        if (plan.Summary is null || plan.Summary.Length > 2000 || plan.Actions is null || plan.Actions.Count is < 1 or > 25) throw new BuddyException("INVALID_PLAN", "The model could not make a bounded action plan. Try one smaller task.");
+        if (plan is null || plan.Summary is null || plan.Summary.Length > 2000 || plan.Actions is null || plan.Actions.Count is < 1 or > 25) throw new BuddyException("INVALID_PLAN", "The model could not make a bounded action plan. Try one smaller task.");
         var actions = plan.Actions.Select(a => {
-            if (a is null || !Kinds.Contains(a.Kind) || a.Value is null || a.Target is null || a.Role is null || a.Ref is null || a.Description is null || a.Value.Length > 4000 || a.Target.Length > 200 || a.Description.Length > 500 || a.Ref.Length > 100 || a.Role.Length > 80)
-                throw new BuddyException("INVALID_PLAN", "The model returned an unsupported action. Nothing was executed.");
+            ValidateFields(a);
             if (a.Kind == "open") {
                 var value=a.Value.Trim();
                 var alias=value.EndsWith(".exe",StringComparison.OrdinalIgnoreCase)?value[..^4]:value;
+                if (a.Ref.Length != 0 || a.Role.Length != 0 && !a.Role.Equals("Application", StringComparison.OrdinalIgnoreCase) ||
+                    a.Target.Trim().Length > 0 && (CanonicalApp(a.Target) is not { } targetAlias || targetAlias != alias.ToLowerInvariant()))
+                    throw new BuddyException("INVALID_PLAN", "The app launch fields conflict; review a corrected plan before running it.");
                 if(Apps.Contains(alias.ToLowerInvariant()))a=a with{Value=alias.ToLowerInvariant()};
                 else {
                     try { a=a with{Value=WebResearch.ValidateUrl(value).AbsoluteUri}; }
@@ -99,13 +148,39 @@ public static class AssistantSchemas
             ["summary"] = new { type = "string" }, [array] = new { type = "array", items = new { type = "object",
                 properties = fields.Split(',').ToDictionary(k => k, k => (object)(k == "kind" ? new { type = "string", @enum = ActionPolicy.Kinds } : (object)new { type = "string" })),
                 required = fields.Split(','), additionalProperties = false } } }, required = new[] { "summary", array }, additionalProperties = false });
-    public static readonly JsonElement Agent = Schema("action", "actions", "kind,ref,target,role,value,description,risk");
+    public static readonly JsonElement Agent = AgentSchema();
+    private static JsonElement AgentSchema()
+    {
+        var actions = ActionPolicy.Kinds.Select(kind => {
+            var fields = new Dictionary<string, object> {
+                ["kind"] = new { type = "string", @enum = new[] { kind } },
+                ["ref"] = new { type = "string", maxLength = 100 },
+                ["target"] = new { type = "string", maxLength = 200 },
+                ["role"] = new { type = "string", maxLength = 80 },
+                ["value"] = new { type = "string", maxLength = 4000 },
+                ["description"] = new { type = "string", maxLength = 500 },
+                ["risk"] = new { type = "string", @enum = new[] { "high", "low" } }
+            };
+            if (kind == "open") {
+                fields["value"] = new { anyOf = new object[] {
+                    new { type = "string", @enum = ActionPolicy.Apps },
+                    new { type = "string", pattern = @"^https://[^\s]+$", maxLength = 2048 }
+                } };
+                foreach (var name in new[] { "ref", "target", "role" }) fields[name] = new { type = "string", @enum = new[] { "" } };
+            } else if (kind == "keys") fields["value"] = new { type = "string", @enum = ActionPolicy.Keys };
+            return new { type = "object", properties = fields, required = fields.Keys.ToArray(), additionalProperties = false };
+        }).ToArray();
+        return JsonSerializer.SerializeToElement(new { type = "object", properties = new {
+            summary = new { type = "string", minLength = 1, maxLength = 2000 },
+            actions = new { type = "array", minItems = 0, maxItems = 25, items = new { oneOf = actions } }
+        }, required = new[] { "summary", "actions" }, additionalProperties = false });
+    }
     public static readonly JsonElement Guide = GuideSchema();
     public static readonly JsonElement Teaching = TeachingSchema();
     private static JsonElement TeachingSchema()
     {
         var node = System.Text.Json.Nodes.JsonNode.Parse(Guide.GetRawText())!;
-        node["properties"]!["steps"]!["maxItems"] = 1;
+        node["properties"]!["steps"]!["maxItems"] = 4;
         node["properties"]!["steps"]!["items"]!["properties"]!["primitive"] = JsonSerializer.SerializeToNode(new { type = "string", @enum = TeachingPolicy.Primitives });
         return JsonSerializer.SerializeToElement(node);
     }

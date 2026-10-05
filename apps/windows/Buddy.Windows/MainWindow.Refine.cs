@@ -15,10 +15,37 @@ public sealed partial class MainWindow
     private SummonedField? summonedField;
     private CancellationTokenSource? summonCapture;
     private bool voiceHeld;
+    private readonly ExternalRefinementOptionsSlot externalRefinementOptions = new();
+    private ExternalRefinementOptionsWindow? externalRefinementOptionsWindow;
+    private int sourceFieldGeneration;
+    private void CancelExternalRefinementOptions()
+    {
+        sourceFieldGeneration++;
+        externalRefinementOptions.Clear();
+        promptWatcher?.ClearPreparedOptionsPause();
+        externalRefinementOptionsWindow?.Close(); externalRefinementOptionsWindow = null;
+    }
+    private void PrepareExternalRefinementOptions()
+    {
+        if (host is null) return;
+        // Editing options invalidates both an in-flight capture and an existing review.
+        fieldCapture?.Cancel(); summonCapture?.Cancel(); summonedField = null;
+        promptWatcher?.Suspend(); CancelExternalRefinementOptions();
+        PrepareDesktopActivity("external-refinement-options"); quick?.Dismiss(); voiceOverlay?.Dismiss();
+        var window = new ExternalRefinementOptionsWindow((options, mode) => {
+            externalRefinementOptions.Arm(options, mode, Environment.TickCount64);
+            promptWatcher?.PauseForPreparedOptions();
+            status.Text = "Source-field options prepared for one capture. Focus the original prompt and press Ctrl+Alt+R within five minutes.";
+        });
+        externalRefinementOptionsWindow = window;
+        window.Closed += (_, _) => { if (ReferenceEquals(externalRefinementOptionsWindow, window)) externalRefinementOptionsWindow = null; };
+        window.Show();
+    }
     private async Task<bool> RememberSourceField()
     {
         var active=Native.GetForegroundWindow();
         if(active==IntPtr.Zero||Native.IsOwnWindow(active))return true;
+        windowSelection.Observe(active);
         if(previousWindow!=active)ClearContext();previousWindow=active;summonedField=null;
         summonCapture?.Cancel();using var cts=new CancellationTokenSource(TimeSpan.FromSeconds(3));summonCapture=cts;
         try {
@@ -44,9 +71,23 @@ public sealed partial class MainWindow
     private async Task RefineFocusedField(string? expectedIdentity = null, bool dictation = false, bool useSummonedField = false)
     {
         if (host is null || assistant is null || fieldCapture is not null) return;
+        int currentCapture = ++sourceFieldGeneration;
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3)); fieldCapture = cts;
+        var feedback = new RefinementCaptureFeedback(
+            () => currentCapture == sourceFieldGeneration && ReferenceEquals(fieldCapture, cts),
+            () => desktopActivity);
         try {
             var window = Native.GetForegroundWindow();
+            ExternalRefinementPlan? preparedOptions = null;
+            if (!dictation) {
+                if (externalRefinementOptionsWindow is not null)
+                    throw new InvalidOperationException("Finish or cancel source-field options before capturing the original prompt.");
+                preparedOptions = promptWatcher is null ? externalRefinementOptions.Consume(Environment.TickCount64)
+                    : promptWatcher.ConsumePreparedOptions(externalRefinementOptions, Environment.TickCount64);
+                // Options are never attached to a field remembered before configuration.
+                if (preparedOptions is not null && (useSummonedField || window == IntPtr.Zero || Native.IsOwnWindow(window)))
+                    throw new InvalidOperationException("Prepared options require a fresh capture from the original external field. Prepare them again, focus that field and press Ctrl+Alt+R.");
+            }
             SummonedField? pinned=null;
             if (useSummonedField || Native.IsOwnWindow(window)) {
                 pinned=summonedField??throw new InvalidOperationException("No external prompt field was selected. Focus the original AI prompt and press Ctrl+Alt+R. Buddy drafts are separate.");
@@ -54,13 +95,14 @@ public sealed partial class MainWindow
                 expectedIdentity=pinned.Anchor.Identity;
             }
             if(window==IntPtr.Zero||Native.IsOwnWindow(window))throw new InvalidOperationException("Refine source field cannot target Buddy's own composer. Focus the original external prompt and press Ctrl+Alt+R.");
-            PrepareDesktopActivity("field");quick?.Dismiss();voiceOverlay?.Dismiss();
+            PrepareDesktopActivity("field");feedback.EnterFieldActivity();quick?.Dismiss();voiceOverlay?.Dismiss();
             if (Native.GetForegroundWindow() != window) {
                 if (!InputNative.SetForegroundWindow(window)) throw new InvalidOperationException("Focus the prompt field and press Ctrl+Alt+R.");
                 await Task.Delay(100, cts.Token);
             }
             fieldEditor ??= new FocusedFieldEditor(assistant.Perception);
             var draft = await fieldEditor.Capture(window, cts.Token, dictation, expectedIdentity,strictFocus:!dictation,explicitInvocation:true); cts.Token.ThrowIfCancellationRequested();
+            if (!feedback.OwnsFieldActivity) return;
             pinned?.Validate(window,Native.Label(window),Environment.TickCount64);
             if (dictation) {
                 quick?.Cancel(); voiceOverlay?.Cancel(); StopMainDictation(); tts?.Cancel(); dictationWindow?.Close();
@@ -68,17 +110,19 @@ public sealed partial class MainWindow
                 dictationWindow = overlay; overlay.Closed += (_, _) => { if (ReferenceEquals(dictationWindow, overlay)) dictationWindow = null; };
                 overlay.Show(); _ = overlay.Start();
             } else {
-                promptWatcher??=new(fieldEditor,()=>host?.Service,()=>OpenQuick(true),()=>desktop.VoiceShortcut);
-                await promptWatcher.ShowReview(draft);
+                var prepared = preparedOptions?.Bind(draft.Edit.Original);
+                promptWatcher??=new(fieldEditor,()=>host?.Service,()=>OpenQuick(true),()=>desktop.VoiceShortcut,PrepareExternalRefinementOptions);
+                await promptWatcher.ShowReview(draft, prepared?.Request, preparedOptions is null ? null : () => preparedOptions.IsCurrent,
+                    () => feedback.OwnsFieldActivity && !cts.IsCancellationRequested);
             }
         } catch (Exception e) {
-            Summon(); ShowChat(); status.Text = e is OperationCanceledException ? "Field operation stopped." : e.Message;
+            feedback.Report(e, cts.IsCancellationRequested, message => { Summon(); ShowChat(); status.Text = message; });
         } finally { if (ReferenceEquals(fieldCapture, cts)) fieldCapture = null; }
     }
     private void OpenRefine(string original, Func<string, CancellationToken, Task> apply, Func<CancellationToken, Task> undo, string source)
     {
         refineWindow?.Close();
-        var window = new RefineWindow(host!.Service, original, apply, undo, source, mood => companionState.Set("refine", mood), () => PrepareDesktopActivity("refine"));
+        var window = new RefineWindow(host!.Service, original, apply, undo, source, mood => companionState.Set("refine", mood), () => PrepareDesktopActivity("refine"), localTasks: localTasks);
         refineWindow = window; window.Closed += (_, _) => { if (ReferenceEquals(refineWindow, window)) refineWindow = null; };
         window.Show(); _ = window.Refine("quick");
     }
@@ -92,5 +136,21 @@ public sealed partial class MainWindow
             if (field.Text != expected || field.IsReadOnly) throw new InvalidOperationException("The draft changed. Use Copy instead.");
             field.Text = value;
         }
+    }
+}
+
+// Failure presentation belongs to the capture which still owns its entered activity.
+// In particular, a normal (not cancelled) provider failure cannot reopen Home over
+// a newer Buddy-draft refinement. Invalid input before field entry still gets feedback.
+internal sealed class RefinementCaptureFeedback(Func<bool> ownsRequest, Func<string> activity)
+{
+    private bool enteredField;
+    internal void EnterFieldActivity() => enteredField = true;
+    internal bool OwnsFieldActivity => enteredField && ownsRequest() && activity() == "field";
+    internal bool Report(Exception error, bool cancelled, Action<string> present)
+    {
+        if (!ownsRequest() || enteredField && activity() != "field" || !enteredField && cancelled) return false;
+        present(error is OperationCanceledException ? "Field operation stopped." : error.Message);
+        return true;
     }
 }

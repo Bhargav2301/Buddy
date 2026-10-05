@@ -14,6 +14,30 @@ internal static class Program
     [STAThread] private static int Main(string[] args)
     {
         PreviewEnvironment.Configure(["--preview"]);
+        if(args.Contains("--observation46-pure")) {
+            int diagnostics = 0;
+            ObservationQualityChecks.Diagnostics((ok, note) => { if(!ok)throw new Exception("FAIL: " + note); diagnostics++; });
+            Console.WriteLine($"ALL {diagnostics} PURE OBSERVATION DIAGNOSTIC CHECKS PASSED; no windows, UIA or native calls."); return 0;
+        }
+        if(args.Contains("--installed-apps47"))return InstalledAppResolutionChecks.Run().GetAwaiter().GetResult();
+        if(args.Contains("--local-notch50"))return LocalNotchChecks.Run();
+        if(args.Contains("--local-task-lifecycle50"))return LocalTaskLifecycleChecks.Run();
+        if(args.Contains("--feedback-visual47"))return FeedbackVisualChecks.Run();
+        if(args.Contains("--feedback-lifecycle47"))return FeedbackLifecycleChecks.Run();
+        if(args.Contains("--observation46"))return ObservationQualityChecks.Run();
+        if(args.Contains("--comet-observation46"))return CometGuideChecks.Run();
+        if(args.Contains("--comet-guide46"))return CometGuideChecks.Run(true);
+        if(args.Contains("--userfailure45"))return UserFailureChecks.Run();
+        if(args.Contains("--comet-readonly45"))return UserFailureChecks.RunCometReadOnly();
+        if(args.Contains("--windowselection45"))return WindowSelectionChecks.Run();
+        if(args.Contains("--computeruse45"))return ComputerUseChecks.Run();
+        if(args.Contains("--refinement45"))return RefinementOptionsChecks.Run();
+        if(args.Contains("--nightmint44"))return NightMintChecks.Run();
+        if(args.Contains("--reliability44-live")||args.Contains("--reliability44-real-model"))return ReliabilityUiChecks.Run(true);
+        if(args.Contains("--reliability44"))return ReliabilityUiChecks.Run();
+        if(args.Contains("--parity43"))return ParityVisualChecks.Run();
+        if(args.Contains("--core42-local-vision"))return CoreTeachingChecks.Run(true);
+        if(args.Contains("--core42"))return CoreTeachingChecks.Run();
         if(args.Contains("--feedback41"))return RecognitionFeedbackChecks.Run();
         if(args.Contains("--recognition40")){int n=0;RecognitionLifecycleChecks.Run((ok,note)=>{if(!ok)throw new Exception("FAIL: "+note);n++;Console.WriteLine("PASS: "+note);}).GetAwaiter().GetResult();Console.WriteLine($"ALL {n} RECOGNITION LIFECYCLE CHECKS PASSED");return 0;}
         if(args.Length==3&&args[0]=="--whisper40")return WhisperChecks.Run(args[1],args[2]).GetAwaiter().GetResult();
@@ -34,6 +58,7 @@ internal static class Program
         if (args.Length == 3 && args[0] == "--neural-voice") return NeuralVoiceChecks.Run(args[1], args[2]).GetAwaiter().GetResult();
         if (args.Contains("--tray-routing")) return TrayRoutingChecks.Run();
         if (args.Contains("--preview-checks")) return PreviewChecks.Run();
+        if (args.Contains("--preview-policy47")) return PreviewChecks.Run(false);
         if (args.Contains("--settings-navigation")) return SettingsNavigation();
         if (args.Contains("--ocr")) return OcrChecks().GetAwaiter().GetResult();
         if (args.Length == 2 && args[0] == "--real-vision") return RealVisionChecks.Run(args[1]).GetAwaiter().GetResult();

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <BuddySourceRoot Condition="'$(BuddySourceRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..\</BuddySourceRoot>
+    <DefineConstants Condition="Exists('$(BuddySourceRoot)services\Buddy.Server\RefinementCore.cs')">$(DefineConstants);REFINEMENT_CORE</DefineConstants>
+  </PropertyGroup>
+  <!-- Compile the reviewed source into this isolated fixture. A source override must
+       never write bin/obj into another owner's checkout. -->
+  <ItemGroup>
+    <Compile Include="$(BuddySourceRoot)services\Buddy.Server\*.cs" Link="Production\%(Filename)%(Extension)" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="AngleSharp" Version="1.8.2" />
+    <AssemblyMetadata Include="BuddySourceRoot" Value="$([System.IO.Path]::GetFullPath('$(BuddySourceRoot)'))" />
+  </ItemGroup>
+  <Import Project="ReviewedSource.targets" />
+</Project>

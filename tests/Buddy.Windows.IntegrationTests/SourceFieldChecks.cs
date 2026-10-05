@@ -16,7 +16,7 @@ using System.Windows.Interop;
 internal static class SourceFieldChecks
 {
     const string Original="Write a poem on a boat sailing on a lonely sea";
-    const string Improved="Write a poem about a boat sailing on a lonely sea.";
+    const string Improved="Please draft a poem on a boat sailing on a lonely sea.";
     static object? Get(object o,string name)=>o.GetType().GetField(name,BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(o);
     static void Set(object o,string name,object? value)=>o.GetType().GetField(name,BindingFlags.Instance|BindingFlags.NonPublic)!.SetValue(o,value);
     static Task Call(object o,string name,params object[] args)=>(Task)o.GetType().GetMethod(name,BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public)!.Invoke(o,args)!;
@@ -91,9 +91,11 @@ internal static class SourceFieldChecks
                 await Task.Run(()=>((ValuePattern)node.GetCurrentPattern(ValuePattern.Pattern)).SetValue("The user's newer external draft"));
                 await Wait(()=>Get(watcher,"bubble") is null);
                 Check(await Task.Run(Read)=="The user's newer external draft"&&input.Text==Original,"Scoped UIA text-change events dismiss an actual explicit review when the user edits the original field");
+                // Begin an independent focus-invalidation case with the faithful canned rewrite's original draft.
+                await Task.Run(()=>((ValuePattern)node.GetCurrentPattern(ValuePattern.Pattern)).SetValue(Original));
                 await Focus();await Call(home,"RememberSourceField");home.Activate();await Call(home,"RefineFocusedField",null!,false,true);await Wait(()=>Get(watcher,"bubble") is InlinePromptWindow c&&Get(c,"proposal") is string);
                 var other=await Task.Run(()=>AutomationElement.FromHandle(hwnd).FindFirst(TreeScope.Descendants,new PropertyCondition(AutomationElement.NameProperty,"Other fixture")));await Task.Run(()=>other.SetFocus());await Wait(()=>Get(watcher,"bubble") is null);
-                Check(await Task.Run(Read)=="The user's newer external draft","Changing focused field dismisses the source review without overwriting either field");
+                Check(await Task.Run(Read)==Original,"Changing focused field dismisses the source review without overwriting either field");
                 home.Show();home.Activate();home.Close();await Task.Delay(150);
                 Check(!home.IsVisible&&companion.IsVisible&&app.ShutdownMode==ShutdownMode.OnExplicitShutdown,"Closing Home hides it while the configured companion and explicit app lifetime remain active");
                 Check(!FullscreenPolicy.Suppress("Progman",0,true)&&!FullscreenPolicy.Suppress("WorkerW",0,true)&&!FullscreenPolicy.Suppress("Chrome_WidgetWin_1",0x00C00000,true)&&FullscreenPolicy.Suppress("Owned borderless fullscreen",0,true),"Desktop shell and ordinary maximized apps preserve the companion; actual borderless fullscreen remains suppressible");

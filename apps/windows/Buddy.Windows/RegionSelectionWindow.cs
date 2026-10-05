@@ -15,8 +15,8 @@ internal sealed class RegionSelectionWindow : Window
     private readonly Action<RegionSelection?> completed;
     private readonly List<PixelPosition> points=[];
     private readonly Canvas canvas=new(){Background=new SolidColorBrush(Color.FromArgb(30,0,0,0))};
-    private readonly Polyline line=new(){Stroke=Brushes.Turquoise,StrokeThickness=3,IsHitTestVisible=false};
-    private readonly TextBlock hint=new(){Text="Draw around one area. Release the shortcut or press Enter to use it. Esc cancels.",Foreground=Brushes.White,TextWrapping=TextWrapping.Wrap,MaxWidth=500,Margin=new(14),IsHitTestVisible=false};
+    private readonly Polyline line=new(){Stroke=BuddyTheme.Deep,StrokeThickness=3,IsHitTestVisible=false};
+    private readonly TextBlock hint=new(){Text="Draw around one area. Release the shortcut or press Enter to use it. Esc cancels.",Foreground=BuddyTheme.Ink,TextWrapping=TextWrapping.Wrap,MaxWidth=500,Margin=new(14),IsHitTestVisible=false};
     private bool drawing,finished,ready;
     internal RegionSelectionWindow(IntPtr window,Action<RegionSelection?> completed)
     {
@@ -28,7 +28,7 @@ internal sealed class RegionSelectionWindow : Window
         initial=new(window,InputNative.ProcessName(window),Security.Redact(Native.Label(window)),monitor.DeviceName,new(mb.X,mb.Y,mb.Width,mb.Height),bounds,1,DateTimeOffset.UtcNow,null!);
         Title="Buddy - select a region";WindowStyle=WindowStyle.None;ResizeMode=ResizeMode.NoResize;AllowsTransparency=true;Background=Brushes.Transparent;Topmost=true;ShowInTaskbar=false;
         var root=new Grid();canvas.Children.Add(line);root.Children.Add(canvas);
-        root.Children.Add(new Border{Background=new SolidColorBrush(Color.FromArgb(235,18,35,38)),HorizontalAlignment=HorizontalAlignment.Left,VerticalAlignment=VerticalAlignment.Top,Child=hint,IsHitTestVisible=false});Content=root;
+        root.Children.Add(new Border{Background=BuddyTheme.Surface,BorderBrush=BuddyTheme.ControlBorder,BorderThickness=new(1),HorizontalAlignment=HorizontalAlignment.Left,VerticalAlignment=VerticalAlignment.Top,Child=hint,IsHitTestVisible=false});Content=root;
         SourceInitialized+=(_,_)=>{OverlayNative.Configure(new WindowInteropHelper(this).Handle,false);OverlayNative.SetBounds(this,(int)scope.X,(int)scope.Y,(int)scope.Width,(int)scope.Height);};
         Loaded+=(_,_)=>{ready=true;Activate();Focus();};
         DpiChanged+=(_,_)=>{if(ready)Cancel();};

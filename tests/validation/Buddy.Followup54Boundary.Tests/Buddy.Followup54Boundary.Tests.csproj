@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework>
+    <BuddySourceRoot Condition="'$(BuddySourceRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..\</BuddySourceRoot>
+    <BuddyNotchRoot Condition="'$(BuddyNotchRoot)' == ''">$(BuddySourceRoot)</BuddyNotchRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(BuddySourceRoot)services\Buddy.Server\*.cs" Link="Production\%(Filename)%(Extension)" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="AngleSharp" Version="1.8.2" />
+    <AssemblyMetadata Include="BuddySourceRoot" Value="$([System.IO.Path]::GetFullPath('$(BuddySourceRoot)'))" />
+    <EmbeddedResource Include="teaching-heldouts.json" LogicalName="Qa54Heldouts" />
+  </ItemGroup>
+  <PropertyGroup Condition="Exists('$(BuddySourceRoot)services\Buddy.Server\KnownControlConcepts.cs')"><DefineConstants>$(DefineConstants);HAS_CONCEPT54</DefineConstants></PropertyGroup>
+  <PropertyGroup Condition="Exists('$(BuddySourceRoot)services\Buddy.Server\LocalAgentClient.cs')"><DefineConstants>$(DefineConstants);HAS_PIPE54</DefineConstants></PropertyGroup>
+  <PropertyGroup Condition="Exists('$(BuddySourceRoot)services\Buddy.Server\RefinementGrammar.cs')"><DefineConstants>$(DefineConstants);HAS_GRAMMAR54</DefineConstants></PropertyGroup>
+  <PropertyGroup Condition="$([System.IO.File]::ReadAllText('$(BuddySourceRoot)services\Buddy.Server\Models.cs').Contains('ContextKind'))"><DefineConstants>$(DefineConstants);HAS_FILE_CONTEXT</DefineConstants></PropertyGroup>
+  <PropertyGroup Condition="Exists('$(BuddyNotchRoot)apps\windows\Buddy.Windows\NotchPlacementPolicy.cs')"><DefineConstants>$(DefineConstants);HAS_PLACEMENT54</DefineConstants></PropertyGroup>
+  <ItemGroup Condition="Exists('$(BuddyNotchRoot)apps\windows\Buddy.Windows\NotchPlacementPolicy.cs')">
+    <Compile Include="$(BuddyNotchRoot)apps\windows\Buddy.Windows\NotchPlacementPolicy.cs;$(BuddyNotchRoot)apps\windows\Buddy.Windows\NotchPlacementState.cs;$(BuddyNotchRoot)apps\windows\Buddy.Windows\OverlayPlacement.cs" Link="Production\%(Filename)%(Extension)" />
+  </ItemGroup>
+  <Import Project="ReviewedSource.targets" />
+</Project>

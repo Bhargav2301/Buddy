@@ -17,7 +17,7 @@ try {
     Check(RefinementPolicy.Mode(new("short", "auto", Domain: "coding")) == "guided", "Coding uses Guided");
     Check(RefinementPolicy.Mode(new(new string('a', 801), "auto")) == "council", "Long prompts use Council");
     Check(RefinementPolicy.Mode(new(new string('a', 900), "quick", Important: true)) == "quick", "Explicit mode beats auto selection");
-    Check(RefinementPolicy.Technique(new("x", Domain: "planning")) == "tree-of-thoughts", "Planning technique selected");
+    Check(RefinementPolicy.Technique(new("x", Domain: "planning")) == "zero-shot", "A domain label alone does not invent alternatives, examples or tools");
     Check(!RefinementPolicy.PreservesLiterals("Return 3 items at https://example.com", "Return 4 items at https://example.com"), "Changed numeric facts fail preservation");
     Check(!RefinementPolicy.PreservesLiterals("Use `theExactName`", "Use another name"), "Literal identifiers must survive");
     Check(RefinementPolicy.Cosine([0,0], [0,0]) == 0 && RefinementPolicy.Cosine([float.NaN], [1]) == 0, "Invalid embeddings cannot validate a rewrite");
@@ -29,10 +29,11 @@ try {
         Check(handler.ChatCalls == expected && result.Passes.Count == (mode == "guided" ? 3 : mode == "council" ? 5 : 1), mode + " runs actual specialist/synthesis passes");
         Check(events.Any(x => x.Type == "delta") && result.Engine == "buddy_local", mode + " streams text and reports the local engine");
     }
-    handler.Preserved = false;
+    handler.Preserved = false; handler.Rewrite = "Please do not mention my name.";
     Check(!(await service.RefineDetailed(new("Do not mention my name"), default)).Accepted, "Negation or intent failure rejects even semantically similar text");
     handler.Preserved = true; handler.EmbeddingAvailable = false;
-    var original = "Keep this draft"; var rejected = await service.RefineDetailed(new(original), default);
+    var original = "Write a useful prompt"; handler.Rewrite = "Write a clear, useful prompt.";
+    var rejected = await service.RefineDetailed(new(original), default);
     Check(rejected.RefinedPrompt == original && !rejected.Accepted && rejected.Similarity is null, "Missing embeddings keep the byte-equal original");
     handler.EmbeddingAvailable = true; handler.Similar = false;
     Check(!(await service.RefineDetailed(new(original), default)).Accepted, "Unrelated rewrite fails similarity gate"); handler.Similar = true;
@@ -73,6 +74,7 @@ try {
 sealed class LocalModel : HttpMessageHandler
 {
     public int ChatCalls; public bool Preserved = true, EmbeddingAvailable = true, Similar = true, Delay;
+    public string Rewrite = "Write a clear, useful prompt.";
     public TaskCompletionSource Started = new(TaskCreationOptions.RunContinuationsAsynchronously);
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
     {
@@ -85,7 +87,7 @@ sealed class LocalModel : HttpMessageHandler
         }
         if (!data.RootElement.GetProperty("stream").GetBoolean()) return Json(new { message = new { content = JsonSerializer.Serialize(new { preserved = Preserved, scoreBefore = 40, scoreAfter = 75, changes = new[] { "Clarified output" } }) }, done = true });
         ChatCalls++;
-        return new(HttpStatusCode.OK) { Content = new StringContent("{\"message\":{\"content\":\"Write a clear, useful prompt.\"},\"done\":true}\n") };
+        return new(HttpStatusCode.OK) { Content = new StringContent(JsonSerializer.Serialize(new { message = new { content = Rewrite }, done = true }) + "\n") };
     }
     private static HttpResponseMessage Json(object value) => new(HttpStatusCode.OK) { Content = new StringContent(JsonSerializer.Serialize(value)) };
 }

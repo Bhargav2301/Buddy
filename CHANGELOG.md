@@ -4,6 +4,43 @@ Versions follow `major.minor.patch`; Git tags use `v` plus the version.
 The root [VERSION](VERSION) file controls both applications. See
 [Versioning](docs/Versioning.md) for the release process.
 
+## Unreleased local feedback preview — 2026-10-05
+
+- Repair preference persistence, region Enter/cancellation, refinement lifecycle, Black surfaces and clipped/vanishing companion/chat controls.
+- Bind reviewed app actions to the exact task; add verified Camera/Spotify signed registrations and grounded authored browser lessons; clean local speech without changing speaker85/F3.
+- Keep this separate from installed0.4.4. [Feedback preview report](docs/Windows-feedback47.md) records actual-model checks, acceptance limits and remaining Coucou features.
+
+## [0.4.5] - 2026-10-04
+
+- Bind Guide observations to a live window, thread, process and process creation identity. Report inaccessible or expired selections with a fresh-focus retry, keeping access and privacy restrictions in place.
+- Reject unchanged or cosmetic-only refinement as an applicable proposal; allow one bounded faithful wording retry. Keep source-field review nonactivating and fit its controls within the work area.
+- Add a Buddy-owned observe, checkpoint, single-launch and verification path for exact supported app-opening requests. Honor Agent and privacy settings, immediate Stop and existing approval for broader or consequential work. No upstream computer-use runtime is installed.
+- Expose local technique inputs, reviewed TXT/MD references, explicit output counts/limits and result details in Buddy-draft refinement. Bind Apply to the current request; advanced options in external application fields remain incomplete.
+- Preserve installed 0.4.4 and use a separate preview. Final validation and remaining limits are recorded in the Windows 0.4.5 report; no publication or account activation is included.
+
+## [0.4.4] - 2026-10-04
+
+- Reclassify edited Guide requests before planning, invalidate stale reviewed actions, and show actionless clarification without enabling Run. Keep strict action approval and verified installed-app resolution.
+- Normalize the measured Comet target/value confusion within exact supported aliases, bound model repair, and prevent Comet guidance from targeting unrelated applications.
+- Enforce explicit shorter conversational limits through complete-answer validation and regeneration; remove unsolicited feature offers without trimming safety qualifications.
+- Preserve prompt intent with an independent bounded wording check and a local technique/context/budget core. New requirements need confirmation; impossible destination budgets preserve the original instead of clipping it.
+- Add an optional functional companion bar with existing Buddy artwork and reversible core presentation. Apply the user-selected Night Mint palette to native controls, states, popups and review surfaces while preserving explicit saved appearance choices.
+- Record pinned Clicky/Coucou/Clarift source, platform and licensing boundaries. This local build is validated before separate packaging and authorized recoverable installation; publication remains blocked. No account activation or cloud audio is included.
+
+## [0.4.3] - 2026-10-04
+
+- Add opt-in staged local sentence generation for selected neutral voice prompts, preserving the three-sentence default and complete screen/action review. Stop cancels queued generation and audio without replay or partial-history completion.
+- Add an optional compact pointer/activity presentation and 5/15/30-second ink lifetime, retaining mascot choice, stale-target invalidation and existing local audio/privacy settings.
+- Add disconnected provider setup drafts and bounded injected HTTP/realtime text components with synthetic transport tests; no credentials, live routing or cloud audio are enabled.
+- Establish an actual isolated development team, durable project/task/evidence records and checked handoff gates. This batch is a separate local preview; installed 0.4.2 and publication restrictions remain in place.
+
+## [0.4.2] - 2026-10-04
+
+- Add bounded same-window screen-teaching follow-ups, an explicit selected-window image choice, and up to four independently verified current-screen annotations. Stale targets suppress the complete packet.
+- Prefetch one completed-answer sentence while another plays through one fixed audio endpoint; retain cancellation, buffer cleanup and headphone-only no-fallback behavior.
+- Add opt-in encrypted app-specific teaching Q&A with separate view/clear controls, leaving existing profiles and speech-review fixes intact.
+- Include disconnected provider request/response and text-realtime protocol components with offline validation. These do not enable cloud models, accounts or audio. See the evidence-linked comparison and Windows validation report.
+
 ## [0.4.1] - 2026-10-04
 
 - Preserve accepted or tentative words for explicit review when a local recognizer finishes with an empty result. Reject stale, duplicate and cancelled completions without submitting commands.

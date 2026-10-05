@@ -1,0 +1,11 @@
+# Independent meaning and usefulness goldens
+
+These 14 fixtures were authored independently of the REFINE-47 implementation. They retain all eight exact 0.4.5 comparison prompts and add six adversarial relation, conditional, negation, value-binding, Unicode and ambiguity cases. The witnesses are meaningful expected properties rather than an exact output string that the model must repeat.
+
+Passing the oracle requires retained fixture-specific relations/literals, no listed unsupported constraints, and useful separation of distinct source-grounded task components. A period, verb substitution, higher model score, unchanged input or a header around the whole input cannot qualify. The contradictory-count case requires a safe refusal or clarification; it can never inflate useful-rewrite counts. Model refusal is safe outcome evidence, not successful refinement.
+
+The oracle is intentionally bounded to this catalog. It is not a universal semantic proof, and labels by themselves do not establish correct relation attachment. Root must inspect actual candidate text against each human-written Utility specification. The reviewed poem interpretation permits Task/Subject separation while keeping the entire supplied scene together; it does not permit stanza count, rhyme, a new mood or speaker. Independent timing/agency/device counterexamples prevent the same connector from being universally relabeled as a subject.
+
+`dotnet run --project tests/validation/Buddy.RefinementMeaningBoundary.Tests/Buddy.RefinementMeaningBoundary.Tests.csproj -c Release -r win-x64 --self-contained true` runs the witnesses. When `BuddySourceRoot` contains the new contract, the project additionally compiles hash-bound server sources into its own output and runs pure contract plus leaf-handler service tests. The suite never calls a real model or native UI. Source overrides require a trailing directory separator and a frozen owner checkpoint; root reruns the integrated tree.
+
+Evidence motivating the goldens: `validation/core45/live-review-attempt1.json` rejected period-only output; `live-review-attempt2.json` rejected Write-to-Draft; `golden-output-review.json` accepted useful grammar in only 2/8 scenarios and recorded number/order regressions in an earlier raw attempt. Historical results are not new implementation acceptance.

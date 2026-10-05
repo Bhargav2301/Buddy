@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework>
+    <BuddySourceRoot Condition="'$(BuddySourceRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..\</BuddySourceRoot>
+  </PropertyGroup>
+  <ItemGroup><Compile Include="$(BuddySourceRoot)apps\windows\Buddy.Windows\LocalTaskJournal.cs" Link="Production\LocalTaskJournal.cs" /></ItemGroup>
+  <Import Project="..\Buddy.UserFailureBoundary.Tests\ReviewedSource.targets" />
+</Project>

@@ -1,14 +1,15 @@
 namespace Buddy.Server;
 
 public record SourceLink(string Title, string Url);
-public record MessageEvidence(bool Screen = false, string? App = null, bool Image = false, List<SourceLink>? Sources = null);
-public record ChatMessage(string Id, string Role, string Text, DateTimeOffset At, string Mode = "type", string? RequestId = null, MessageEvidence? Evidence = null);
+public record MessageEvidence(bool Screen = false, string? App = null, bool Image = false, List<SourceLink>? Sources = null, bool File = false);
+public record ChatMessage(string Id, string Role, string Text, DateTimeOffset At, string Mode = "type", string? RequestId = null, MessageEvidence? Evidence = null, string? LocalModel = null, string? ContextFingerprint = null);
 public record Conversation(string Id, string Title, DateTimeOffset UpdatedAt, List<ChatMessage> Messages, bool Pinned = false, bool Archived = false);
 public record Note(string Id, string Title, string Text);
 public record PairedDevice(string Id, string Name, string TokenHash, DateTimeOffset AddedAt);
-public record ChatRequest(string ConversationId, string Text, string RequestId, string Mode = "type", string? Context = null, string? ImageBase64 = null, bool UseWeb = false, string? ScreenApp = null, string? BrainId = null, string? SkillId = null);
+public record ChatRequest(string ConversationId, string Text, string RequestId, string Mode = "type", string? Context = null, string? ImageBase64 = null, bool UseWeb = false, string? ScreenApp = null, string? BrainId = null, string? SkillId = null, bool StreamSentences = false, string? LocalModel = null, string? ContextKind = null);
 public record PairRequest(string Code, string Name);
-public record RefineRequest(string Prompt, string Mode = "quick", string Technique = "auto", string Domain = "general", bool Important = false);
+public record RefineRequest(string Prompt, string Mode = "quick", string Technique = "auto", string Domain = "general", bool Important = false,
+    RefinementInputs? Inputs = null, RefinementBudget? Budget = null);
 public record ConversationUpdate(string? Title = null, bool? Pinned = null, bool? Archived = null);
 public record NoteRequest(string Title, string Text);
 public record StreamEvent(string Type, string? Text = null, string? Code = null, string? ConversationId = null, MessageEvidence? Evidence = null, string? BrainId = null);

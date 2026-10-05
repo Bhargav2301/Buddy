@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><BuddySourceRoot Condition="'$(BuddySourceRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..\</BuddySourceRoot><BuddyDesktopRoot Condition="'$(BuddyDesktopRoot)' == ''">$(BuddySourceRoot)</BuddyDesktopRoot></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(BuddySourceRoot)services\Buddy.Server\*.cs" Link="Production\%(Filename)%(Extension)" />
+    <Compile Include="$(BuddyDesktopRoot)apps\windows\Buddy.Windows\DesktopPreferences.cs" Link="Production\DesktopPreferences.cs" />
+    <Compile Include="..\Buddy.UserFailureBoundary.Tests\SourceReceipt.cs" Link="SourceReceipt.cs" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" /><PackageReference Include="AngleSharp" Version="1.8.2" />
+    <AssemblyMetadata Include="BuddySourceRoot" Value="$([System.IO.Path]::GetFullPath('$(BuddySourceRoot)'))" />
+  </ItemGroup>
+  <Import Project="..\Buddy.UserFailureBoundary.Tests\ReviewedSource.targets" />
+  <PropertyGroup Condition="Exists('$(BuddySourceRoot)apps\windows\Buddy.Windows\RefinementRequest.cs')"><DefineConstants>$(DefineConstants);HAS_LIFECYCLE</DefineConstants></PropertyGroup>
+  <ItemGroup Condition="Exists('$(BuddySourceRoot)apps\windows\Buddy.Windows\RefinementRequest.cs')"><Compile Include="$(BuddySourceRoot)apps\windows\Buddy.Windows\RefinementRequest.cs" Link="Production\RefinementRequest.cs" /></ItemGroup>
+</Project>

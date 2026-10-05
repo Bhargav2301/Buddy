@@ -87,9 +87,8 @@ internal static class QaChecks
                 bool Approval(string text)=>((Button)Field(assistant,"approve")).Visibility==Visibility.Visible&&((TextBlock)Field(assistant,"state")).Text.Contains(text);
                 var followup=action with{Value="Second reviewed draft, including every word of this replacement.",Description="Replace the fixture with the reviewed second draft",RequireEmpty=false};
                 model.Replies.Enqueue(JsonSerializer.Serialize(new AssistantPlan("First reviewed batch",[action]),StateStore.Json));
-                await assistant.Open("agent","Insert the reviewed fixture draft");
-                // Switch the already-reviewed fixture goal to exercise the real mixed-request execution path.
-                ((TextBox)Field(assistant,"goal")).Text="Teach me and then write the reviewed fixture draft";
+                // Plan the final mixed request; edits after review deliberately invalidate approval.
+                await assistant.Open("agent","Teach me and then write the reviewed fixture draft");
                 model.Replies.Enqueue(JsonSerializer.Serialize(new AgentDecision("continue","Review a second fixture batch",[followup]),StateStore.Json));
                 model.Replies.Enqueue("{\"status\":\"done\",\"summary\":\"Both fixture replacements were read back; nothing was sent or saved.\",\"actions\":[]}");
                 execution=Call(assistant,"Execute");await AwaitState(()=>Approval(action.Description),execution);
@@ -120,7 +119,9 @@ internal static class QaChecks
         internal Queue<string> Replies=new();internal int TeacherCalls;
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage r,CancellationToken ct){
             var input=await r.Content!.ReadAsStringAsync(ct);string reply;
-            if(input.Contains("Explain the observed progress")){TeacherCalls++;reply="{\"summary\":\"The recorded fixture edit was read back. Nothing was sent or saved.\"}";}else reply=Replies.Dequeue();
+            if(input.Contains("Explain the observed progress")){TeacherCalls++;reply="{\"summary\":\"The recorded fixture edit was read back. Nothing was sent or saved.\"}";}
+            else if(input.Contains("Give a brief source-backed orientation")) reply="{\"summary\":\"Review each fixture draft before approving its insertion.\",\"steps\":[]}";
+            else reply=Replies.Dequeue();
             return new(HttpStatusCode.OK){Content=new StringContent(JsonSerializer.Serialize(new{message=new{content=reply},done=true}))};
         }
     }

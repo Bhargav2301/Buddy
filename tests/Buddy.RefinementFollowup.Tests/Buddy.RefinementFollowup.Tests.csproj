@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework></PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Unshown/**/*.cs" />
+    <ProjectReference Include="../../services/Buddy.Server/Buddy.Server.csproj" />
+    <Compile Include="../../apps/windows/Buddy.Windows/ExternalRefinementOptions.cs" Link="ExternalRefinementOptions.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/RefinementDraftOptions.cs" Link="RefinementDraftOptions.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/GuardedEdit.cs" Link="GuardedEdit.cs" />
+  </ItemGroup>
+</Project>

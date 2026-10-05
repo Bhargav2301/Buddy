@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0-windows10.0.19041.0</TargetFramework><UseWPF>true</UseWPF></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../services/Buddy.Server/Buddy.Server.csproj" />
+    <Compile Include="../../apps/windows/Buddy.Windows/GlobalUsings.cs" Link="GlobalUsings.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/BoundedComputerUse.cs" Link="BoundedComputerUse.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/RoutineAppOpen.cs" Link="RoutineAppOpen.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/InstalledAppResolver.cs" Link="InstalledAppResolver.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/WindowSelection.cs" Link="WindowSelection.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/InputNative.cs" Link="InputNative.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/Native.cs" Link="Native.cs" />
+  </ItemGroup>
+</Project>

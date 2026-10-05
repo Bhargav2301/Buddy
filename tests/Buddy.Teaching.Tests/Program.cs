@@ -25,12 +25,28 @@ Reject(valid, context with { Elements = [context.Elements[0], context.Elements[0
 Check(TeachingPolicy.Validate(valid with { Steps = [step with { Expect = new("visible", "Export", "Button") }] }, context).Step?.Expect?.Kind == "manual", "Model cannot turn a teaching step into automatic advancement");
 Check(TeachingPolicy.Validate(new("Please focus the Export dialog.", []), context).Step is null, "Clarification is allowed without invented annotations");
 Check(ConversationalReply.PlainText("Choose Export. [circle: 12, 40, 8] <arrow x=5>") == "Choose Export.", "Annotation markup and coordinates are removed from spoken text");
-Check(AssistantSchemas.Teaching.GetProperty("properties").GetProperty("steps").GetProperty("maxItems").GetInt32() == 1, "Model schema restricts generation to one step");
+Check(AssistantSchemas.Teaching.GetProperty("properties").GetProperty("steps").GetProperty("maxItems").GetInt32() == 4, "Model schema bounds current-screen annotation packets to four targets");
+var second=new GuideStep("Compare Preview.","observed-preview","Preview","Button","arrow");
+var multiContext=context with{Elements=[..context.Elements,new("observed-preview","Preview","Button",0,50,90,35)]};
+var multi=TeachingPolicy.Validate(new("Choose Export. Compare Preview.",[step,second]),multiContext);
+Check(multi.Targets.Count==2&&multi.Targets.All(s=>s.Expect?.Kind=="manual"),"Two independently observed target annotations survive validation without executable actions");
+Reject(new("Choose Export. Compare Preview.",[step,second with{Ref="invented"}]),multiContext,"One invented target invalidates the entire annotation packet");
+Reject(new("Choose Export.",Enumerable.Repeat(step,5).ToList()),context,"More than four markings are refused");
 Check(!AssistantSchemas.Teaching.GetRawText().Contains("actions"), "Teaching schema exposes no executable action list");
 
 var folder = Path.Combine(Path.GetTempPath(), "Buddy-teaching-tests-" + Guid.NewGuid()); Directory.CreateDirectory(folder);
 try {
     var store = new StateStore(folder, DataProtectionProvider.Create(new DirectoryInfo(Path.Combine(folder, "keys")))); await store.EnsureSaved();
+    var notes=new TeachingMemoryStore(folder,DataProtectionProvider.Create(new DirectoryInfo(Path.Combine(folder,"teaching-test-keys"))));
+    Check((await notes.Read()).Count==0&&!File.Exists(Path.Combine(folder,"teaching.v1.encrypted")),"Disabled/empty teaching memory reads create no content file");
+    for(int i=0;i<12;i++)await notes.Save("fixture","unique question "+i,"qualified answer");
+    await notes.Save("another","another question","another answer");
+    Check((await notes.Read("fixture")).Count==10&&(await notes.Read("another")).Count==1,"Opt-in memory bounds each app independently");
+    Check(!Encoding.UTF8.GetString(await File.ReadAllBytesAsync(Path.Combine(folder,"teaching.v1.encrypted"))).Contains("unique question"),"Saved teaching Q&A is encrypted on disk");
+    var reopenedNotes=new TeachingMemoryStore(folder,DataProtectionProvider.Create(new DirectoryInfo(Path.Combine(folder,"teaching-test-keys"))));
+    Check((await reopenedNotes.Read("fixture")).Last().Question=="unique question 11","Saved Q&A reopens with intact app provenance");
+    using(var stopSave=new CancellationTokenSource()){stopSave.Cancel();bool refused=false;try{await notes.Save("fixture","cancelled question","answer",stopSave.Token);}catch(OperationCanceledException){refused=true;}Check(refused&&!(await notes.Read()).Any(r=>r.Question=="cancelled question"),"Cancelled teaching memory writes preserve the previous file");}
+    await notes.Clear();Check((await notes.Read()).Count==0,"Dedicated clear removes all saved teaching questions and answers");
     using var model = new TeachingModel(); using var client = new HttpClient(model) { BaseAddress = new("http://127.0.0.1:11434") };
     var service = new BuddyService(store, new(client)) { WebEnabled = true, AgentEnabled = true };
     model.Replies.Enqueue(valid);
@@ -60,6 +76,12 @@ try {
         Check(regionPayload.RootElement.GetProperty("model").GetString()=="gemma3:4b"&&regionPayload.RootElement.GetProperty("messages")[1].TryGetProperty("images",out _),"Explicit regional image requests use the local vision model, not a cloud adapter");
     }
     int beforeInvalidImage=model.Requests.Count;bool invalidImage=false;
+    model.Replies.Enqueue(new GuidePlan("The visible chart has two bars.",[]));
+    await service.Teach(new("What about the second bar?",context,RegionImageBase64:Convert.ToBase64String([1,2,3]),Conversation:[new("Explain this chart.","There are two bars.")],ImageScope:"window"),default);
+    Check(model.Requests[^1].Body.Contains("untrustedQuestionAnswerHistory")&&model.Requests[^1].Body.Contains("There are two bars.")&&model.Requests[^1].Body.Contains("selected scope is window"),"Explicit selected-window image and bounded follow-up Q&A reach local vision as untrusted evidence");
+    beforeInvalidImage=model.Requests.Count;
+    bool invalidHistory=false;try{await service.Teach(new("follow up",context,Conversation:Enumerable.Repeat(new TeachingExchange("q","a"),11).ToArray()),default);}catch(BuddyException){invalidHistory=true;}
+    Check(invalidHistory&&model.Requests.Count==beforeInvalidImage,"Oversize conversational history is refused before inference");
     try{await service.Teach(new("area",context,RegionImageBase64:"not base64"),default);}catch(BuddyException e)when(e.Code=="INVALID_IMAGE"){invalidImage=true;}
     Check(invalidImage&&model.Requests.Count==beforeInvalidImage,"Malformed regional image fails before inference");
     invalidImage=false;try{await service.Teach(new("area",context,RegionImageBase64:new string('a',2_800_001)),default);}catch(BuddyException e)when(e.Code=="INVALID_IMAGE"){invalidImage=true;}

@@ -4,7 +4,7 @@ Native Windows and Android applications backed by an AI model running on the use
 
 **Current version:** [VERSION](VERSION) · testing prerelease. [Changes](CHANGELOG.md) · [Downloads](https://github.com/Bhargav2301/Buddy/releases) · [Build status](https://github.com/Bhargav2301/Buddy/actions/workflows/build.yml).
 
-Buddy is a local-first cursor companion for voice, screen-aware teaching and reviewed prompt refinement. Home holds settings/history; closing it keeps the configured companion running. Optional action agents, local knowledge and Android access retain explicit privacy and approval boundaries. See [the current Windows workflow and acceptance limits](docs/Windows-0.3.9.md).
+Buddy is a local-first cursor companion for voice, screen-aware teaching and reviewed prompt refinement. Home holds settings/history; closing it keeps the configured companion running. Optional action agents, local knowledge and Android access retain explicit privacy and approval boundaries. See [the current preview and acceptance limits](docs/Windows-0.4.5.md).
 
 ## Start using it
 
@@ -12,9 +12,13 @@ Read [the setup guide](docs/Buddy-Setup-Guide.md). The Windows download contains
 
 **Windows installation:** the updated Windows ZIP corrects the `WindowsBase.dll` packaging collision. Extract it into a fresh folder, then run `Install-Buddy.cmd` to install, or `Run-Buddy.cmd` to launch with startup diagnostics. Logs are in `%LOCALAPPDATA%\Buddy\Logs`. Windows voice initialization is deferred until read-aloud is used. The native installer keeps PC conversations and pairing state in the user profile.
 
-**Windows companion (0.3.9):** Use your configured voice/chat shortcuts or click the companion to talk. Right-click for Type, Guide and optional tools. **Refine source field** captures the original supported AI composer before Buddy takes focus, then offers a field-anchored diff, Accept and Undo without sending. **Refine Buddy draft** is a separate local action. **Hide Home - keep Buddy running** preserves the tray service; **Exit Buddy (stops companion)** exits. Current settings and voices survive local upgrades. See [current behavior, tests and limits](docs/Windows-0.3.9.md).
+**Windows companion:** Use your configured voice/chat shortcuts or click the companion to talk. Right-click for Type, Guide and optional tools. **Refine source field** captures the original supported AI composer before Buddy takes focus, then offers a field-anchored diff, Accept and Undo without sending. **Refine Buddy draft** is a separate local action. **Hide Home - keep Buddy running** preserves the tray service; **Exit Buddy (stops companion)** exits. Current settings and voices survive local upgrades. See [current behavior, tests and limits](docs/Windows-0.4.5.md).
 
 **Settings:** Open Buddy again to show Home and select Settings, use the tray or Buddy Settings shortcut, or run `Open-Buddy-Settings.cmd` in a portable folder. `--background` requests companion startup. Offline Piper voice setup is optional and separate; model weights and user profiles are never committed.
+
+See the [core teaching and validation report](docs/Windows-0.4.2.md), [local Whisper evidence](docs/Whisper-local.md), and [evidence-linked Clicky comparison](docs/Clicky-comparison-0.4.md) for implementation status and remaining gaps.
+
+Installed [0.4.4](docs/Windows-0.4.4.md) remains the recoverable baseline with Night Mint and preserved settings. The separate [0.4.5 preview](docs/Windows-0.4.5.md) addresses selected-window and unchanged-refinement failures, adds a bounded exact-app launch path, and exposes advanced Buddy-draft refinement controls. See the [remaining feature matrix](docs/Remaining-union-0.4.5.md), [verified upstream comparison](docs/Upstream-union.md), and [development records](docs/development/README.md) for implementation and acceptance limits. Optional staged speech remains experimental; advanced refinement in original external fields remains incomplete.
 
 ## Project map
 

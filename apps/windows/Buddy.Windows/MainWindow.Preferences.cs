@@ -12,15 +12,19 @@ public sealed partial class MainWindow
     private readonly Dictionary<string, System.Windows.Controls.Button> settingsButtons = [];
     private int settingsRevision;
     private CancellationTokenSource? speechModelDownload;
+    private static bool AdvancedSettings(string section) => section is "Connectors" or "Internet" or "Skills" or "Channels" or "Devices";
     internal void OpenSettingsSection(string section)
     {
+        if (!FlushPendingPreferences()) return;
         settingsSection = SettingsSections.Contains(section) ? section : "General"; Summon(); NavigateHome("Settings");
     }
     private void BuildSettings()
     {
+        if (desktop.CoreControlsOnly && AdvancedSettings(settingsSection)) settingsSection = "General";
         var layout = new Grid(); layout.ColumnDefinitions.Add(new() { Width = new(172) }); layout.ColumnDefinitions.Add(new());
         var rail = new StackPanel { Margin = new(0, 0, 20, 0) }; rail.Children.Add(Text("Settings", 24)); settingsButtons.Clear();
         foreach (var section in SettingsSections) {
+            if (desktop.CoreControlsOnly && AdvancedSettings(section)) continue;
             var b = Btn(section, () => ShowSettingsCategory(section)); b.HorizontalContentAlignment = HorizontalAlignment.Left;
             b.Margin = new(0, 0, 0, 4); b.Padding = new(8); settingsButtons[section] = b; rail.Children.Add(b);
         }
@@ -32,20 +36,31 @@ public sealed partial class MainWindow
     }
     private void ShowSettingsCategory(string section)
     {
+        if (!FlushPendingPreferences()) return;
+        ClearPreferenceEditor();
         settingsSection = section; settingsRevision++;
         foreach (var item in settingsButtons) { item.Value.Background = item.Key == section ? BuddyTheme.Soft : Panel; item.Value.Foreground = item.Key == section ? Accent : Muted; }
         var p = new StackPanel(); settingsBody.Content = p; p.Children.Add(Text(section, 24));
         var notice = Text("", 12, Accent); AutomationProperties.SetLiveSetting(notice, AutomationLiveSetting.Polite);
         CheckBox Toggle(string label, bool value) { var box = new CheckBox { Content = new TextBlock { Text = label, TextWrapping = TextWrapping.Wrap }, IsChecked = value, Margin = new(0, 4, 0, 8) }; AutomationProperties.SetName(box, label); p.Children.Add(box); return box; }
-        void Save(Func<DesktopPreferences> next) { p.Children.Add(notice); p.Children.Add(Btn("Save changes", () => { try { SavePreferences(next()); notice.Text = "Saved on this PC."; } catch (Exception e) { notice.Text = e.Message; } }, true)); }
+        void Save(Func<DesktopPreferences> next) { p.Children.Add(notice); p.Children.Add(Btn("Save changes", () => { MarkPreferencesPending(); FlushPendingPreferences(); }, true)); BindPreferenceEditor(p, notice, next); }
         if (section == "General") {
             if (!companionPresenceAvailable) p.Children.Add(Text("Installed Buddy is still running. This preview keeps its companion hidden to prevent duplicates. Quit the installed copy from its tray menu; the preview will take over automatically.", 14, Muted));
             p.Children.Add(Text("Companion name", 14)); var name = new TextBox { Text = desktop.CompanionName, MaxLength = 40 }; StyleBox(name); AutomationProperties.SetName(name, "Companion name"); p.Children.Add(name);
-            p.Children.Add(Text("Appearance", 14)); var theme = new ComboBox { ItemsSource = new[] { "System", "Light", "Dark" }, SelectedItem = desktop.Appearance }; AutomationProperties.SetName(theme, "Appearance"); p.Children.Add(theme);
+            p.Children.Add(Text("Appearance", 14)); var theme = new ComboBox { ItemsSource = new[] { "Black", "Night Mint", "System", "Light", "Dark" }, SelectedItem = desktop.Appearance }; AutomationProperties.SetName(theme, "Appearance"); p.Children.Add(theme);
             var motion = Toggle("Reduce motion", desktop.ReduceMotion); var companionEnabled = Toggle("Show companion", desktop.ShowCompanion);
+            var compactPointer = Toggle("Use compact pointer and activity", desktop.CompactPointerMode);
+            p.Children.Add(Text("Off uses the official Buddy mascot. Compact mode shows a small pointer and listening, thinking or speaking activity. Its bars are decorative, not a microphone waveform; reduced motion keeps them still.", 14, Muted));
+            p.Children.Add(Text("Top-edge Buddy bar", 14));
+            var islandMode = new ComboBox { ItemsSource = new[] { "Hidden", "Compact", "Expanded" }, SelectedItem = desktop.IslandMode };
+            AutomationProperties.SetName(islandMode, "Top-edge Buddy bar"); p.Children.Add(islandMode);
+            p.Children.Add(Text("Optional quick access to Type, Voice, Guide and Refine, with the current task and Stop. The original companion remains available. Changing the bar never starts listening.", 14, Muted));
+            var hideFullscreen = Toggle("Hide Buddy bar in fullscreen apps", desktop.IslandHideInFullscreen);
+            var coreOnly = Toggle("Show core controls first", desktop.CoreControlsOnly);
+            p.Children.Add(Text("Simplify Home and Settings by hiding advanced entries. Saved data, existing permissions and tools are retained. Turn this off to restore all entries.", 14, Muted));
             var background = Toggle("Hide Home after an explicit background launch", desktop.StartInCompanionMode);
             p.Children.Add(Text("Closing Home keeps Buddy in the tray. Quit stops Buddy and phone access. Windows high contrast and reduced animation settings are respected.", 14, Muted));
-            Save(() => desktop with { CompanionName = string.IsNullOrWhiteSpace(name.Text) ? "Buddy" : name.Text.Trim(), Appearance = theme.SelectedItem?.ToString() ?? "System", ReduceMotion = motion.IsChecked == true, ShowCompanion = companionEnabled.IsChecked == true, StartInCompanionMode = background.IsChecked == true });
+            Save(() => desktop with { CompanionName = string.IsNullOrWhiteSpace(name.Text) ? "Buddy" : name.Text.Trim(), Appearance = theme.SelectedItem?.ToString() ?? desktop.Appearance, ReduceMotion = motion.IsChecked == true, ShowCompanion = companionEnabled.IsChecked == true, CompactPointerMode = compactPointer.IsChecked == true, IslandMode = islandMode.SelectedItem?.ToString() ?? desktop.IslandMode, IslandHideInFullscreen = hideFullscreen.IsChecked == true, CoreControlsOnly = coreOnly.IsChecked == true, StartInCompanionMode = background.IsChecked == true });
             p.Children.Add(Btn("Try pointing tutorial", ShowPractice));
         } else if (section == "Add-ons") {
             p.Children.Add(Text("The core teaches one step at a time. Turn on extra interactions here when you want them.",14,Muted));
@@ -58,12 +73,14 @@ public sealed partial class MainWindow
             var triangle=Toggle("Turn Buddy into a triangle while pointing",desktop.TrianglePointerEnabled);
             p.Children.Add(Text("A visual pointer only. Your real mouse stays under your control; reduced motion is respected.",14,Muted));
             Save(()=>desktop with { RegionSelectionEnabled=region.IsChecked==true,RegionVoiceAfterSelection=regionVoice.IsChecked==true,RegionShortcut=((ShortcutChoice)chord.SelectedItem).Label,TrianglePointerEnabled=triangle.IsChecked==true });
-            p.Children.Add(Btn("Local jobs and app knowledge",OpenTasks));
-            p.Children.Add(Btn("Connector setup and permissions",()=>ShowSettingsCategory("Connectors")));
+            p.Children.Add(Btn(desktop.CoreControlsOnly ? "App notes" : "Local jobs and app knowledge",OpenTasks));
+            if (!desktop.CoreControlsOnly) {
+                p.Children.Add(Btn("Connector setup and permissions",()=>ShowSettingsCategory("Connectors")));
+            }
             p.Children.Add(Btn("Local voice options",()=>ShowSettingsCategory("Voice")));
-            p.Children.Add(Btn("Action approval settings",()=>ShowSettingsCategory("Guide & Agent")));
+            p.Children.Add(Btn(desktop.CoreControlsOnly ? "Guidance settings" : "Action approval settings",()=>ShowSettingsCategory("Guide & Agent")));
             p.Children.Add(Btn("Prompt refinement",()=>ShowSettingsCategory("Prompts")));
-            p.Children.Add(Text("Say 'Start an agent to ...' for a reviewed action plan, or 'Search my app notes ...' for sourced local excerpts. One job runs at a time; results and cancellations are visible in Local jobs. No terminal is required.",14,Muted));
+            if (!desktop.CoreControlsOnly) p.Children.Add(Text("Say 'Start an agent to ...' for a reviewed action plan, or 'Search my app notes ...' for sourced local excerpts. One job runs at a time; results and cancellations are visible in Local jobs. No terminal is required.",14,Muted));
         } else if(section=="Connectors") {
             p.Children.Add(Text("Not connected - account grants disabled",18));
             p.Children.Add(Text("This build cannot open an account-consent flow or read your accounts. Provider registration and your specific permission are needed first. Existing ChatGPT connections do not automatically grant Buddy access.",14,Muted));
@@ -77,8 +94,9 @@ public sealed partial class MainWindow
         } else if (section == "Shortcuts") {
             p.Children.Add(Text("Chat shortcut", 14)); var keys = new ComboBox { ItemsSource = ShortcutChoice.Choices, SelectedItem = ShortcutChoice.Find(desktop.Shortcut) }; AutomationProperties.SetName(keys, "Chat shortcut"); p.Children.Add(keys);
             p.Children.Add(Text("Voice shortcut", 14)); var voiceKeys = new ComboBox { ItemsSource = ShortcutChoice.Choices, SelectedItem = ShortcutChoice.Find(desktop.VoiceShortcut) }; AutomationProperties.SetName(voiceKeys, "Voice shortcut"); p.Children.Add(voiceKeys);
-            var warning = Text(ShortcutChoice.Warning(desktop.Shortcut), 14, Muted); p.Children.Add(warning);
-            keys.SelectionChanged += (_, _) => warning.Text = ShortcutChoice.Warning(((ShortcutChoice)keys.SelectedItem).Label);
+            var warning = Text("", 14, Muted); p.Children.Add(warning);
+            void WarnShortcuts() => warning.Text = ShortcutChoice.Warnings(((ShortcutChoice)keys.SelectedItem).Label, ((ShortcutChoice)voiceKeys.SelectedItem).Label);
+            WarnShortcuts(); keys.SelectionChanged += (_, _) => WarnShortcuts(); voiceKeys.SelectionChanged += (_, _) => WarnShortcuts();
             var hold = Toggle("Hold the voice shortcut to talk; release to finish", desktop.HoldToTalk);
             p.Children.Add(Text("Chat always opens typing. Voice opens listening. Ctrl+Alt+Esc stops Buddy. A shortcut conflict keeps your previous bindings active.", 14, Muted));
             p.Children.Add(Text(shortcutHint.Text, 12, Muted));
@@ -86,6 +104,8 @@ public sealed partial class MainWindow
             p.Children.Add(Btn("Test typed shortcut surface", () => OpenQuick(false))); p.Children.Add(Btn("Test voice shortcut surface", () => OpenQuick(true)));
         } else if (section == "Voice") {
             var read = Toggle("Read voice answers aloud", desktop.ReadVoiceAnswers);
+            var stream = Toggle("Start speaking complete sentences while Buddy prepares the rest", desktop.StreamVoiceSentences);
+            p.Children.Add(Text("Optional for selected simple conversations: greetings, short jokes or poems, and selected neutral topics, with up to three sentences. Buddy generates sentences in separate stages; memory, screen context, advice, web research and actions use the full response. Stop cancels the remaining speech.", 14, Muted));
             ComboBox Select(string label, object[] items, object? selected) { p.Children.Add(Text(label, 14)); var box = new ComboBox { ItemsSource = items, SelectedItem = selected }; AutomationProperties.SetName(box, label); p.Children.Add(box); return box; }
             var recognitionEngines = new[]{new AudioChoice("whisper","Whisper - local neural recognition"),new AudioChoice("windows","Windows speech - legacy")};
             var recognitionEngine = Select("Speech recognition engine", recognitionEngines, recognitionEngines.FirstOrDefault(e=>e.Id==desktop.RecognitionEngine)??recognitionEngines[0]);
@@ -122,7 +142,7 @@ public sealed partial class MainWindow
             var output = Select("Headphone output", outputs, outputs.First(o => o.Id == desktop.HeadphoneDeviceId));
             p.Children.Add(Text("Audio stays on this PC. Headphones-only speech stops on disconnect or default-output change and never switches to speakers. Windows must identify the endpoint as headphones or a headset; unverified devices stay muted.", 14, Muted));
             p.Children.Add(Text(NeuralSpeechSynthesizer.Available ? "Piper runs locally on this PC. Preview each voice to choose your preferred sound; the first phrase may take longer while the model loads. Stop releases the voice worker. Voice quality and pronunciation vary." : "Windows voices run locally. The optional Piper voice files are unavailable in this build; selecting Piper keeps speech muted until the approved files are restored.", 14, Muted));
-            DesktopPreferences VoiceSelection() => desktop with { RecognitionEngine = ((AudioChoice)recognitionEngine.SelectedItem).Id, WhisperModel = ((WhisperModel)whisperModel.SelectedItem).Id, ReadVoiceAnswers = read.IsChecked == true, MicrophoneId = ((AudioChoice)mic.SelectedItem).Id, RecognitionLanguage = language.SelectedItem?.ToString() ?? "", VoiceEngine = ((AudioChoice)engine.SelectedItem).Id, NeuralSpeakerId = ((NeuralVoiceChoice)neuralVoice.SelectedItem).Id, NeuralPreset = ((NeuralVoiceChoice)neuralVoice.SelectedItem).Preset, VoiceName = selectedVoice.SelectedIndex <= 0 ? "" : selectedVoice.SelectedItem.ToString()!, VoiceRate = ((NeuralVoiceChoice)rate.SelectedItem).Id, HeadphonesOnly = headphonesOnly.IsChecked == true, HeadphoneDeviceId = ((AudioChoice)output.SelectedItem).Id };
+            DesktopPreferences VoiceSelection() => desktop with { RecognitionEngine = ((AudioChoice)recognitionEngine.SelectedItem).Id, WhisperModel = ((WhisperModel)whisperModel.SelectedItem).Id, ReadVoiceAnswers = read.IsChecked == true, StreamVoiceSentences = stream.IsChecked == true, MicrophoneId = ((AudioChoice)mic.SelectedItem).Id, RecognitionLanguage = language.SelectedItem?.ToString() ?? "", VoiceEngine = ((AudioChoice)engine.SelectedItem).Id, NeuralSpeakerId = ((NeuralVoiceChoice)neuralVoice.SelectedItem).Id, NeuralPreset = ((NeuralVoiceChoice)neuralVoice.SelectedItem).Preset, VoiceName = selectedVoice.SelectedIndex <= 0 ? "" : selectedVoice.SelectedItem.ToString()!, VoiceRate = ((NeuralVoiceChoice)rate.SelectedItem).Id, HeadphonesOnly = headphonesOnly.IsChecked == true, HeadphoneDeviceId = ((AudioChoice)output.SelectedItem).Id };
             Save(VoiceSelection);
             voiceActions.Children.Add(Btn("Preview voice", async () => { try { tts ??= new LocalVoiceOutput(); await tts.SpeakAsync("I'm here. Tell me what you need, and we'll take it one step at a time.", VoiceSelection()); } catch (OperationCanceledException) { notice.Text = "Preview stopped."; } catch (Exception ex) { notice.Text = ex.Message; } }));
             voiceActions.Children.Add(Btn("Stop preview", () => tts?.Cancel())); p.Children.Add(Btn("Try voice", () => OpenQuick(true)));
@@ -143,13 +163,22 @@ public sealed partial class MainWindow
             if (host is null) p.Children.Add(Text("The local service is starting…", 14, Muted));
             else _ = Setup(true, settingsRevision);
         } else if (section == "Brains") {
-            p.Children.Add(Text("On this PC — active", 18, Accent));
-            p.Children.Add(Text("Ollama runs locally. Grok, ChatGPT, Claude, Gemini and Codex account adapters are planned for 0.6 and are not connected in this preview. Consumer subscriptions do not automatically include API access.", 14, Muted));
+            p.Children.Add(Text("On this PC - active", 18, Accent));
+            p.Children.Add(Text("Local chat and voice use Ollama. A separately configured cloud text session requires review before each request; consumer subscriptions do not automatically include API access.", 14, Muted));
+            p.Children.Add(Text(providerSession?.Status.Detail ?? "Cloud text is disconnected.", 14, Muted));
+            p.Children.Add(Btn("Configure reviewed cloud text", OpenProviderSetup));
+            p.Children.Add(Btn("Open reviewed cloud text", OpenCloudText));
+            p.Children.Add(Btn("Local agent sessions", OpenLocalAgentSessions));
         } else if (section == "Skills") {
             p.Children.Add(Text("Available actions: Point, Guide, Refine and Dictate", 18));
             p.Children.Add(Text("Editable skill packs and Save as skill are planned for 0.7. No external skill runs in this preview.", 14, Muted));
         } else if (section == "Memory") {
             p.Children.Add(Text("Memories stay encrypted on this PC", 18));
+            var remember=Toggle("Remember my screen-teaching questions and answers on this PC",desktop.RememberTeaching);
+            p.Children.Add(Text("Off by default. When enabled, Buddy saves up to ten Q&A pairs per app, with one hundred total. Answers can include text you ask Buddy to read. Screenshots, microphone audio and unrelated field contents are not saved. Turning this off stops saving and using these notes; Clear removes them.",14,Muted));
+            Save(()=>desktop with{RememberTeaching=remember.IsChecked==true});
+            p.Children.Add(Btn("View saved teaching Q&A",async()=>{try{var rows=await TeachingMemory.Open().Read();var box=new TextBox{Text=rows.Count==0?"No teaching Q&A saved.":string.Join("\n\n",rows.Select(r=>r.App+" | "+r.At.ToLocalTime()+"\nYou: "+r.Question+"\nBuddy: "+r.Answer)),IsReadOnly=true,TextWrapping=TextWrapping.Wrap,VerticalScrollBarVisibility=ScrollBarVisibility.Auto};Dialog("Saved teaching Q&A",box).Show();}catch(Exception ex){notice.Text=ex.Message;}}));
+            p.Children.Add(Btn("Clear saved teaching Q&A",async()=>{try{await TeachingMemory.Open().Clear();voiceOverlay?.Cancel();notice.Text="Saved teaching Q&A cleared.";}catch(Exception ex){notice.Text=ex.Message;}}));
             p.Children.Add(Btn("Inspect saved facts", () => NavigateHome("Memories")));
             p.Children.Add(Text("The USER.md editor is planned for 0.7. Optional Honcho memory is off and unconnected; it requires separate consent before any conversation text leaves this PC.", 14, Muted));
         } else if (section == "Channels") {
@@ -158,8 +187,13 @@ public sealed partial class MainWindow
             p.Children.Add(Text("Telegram is planned for 0.8 and is not connected. Slack is later; iMessage is unavailable on Windows. Provider keys stay on the PC.", 14, Muted));
         } else if (section == "Guide & Agent") {
             var enabled = Toggle("Enable Agent on this PC", desktop.AgentEnabled); var strict = Toggle("Ask before every Agent change", desktop.StrictAgentConfirmations); var advance = Toggle("Advance Guide after a verified expected result", desktop.GuideAutoAdvance);
+            if (desktop.CoreControlsOnly) enabled.Visibility = strict.Visibility = Visibility.Collapsed;
             p.Children.Add(Text("Approve the plan first. Every click, edit and app launch requires confirmation. Pixel-only targets provide directions. Esc, Stop and physical pointer movement halt further actions.", 14, Muted));
-            Save(() => desktop with { AgentEnabled = enabled.IsChecked == true, StrictAgentConfirmations = strict.IsChecked == true, GuideAutoAdvance = advance.IsChecked == true });
+            p.Children.Add(Text("Guidance ink lifetime", 14));
+            var inkLifetime = new ComboBox { ItemsSource = new[] { 5, 15, 30 }, SelectedItem = desktop.InkLifetimeSeconds };
+            AutomationProperties.SetName(inkLifetime, "Guidance ink lifetime in seconds"); p.Children.Add(inkLifetime);
+            p.Children.Add(Text("Seconds to show verified teaching and Guide marks. Input, focus loss or a changed target still clears them early; a longer lifetime does not keep stale pointers.", 14, Muted));
+            Save(() => desktop with { AgentEnabled = enabled.IsChecked == true, StrictAgentConfirmations = strict.IsChecked == true, GuideAutoAdvance = advance.IsChecked == true, InkLifetimeSeconds = inkLifetime.SelectedItem is int seconds ? seconds : 15 });
             p.Children.Add(Btn("Try pointing tutorial", ShowPractice));
         } else if (section == "Prompts") {
             var badge = Toggle("Show the Refine badge beside supported AI-chat fields", desktop.ShowFieldBadge);
@@ -176,27 +210,38 @@ public sealed partial class MainWindow
     }
     private void SavePreferences(DesktopPreferences next)
     {
-        var old = desktop; var binding = shortcut?.Active; var voiceBinding = voiceShortcut?.Active;
-        if (next.Shortcut == next.VoiceShortcut) throw new InvalidOperationException("Choose different chat and voice shortcuts.");
-        if (next.Shortcut != desktop.Shortcut && shortcut is not null) {
-            var selected = ShortcutChoice.Choices.First(c => c.Label == next.Shortcut);
-            if (!shortcut.TrySet(selected)) throw new InvalidOperationException("That shortcut is in use. Your previous shortcut is unchanged.");
+        var old = desktop; var voiceBinding = voiceShortcut?.Active;
+        using (var bindings = ShortcutBindingUpdate.Prepare(shortcut, voiceShortcut, regionShortcut, next)) {
+            try { CaptureProtection.Set(next.ProtectScreenshots); next = persistPreferences(next); }
+            catch { CaptureProtection.Set(old.ProtectScreenshots); throw; }
+            bindings.Commit(); shortcut = bindings.Chat; voiceShortcut = bindings.Voice;
         }
+        desktop = next;
+        // Persistence can merge unrelated newer changes from another Buddy writer.
+        // Reconcile the returned effective values, never the stale proposed object.
+        var runtimeIssues = new List<string>();
         try {
-            if (voiceShortcut is not null && !voiceShortcut.TrySet(ShortcutChoice.Find(next.VoiceShortcut))) throw new InvalidOperationException("That voice shortcut is in use. Previous bindings remain active.");
-            if(next.RegionSelectionEnabled && regionShortcut is not null && !regionShortcut.TrySet(ShortcutChoice.FindRegion(next.RegionShortcut))) throw new InvalidOperationException("That area-selection shortcut is in use. Previous settings remain active.");
-            if(!next.RegionSelectionEnabled) regionShortcut?.Dispose();
-            CaptureProtection.Set(next.ProtectScreenshots); next.Save();
-        } catch { if (binding is not null) shortcut?.TrySet(binding); if (voiceBinding is not null) voiceShortcut?.TrySet(voiceBinding); if(old.RegionSelectionEnabled) regionShortcut?.TrySet(ShortcutChoice.FindRegion(old.RegionShortcut)); else regionShortcut?.Dispose(); CaptureProtection.Set(old.ProtectScreenshots); throw; }
-        desktop = next; BuddyTheme.Apply(next.Appearance, next.ReduceMotion); companion?.SetEnabled(companionPresenceAvailable && next.ShowCompanion);
-        ApplyDisplayName(); companion?.SetTriangleEnabled(next.TrianglePointerEnabled); ConfigureRegionHook();
+            using var bindings = ShortcutBindingUpdate.Prepare(shortcut, voiceShortcut, regionShortcut, next);
+            bindings.Commit(); shortcut = bindings.Chat; voiceShortcut = bindings.Voice;
+        } catch (InvalidOperationException ex) { runtimeIssues.Add("Saved shortcut settings could not become active. " + ex.Message + " Use the displayed active shortcuts or tray."); }
+        CaptureProtection.Set(next.ProtectScreenshots);
+        BuddyTheme.Apply(next.Appearance, next.ReduceMotion); companion?.SetEnabled(companionPresenceAvailable && next.ShowCompanion);
+        island?.SetMode(next.IslandMode); ApplyCoreNavigation();
+        if (old.CoreControlsOnly != next.CoreControlsOnly) NavigateHome(next.CoreControlsOnly && homeSection is "Devices" or "Memories" or "Prompts" ? "Conversations" : homeSection);
+        ApplyDisplayName(); companion?.SetTriangleEnabled(next.TrianglePointerEnabled); companion?.SetCompactPointerMode(next.CompactPointerMode); ConfigureRegionHook();
         fieldBadge?.SetEnabled(next.ShowFieldBadge);
         promptWatcher?.SetEnabled(next.LocalPromptSuggestions);
-        if (old.Shortcut != next.Shortcut || old.VoiceShortcut != next.VoiceShortcut || old.HoldToTalk != next.HoldToTalk) ConfigurePtt();
-        tts?.Cancel(); voiceOverlay?.Cancel(); StopMainDictation();
+        if (voiceBinding != voiceShortcut?.Active || old.HoldToTalk != next.HoldToTalk) ConfigurePtt();
+        if (old.VoiceEngine != next.VoiceEngine || old.VoiceName != next.VoiceName || old.NeuralSpeakerId != next.NeuralSpeakerId || old.NeuralPreset != next.NeuralPreset || old.VoiceRate != next.VoiceRate || old.HeadphonesOnly != next.HeadphonesOnly || old.HeadphoneDeviceId != next.HeadphoneDeviceId || old.ReadVoiceAnswers != next.ReadVoiceAnswers || old.StreamVoiceSentences != next.StreamVoiceSentences) { tts?.Cancel(); voiceOverlay?.Cancel(); }
+        if (old.RecognitionEngine != next.RecognitionEngine || old.RecognitionLanguage != next.RecognitionLanguage || old.MicrophoneId != next.MicrophoneId || old.WhisperModel != next.WhisperModel) { voiceOverlay?.Cancel(); StopMainDictation(); }
         if (old.CaptureOnVoice != next.CaptureOnVoice || old.AgentEnabled != next.AgentEnabled || old.AllowWebResearch != next.AllowWebResearch || old.BlockedApps != next.BlockedApps) Cancel();
         if (host is not null) { host.Service.WebEnabled = next.AllowWebResearch; host.Service.AgentEnabled = next.AgentEnabled; }
         UpdateShortcutHint();
+        // The disk commit succeeded. A merged shortcut can still be occupied by
+        // another app; retain the working registration and let Settings navigate
+        // to Shortcuts to repair it instead of misreporting an unsaved edit.
+        preferenceRuntimeWarning = string.Join(" ", runtimeIssues);
+        if (preferenceRuntimeWarning.Length > 0) status.Text = "Settings saved. " + preferenceRuntimeWarning;
     }
     private void ApplyDisplayName()
     {
@@ -236,5 +281,54 @@ public sealed partial class MainWindow
         p.Children.Add(erase);
         var card = BuddyTheme.Card(p); p.Children.Add(Btn("Keep my data", () => parent.Children.Remove(card)));
         parent.Children.Add(card); confirmation.Focus();
+    }
+}
+
+// A capability-free view: only bounded dropdown choices and a local preferences callback.
+// No credentials, provider transport, account flow or active-routing control exists here.
+internal sealed class ProviderDraftSetup : StackPanel
+{
+    private sealed record Choice(string Id, string Label, string[] Models)
+    {
+        public override string ToString() => Label;
+    }
+    private static readonly Choice[] choices = [
+        new("", "Choose a provider draft", []),
+        new("openai", "OpenAI API", ["gpt-4.1-mini", "gpt-4.1"]),
+        new("anthropic", "Anthropic API", ["claude-sonnet-4-20250514"]),
+        new("gemini", "Google Gemini API", ["gemini-2.0-flash"]),
+        new("openrouter", "OpenRouter API", ["openai/gpt-4.1-mini"])
+    ];
+    internal ProviderDraftSetup(Func<DesktopPreferences> preferences, Action<DesktopPreferences> save)
+    {
+        void Label(string text, double size = 14)
+            => Children.Add(new TextBlock { Text = text, FontSize = size, Foreground = BuddyTheme.Ink, TextWrapping = TextWrapping.Wrap, Margin = new(0, 0, 0, 8) });
+        Label("Not connected - live activation unavailable", 18);
+        Label("Save a provider and model draft on this PC. This sends no requests, accepts no keys or passwords, and grants no account access. Text and realtime transports are disconnected; microphone audio stays local.");
+        var current = preferences();
+        var provider = new ComboBox { ItemsSource = choices, SelectedItem = choices.FirstOrDefault(c => c.Id == current.ProviderDraft) ?? choices[0], Margin = new(0, 0, 0, 8) };
+        var model = new ComboBox { Margin = new(0, 0, 0, 8) };
+        AutomationProperties.SetName(provider, "Provider draft"); AutomationProperties.SetName(model, "Model draft");
+        Label("Provider draft"); Children.Add(provider); Label("Model draft"); Children.Add(model);
+        void Models(string selected = "")
+        {
+            var values = ((Choice)provider.SelectedItem).Models;
+            model.ItemsSource = values; model.SelectedItem = values.Contains(selected) ? selected : values.FirstOrDefault(); model.IsEnabled = values.Length > 0;
+        }
+        Models(current.ProviderModelDraft); provider.SelectionChanged += (_, _) => Models();
+        Label("Model identifiers are draft examples. Availability and account access have not been checked. Saving this draft keeps the local brain active.");
+        var status = new TextBlock { Text = "Disconnected. No provider session or audio connection.", TextWrapping = TextWrapping.Wrap, Foreground = BuddyTheme.Deep, Margin = new(0, 0, 0, 8) };
+        AutomationProperties.SetLiveSetting(status, AutomationLiveSetting.Polite); Children.Add(status);
+        Children.Add(BuddyTheme.Button("Save disconnected draft", () => {
+            try {
+                var selected = (Choice)provider.SelectedItem;
+                var selectedModel = model.SelectedItem as string ?? "";
+                if (selected.Id.Length > 0 && !selected.Models.Contains(selectedModel)) throw new InvalidOperationException("Choose a model draft for this provider.");
+                save(preferences() with { ProviderDraft = selected.Id, ProviderModelDraft = selectedModel });
+                status.Text = "Draft saved on this PC. Still disconnected; your local brain is unchanged.";
+            } catch (Exception ex) { status.Text = ex.Message; }
+        }));
+        var connect = new System.Windows.Controls.Button { Content = "Connect - unavailable in this build", IsEnabled = false, Margin = new(0, 0, 0, 8) };
+        AutomationProperties.SetName(connect, "Connect - unavailable in this build"); Children.Add(connect);
     }
 }

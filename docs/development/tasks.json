@@ -1,0 +1,3238 @@
+{
+  "schema": 1,
+  "integrationOwner": "/root",
+  "publication": "blocked_pending_trusted_direct_approval",
+  "installedBaseline": "0.4.4 / 950095dc1f8d1ce86b0f17bf8919a3465344e369",
+  "tasks": [
+    {
+      "id": "DEV-01",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "dd87c798a5973277856261a3410b804073cd951b",
+      "writeScope": [
+        "AGENTS.md",
+        "docs/development/*",
+        "scripts/team-ledger.py",
+        "tests/team_ledger_test.py"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Operating team, explicit ownership and machine-checked stale/dependency gates"
+      ],
+      "status": "validated",
+      "deliverable": "Reviewed source/report handoff with file hashes and evidence",
+      "worktree": "integration"
+    },
+    {
+      "id": "UX-43",
+      "attempt": 1,
+      "owner": "/root/desktop43",
+      "baseRevision": "dd87c798a5973277856261a3410b804073cd951b",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/CompanionActivity.cs",
+        "apps/windows/Buddy.Windows/CompanionFace.cs",
+        "apps/windows/Buddy.Windows/CursorCompanionWindow.cs",
+        "apps/windows/Buddy.Windows/DesktopPreferences.cs",
+        "apps/windows/Buddy.Windows/MainWindow.cs",
+        "apps/windows/Buddy.Windows/MainWindow.Preferences.cs",
+        "apps/windows/Buddy.Windows/GuidanceOverlay.cs",
+        "apps/windows/Buddy.Windows/VoiceTeaching.cs",
+        "apps/windows/Buddy.Windows/DesktopAssistant.cs",
+        "tests/Buddy.Windows.IntegrationTests/ParityVisualChecks.cs"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Optional visuals and bounded lifetime preserve mascot, settings and stale-target rules"
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed source/report handoff with file hashes and evidence",
+      "worktree": "desktop43",
+      "acceptedSnapshot": "d7827db135577dca73984e6d537af33a240608e249d086490cf3ad9054e6091f",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/CompanionActivity.cs",
+          "sha256": "bf2bf13555430767df0a8931e4dd13f52952eb9d35843ad86a2883ec8c0651f7"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/CompanionFace.cs",
+          "sha256": "75bab6bb8ebd2c714ca37557d5947f98315ccae44618c4208365065cd39ccf02"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/CursorCompanionWindow.cs",
+          "sha256": "2d6d4ff8730be182f2b49531b1b102eb6f75f4d5eb23978360e4c385fee00bb7"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/DesktopAssistant.cs",
+          "sha256": "f124260664b62decf4436ddf85de277680838d3a6d00fc593853ff8298152a5e"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/DesktopPreferences.cs",
+          "sha256": "518668e6f730fec9316b4245acc33f5915375f2f135c16778c7e52a5486c3b65"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/GuidanceOverlay.cs",
+          "sha256": "098c3f99453c65eb7bc38488939695ca7b178b50acf3a3f2faa4e2bfcf178a69"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/MainWindow.Preferences.cs",
+          "sha256": "3f19fe22e8336bc49deb2149491e272f51575e04f62dbd69d430b6b71fe7bf03"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/MainWindow.cs",
+          "sha256": "5baed141ff3f314de493a6bf329b51718c7b78cc2637cc495df32bef8fcf539c"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/VoiceTeaching.cs",
+          "sha256": "02d063481cf9fee239f2318f707b2603b9f7657ad0029b4f0c06ad5006e961ed"
+        },
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/ParityVisualChecks.cs",
+          "sha256": "3ceea04fb83d00d2312fb256d06822a3a1a40376b4dac1fb3515b427485e5702"
+        }
+      ]
+    },
+    {
+      "id": "SP-43",
+      "attempt": 1,
+      "owner": "/root/speech43",
+      "baseRevision": "dd87c798a5973277856261a3410b804073cd951b",
+      "writeScope": [
+        "services/Buddy.Server/StagedConversation.cs",
+        "services/Buddy.Server/Models.cs",
+        "services/Buddy.Server/BuddyService.cs",
+        "apps/windows/Buddy.Windows/LocalVoiceOutput.cs",
+        "apps/windows/Buddy.Windows/SentencePlayback.cs",
+        "apps/windows/Buddy.Windows/VoiceOverlayWindow.cs",
+        "tests/Buddy.Staged.Tests/*"
+      ],
+      "dependencies": {
+        "UX-43": 1
+      },
+      "acceptance": [
+        "First speech overlaps later generation; scope/default/cancellation/one-endpoint boundaries pass"
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed source/report handoff with file hashes and evidence",
+      "worktree": "speech43",
+      "acceptedSnapshot": "fcd272620891485160e5a74e10877777011710b2b61ac225ea25285d01182f86",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/LocalVoiceOutput.cs",
+          "sha256": "67ae818f468a617f94043e87099a9152f6f32035f44bc585635ad9a4d8fe37d3"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/SentencePlayback.cs",
+          "sha256": "8dec5080914d89b088a9c3367276fe51958de80b7146af2541b274a72f1085ac"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/VoiceOverlayWindow.cs",
+          "sha256": "48fe7f90cb7f1103bb2e945f0f114a9dcef577b7b4c433fd6c1f71bbfae2cda9"
+        },
+        {
+          "path": "services/Buddy.Server/BuddyService.cs",
+          "sha256": "05c0f14b67e9a5b21fc39ad4ccdb2806692327c3bcf3fbf81a67802f8ac0f87e"
+        },
+        {
+          "path": "services/Buddy.Server/Models.cs",
+          "sha256": "311a45fa3bc034e7a6a931852f2b2aceb4e36d7668d1a108e5782977a39ae946"
+        },
+        {
+          "path": "services/Buddy.Server/StagedConversation.cs",
+          "sha256": "e0bf192291402e0fe5428f661f78828d89f71b8659eec4f8e391e38ada84f081"
+        },
+        {
+          "path": "tests/Buddy.Staged.Tests/Buddy.Staged.Tests.csproj",
+          "sha256": "d0e5bef31d4c232d3ab840d75ad2a4e36a22427993dc604d194a58691a7b1a33"
+        },
+        {
+          "path": "tests/Buddy.Staged.Tests/Program.cs",
+          "sha256": "d1bfe2f873a308813d4927c0dd139fc916575b8420c56d50f9d698f1dffd004c"
+        },
+        {
+          "path": "tests/Buddy.Staged.Tests/README.md",
+          "sha256": "465097f20ae8923ff9b81a28483941a5e85c333395cd2989b82d02324a94db28"
+        }
+      ]
+    },
+    {
+      "id": "NET-43",
+      "attempt": 1,
+      "owner": "/root/provider43",
+      "baseRevision": "dd87c798a5973277856261a3410b804073cd951b",
+      "writeScope": [
+        "services/Buddy.Server/ProviderTransport*.cs",
+        "services/Buddy.Server/ProviderMock*.cs",
+        "tests/Buddy.Provider.Tests/*",
+        "services/Buddy.Server/RealtimeTextTransport.cs"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Bounded disconnected text transports pass mock-only rejection/cancellation tests; no credentials/network activation"
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed source/report handoff with file hashes and evidence",
+      "worktree": "provider43",
+      "acceptedSnapshot": "2e3cbad691522a6457a4834ea15faf59f547298dd5073198836c581d6700d758",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/ProviderTransports.cs",
+          "sha256": "03038fae7e7b7de045cc6453fb17b77042e9b9aa3da06973a4245808070cdc88"
+        },
+        {
+          "path": "services/Buddy.Server/RealtimeTextTransport.cs",
+          "sha256": "402f88e1598ab3b2e5590070385ffe5c01b0dcf1fdf3e068c23c3f0aee073ff8"
+        },
+        {
+          "path": "tests/Buddy.Provider.Tests/Buddy.Provider.Tests.csproj",
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5"
+        },
+        {
+          "path": "tests/Buddy.Provider.Tests/Program.cs",
+          "sha256": "74ef674a9b8caa44f0e96a18ea2467fd90f78a6a065d95eb6251bca9d3381bdf"
+        },
+        {
+          "path": "tests/Buddy.Provider.Tests/README.md",
+          "sha256": "207f61203508de907ac8759a1fc3d3629cbea0ae6300514b4086f9a51f1aa3b6"
+        }
+      ]
+    },
+    {
+      "id": "QA-43",
+      "attempt": 1,
+      "owner": "/root/qa43",
+      "baseRevision": "dd87c798a5973277856261a3410b804073cd951b",
+      "writeScope": [
+        "tests/Buddy.Windows.IntegrationTests/Program.cs",
+        "tests/validation/*"
+      ],
+      "dependencies": {
+        "UX-43": 1,
+        "SP-43": 1,
+        "NET-43": 1
+      },
+      "acceptance": [
+        "Independent review and boundary checks; exact integrated source identified before native runs"
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed source/report handoff with file hashes and evidence",
+      "worktree": "qa43",
+      "acceptedSnapshot": "cd7631fbad1e7ba0e5e0536ebec8c1b0a0bb19f4970ddd978a81a0c4d5ba9230",
+      "acceptedFiles": [
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/Program.cs",
+          "sha256": "627bd08f5f1fa765801564336601dada1f6a37071a58b2039c638db8d67eea84"
+        },
+        {
+          "path": "tests/validation/Buddy.ParityBoundary.Tests/Buddy.ParityBoundary.Tests.csproj",
+          "sha256": "b0330a8146116151def7a3903f00483524dcc2dedd9406ea576c0ece76f165a3"
+        },
+        {
+          "path": "tests/validation/Buddy.ParityBoundary.Tests/Program.cs",
+          "sha256": "ebb39b9ed74ea82d617383e364418f9293f1cdbaf9cf8dceb918f5a4698dd5ab"
+        }
+      ]
+    },
+    {
+      "id": "DOC-43",
+      "attempt": 1,
+      "owner": "/root/docs43",
+      "baseRevision": "dd87c798a5973277856261a3410b804073cd951b",
+      "writeScope": [
+        "docs/Clicky-comparison-0.4.md",
+        "docs/Windows-0.4.3.md"
+      ],
+      "dependencies": {
+        "UX-43": 1,
+        "SP-43": 1,
+        "NET-43": 1,
+        "QA-43": 1
+      },
+      "acceptance": [
+        "Source-backed implementation/partial/missing/live-unverified table and report"
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed source/report handoff with file hashes and evidence",
+      "worktree": "docs43",
+      "acceptedSnapshot": "1494206f8ceda8c1b28dc8e8305120a4f1bb659401ee53fa55ba0f276b49e118",
+      "acceptedFiles": [
+        {
+          "path": "docs/Clicky-comparison-0.4.md",
+          "sha256": "189362f4098136cef804a5c04f09215dbc43c3a8fcc7d7416dece0c2ced0c487"
+        },
+        {
+          "path": "docs/Windows-0.4.3.md",
+          "sha256": "61c03215b828900356c72f449df926f033db99a1fbe98458c28ef04a05313e29"
+        }
+      ]
+    },
+    {
+      "id": "PUB-42",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "dd87c798a5973277856261a3410b804073cd951b",
+      "writeScope": [
+        "publication/feature-branch",
+        "publication/draft-pr-1"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Trusted direct approval, sanitized push, exact-head draft verification and CI"
+      ],
+      "status": "blocked",
+      "deliverable": "Verified remote draft PR and CI",
+      "worktree": "integration"
+    },
+    {
+      "id": "INT-43",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "93dc72fe58e81e4c59d279f8ab29ed0ac50803f7",
+      "writeScope": [
+        "VERSION",
+        "README.md",
+        "CHANGELOG.md",
+        "apps/windows/Buddy.Windows/app.manifest",
+        "services/Buddy.Server/StagedConversation.cs",
+        "docs/*",
+        "docs/development/*"
+      ],
+      "dependencies": {
+        "UX-43": 1,
+        "SP-43": 1,
+        "NET-43": 1,
+        "QA-43": 1,
+        "DOC-43": 1
+      },
+      "acceptance": [
+        "Final integrated source tests and honest real-model results; separate package receipt required before delivery"
+      ],
+      "status": "validated",
+      "deliverable": "Local source commit with package and validation receipts in the final handoff",
+      "worktree": "integration",
+      "validation": {
+        "applicationAssertions": 1092,
+        "coordinationTests": 12,
+        "stagingLiveAcceptance": "failed_whole_answer_fallback",
+        "physicalAudioAcceptance": "pending",
+        "installedVersion": "0.4.2"
+      }
+    },
+    {
+      "id": "PLAN-44",
+      "attempt": 1,
+      "owner": "/root/speech43",
+      "baseRevision": "1b330c4d8aecbba5bcac447fcf64281b6b1643d6",
+      "writeScope": [
+        "services/Buddy.Server/AssistantModels.cs",
+        "services/Buddy.Server/AssistantPlanning.cs",
+        "services/Buddy.Server/GuideSafety.cs",
+        "services/Buddy.Server/ConversationalReply.cs",
+        "services/Buddy.Server/OllamaEngine.cs",
+        "services/Buddy.Server/BuddyService.cs",
+        "services/Buddy.Server/ReplyConstraints.cs",
+        "tests/Buddy.PlanningRepair.Tests/*"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Typed/recoverable Comet planning, actionless clarification, Guide binding and explicit concise-answer constraints; strict execution gates unchanged"
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed handoff with exact file hashes, executed tests and remaining gaps",
+      "worktree": "reliability44",
+      "privateEvidenceScope": [
+        "validation/plan44/*"
+      ],
+      "acceptedSnapshot": "91c1a535dd39454eb6772fd2d6dcb29a3fb0795c42a873fbcd6d7b8c0c8808c2",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/AssistantModels.cs",
+          "sha256": "f7df668fb0c714d8cf40e4fae69a8cd4dc60469c3c0445230792aa60af92eb72"
+        },
+        {
+          "path": "services/Buddy.Server/AssistantPlanning.cs",
+          "sha256": "21509c7fa456e359ec78bfa67bf0da29b9d2ee1d713359eec2761d46fab9eca9"
+        },
+        {
+          "path": "services/Buddy.Server/BuddyService.cs",
+          "sha256": "61c7799245db8d03361b207b3ddb28297566cf2c0172991376785414ad0f4d79"
+        },
+        {
+          "path": "services/Buddy.Server/ConversationalReply.cs",
+          "sha256": "4a42cd62368d73f1cff604d270fcdd8410f0700eba9e98ccfe99da7ed16cd676"
+        },
+        {
+          "path": "services/Buddy.Server/GuideSafety.cs",
+          "sha256": "b79a61ed5bb5e69bb7d5fcc6a33a5cf75209b5f15fc53244cac10cc8a293a294"
+        },
+        {
+          "path": "services/Buddy.Server/OllamaEngine.cs",
+          "sha256": "5432ffa460cc59aed06a7bc4bc5759b266894f8ecb9dac1e598974eafbb0e3c4"
+        },
+        {
+          "path": "services/Buddy.Server/ReplyConstraints.cs",
+          "sha256": "d6f53b63135cb4485d62941faa04a74fa3a5465e3f650ff99dbf2199218ea39d"
+        },
+        {
+          "path": "tests/Buddy.PlanningRepair.Tests/Buddy.PlanningRepair.Tests.csproj",
+          "sha256": "c6d7a691c15d01cf0c23baab06a7e417dd001db7b5bbf16bd25cbe19e5317be9"
+        },
+        {
+          "path": "tests/Buddy.PlanningRepair.Tests/Program.cs",
+          "sha256": "d781cae189dc1f190c2aa9a4df6224fca2b30702d77931322e3d6f56aa23226d"
+        },
+        {
+          "path": "tests/Buddy.PlanningRepair.Tests/README.md",
+          "sha256": "dc44adac95269d64de63201e3f3a8495ca969f2997045dca2384ff190dfa1ec5"
+        }
+      ]
+    },
+    {
+      "id": "UI-44",
+      "attempt": 1,
+      "owner": "/root/desktop43",
+      "baseRevision": "1b330c4d8aecbba5bcac447fcf64281b6b1643d6",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/AssistantInteraction.cs",
+        "apps/windows/Buddy.Windows/DesktopAssistant.cs",
+        "apps/windows/Buddy.Windows/InstalledAppResolver.cs",
+        "apps/windows/Buddy.Windows/MainWindow.cs",
+        "apps/windows/Buddy.Windows/MainWindow.Preferences.cs",
+        "apps/windows/Buddy.Windows/DesktopPreferences.cs",
+        "apps/windows/Buddy.Windows/AssistantSettings.cs",
+        "apps/windows/Buddy.Windows/CompanionIsland.cs",
+        "tests/Buddy.Windows.IntegrationTests/ReliabilityUiChecks.cs",
+        "apps/windows/Buddy.Windows/MainWindow.Home.cs"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Repair sticky Guide/Agent mode and clarify-only UI; then coherent local core island using original Buddy assets with reversible extra-feature presentation"
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed handoff with exact file hashes, executed tests and remaining gaps",
+      "worktree": "desktop44",
+      "acceptedSnapshot": "6c76423526975c03da3d7ac08be7a2d733ad6e586ddc19cb3897cf4ff6c614dc",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/AssistantInteraction.cs",
+          "sha256": "f8fb4a66e909967e58cec44dbadee4b40be04779b29579547c8c5bf9920648f0"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/AssistantSettings.cs",
+          "sha256": "1d3351101df63b28221a0cddf973abba3f1b8aed7bd24f5c75341bf619f80952"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/CompanionIsland.cs",
+          "sha256": "1db0c2a2b768b5c0da9d56b462ecc1ea9630a2739f3670de95e6956753e84bab"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/DesktopAssistant.cs",
+          "sha256": "71028754d1236c20c883f7653708d25983b965baa480977e45a51881e12034f1"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/DesktopPreferences.cs",
+          "sha256": "0046fc293df7a64bec3886819a61c8d985b5e59b58287dd93fb25d30291a0d07"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/MainWindow.Home.cs",
+          "sha256": "b56f5610b15c05aeaf7df4651757f58e4b8c364f7d18994f542a0fc029546b5b"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/MainWindow.Preferences.cs",
+          "sha256": "d5d77671ba09e4df324e70c4e4c02337ccbadb35db1e86bb63e7329ca938e1c4"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/MainWindow.cs",
+          "sha256": "c0f21987fe358a1b011075b2dd9515f4c4328f5c0f19082746627837ecc85dac"
+        },
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/ReliabilityUiChecks.cs",
+          "sha256": "6d32d5fc9bf08b9a24344999b3f38862f530ade6ec746e78870a9af5b090da29"
+        }
+      ]
+    },
+    {
+      "id": "REFINE-44",
+      "attempt": 1,
+      "owner": "/root/provider43",
+      "baseRevision": "1b330c4d8aecbba5bcac447fcf64281b6b1643d6",
+      "writeScope": [
+        "services/Buddy.Server/Refinement.cs",
+        "services/Buddy.Server/Models.cs",
+        "services/Buddy.Server/RefinementCore.cs",
+        "services/Buddy.Server/RefinementContext.cs",
+        "tests/Buddy.RefinementCore.Tests/*"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "No invented requirements; preserve original/diff/Undo; pure technique/context/budget core with strict provenance and goldens"
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed handoff with exact file hashes, executed tests and remaining gaps",
+      "worktree": "refine44",
+      "privateEvidenceScope": [
+        "validation/refine44*",
+        "validation/REFINE-44-handoff.json"
+      ],
+      "acceptedSnapshot": "b76e35a557152f118aeca8814ca7a127730d30bc2afc4855ef3293d9f22b8df8",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/Models.cs",
+          "sha256": "dcad227b3d0bab6bed014975ef4ddd4fa32bd89f52efc0c227c0d03c68be3b9f"
+        },
+        {
+          "path": "services/Buddy.Server/Refinement.cs",
+          "sha256": "b8fe987eb1bb822baabce7b87b6938dc8d6ca2f9b4a24c10883e1826af3bf5d7"
+        },
+        {
+          "path": "services/Buddy.Server/RefinementContext.cs",
+          "sha256": "8704e0ee84f1ea657f5c1e7c42d5191d3e722f4b22efbac51a698f9a69382b95"
+        },
+        {
+          "path": "services/Buddy.Server/RefinementCore.cs",
+          "sha256": "810ead402ef2c72bef2c5f36e44dc263e5f421a5b5e88bb9a57b53ddfc827012"
+        },
+        {
+          "path": "tests/Buddy.RefinementCore.Tests/Buddy.RefinementCore.Tests.csproj",
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5"
+        },
+        {
+          "path": "tests/Buddy.RefinementCore.Tests/Program.cs",
+          "sha256": "dd54e703e5626f0d53e46ef4d4140f54d8cfb8216e2f401aa6c32601995e19f0"
+        }
+      ]
+    },
+    {
+      "id": "QA-45",
+      "attempt": 1,
+      "owner": "/root/qa43",
+      "baseRevision": "1b330c4d8aecbba5bcac447fcf64281b6b1643d6",
+      "writeScope": [
+        "tests/validation/Buddy.ReliabilityBoundary.Tests/*",
+        "tests/validation/Buddy.ReliabilityLive.Tests/*",
+        "tests/Buddy.Windows.IntegrationTests/Program.cs"
+      ],
+      "dependencies": {
+        "PLAN-44": 1,
+        "UI-44": 1,
+        "REFINE-44": 1
+      },
+      "acceptance": [
+        "Independent regression and actual local-model/source-flow evidence; exact errors cannot be hidden behind aggregate counts"
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed handoff with exact file hashes, executed tests and remaining gaps",
+      "worktree": "qa44repair",
+      "acceptedSnapshot": "ad9112267cc7cad51c3847d345f784b66d94df3ba0c5968757c39a6944af0dc3",
+      "acceptedFiles": [
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/Program.cs",
+          "sha256": "535195e4995c3ccdbdff094d3a70000c1e59b540498bd9e00f01918d9bce0ea6"
+        },
+        {
+          "path": "tests/validation/Buddy.ReliabilityBoundary.Tests/Buddy.ReliabilityBoundary.Tests.csproj",
+          "sha256": "9096bc59c11a48fbbded67a89a45e13dffc18c2455de96293180b02b9f62b73f"
+        },
+        {
+          "path": "tests/validation/Buddy.ReliabilityBoundary.Tests/CoreChecks.cs",
+          "sha256": "96ccb24a3b31ecb00641723923ea8283193153119abf2ee0920e9f06cb0e0cdf"
+        },
+        {
+          "path": "tests/validation/Buddy.ReliabilityBoundary.Tests/Fixture.cs",
+          "sha256": "95b4700979229314ff47068fd52cbcc3d2a4c3413197c2abd731e8540bc372a7"
+        },
+        {
+          "path": "tests/validation/Buddy.ReliabilityBoundary.Tests/Program.cs",
+          "sha256": "f30bb7df9613bdab3ecc10fe2b41e65b7af93c8c0c8ee787260ce1dfcb7347d0"
+        },
+        {
+          "path": "tests/validation/Buddy.ReliabilityBoundary.Tests/README.md",
+          "sha256": "8720f4181d4cf079ef66bd77f1c83e0f7f4adde81a390827a1b4f0209aae03fb"
+        },
+        {
+          "path": "tests/validation/Buddy.ReliabilityBoundary.Tests/ReviewedSource.targets",
+          "sha256": "a7a32e66c2c9dee6ac792681e97ff4eeee9c92bd4b25fe91bc87c5fd5c4ea458"
+        },
+        {
+          "path": "tests/validation/Buddy.ReliabilityLive.Tests/Buddy.ReliabilityLive.Tests.csproj",
+          "sha256": "d9c341f5e5a58f82531a4f577cc4a89765ac07d3c9de45a917b8a5ed7fe1468b"
+        },
+        {
+          "path": "tests/validation/Buddy.ReliabilityLive.Tests/Program.cs",
+          "sha256": "b8599eec60938be3140c38d6a4273f8839cb7911a7208c23ffd4ec3f65d8643b"
+        },
+        {
+          "path": "tests/validation/Buddy.ReliabilityLive.Tests/README.md",
+          "sha256": "2069d41fa350d0a4ab4b40289e179924416ae439242e84ea3e0854f6762b1995"
+        }
+      ]
+    },
+    {
+      "id": "DOC-44",
+      "attempt": 1,
+      "owner": "/root/docs43",
+      "baseRevision": "1b330c4d8aecbba5bcac447fcf64281b6b1643d6",
+      "writeScope": [
+        "docs/Upstream-union.md",
+        "docs/Windows-0.4.4.md",
+        "docs/Clicky-comparison-0.4.md",
+        "docs/Existing-feature-migration.md"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Platform/source/license matrix, coherent UI scope and reversible migration inventory; distinguish implemented/partial/missing/real-unverified"
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed handoff with exact file hashes, executed tests and remaining gaps",
+      "worktree": "docs44",
+      "acceptedSnapshot": "323b44a4591933ee0c8e14e5da2df3699d0e2ce49e3d2d02dc10810a9cf22646",
+      "acceptedFiles": [
+        {
+          "path": "docs/Clicky-comparison-0.4.md",
+          "sha256": "98dba273ebcb8c344d08ab1801a001da5c91900840f10e5df36f924508f1a42e"
+        },
+        {
+          "path": "docs/Existing-feature-migration.md",
+          "sha256": "c8597fcf80def4c8a321c64c83e679f1fc83ba2ba645d95d3c74b430922c37e1"
+        },
+        {
+          "path": "docs/Upstream-union.md",
+          "sha256": "68f05f637b61c535d3aca655d055b613c3601eb26d328aff9149366ab036ea36"
+        },
+        {
+          "path": "docs/Windows-0.4.4.md",
+          "sha256": "e39a3fb172fd5bf4027347dc390529d9114632739d78ffdc50bbc91f357feb8c"
+        }
+      ]
+    },
+    {
+      "id": "INT-45",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "1b330c4d8aecbba5bcac447fcf64281b6b1643d6",
+      "writeScope": [
+        "VERSION",
+        "README.md",
+        "CHANGELOG.md",
+        "apps/windows/Buddy.Windows/app.manifest",
+        "docs/*",
+        "docs/development/*",
+        "tests/Buddy.Assistant.Tests/Program.cs",
+        "tests/Buddy.Mvp.Tests/Program.cs",
+        "services/Buddy.Server/ReplyConstraints.cs",
+        "services/Buddy.Server/AssistantPlanning.cs",
+        "tests/Buddy.PlanningRepair.Tests/Program.cs",
+        "tests/Buddy.Windows.IntegrationTests/SourceFieldChecks.cs",
+        "services/Buddy.Server/OllamaEngine.cs",
+        "services/Buddy.Server/ConversationalReply.cs",
+        "services/Buddy.Server/BuddyService.cs",
+        "tests/Buddy.Windows.IntegrationTests/ReliabilityUiChecks.cs",
+        "tests/validation/Buddy.ReliabilityLive.Tests/Program.cs",
+        "tests/Buddy.Windows.IntegrationTests/Program.cs",
+        "services/Buddy.Server/GuideLessons.cs",
+        "tests/Buddy.Windows.IntegrationTests/ParityVisualChecks.cs",
+        "tests/Buddy.Windows.IntegrationTests/NightMintChecks.cs",
+        "apps/windows/Buddy.Windows/MainWindow.cs",
+        "apps/windows/Buddy.Windows/Themes/Controls.xaml",
+        "tests/Buddy.Windows.IntegrationTests/QaChecks.cs",
+        "tests/Buddy.Windows.IntegrationTests/VisualChecks.cs",
+        "tests/Buddy.Windows.IntegrationTests/TrayRoutingChecks.cs",
+        "apps/windows/Buddy.Windows/VoiceOverlayWindow.cs"
+      ],
+      "dependencies": {
+        "PLAN-44": 1,
+        "UI-44": 1,
+        "REFINE-44": 1,
+        "QA-45": 1,
+        "DOC-44": 1,
+        "MINT-44": 1
+      },
+      "acceptance": [
+        "Reviewed final integration with real-model and applicable native checks, fresh preview, installed 0.4.2 and all prior artifacts preserved"
+      ],
+      "status": "validated",
+      "deliverable": "Reviewed handoff with exact file hashes, executed tests and remaining gaps",
+      "worktree": "integration",
+      "rootAmendments": [
+        "Whole-operation Guide cancellation and nonpointable contradictory-reference lessons",
+        "Night Mint dropdown keyboard-focus ring/gap and complete Home footer labels",
+        "Native renderer includes actual owner background; actual Guide and Voice render coverage; legacy provider fixture checks visible inputs",
+        "Wrapped voice capture label; native windows rendered directly without stretching",
+        "Legacy mixed workflow fixture plans final goal and provides independent teacher preparation",
+        "Guide fixture locates owned panel directly; tray fixture uses F23/F24 instead of competing installed Space chords"
+      ],
+      "validation": {
+        "serviceMock": 1145,
+        "nativeOwned": 418,
+        "realService": 21,
+        "realNative": 5,
+        "packaging": "root-owned receipt outside source"
+      }
+    },
+    {
+      "id": "MINT-44",
+      "attempt": 1,
+      "owner": "/root/desktop43",
+      "baseRevision": "1b330c4d8aecbba5bcac447fcf64281b6b1643d6",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/*.cs",
+        "apps/windows/Buddy.Windows/*.xaml",
+        "tests/Buddy.Windows.IntegrationTests/NightMintChecks.cs",
+        "apps/windows/Buddy.Windows/Themes/*.xaml"
+      ],
+      "dependencies": {
+        "UI-44": 1
+      },
+      "acceptance": [
+        "Map full user-selected Night Mint 1.1 tokens into native controls/states/overlays; preserve artwork, behavior and preferences; build and owned-fixture evidence required"
+      ],
+      "status": "accepted",
+      "deliverable": "Incremental theme handoff against recorded pre-theme worker hashes",
+      "worktree": "desktop44",
+      "privateEvidenceScope": [
+        "validation/nightmint44/*"
+      ],
+      "acceptedSnapshot": "864b5dddfe980936216a9ad7aec96e1596d7e0333653a564314b12a41c484c97",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/BuddyTheme.cs",
+          "sha256": "968bc82f80e080ff9de9e17b08e1bd7c859f0865cca5c1506d9f1451417d40b1"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/CompanionIsland.cs",
+          "sha256": "49c41553bedbc4dffdfd28e2770d5519b0dd027300bd1750eb1c39c91afe30d3"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/CursorCompanionWindow.cs",
+          "sha256": "9aceaddf56664d5fbb91c6317971d44ab88e9691ce168c33ebd67b25d1f9e75a"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/DesktopPreferences.cs",
+          "sha256": "4256440e94f697c0f9f66faa3ea7700b74bfde99b3b04dcd35afabcb3acf42ca"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/DictationWindow.cs",
+          "sha256": "d090df3a67b8076ee56cf87f0e8b2b2aaa1b04576e4523dfd1549809b347656e"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/ExecutionBanner.cs",
+          "sha256": "1d532af585496d68282ff2859e9966c1bac867ca4ed9db4b9cb9086c1e794e78"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/GuidanceOverlay.cs",
+          "sha256": "cbf96e409213df9803e35ca18f90a8b91cb32052289def2c63ef88cad4b57003"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/InlinePromptWindow.cs",
+          "sha256": "b2403c000b106a3d65ee323639ca57cba7bce90c5cbd33d08fbab9cd373b045e"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/MainWindow.Preferences.cs",
+          "sha256": "ab0a9a07e6e076f6c17ce62b0101662c22ea83a9b6aa782ff5488ed6a5f94b94"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/MainWindow.cs",
+          "sha256": "c8ef6f28bbcce865f65cabb90c8cf512041c74bd00085180fc263ec4fa68de4f"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/RegionSelectionWindow.cs",
+          "sha256": "0c89674b06bcf0e7ebe57aa42e7016b2464d195023df5205153a562a2d471dba"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/Themes/Controls.xaml",
+          "sha256": "b98037cbe8effd65b911ecb40e3cf4644974c89ecafb66c6041e0a82727fbfc5"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/VoiceOverlayWindow.cs",
+          "sha256": "df42bf9d0df7d4e30d309106b36dd34a7f2b5ca68b1b0afe0b86618d1c5e265d"
+        },
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/NightMintChecks.cs",
+          "sha256": "edf1301d8f9f371a3b7f12e6ead388e45fa181547dedc1cecf54b08a33569853"
+        }
+      ]
+    },
+    {
+      "id": "REFINE-45",
+      "attempt": 1,
+      "owner": "/root/provider43",
+      "baseRevision": "950095dc1f8d1ce86b0f17bf8919a3465344e369",
+      "worktree": "core-refine45",
+      "writeScope": [
+        "services/Buddy.Server/Refinement.cs",
+        "services/Buddy.Server/RefinementCore.cs",
+        "services/Buddy.Server/RefinementContext.cs",
+        "services/Buddy.Server/RefinementPreparation.cs",
+        "tests/Buddy.RefinementCore.Tests/*"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Single deterministic public preflight shared with production service; no retrieval/token claims; preserve original/fidelity/budget boundaries."
+      ],
+      "status": "accepted",
+      "deliverable": "Scoped handoff, exact file hashes, build-input snapshot, executed tests and limitations",
+      "acceptedSnapshot": "5d7c36fa9f6badb7ea33efb871e4638b3f6b18a874a8d9547713c115eb2200f6",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/RefinementPreparation.cs",
+          "sha256": "feb305069f4634b5f7311aa7198336072fce6d593a2dd2a85b00956b1f969aad"
+        },
+        {
+          "path": "services/Buddy.Server/Refinement.cs",
+          "sha256": "4671e9a8786391633182643c249f4376b9631d39131a2d056735c10c0fcaa0a5"
+        },
+        {
+          "path": "tests/Buddy.RefinementCore.Tests/Program.cs",
+          "sha256": "eea70a37a3cba244a6fef80db2fc53bbdd2867c929f4b8462f0c6371ed627a1f"
+        }
+      ]
+    },
+    {
+      "id": "RESOURCE-45",
+      "attempt": 1,
+      "owner": "/root/speech43",
+      "baseRevision": "950095dc1f8d1ce86b0f17bf8919a3465344e369",
+      "worktree": "core-speech45",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/RefinementResourceReader.cs",
+        "tests/Buddy.RefinementResources.Tests/*"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Explicit bounded local UTF8 txt/md resource loader; no links/network/watch/persistence; owned fixture tests."
+      ],
+      "status": "accepted",
+      "deliverable": "Scoped handoff, exact file hashes, build-input snapshot, executed tests and limitations",
+      "acceptedSnapshot": "48cce2f4408f80b3b4a22a3ca838a54a9930f0fe52453ebdf841c0819ba96f15",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/RefinementResourceReader.cs",
+          "bytes": 11395,
+          "sha256": "78b4abbd66b40520de272b240bf3f1d785d8f5970ae12fba11bf525fe44ade69"
+        },
+        {
+          "path": "tests/Buddy.RefinementResources.Tests/Buddy.RefinementResources.Tests.csproj",
+          "bytes": 382,
+          "sha256": "24d5fc1a80ac86e8d6d34abdcafed277fa3fb639485a612fd8569fd09231ca83"
+        },
+        {
+          "path": "tests/Buddy.RefinementResources.Tests/Program.cs",
+          "bytes": 13282,
+          "sha256": "2b415907788e3ba9f4bc102ec1667c1b79c6d7f5bf57ac96da8bd99c60644549"
+        },
+        {
+          "path": "tests/Buddy.RefinementResources.Tests/README.md",
+          "bytes": 2870,
+          "sha256": "408f793b6e6428380d67983335377da2455317dad0482a6b11049ce78117a348"
+        }
+      ]
+    },
+    {
+      "id": "UI-45",
+      "attempt": 1,
+      "owner": "/root/desktop43",
+      "baseRevision": "950095dc1f8d1ce86b0f17bf8919a3465344e369",
+      "worktree": "core-desktop45",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/RefineWindow.cs",
+        "apps/windows/Buddy.Windows/RefinementOptionsPanel.cs",
+        "apps/windows/Buddy.Windows/RefinementDraftOptions.cs"
+      ],
+      "dependencies": {
+        "REFINE-45": 1,
+        "RESOURCE-45": 1
+      },
+      "acceptance": [
+        "Usable Buddy-draft technique prerequisites/rationale, user-specified limits and reviewed resources; every option change invalidates old acceptance; retain NightMint,Stop,Apply/Undo."
+      ],
+      "status": "accepted",
+      "deliverable": "Scoped handoff, exact file hashes, build-input snapshot, executed tests and limitations",
+      "acceptedSnapshot": "0383a33f9939ac9b0d36c17dafb5e639fbfea76f8d0920aea5a9fee60672cce9",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/RefineWindow.cs",
+          "sha256": "99448656333a99beb7b3b5358d21d9ae7d0affe3ca502947593811c4f2fecdfa"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/RefinementOptionsPanel.cs",
+          "sha256": "b0b3cd0c99bf66915895ec0b2f39746b6ab58016e68a9251ba628a555dc33f37"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/RefinementDraftOptions.cs",
+          "sha256": "dd4840d38b4e65abc43d9863ccdcc2aee7439cf0fa4d9809f45276c09a3b53f1"
+        }
+      ]
+    },
+    {
+      "id": "QA-46",
+      "attempt": 1,
+      "owner": "/root/qa43",
+      "baseRevision": "950095dc1f8d1ce86b0f17bf8919a3465344e369",
+      "worktree": "core-qa45",
+      "writeScope": [
+        "tests/Buddy.Windows.IntegrationTests/RefinementOptionsChecks.cs",
+        "tests/validation/Buddy.RefinementOptionsBoundary.Tests/*"
+      ],
+      "dependencies": {
+        "REFINE-45": 1,
+        "RESOURCE-45": 1,
+        "UI-45": 1
+      },
+      "acceptance": [
+        "Independent option-revision/cancel/budget/resource and owned native acceptance; no installed/third-party/profile actions."
+      ],
+      "status": "accepted",
+      "deliverable": "Scoped handoff, exact file hashes, build-input snapshot, executed tests and limitations",
+      "acceptedSnapshot": "29f1dd083f952706fb53d18ef402573aaab54cc66e79886106fe77f35f579d2e",
+      "acceptedFiles": [
+        {
+          "path": "tests/validation/Buddy.RefinementOptionsBoundary.Tests/Buddy.RefinementOptionsBoundary.Tests.csproj",
+          "sha256": "015e68fe6d6b17e9725d5e3c9d950015c41c13143c80cf1cd752aa842ed845d2"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementOptionsBoundary.Tests/Fixture.cs",
+          "sha256": "24c6da3178ce0336cd9d6e55dcad715ca85b8b653025a444dfcccf6a860a280b"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementOptionsBoundary.Tests/PreparationCases.cs",
+          "sha256": "30add00d524c9ccee3579878c2b338540ecd7cc4f4d62143ad3abfc377e21975"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementOptionsBoundary.Tests/Program.cs",
+          "sha256": "b384cf7cdbb8939a8be69f56de00be73466307e03f503774016d69256acede11"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementOptionsBoundary.Tests/README.md",
+          "sha256": "e588d1c99d577d41614692189a430ad0004848fd3ff56f69728821c5d4de6a98"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementOptionsBoundary.Tests/ResourceCases.cs",
+          "sha256": "be311e3567eade590d193d191335ce45dcebe6c9321d8bfec614f42f608eaa56"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementOptionsBoundary.Tests/ReviewedSource.targets",
+          "sha256": "8eddb1cb18b3f62caa2bd015774c8d2674cd9276c2d72f3c1588f9426abe8a46"
+        },
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/RefinementOptionsChecks.cs",
+          "sha256": "6a11575c227a0d7850f131cce01646e9b6e8e2122de3836d1f3f661f81bf3a6a"
+        }
+      ]
+    },
+    {
+      "id": "DOC-45",
+      "attempt": 1,
+      "owner": "/root/docs43",
+      "baseRevision": "950095dc1f8d1ce86b0f17bf8919a3465344e369",
+      "worktree": "core-docs45",
+      "writeScope": [
+        "docs/Remaining-union-0.4.5.md",
+        "docs/Upstream-union.md",
+        "docs/Clicky-comparison-0.4.md",
+        "docs/Existing-feature-migration.md"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Reconcile all remaining union features against950095dc with exact implemented/partial/missing/unverified boundaries; source attribution/pinned platform evidence; nextbatch scoped."
+      ],
+      "status": "accepted",
+      "deliverable": "Scoped handoff, exact file hashes, build-input snapshot, executed tests and limitations",
+      "acceptedSnapshot": "8c23c4ddcdd41322d297ff400b70ea141025120015c1ae945514dc5ff9f78550",
+      "acceptedFiles": [
+        {
+          "path": "docs/Remaining-union-0.4.5.md",
+          "sha256": "43f235745d3bde326c0f04d763a55ffdf1b8b9745e00ccfb41b0f34d40636849"
+        },
+        {
+          "path": "docs/Upstream-union.md",
+          "sha256": "9eb1080e7369fb873e4e61c9732318620c8a5fd1d49c598f7af1542c33922624"
+        },
+        {
+          "path": "docs/Clicky-comparison-0.4.md",
+          "sha256": "97ce2f490a22eea3a2baf58cc96265d72b40884423059b0fc46165d6638eee9f"
+        },
+        {
+          "path": "docs/Existing-feature-migration.md",
+          "sha256": "ce71cf3e9911745a9f42948f0ddc3cbfd61a738d5d2bd6356ebd0fa6ba12af53"
+        }
+      ]
+    },
+    {
+      "id": "INT-46",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "950095dc1f8d1ce86b0f17bf8919a3465344e369",
+      "worktree": "integration",
+      "writeScope": [
+        "VERSION",
+        "README.md",
+        "CHANGELOG.md",
+        "apps/windows/Buddy.Windows/app.manifest",
+        "docs/development/*",
+        "docs/Windows-0.4.5.md",
+        "tests/Buddy.Windows.IntegrationTests/Program.cs",
+        "apps/windows/Buddy.Windows/MainWindow.cs",
+        "apps/windows/Buddy.Windows/AssistantSettings.cs",
+        "apps/windows/Buddy.Windows/MainWindow.Refine.cs",
+        "apps/windows/Buddy.Windows/MainWindow.Routine.cs",
+        "apps/windows/Buddy.Windows/AssistantInteraction.cs",
+        "apps/windows/Buddy.Windows/RefineWindow.cs",
+        "tests/Buddy.Windows.IntegrationTests/RefinementOptionsChecks.cs"
+      ],
+      "dependencies": {
+        "REFINE-45": 1,
+        "RESOURCE-45": 1,
+        "UI-45": 1,
+        "QA-46": 1,
+        "DOC-45": 1,
+        "REFINE-46": 3,
+        "WINDOW-45": 1,
+        "CONTROL-45": 1,
+        "QA-47": 1
+      },
+      "acceptance": [
+        "Root integration, complete scoped evidence, separate preview; installed0.4.4andNightMint preserved, no accounts/hooks/grants/userdata transmission/publication."
+      ],
+      "status": "validated",
+      "deliverable": "Scoped handoff, exact file hashes, build-input snapshot, executed tests and limitations",
+      "validation": {
+        "applicationChecks": 2006,
+        "serviceChecks": 1518,
+        "nativeChecks": 488,
+        "realModelOutcomeChecks": 24,
+        "usefulGrammarCases": 2,
+        "goldenScenarios": 8,
+        "exactPoemRefined": false,
+        "packageSmoke": "recorded outside source after seal",
+        "installedReplacement": false
+      },
+      "integrationAmendments": [
+        "MainWindow selection monitor, exact action route and immediate Stop feedback",
+        "Refinement prompt exact numeric/ordering preservation, guards unchanged",
+        "Legacy fixture updates for no-op rejection, footer tree and mandatory live selection",
+        "Golden local-model harness expanded to eight cases with integrity versus usefulness separation"
+      ]
+    },
+    {
+      "id": "REFINE-46",
+      "attempt": 3,
+      "owner": "/root/provider43",
+      "baseRevision": "950095dc1f8d1ce86b0f17bf8919a3465344e369",
+      "worktree": "fix-refine45",
+      "writeScope": [
+        "services/Buddy.Server/Refinement.cs",
+        "services/Buddy.Server/RefinementChange.cs",
+        "tests/Buddy.RefinementRepair.Tests/*"
+      ],
+      "dependencies": {
+        "REFINE-45": 1
+      },
+      "acceptance": [
+        "Reject unchanged final output, bounded faithful rewrite retry, explicit no-refinement state; echo and preservation regressions.",
+        "Reject lexically changed final proposals when the independent assessment reports no improvement; never manufacture success by synonym substitution."
+      ],
+      "status": "accepted",
+      "deliverable": "Frozen scoped files with exact hashes, dependencies, executed evidence and honest limits",
+      "previousAcceptedFiles": [
+        {
+          "path": "services/Buddy.Server/Refinement.cs",
+          "sha256": "5014d8e19249bccc56c1cc13281939fc8b4f721905070943e8da26a1a0d204cf"
+        },
+        {
+          "path": "services/Buddy.Server/RefinementChange.cs",
+          "sha256": "5e55026aa2649a18bccb7b12ce86cf4fdf1a6ab687a29ec46b7b7b2d6ccde55f"
+        },
+        {
+          "path": "tests/Buddy.RefinementRepair.Tests/Buddy.RefinementRepair.Tests.csproj",
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5"
+        },
+        {
+          "path": "tests/Buddy.RefinementRepair.Tests/Program.cs",
+          "sha256": "1da54f627f0d89c4705185e8180c79c302b3d11a5f1337fefcb262128e301cde"
+        }
+      ],
+      "previousAcceptedSnapshot": "512cdbbcf8353a5b8ae092534b1029dae3b11f41106bbffa7e9710e945ee56ca",
+      "acceptedSnapshot": "ac958b92aaae9e61d999de86209441d51dc0bad11420d8da207acb87be0f9755",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/Refinement.cs",
+          "sha256": "ab7abf4ef6233b568ef1e28431ba8521c5b5ac8695c6dd8aa3b514ad03cd95f6"
+        },
+        {
+          "path": "services/Buddy.Server/RefinementChange.cs",
+          "sha256": "5e55026aa2649a18bccb7b12ce86cf4fdf1a6ab687a29ec46b7b7b2d6ccde55f"
+        },
+        {
+          "path": "tests/Buddy.RefinementRepair.Tests/Buddy.RefinementRepair.Tests.csproj",
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5"
+        },
+        {
+          "path": "tests/Buddy.RefinementRepair.Tests/Program.cs",
+          "sha256": "2bb00a24c7256f9016c858799b4583d177a4888f5ec23c4d72e07ccfee9cf0ae"
+        }
+      ]
+    },
+    {
+      "id": "WINDOW-45",
+      "attempt": 1,
+      "owner": "/root/desktop43",
+      "baseRevision": "950095dc1f8d1ce86b0f17bf8919a3465344e369",
+      "worktree": "fix-desktop45",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/InputNative.cs",
+        "apps/windows/Buddy.Windows/Native.cs",
+        "apps/windows/Buddy.Windows/ScreenPerception.cs",
+        "apps/windows/Buddy.Windows/DesktopAssistant.cs",
+        "apps/windows/Buddy.Windows/InlinePromptWindow.cs",
+        "apps/windows/Buddy.Windows/WindowSelection.cs",
+        "tests/Buddy.Windows.IntegrationTests/WindowSelectionChecks.cs"
+      ],
+      "dependencies": {
+        "REFINE-46": 3
+      },
+      "acceptance": [
+        "Validate selected HWND/PID lifetime, retain process error without bypass, actionable fresh-focus retry; inline no-op defensive guard and bounded review height."
+      ],
+      "status": "accepted",
+      "deliverable": "Frozen scoped files with exact hashes, dependencies, executed evidence and honest limits",
+      "acceptedSnapshot": "051941aae1f65fa93419aa5b88df96a5ab3e788834f39b3dea7224210416a695",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/InputNative.cs",
+          "sha256": "8de1f8608fc8988247cdbaaa1bc1c43963a6d6e60f26217ec31c0ed44cf8f88b"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/Native.cs",
+          "sha256": "5f4a80366e0dd446cd6bf546203b36c96c35e4513de2661edba537d0e8aa4ea8"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/ScreenPerception.cs",
+          "sha256": "396e5491420e7268ed5af7147e37f5cce225ef554c4d3700c2d991442d6cc63d"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/DesktopAssistant.cs",
+          "sha256": "2d0e1f549eb07307f086d4e4ae02b2cf3942df57225cc18af81ccb48e481f6ef"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/InlinePromptWindow.cs",
+          "sha256": "2bbfff11238808a8d41c3c6af5e916fb768cb2cee5c2052765179cd998b4d493"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/WindowSelection.cs",
+          "sha256": "9480cd91c73aeaa9ca4682b4f96bcfe9e5e2d11661d0cf26f5621facf793b79d"
+        },
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/WindowSelectionChecks.cs",
+          "sha256": "26a96112b43aa28c651263efa9b28e4bd3f94c95a6bc1d50f603ae6f00f7952f"
+        }
+      ],
+      "integrationAmendments": [
+        {
+          "owner": "/root",
+          "reason": "REFINE-46 reopened for final service quality assessment. WINDOW uses the unchanged lexical helper only; its frozen source/build evidence remains historical. Final root tests will bind all integrated code to attempt3.",
+          "previousDependencyAttempt": 2,
+          "currentRequiredAttempt": 3,
+          "helperSha256": "5e55026aa2649a18bccb7b12ce86cf4fdf1a6ab687a29ec46b7b7b2d6ccde55f"
+        }
+      ]
+    },
+    {
+      "id": "CONTROL-45",
+      "attempt": 1,
+      "owner": "/root/speech43",
+      "baseRevision": "950095dc1f8d1ce86b0f17bf8919a3465344e369",
+      "worktree": "fix-computer45",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/BoundedComputerUse.cs",
+        "apps/windows/Buddy.Windows/RoutineAppOpen.cs",
+        "tests/Buddy.ComputerUse.Tests/*",
+        "tests/Buddy.Windows.IntegrationTests/ComputerUseChecks.cs"
+      ],
+      "dependencies": {
+        "WINDOW-45": 1
+      },
+      "acceptance": [
+        "Buddy-owned local observe-one-action-verify adapter with scope identity, checkpoint, cancellation and postcondition; exact approved app aliases only, no shell/upstream code/grants."
+      ],
+      "status": "accepted",
+      "deliverable": "Frozen scoped files with exact hashes, dependencies, executed evidence and honest limits",
+      "acceptedSnapshot": "3ac774b21b073c9f2a6c8adfc1cab3d841be061ed6745c8b6ada9008cfe52a16",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/BoundedComputerUse.cs",
+          "bytes": 9484,
+          "sha256": "9e73833b4e1bcd831d061e1cdd65797ff17e64f23383d9fed27ef75bc5b117ff"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/RoutineAppOpen.cs",
+          "bytes": 19881,
+          "sha256": "6b6bd5d16e7cce65547078ca52063302fc631c362359d46e35b3cc3e3d64066f"
+        },
+        {
+          "path": "tests/Buddy.ComputerUse.Tests/Buddy.ComputerUse.Tests.csproj",
+          "bytes": 1264,
+          "sha256": "0f6bd04c13f9e01cd4e12e98688534066badae8340f400f9e4dff2f8f3a75b1d"
+        },
+        {
+          "path": "tests/Buddy.ComputerUse.Tests/Program.cs",
+          "bytes": 17250,
+          "sha256": "7b9dbf1b67d71c251759aa4e22052218c409bcb455556037d3942b66e54ab393"
+        },
+        {
+          "path": "tests/Buddy.ComputerUse.Tests/README.md",
+          "bytes": 4323,
+          "sha256": "571ae46c0ec68464011734bd49908d335d95f816c44c96dfdb76316c7fa02cd3"
+        },
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/ComputerUseChecks.cs",
+          "bytes": 3358,
+          "sha256": "455fec669bad39eb48f888b188a347246b2fba333f7d44971ebf24cc1c08833e"
+        }
+      ]
+    },
+    {
+      "id": "QA-47",
+      "attempt": 1,
+      "owner": "/root/qa43",
+      "baseRevision": "950095dc1f8d1ce86b0f17bf8919a3465344e369",
+      "worktree": "fix-qa45",
+      "writeScope": [
+        "tests/Buddy.Windows.IntegrationTests/UserFailureChecks.cs",
+        "tests/validation/Buddy.UserFailureBoundary.Tests/*",
+        "tests/validation/Buddy.UserFailureLive.Tests/*"
+      ],
+      "dependencies": {
+        "REFINE-46": 3,
+        "WINDOW-45": 1,
+        "CONTROL-45": 1
+      },
+      "acceptance": [
+        "Independent exact echo/window/access fault cases and new adapter boundaries, owned native and actual local-model harness; root runs native/live serially."
+      ],
+      "status": "accepted",
+      "deliverable": "Frozen scoped files with exact hashes, dependencies, executed evidence and honest limits",
+      "acceptedSnapshot": "f97ea5a76ec44af581bc00fce5b172190debc08a5c23b9606e45b25275549969",
+      "acceptedFiles": [
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/UserFailureChecks.cs",
+          "sha256": "ab27c0c97b2382e8a7164d84e959beb59770f91e2129175f25fd57336c7b97e0"
+        },
+        {
+          "path": "tests/validation/Buddy.UserFailureBoundary.Tests/Buddy.UserFailureBoundary.Tests.csproj",
+          "sha256": "5b42632c8f2ab7cfc0b328f121903aa4efe804f5296786f8113b029190083da3"
+        },
+        {
+          "path": "tests/validation/Buddy.UserFailureBoundary.Tests/ControlCases.cs",
+          "sha256": "1f59cbebe7bc34956d221816a9706f314b862c6cc04cc5fd05276b47bd2c2b43"
+        },
+        {
+          "path": "tests/validation/Buddy.UserFailureBoundary.Tests/NativeStubs.cs",
+          "sha256": "3efbf35ea75cb116d762c8c9d1f5e4a3068599ec6e3f1fef1f25bb647cedf463"
+        },
+        {
+          "path": "tests/validation/Buddy.UserFailureBoundary.Tests/Program.cs",
+          "sha256": "17c5af69ef4af6ff97288e2fe1eb2c314e2c17d586271766d9c680352847a790"
+        },
+        {
+          "path": "tests/validation/Buddy.UserFailureBoundary.Tests/README.md",
+          "sha256": "0ecf50954835867aede2be9dbb1b278993016cabe6565477b2616f02cc755e3e"
+        },
+        {
+          "path": "tests/validation/Buddy.UserFailureBoundary.Tests/RefineFixture.cs",
+          "sha256": "aa22548d423ebbe52324909e72175780fc9b0c07e932c2260ff9ac57f2dee12f"
+        },
+        {
+          "path": "tests/validation/Buddy.UserFailureBoundary.Tests/RefinementCases.cs",
+          "sha256": "0ee97b3ee8422746b9cfda9e4aff9e29faaf8dee0f1dfeb674377025efe820be"
+        },
+        {
+          "path": "tests/validation/Buddy.UserFailureBoundary.Tests/ReviewedSource.targets",
+          "sha256": "8eddb1cb18b3f62caa2bd015774c8d2674cd9276c2d72f3c1588f9426abe8a46"
+        },
+        {
+          "path": "tests/validation/Buddy.UserFailureBoundary.Tests/SourceReceipt.cs",
+          "sha256": "22b1cd2da0ee6016610b7a46c0bd6cc38719d7da5af10fe66be23e48dde0de2a"
+        },
+        {
+          "path": "tests/validation/Buddy.UserFailureBoundary.Tests/WindowCases.cs",
+          "sha256": "34fb4fce987bfb1109db7fdf29073bbab24c42253e1d773f60b08aea4f73f0ed"
+        },
+        {
+          "path": "tests/validation/Buddy.UserFailureLive.Tests/Buddy.UserFailureLive.Tests.csproj",
+          "sha256": "d1de690c2e52e73c9138c2ec966f6cd419db5fcaf7b39d50fb6025f1b99baf4d"
+        },
+        {
+          "path": "tests/validation/Buddy.UserFailureLive.Tests/Program.cs",
+          "sha256": "6bd8796a3893e18c0b36fff65bcb87cda43f7b90a8ae24acf4bbd12ba5d24610"
+        },
+        {
+          "path": "tests/validation/Buddy.UserFailureLive.Tests/README.md",
+          "sha256": "2a97811db2ce47383bd766e53c8caa69a15d6d8e93ce73a7a3b667a7abdb81a8"
+        }
+      ]
+    },
+    {
+      "id": "REFINE-47",
+      "attempt": 1,
+      "owner": "/root/provider43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "quality-refine46",
+      "writeScope": [
+        "services/Buddy.Server/Refinement.cs",
+        "services/Buddy.Server/RefinementCore.cs",
+        "services/Buddy.Server/RefinementChange.cs",
+        "services/Buddy.Server/RefinementContract*.cs",
+        "tests/Buddy.RefinementMeaning.Tests/*"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Diagnose identity-forcing architecture, implement meaningful source-grounded task structuring with explicit constraints; exact poem and adversarial meaning tests. No invented hard requirements; no cloud/newmodels."
+      ],
+      "status": "accepted",
+      "deliverable": "Causal findings, scoped files/hashes, concrete semantic fixtures, execution receipts and limits",
+      "acceptedSnapshot": "70d693296623cc5ab896b651dbd1b4fb5a536576826837be147654909225b8d9",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/Refinement.cs",
+          "sha256": "c04c46ce95be9996c80da972997d0c412b33b9c818bd35e3d45c2a1456c8fc19"
+        },
+        {
+          "path": "services/Buddy.Server/RefinementContract.cs",
+          "sha256": "36eb663fbecf81f3e5a628df55b9e3db608646e17fcc1ec65cc34c00aca5cfa5"
+        },
+        {
+          "path": "tests/Buddy.RefinementMeaning.Tests/Buddy.RefinementMeaning.Tests.csproj",
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5"
+        },
+        {
+          "path": "tests/Buddy.RefinementMeaning.Tests/Program.cs",
+          "sha256": "487cc20c8c3b0b3ab2de4507ecf4add33ca7773638f5256dc80a53422949d41a"
+        }
+      ]
+    },
+    {
+      "id": "WINDOW-46",
+      "attempt": 1,
+      "owner": "/root/desktop43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "quality-window46",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/ScreenPerception.cs",
+        "apps/windows/Buddy.Windows/ScreenObservation*.cs",
+        "apps/windows/Buddy.Windows/DesktopAssistant.cs",
+        "tests/Buddy.Windows.IntegrationTests/ObservationQualityChecks.cs"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Diagnose incomplete UIA by explicit limit/timing/tree/provider diagnostics, bounded improvements preserving full privacy and lifetime guards; read-only actual probe and Guide evidence root-owned."
+      ],
+      "status": "accepted",
+      "deliverable": "Causal findings, scoped files/hashes, concrete semantic fixtures, execution receipts and limits",
+      "acceptedSnapshot": "850fea4dfcc945ff5a74cdeadb44f1b76d77bb742f71d0bb50de60b41c2e2970",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/ScreenPerception.cs",
+          "sha256": "a8cc65dd9a1456059109469c3dfa61d44869acf910c176aa41f14eed8b1d8df8"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/ScreenObservation.cs",
+          "sha256": "378a4b7e798ab45ea84949a0a84de7c1bdf5d93b9d30c5b669c5e00a58a8c8d7"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/ScreenObservationProperties.cs",
+          "sha256": "79b25a5341da82268a73f8ca41f765299dfa22b217d5326205e4c0021fa3c06e"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/DesktopAssistant.cs",
+          "sha256": "082d374861b6fdb115f3867b19a6f36749e5cf68625fc128ec89a576351cb477"
+        },
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/ObservationQualityChecks.cs",
+          "sha256": "22bd5e94372b84a435640eecc5cff703a94c1e9fc6ffcff8e7bba491b41930dd"
+        }
+      ]
+    },
+    {
+      "id": "QA-48",
+      "attempt": 1,
+      "owner": "/root/qa43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "quality-qa46",
+      "writeScope": [
+        "tests/validation/Buddy.RefinementMeaningBoundary.Tests/*",
+        "tests/validation/Buddy.RefinementMeaningLive.Tests/*",
+        "tests/Buddy.Windows.IntegrationTests/CometGuideChecks.cs"
+      ],
+      "dependencies": {
+        "REFINE-47": 1,
+        "WINDOW-46": 1
+      },
+      "acceptance": [
+        "Independent golden semantics/utility oracle beyond cosmetic changes and inventedconstraints, actualmodel root-only; read-only Comet Guide harness withoutscreenshots/input/focus or pagecontentlogs."
+      ],
+      "status": "accepted",
+      "deliverable": "Causal findings, scoped files/hashes, concrete semantic fixtures, execution receipts and limits",
+      "acceptedSnapshot": "c430dab93d4ee8f59026c080836fd705a3f5f4cb9795bb3a1528462d274583bf",
+      "acceptedFiles": [
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/CometGuideChecks.cs",
+          "sha256": "c9e32246108aa9c2d0f99f2e3001014c82f9f55c41969608d4b6598b211c6941"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementMeaningBoundary.Tests/Buddy.RefinementMeaningBoundary.Tests.csproj",
+          "sha256": "1e98bd0ad7838481b70bbf526782bf4f04928523a248ecb864a0866d88636631"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementMeaningBoundary.Tests/ContractCases.cs",
+          "sha256": "b5f982109399f37810e3689800e65a31633a8bd228bdb41d72601769e8fa7332"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementMeaningBoundary.Tests/Goldens.cs",
+          "sha256": "21cae17d7000c6975b43c3246326ae87253aa1028738de2bfa1defed3fc68bb3"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementMeaningBoundary.Tests/MeaningOracle.cs",
+          "sha256": "6a240a2782bf8dcccf187a747c21950d054719758f73310f5a07f6feaad62094"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementMeaningBoundary.Tests/Program.cs",
+          "sha256": "03b44579cf402ee1db3a43661cf9a3792dd0c17d0b30b110e92867fcd61a919e"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementMeaningBoundary.Tests/README.md",
+          "sha256": "402c58a63d1e7cfa70dcdb519bc5669a563d89cade3cb50a89475a1000b750c6"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementMeaningBoundary.Tests/ServiceCases.cs",
+          "sha256": "966301b500ee44a692959a27ff051ed9ab95185c44bd2561595650b63c2f8a54"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementMeaningLive.Tests/Buddy.RefinementMeaningLive.Tests.csproj",
+          "sha256": "68eb9c86bd217fb11a6b95219ceb7855a39c8b8024e7da2231a407509c5c8b5f"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementMeaningLive.Tests/CannedResponseRecorder.cs",
+          "sha256": "837dc60f642a8f964914b7414367ddcd70d2e9377c5521f1856ff89f81da4ccb"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementMeaningLive.Tests/Program.cs",
+          "sha256": "8b34e07bde65d4784c6abe57f056323c0036030f00a0589c20e45d0c8daef36d"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementMeaningLive.Tests/README.md",
+          "sha256": "67bd307dbe38ab4c7bafd17737588b43d87ce76bd0ea00d881791c84cb1ffa45"
+        }
+      ]
+    },
+    {
+      "id": "INT-47",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "quality46-integration",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/MainWindow*.cs",
+        "apps/windows/Buddy.Windows/RefineWindow.cs",
+        "tests/Buddy.Windows.IntegrationTests/Program.cs",
+        "tests/**",
+        "VERSION",
+        "apps/windows/Buddy.Windows/app.manifest",
+        "README.md",
+        "CHANGELOG.md",
+        "docs/**"
+      ],
+      "dependencies": {
+        "REFINE-47": 1,
+        "WINDOW-46": 1,
+        "QA-48": 1
+      },
+      "acceptance": [
+        "Integrate causal fixes, independently review exact poem and broadergoldens, actualread-onlyCometGuide; noinstallation beforetargetqualitygatespass; preserve0.4.5/installed0.4.4."
+      ],
+      "status": "accepted",
+      "deliverable": "Causal findings, scoped files/hashes, concrete semantic fixtures, execution receipts and limits",
+      "independentResult": "Integrated; 1793 headless checks plus 13 pure diagnostics pass; clean Windows compile; actual14cases twice yields12useful unique, one expected clarification and one unmet utility case. Full report docs/Windows-quality46.md.",
+      "blocker": "Historical secure-desktop refusal superseded by explicit Ready and October5 read-only checks; remaining native acceptance is tracked by INT-48.",
+      "rootAmendments": [
+        {
+          "path": "services/Buddy.Server/RefinementContract.cs",
+          "sha256": "b525087f72ed0ff720b5312eb9f910f3442493e8567e35b3c3589d42b3651fde"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/RefineWindow.cs",
+          "sha256": "2b818bad66732b6567c1998bcc8198825f337c7aa87ba7a8dad48ce279ba8d90"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementMeaningBoundary.Tests/ContractCases.cs",
+          "sha256": "478f342c6f3b8aef379a5f362ee52762d1cdbad5749295292b586f91d2bbd7ea"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementMeaningLive.Tests/Program.cs",
+          "sha256": "328122fc4564ee4f72176115c50f8e81fe0f15e02d6c9be0fe5f048fb4396876"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementOptionsBoundary.Tests/Fixture.cs",
+          "sha256": "f311aff3615a3cdae961e015bdb1813b6ca4321ce6faf2c6ca05520fc8710d35"
+        },
+        {
+          "path": "tests/validation/Buddy.ReliabilityBoundary.Tests/Program.cs",
+          "sha256": "df7a4471ce8330f1bc186d267c2b500790a55fd16b99ae40d6ec27a5b4e99ede"
+        },
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/Program.cs",
+          "sha256": "d381d69231b69b04d423503372c2fd28e99635df7794fee632ee7aee762c7a77"
+        },
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/UserFailureChecks.cs",
+          "sha256": "2838377f81e9d67f79535b1963f0ee7cbb2bfee40e5156a66d660a812cc09c34"
+        }
+      ]
+    },
+    {
+      "id": "REG-46",
+      "attempt": 1,
+      "owner": "/root/provider43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "quality-refine46",
+      "writeScope": [
+        "tests/Buddy.RefinementCore.Tests/Program.cs",
+        "tests/Buddy.RefinementRepair.Tests/Program.cs",
+        "tests/validation/Buddy.UserFailureBoundary.Tests/RefineFixture.cs",
+        "tests/validation/Buddy.UserFailureBoundary.Tests/RefinementCases.cs"
+      ],
+      "dependencies": {
+        "REFINE-47": 1
+      },
+      "acceptance": [
+        "Adapt obsolete mocks for the explicit legacy wording fallback while retaining actual assertions and independent source-structure coverage; no production changes or relaxed safety assertions. Headless tests only."
+      ],
+      "status": "accepted",
+      "deliverable": "Scoped test-only handoff, exact hashes and affected mocked-suite results",
+      "acceptedSnapshot": "347268a71746438197f52ab8b8e3af8547e3710c5095a48215544ffc71de027a",
+      "acceptedFiles": [
+        {
+          "sha256": "e6b0deaad318c2ccce240e04048375da4a41b28a016a52298bf0089bcbecc3b3",
+          "path": "tests/Buddy.RefinementCore.Tests/Program.cs"
+        },
+        {
+          "sha256": "c00c9937fe43b5789b623def3cb1dc39a4197ab1201870921e4ff38e4960a4fa",
+          "path": "tests/Buddy.RefinementRepair.Tests/Program.cs"
+        },
+        {
+          "sha256": "97e43a6c31630a25fd4377e3dffee8c87c594d3c1d34cc06317d9c61c5f8870d",
+          "path": "tests/validation/Buddy.UserFailureBoundary.Tests/RefineFixture.cs"
+        },
+        {
+          "sha256": "2d4f1c10682ebfce71f32fba9ac8e1a7230c402f518d0de9270509b8c1565e1f",
+          "path": "tests/validation/Buddy.UserFailureBoundary.Tests/RefinementCases.cs"
+        }
+      ]
+    },
+    {
+      "id": "LIFE-47",
+      "attempt": 1,
+      "owner": "/root/provider43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "feedback-refine47",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/RefineWindow.cs",
+        "apps/windows/Buddy.Windows/InlinePromptWindow.cs",
+        "apps/windows/Buddy.Windows/LocalPromptWatcher.cs",
+        "apps/windows/Buddy.Windows/RefinementRequest*.cs",
+        "services/Buddy.Server/Refinement.cs",
+        "tests/Buddy.RefinementLifecycle.Tests/*"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Trace and fix refinement busy/completion/error/cancel lifecycle; terminal timeout and stale-result rejection; preserve all meaningful-structure/intent/review guards."
+      ],
+      "status": "accepted",
+      "deliverable": "Reproducible finding, scoped source hashes, focused checks and limits; no install/publication/native interaction",
+      "seedSnapshot": "176083516139a2a93c4bc2a7ddbd735e7a310ac24f77a0dfb964819cd2ed8937",
+      "acceptedSnapshot": "ed6cafdb48de80cd3d499f88b6b6deef2db4a0820ea65ab0a1fa19175f74e8df",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/RefineWindow.cs",
+          "sha256": "8fdd8e67e7c009a204549f4dc2a084e21cc419a6a8139fdd64a5d39616a91c99"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/InlinePromptWindow.cs",
+          "sha256": "47ae1e6cbcab31e4c0705cc34df4552afe6fbbc377a72fb42e5a5e61adf493ae"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/LocalPromptWatcher.cs",
+          "sha256": "db034b3a310f637ac4e07c2c4560dbaacf990bcf5987aa7c2240678258c0b373"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/RefinementRequest.cs",
+          "sha256": "114477d22d54253d78f16e95c798768dcf9e4d00ad64e7e6624baf26e6cc705d"
+        },
+        {
+          "path": "services/Buddy.Server/Refinement.cs",
+          "sha256": "bd750e1ee350611fb973c8b7482ec970433238c60c426ce16431d73a4e3d92d3"
+        },
+        {
+          "path": "tests/Buddy.RefinementLifecycle.Tests/Buddy.RefinementLifecycle.Tests.csproj",
+          "sha256": "db19316c7167beb18d59a703edc9231deb6a52c112d37432c8c53694dc79bd97"
+        },
+        {
+          "path": "tests/Buddy.RefinementLifecycle.Tests/Program.cs",
+          "sha256": "1e78c7819fcde7e099a8be502d8b5a58bdb5d362c431557074ee83ef7fb6ae6c"
+        },
+        {
+          "path": "tests/Buddy.RefinementLifecycle.Tests/WatcherFakes.cs",
+          "sha256": "9354614cc9bcc871e7ad4a385fdc5ebbdf79011ecf426411f1859387ef4ad6be"
+        },
+        {
+          "path": "tests/Buddy.RefinementLifecycle.Tests/WatcherChecks.cs",
+          "sha256": "d2ee186024139253cb2cabfe89b93037e535e61cec0d57294095921881daaa72"
+        }
+      ]
+    },
+    {
+      "id": "UI-47",
+      "attempt": 1,
+      "owner": "/root/desktop43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "feedback-desktop47",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/BuddyTheme.cs",
+        "apps/windows/Buddy.Windows/CompanionIsland.cs",
+        "apps/windows/Buddy.Windows/CompanionFace.cs",
+        "apps/windows/Buddy.Windows/CursorCompanionWindow.cs",
+        "apps/windows/Buddy.Windows/FacialRig.cs",
+        "apps/windows/Buddy.Windows/QuickChatWindow.cs",
+        "apps/windows/Buddy.Windows/MainWindow.Home.cs",
+        "tests/Buddy.Windows.IntegrationTests/FeedbackVisualChecks.cs",
+        "tests/Buddy.CompanionFeedback.Tests/*",
+        "apps/windows/Buddy.Windows/Themes/Controls.xaml",
+        "apps/windows/Buddy.Windows/CompanionPresentation.cs"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Black palette with readable text; clipping and persistent notch diagnosis/fixes; independently authored appropriate Coucou parity, no external hooks/grants/assets."
+      ],
+      "status": "accepted",
+      "deliverable": "Reproducible finding, scoped source hashes, focused checks and limits; no install/publication/native interaction",
+      "seedSnapshot": "176083516139a2a93c4bc2a7ddbd735e7a310ac24f77a0dfb964819cd2ed8937",
+      "acceptedSnapshot": "feb8cb8f6463cb78b3121d7cf4ed7385c6c5f4dfb3cf6fc5493f127a26b21a21",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/BuddyTheme.cs",
+          "sha256": "df7abc64854e342110965b036514bbde0c415d7cc19dd0f82c1cdfce6e70f354"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/CompanionIsland.cs",
+          "sha256": "acb616d42ee260532953050619d36258bb8b9236be6f6c85d570489d6c32e237"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/CompanionFace.cs",
+          "sha256": "a3b8bfcc06aad38f437379a2a92eb026267eb29fc10802b0f34bc5dafb4c3b2a"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/CursorCompanionWindow.cs",
+          "sha256": "d4369a2bf72690cd6f6df98f71a6cd3e0a79e7b36d8419ca79ba38c726a23b2e"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/QuickChatWindow.cs",
+          "sha256": "8d1e748fbac205c6a29b6532b878a5c91ed6cd010ba8cc04c90c8f223f5462d1"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/MainWindow.Home.cs",
+          "sha256": "df2175079e50e89d049765f941235555a86747f6e59bddcb34ee7bf14997f865"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/Themes/Controls.xaml",
+          "sha256": "381e89301b0d9d2f8208a1ce3fa4b2f65df9fe972f5916c62bf98ed91e405ed7"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/CompanionPresentation.cs",
+          "sha256": "d077ce894402f726b35a1c1cb49a4ce7f1782e5d79ea6df6b5e5b7dba2de821b"
+        },
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/FeedbackVisualChecks.cs",
+          "sha256": "9bfd09771884b68b9f3f4c4c035db0a220370a4958941f3bd0020a5b80d1f4e6"
+        },
+        {
+          "path": "tests/Buddy.CompanionFeedback.Tests/Buddy.CompanionFeedback.Tests.csproj",
+          "sha256": "4991e52915e5049e448f213176d25ee6a6e38f6feadd4d58a22679d401ce2afd"
+        },
+        {
+          "path": "tests/Buddy.CompanionFeedback.Tests/Program.cs",
+          "sha256": "baf4f14d8453039f3ec9021935b82af5e13932cca801ea4fca7f03ec5b1f5f30"
+        }
+      ]
+    },
+    {
+      "id": "VOICE-47",
+      "attempt": 1,
+      "owner": "/root/speech43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "feedback-speech47",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/SpeechText.cs",
+        "apps/windows/Buddy.Windows/SentencePlayback.cs",
+        "apps/windows/Buddy.Windows/LocalVoiceOutput.cs",
+        "apps/windows/Buddy.Windows/AssistantInteraction.cs",
+        "services/Buddy.Server/ConversationalReply.cs",
+        "tests/Buddy.SpeechFeedback.Tests/*"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Trace actual speech sources; sanitize URLs/markdown/citations and use a concise sources-attached cue, preserve local voice selection and cancellation/output policies."
+      ],
+      "status": "accepted",
+      "deliverable": "Reproducible finding, scoped source hashes, focused checks and limits; no install/publication/native interaction",
+      "seedSnapshot": "176083516139a2a93c4bc2a7ddbd735e7a310ac24f77a0dfb964819cd2ed8937",
+      "acceptedSnapshot": "e56502590d14098009f2c6fe967956393a6c6471d8db74e1be15e803fa2d141a",
+      "acceptedFiles": [
+        {
+          "bytes": 4671,
+          "path": "apps/windows/Buddy.Windows/SpeechText.cs",
+          "sha256": "017c24452418ed2b109f29febe4abf1b4d4375cd6872522528071f6891f8fa4a"
+        },
+        {
+          "bytes": 8548,
+          "path": "apps/windows/Buddy.Windows/LocalVoiceOutput.cs",
+          "sha256": "31330ec4f148e878ba484fdc5026509997ae315541abb4bdba22c7405add342f"
+        },
+        {
+          "bytes": 4585,
+          "path": "services/Buddy.Server/ConversationalReply.cs",
+          "sha256": "84098815501bc453b492d2a03a3f493387561d0844061caff0d2d9ed41992333"
+        },
+        {
+          "bytes": 564,
+          "path": "tests/Buddy.SpeechFeedback.Tests/Buddy.SpeechFeedback.Tests.csproj",
+          "sha256": "463e9ed148ce86a356575d28f6ab5f43de98a5a76193affd70af9c158ab3e0f6"
+        },
+        {
+          "bytes": 11141,
+          "path": "tests/Buddy.SpeechFeedback.Tests/Program.cs",
+          "sha256": "243a06f4616cc982c6ea75087e2ed76f2bd991edfce63dea4705ce83dacaf568"
+        },
+        {
+          "bytes": 3991,
+          "path": "tests/Buddy.SpeechFeedback.Tests/README.md",
+          "sha256": "7ea60b0c66edf7ea675942bebaa29cc4cd0b2e2b47d00e7a5c73add45f31932a"
+        }
+      ]
+    },
+    {
+      "id": "QA-49",
+      "attempt": 1,
+      "owner": "/root/qa43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "feedback-qa49",
+      "writeScope": [
+        "tests/validation/Buddy.FeedbackBoundary.Tests/*",
+        "tests/Buddy.Windows.IntegrationTests/FeedbackLifecycleChecks.cs"
+      ],
+      "dependencies": {
+        "APP-47": 1,
+        "LIFE-47": 1
+      },
+      "acceptance": [
+        "Independent reproduction audit for settings writers, region/refinement lifecycle, stale results, launches and connector truthfulness; headless only; reserve native tests as notrun."
+      ],
+      "status": "accepted",
+      "deliverable": "Reproducible finding, scoped source hashes, focused checks and limits; no install/publication/native interaction",
+      "seedSnapshot": "176083516139a2a93c4bc2a7ddbd735e7a310ac24f77a0dfb964819cd2ed8937",
+      "acceptedSnapshot": "96be31f225e489d9f34bbbeb6f03afd92cfd9d968d347e05fbb6288df57795c9",
+      "acceptedFiles": [
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/FeedbackLifecycleChecks.cs",
+          "sha256": "0e910a97b218ae0e285d185d22a9f231da234c5d2e443337632796dc8f75fd53"
+        },
+        {
+          "path": "tests/validation/Buddy.FeedbackBoundary.Tests/Buddy.FeedbackBoundary.Tests.csproj",
+          "sha256": "b878c7311d1d16d808b0e5f85f1f4c53897a22af87424ab94cf2e20afccd0c86"
+        },
+        {
+          "path": "tests/validation/Buddy.FeedbackBoundary.Tests/LifecycleCases.cs",
+          "sha256": "57ddd367ae15a6eaf60de0f84361e1cef8f0eca3a7706bf388c036526668e5e8"
+        },
+        {
+          "path": "tests/validation/Buddy.FeedbackBoundary.Tests/ModelFixture.cs",
+          "sha256": "509b25e6376563f503e0c0ec9dc171a3359c507858c3b218b2a1b02ced769613"
+        },
+        {
+          "path": "tests/validation/Buddy.FeedbackBoundary.Tests/PreferenceCases.cs",
+          "sha256": "83ca53aa829f13f033ec037f841bad5e739fa3b1e31ae357672d8cdecef72cbd"
+        },
+        {
+          "path": "tests/validation/Buddy.FeedbackBoundary.Tests/Program.cs",
+          "sha256": "462021ebdcf9c965b9afc252e58e849f1cb8b4f82b6a4b700e2647ad4f791c7f"
+        },
+        {
+          "path": "tests/validation/Buddy.FeedbackBoundary.Tests/README.md",
+          "sha256": "3a5fb692b2bb2d21fc695249122a9232b4460d1e7a7c299d7585977b97290f2f"
+        }
+      ]
+    },
+    {
+      "id": "DOC-47",
+      "attempt": 1,
+      "owner": "/root/docs43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "feedback-docs47",
+      "writeScope": [
+        "docs/Coucou-notch-feedback47.md"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Audit pinned Coucou notch feature inventory by platform/source against current Buddy; identify actionable missing appropriate features and prohibited activation dependencies, no upstream code execution."
+      ],
+      "status": "accepted",
+      "deliverable": "Reproducible finding, scoped source hashes, focused checks and limits; no install/publication/native interaction",
+      "seedSnapshot": "176083516139a2a93c4bc2a7ddbd735e7a310ac24f77a0dfb964819cd2ed8937",
+      "acceptedSnapshot": "90339f9436d2a030a4589a57739617152fc25c36a6689ba44b9a25e98b72970f",
+      "acceptedFiles": [
+        {
+          "path": "docs/Coucou-notch-feedback47.md",
+          "sha256": "c96cd8603f55d918b44268aac02e28cb3f0482108d9b149115c053398fc4aa11"
+        }
+      ]
+    },
+    {
+      "id": "INT-48",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "quality46-integration",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/**",
+        "services/Buddy.Server/RefinementContract.cs",
+        "services/Buddy.Server/BuddyService.cs",
+        "tests/**",
+        "docs/**",
+        "CHANGELOG.md"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Settings persistence and region lifecycle first; integration and bounded launches/consent; preserve installed baseline and secure-desktop gate; report reproducible findings."
+      ],
+      "status": "running",
+      "deliverable": "Integrated scoped source, exact local-model and installed-resolution evidence, separate preview and final source receipts; announced foreground acceptance next; no install/publication.",
+      "seedSnapshot": "176083516139a2a93c4bc2a7ddbd735e7a310ac24f77a0dfb964819cd2ed8937",
+      "ownershipNotes": "Workers frozen after hash-reviewed intake. Root owns reviewed integration amendments, final checks, documentation, preview packaging and later announced native gate.",
+      "independentResult": "Actual14x2:13useful unique + expected contradiction. AuthoredCometguide/read-onlyCometCameraSpotifyresolution pass. Saved-warning and final Stop fixes integrated; separate preview prepared.",
+      "nextGate": "Notify parent/user before foreground windows; proposed five-minute owned fixture/preview window. No microphone/audio/external app activation. Keep installedbaseline preserved.",
+      "rootAmendments": [
+        {
+          "path": "services/Buddy.Server/RefinementContract.cs",
+          "sha256": "22db27251324a3c5f336e7a129fa706a4c702f05e3e06d3d4e967359d0c8e8d0"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/InstalledAppResolver.cs",
+          "sha256": "8343433516a9b56783280453485fdaa35aede41d1960bd533b44e10efd5a6c0b"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/BrowserChromeObservation.cs",
+          "sha256": "fa600c74c03918484dcbd41916341e70d2db1d8ce026e072c07c8f30a329b0a7"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/MainWindow.PreferencePersistence.cs",
+          "sha256": "c0523149816fb76865a37205ce5b53cd9aeed4cdb0a427a40c8af323a06a316b"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/MainWindow.Preferences.cs",
+          "sha256": "8dc07474ac0e3a0ec8dddebc9b099657e96a92b382faea1d7c716b7f88d662c7"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/VoiceOverlayWindow.Region.cs",
+          "sha256": "e5fd9595036f731cace3686a16d69f2896f9c1cc6b9bb6d498a8685281919634"
+        }
+      ]
+    },
+    {
+      "id": "APP-47",
+      "attempt": 1,
+      "owner": "/root/app47",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "feedback-app47",
+      "writeScope": [
+        "services/Buddy.Server/AssistantPlanning.cs",
+        "services/Buddy.Server/AssistantModels.cs",
+        "services/Buddy.Server/AppLaunchIntent.cs",
+        "apps/windows/Buddy.Windows/RoutineAppOpen.cs",
+        "apps/windows/Buddy.Windows/InstalledAppResolver.cs",
+        "apps/windows/Buddy.Windows/BoundedComputerUse.cs",
+        "apps/windows/Buddy.Windows/MainWindow.Routine.cs",
+        "tests/Buddy.AppBinding.Tests/*"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Bind exact requested application to plan/dispatch; Camera and Spotify may never substitute Calculator/Comet. Safe verified installed-app discovery, bounded low-risk explicit launch path and useful unavailable/ambiguous states. No arbitrary shell, credentials or consequential-action bypass."
+      ],
+      "status": "accepted",
+      "deliverable": "Early causal/reproduction report and scoped tested hash handoff",
+      "seedSnapshot": "176083516139a2a93c4bc2a7ddbd735e7a310ac24f77a0dfb964819cd2ed8937",
+      "acceptedSnapshot": "a82119e7f983d4bf4cc3c8a25062b86242cf331cc42d1c03215b1c1ace952a3d",
+      "acceptedFiles": [
+        {
+          "sha256": "dedae13afdd6bbb0ce70ac47f63e3cc8db1fbf0b1511573f6fc2d7952f0f4085",
+          "path": "services/Buddy.Server/AppLaunchIntent.cs"
+        },
+        {
+          "sha256": "e30a3abaa9838d4d806a92ad31af2ef51fc1fad383465f86a72f9af62ca31870",
+          "path": "services/Buddy.Server/AssistantModels.cs"
+        },
+        {
+          "sha256": "d593d4316bc267c7233a0d81644b5160cd0f526313e8c00e691f01e375a26282",
+          "path": "services/Buddy.Server/AssistantPlanning.cs"
+        },
+        {
+          "sha256": "964b8e5f7e9e9eca80da979de6013a313b094de6ee2a7fee3fa63b002119d571",
+          "path": "apps/windows/Buddy.Windows/BoundedComputerUse.cs"
+        },
+        {
+          "sha256": "8aa9f4ad36eb97162229190d938fbd26871d01a8224851bba0cb84150700b4d6",
+          "path": "apps/windows/Buddy.Windows/InstalledAppResolver.cs"
+        },
+        {
+          "sha256": "f036123f1c0cbdc93c7496b058ee607f8b39bc72600102d651d008418538335d",
+          "path": "apps/windows/Buddy.Windows/RoutineAppOpen.cs"
+        },
+        {
+          "sha256": "70d2902a8b365eb859af5cbc041b7584ef13264f8e9ab25cede9914e48324ca0",
+          "path": "tests/Buddy.AppBinding.Tests/Buddy.AppBinding.Tests.csproj"
+        },
+        {
+          "sha256": "5ac68b3b6a56d3c537b609bb1ebe572eb69cd0cf748c7bb841112e22dc2a8e54",
+          "path": "tests/Buddy.AppBinding.Tests/Program.cs"
+        }
+      ]
+    },
+    {
+      "id": "GUIDE-48",
+      "attempt": 1,
+      "owner": "/root/provider43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "feedback-refine47",
+      "writeScope": [
+        "services/Buddy.Server/GuideLessons.cs",
+        "services/Buddy.Server/AssistantPlanning.cs",
+        "services/Buddy.Server/BrowserGuideLessons.cs",
+        "tests/Buddy.GuideFeedback.Tests/*"
+      ],
+      "dependencies": {
+        "APP-47": 1
+      },
+      "acceptance": [
+        "Useful bounded browser orientation with exact live grounding/manual expectations and no action-completion claims; headless only, root actual-model/native validation."
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed exact-hash handoff; no installation/publication/native actions",
+      "acceptedSnapshot": "75a013dd2814690a389a8e6a9d5a6ec597eb6ceb07a8a6adf8d8e8a61f820798",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/AssistantPlanning.cs",
+          "sha256": "87c86df61f1ba9ba0251f2d1d955cee64d4929fe43f016d4243e514194bc6688"
+        },
+        {
+          "path": "services/Buddy.Server/GuideLessons.cs",
+          "sha256": "393f78ffff613443f622bc01744c0e0b436b9161e4ec0805c1d98a11753eb28c"
+        },
+        {
+          "path": "services/Buddy.Server/BrowserGuideLessons.cs",
+          "sha256": "17b344afc4219301dda68ef29e79f4b4941caa4de903d166e780d03f6ab2dbb8"
+        },
+        {
+          "path": "tests/Buddy.GuideFeedback.Tests/Buddy.GuideFeedback.Tests.csproj",
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5"
+        },
+        {
+          "path": "tests/Buddy.GuideFeedback.Tests/Program.cs",
+          "sha256": "fd60b844ca9f02111f3974a48cd649ffc74a84bb595b0912bdc9e6c3c09ef414"
+        }
+      ]
+    },
+    {
+      "id": "DISPATCH-48",
+      "attempt": 1,
+      "owner": "/root/app47",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "feedback-app47",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/DesktopAssistant.cs"
+      ],
+      "dependencies": {
+        "APP-47": 1
+      },
+      "acceptance": [
+        "Wire immutable original task binding through planning and execution, approved bounded native dispatch, no generic native shell fallback; preserve approvals and Stop."
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed source hash and compile evidence; native not run",
+      "acceptedSnapshot": "8d2ca3c666295ff04783b95a13affd84da9f0b53fb3917536f4f0ed5eb35c539",
+      "acceptedFiles": [
+        {
+          "sha256": "79f17a80a8f6d00d843b3a14605ac1e78cd491f45fe53987bb20ac7b9ee136a0",
+          "path": "apps/windows/Buddy.Windows/DesktopAssistant.cs"
+        }
+      ]
+    },
+    {
+      "id": "RESEARCH-48",
+      "attempt": 1,
+      "owner": "/root/speech43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "feedback-speech47",
+      "writeScope": [
+        "services/Buddy.Server/ReviewedRegionResearch.cs",
+        "tests/Buddy.RegionResearch.Tests/*"
+      ],
+      "dependencies": {
+        "VOICE-47": 1
+      },
+      "acceptance": [
+        "Explicit exact reviewed query <=300 characters only; no screen/audio/extracted text network, bounded public source fetching/local summarization, cancellation and three sentence response with actualsources."
+      ],
+      "status": "accepted",
+      "deliverable": "Scoped source hashes/tests, no live network/model/native/account setup",
+      "acceptedSnapshot": "48d64c8b28899d5f9328fc1f1f45136fa941e5c07b1d9932fe4bc9ba458585fd",
+      "acceptedFiles": [
+        {
+          "sha256": "f4aef4114c9a40734e147d49cf11a7b593a82fb5c6234072702141e82ae38a75",
+          "bytes": 12056,
+          "path": "services/Buddy.Server/ReviewedRegionResearch.cs"
+        },
+        {
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5",
+          "bytes": 252,
+          "path": "tests/Buddy.RegionResearch.Tests/Buddy.RegionResearch.Tests.csproj"
+        },
+        {
+          "sha256": "fe11bc0477108dd508d0cbd35ceee8974a84b55983f3a6a20006fad920c9c5dc",
+          "bytes": 19786,
+          "path": "tests/Buddy.RegionResearch.Tests/Program.cs"
+        },
+        {
+          "sha256": "753a9ee1b3073cb1f5655780525f36ee165c9007a6edf11e25b9d926d2caa162",
+          "bytes": 4610,
+          "path": "tests/Buddy.RegionResearch.Tests/README.md"
+        }
+      ]
+    },
+    {
+      "id": "PACKAGE-49",
+      "attempt": 1,
+      "owner": "/root/app47",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "feedback-app47",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/InstalledAppResolver.cs",
+        "apps/windows/Buddy.Windows/RoutineAppOpen.cs",
+        "tests/Buddy.AppBinding.Tests/Program.cs"
+      ],
+      "dependencies": {
+        "APP-47": 1,
+        "DISPATCH-48": 1
+      },
+      "acceptance": [
+        "Resolve verified signed Windows Camera and current Spotify Store launcher layouts without generic shell, ACL/security changes, arbitrary executable trust or app substitution. Preserve exact task/one-use launch/pinned identity. Headless checks only; root native read-only acceptance."
+      ],
+      "status": "accepted",
+      "deliverable": "Exact hashed handoff, security rationale, tests, no app launch or profile changes",
+      "acceptedSnapshot": "18c26450417bfed272ec7b93e44db4bd31f9d18496fd2526366b7a36a3f903bb",
+      "acceptedFiles": [
+        {
+          "sha256": "5d1ee21cdd9df4d7003bc1583751ef35d6ae1b5e78512e6529eafc764efc758a",
+          "path": "apps/windows/Buddy.Windows/InstalledAppResolver.cs"
+        },
+        {
+          "sha256": "bba9770cf79acfbf6a47b0727b3eea7ded6067f6007296eb3bb9ddbfcbed14fb",
+          "path": "apps/windows/Buddy.Windows/RoutineAppOpen.cs"
+        },
+        {
+          "sha256": "6e1e6e91c9296c7f2667e038e6cdb069f69d26aa818aaaad10312077297a6bc9",
+          "path": "tests/Buddy.AppBinding.Tests/Program.cs"
+        }
+      ]
+    },
+    {
+      "id": "ACTIVITY-50",
+      "attempt": 1,
+      "owner": "/root/app47",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "activity50",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/LocalTaskJournal.cs",
+        "tests/Buddy.LocalTask.Tests/*"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Implement bounded pure real-operation journal with immutable identity, stale-event rejection, truthful terminal states, memory-only recent tasks; no native/account/model operations."
+      ],
+      "status": "accepted",
+      "deliverable": "Exact hashed handoff and scoped checks; limitations explicit; no foreground/installed/preview changes",
+      "seedSnapshot": "197836cd6b4cef72621f1aad1785f2dc6036d2b106f14ae15ed0eb8ba9190441",
+      "acceptedSnapshot": "13e7fe8265a3254ae217c497e23cc5f1e241d6fa835aa610810ab53ccd12d495",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/LocalTaskJournal.cs",
+          "sha256": "64b7b37b7a2f9efc4ad73e8af99b3d15e1e79591f00f6187060f968636d3c39e"
+        },
+        {
+          "path": "tests/Buddy.LocalTask.Tests/Buddy.LocalTask.Tests.csproj",
+          "sha256": "7c6f815245723f7da0a3d24bfe21a3398f976ca9be275b0f2e12b968128f0588"
+        },
+        {
+          "path": "tests/Buddy.LocalTask.Tests/Program.cs",
+          "sha256": "b129fbd90cd954cd736b78b15650d22ae6223899c9429eabd90b63338cba9b65"
+        }
+      ]
+    },
+    {
+      "id": "NOTCH-50",
+      "attempt": 1,
+      "owner": "/root/desktop43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "notch50",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/CompanionIsland.cs",
+        "apps/windows/Buddy.Windows/CompanionPresentation.cs",
+        "tests/Buddy.LocalNotch.Tests/*",
+        "tests/Buddy.Windows.IntegrationTests/LocalNotchChecks.cs"
+      ],
+      "dependencies": {
+        "ACTIVITY-50": 1
+      },
+      "acceptance": [
+        "Add usable local recent task cards/pills, focused detail and explicit dismiss/review-source navigation from journal; preserve nonactivation, Stop, original art, privacy, modes/fullscreen/reduced motion; no fake agents or inferred completion."
+      ],
+      "status": "accepted",
+      "deliverable": "Exact hashed handoff and scoped checks; limitations explicit; no foreground/installed/preview changes",
+      "seedSnapshot": "197836cd6b4cef72621f1aad1785f2dc6036d2b106f14ae15ed0eb8ba9190441",
+      "acceptedSnapshot": "9b755719757b86c18a1ed37b068ff25c31bca70ca1cda39f97a73cae86595f57",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/CompanionIsland.cs",
+          "sha256": "f2b7eb7611cf86223c67799b181ec53082cd4c057677c4b292c6f58520fd2efd"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/CompanionPresentation.cs",
+          "sha256": "7774c3e42a2c95afec3cad134e8071562304f2f3d2e0f7a895119f53084c6649"
+        },
+        {
+          "path": "tests/Buddy.LocalNotch.Tests/Buddy.LocalNotch.Tests.csproj",
+          "sha256": "64daae4c81f3636981646f8d7eba7e6962adaac009e08882516b55ad47e7ec68"
+        },
+        {
+          "path": "tests/Buddy.LocalNotch.Tests/Program.cs",
+          "sha256": "f2405c60a958aa1da28657466c6281023f533de74fcb32f006b207cf21d60e3e"
+        },
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/LocalNotchChecks.cs",
+          "sha256": "ef2d823bd43e1654728835b701f186e1edcac4ca7c5df137a02df3fdc23795b5"
+        }
+      ]
+    },
+    {
+      "id": "TEACH-50",
+      "attempt": 1,
+      "owner": "/root/provider43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "teach50",
+      "writeScope": [
+        "services/Buddy.Server/AssistantPlanning.cs",
+        "services/Buddy.Server/GuideLessons.cs",
+        "services/Buddy.Server/Teaching.cs",
+        "tests/Buddy.GeneralTeaching.Tests/*",
+        "tests/validation/Buddy.GeneralTeachingLive.Tests/*"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Investigate general model-generated teaching utility from nonprivate recorded observations and canned owned contexts; independent oracle and actual model executed by root. Improve explanations without invented targets/actions or weakening safety."
+      ],
+      "status": "accepted",
+      "deliverable": "Exact hashed handoff and scoped checks; limitations explicit; no foreground/installed/preview changes",
+      "seedSnapshot": "197836cd6b4cef72621f1aad1785f2dc6036d2b106f14ae15ed0eb8ba9190441",
+      "acceptedSnapshot": "b961bf52f24d837bd9dc13052daaec768e963493547a462d50e51ad2b7841e1d",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/AssistantPlanning.cs",
+          "sha256": "951d96e09a41f702d1a50c2b7b03308767f82e5e20fd34dab30cb41a9d4706c5"
+        },
+        {
+          "path": "services/Buddy.Server/GuideLessons.cs",
+          "sha256": "8e89dccba906837747beb1d37d7b8ecd0739b784aa71c2493f7485966dac09cf"
+        },
+        {
+          "path": "services/Buddy.Server/Teaching.cs",
+          "sha256": "94eaccd42fe43df39a6d0e6e2260af1fdd142b19188dfc789008c7a5cd217c6c"
+        },
+        {
+          "path": "tests/Buddy.GeneralTeaching.Tests/Buddy.GeneralTeaching.Tests.csproj",
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5"
+        },
+        {
+          "path": "tests/Buddy.GeneralTeaching.Tests/Program.cs",
+          "sha256": "b9db19c804f8299dc8861bc9893aa2ccb2acfef19455e4cf643906acd037bc88"
+        },
+        {
+          "path": "tests/validation/Buddy.GeneralTeachingLive.Tests/Buddy.GeneralTeachingLive.Tests.csproj",
+          "sha256": "209d88af03cbdbc20bd31630aae73674edab50bbc2b8f8b11ed1e24e6fef72ab"
+        },
+        {
+          "path": "tests/validation/Buddy.GeneralTeachingLive.Tests/Fixtures.cs",
+          "sha256": "bdddde2a99220daf4b9675318e4e54666fa3d9cabbee275a0357cd821c4f83a8"
+        },
+        {
+          "path": "tests/validation/Buddy.GeneralTeachingLive.Tests/Program.cs",
+          "sha256": "d8d6157471d0b5d776f331f8d1967ee0fc12d04ec7e11932557527600b17bb24"
+        }
+      ]
+    },
+    {
+      "id": "REGION-50",
+      "attempt": 1,
+      "owner": "/root/speech43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "region50",
+      "writeScope": [
+        "tests/validation/Buddy.RegionCompletionLive.Tests/*",
+        "tests/Buddy.RegionCompletion.Tests/*"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Provide noninteractive actual-local-model region question and exact-reviewed-query web research completion harness using owned/nonprivate inputs; no foreground, native capture, mic/audio or accounts. Root runs actual models/network."
+      ],
+      "status": "accepted",
+      "deliverable": "Exact hashed handoff and scoped checks; limitations explicit; no foreground/installed/preview changes",
+      "seedSnapshot": "197836cd6b4cef72621f1aad1785f2dc6036d2b106f14ae15ed0eb8ba9190441",
+      "acceptedSnapshot": "9e4d3c4383ad5046a22f2b60b5d0c5f454bcc5064d928c30c1baa2bf1c6531a0",
+      "acceptedFiles": [
+        {
+          "path": "tests/validation/Buddy.RegionCompletionLive.Tests/Buddy.RegionCompletionLive.Tests.csproj",
+          "bytes": 816,
+          "sha256": "209d88af03cbdbc20bd31630aae73674edab50bbc2b8f8b11ed1e24e6fef72ab"
+        },
+        {
+          "path": "tests/validation/Buddy.RegionCompletionLive.Tests/Program.cs",
+          "bytes": 5668,
+          "sha256": "ec1a9b8aeaf2e3907ee1ef39fe601dd552b7f72afb9e4d6c5cfc0b39c052d135"
+        },
+        {
+          "path": "tests/validation/Buddy.RegionCompletionLive.Tests/ProbeRunner.cs",
+          "bytes": 2763,
+          "sha256": "acd555b74385f61679d36ea5706e75d6e4a38a7701b041d9edbb754125952c9f"
+        },
+        {
+          "path": "tests/validation/Buddy.RegionCompletionLive.Tests/ProbeTransport.cs",
+          "bytes": 7638,
+          "sha256": "02e251604b7b3964f59e9ec7a73a160e13ec6de2a14aa3d91e5ef340c93d0507"
+        },
+        {
+          "path": "tests/validation/Buddy.RegionCompletionLive.Tests/RegionFixture.cs",
+          "bytes": 12049,
+          "sha256": "a4fe477416f9a845c76edb0f014f87f167b9193373bbb7ca43d65acdc89111a5"
+        },
+        {
+          "path": "tests/validation/Buddy.RegionCompletionLive.Tests/README.md",
+          "bytes": 6566,
+          "sha256": "125d4026e7194d870b94b6127202c546a30f66642898559a765802b50740b90a"
+        },
+        {
+          "path": "tests/Buddy.RegionCompletion.Tests/Buddy.RegionCompletion.Tests.csproj",
+          "bytes": 291,
+          "sha256": "62cca98b6f4988f0955e35ef8a219955f36c16fae2f04e47cea12b7e50ced70e"
+        },
+        {
+          "path": "tests/Buddy.RegionCompletion.Tests/Program.cs",
+          "bytes": 11236,
+          "sha256": "31d38ba2b90c5600244a1de7311bdf71b5f5da8cc355b1175814638e2fbc29d2"
+        }
+      ]
+    },
+    {
+      "id": "STATUS-50",
+      "attempt": 1,
+      "owner": "/root/docs43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "status50",
+      "writeScope": [
+        "docs/Feedback-status-50.md",
+        "docs/Local-notch-scope-50.md"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Recover exact17 feedback inventory from authorized workspace records and map item-specific implementation/test/pending evidence; flag numbering missing rather than fabricate; retain connector/code versus credentials distinctions and Coucou partial/missing gaps."
+      ],
+      "status": "accepted",
+      "deliverable": "Exact hashed handoff and scoped checks; limitations explicit; no foreground/installed/preview changes",
+      "seedSnapshot": "197836cd6b4cef72621f1aad1785f2dc6036d2b106f14ae15ed0eb8ba9190441",
+      "acceptedSnapshot": "f6553fc863cb77401baab66e61de62d58bc5adf7eab30a564f21d417704c0e15",
+      "acceptedFiles": [
+        {
+          "path": "docs/Feedback-status-50.md",
+          "sha256": "4516ef4930b19f697a39f19500325de9e365c1913f6999de8f36e1434fb1e2e4"
+        },
+        {
+          "path": "docs/Local-notch-scope-50.md",
+          "sha256": "4610c5b408fb73af52928bbe3370ed8977802300bc6ed6867771f0bf7b0c25e4"
+        }
+      ]
+    },
+    {
+      "id": "QA-50",
+      "attempt": 1,
+      "owner": "/root/qa43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "qa50",
+      "writeScope": [
+        "tests/validation/Buddy.TeachingUsefulness.Tests/*",
+        "tests/validation/Buddy.LocalTaskBoundary.Tests/*",
+        "tests/Buddy.Windows.IntegrationTests/LocalTaskLifecycleChecks.cs"
+      ],
+      "dependencies": {
+        "ACTIVITY-50": 1
+      },
+      "acceptance": [
+        "Independent usefulness criteria/oracles for model teaching and bounded journal identity/terminal/privacy checks; no actual model/native/account operations."
+      ],
+      "status": "accepted",
+      "deliverable": "Exact hashed handoff and scoped checks; limitations explicit; no foreground/installed/preview changes",
+      "seedSnapshot": "197836cd6b4cef72621f1aad1785f2dc6036d2b106f14ae15ed0eb8ba9190441",
+      "acceptedSnapshot": "75bbfa9249191ec24d9f8ea83759ba7c6968a535c53192bfef9fdbf616fdb33b",
+      "acceptedFiles": [
+        {
+          "path": "tests/validation/Buddy.TeachingUsefulness.Tests/Buddy.TeachingUsefulness.Tests.csproj",
+          "sha256": "209d88af03cbdbc20bd31630aae73674edab50bbc2b8f8b11ed1e24e6fef72ab"
+        },
+        {
+          "path": "tests/validation/Buddy.TeachingUsefulness.Tests/TeachingFixtures.cs",
+          "sha256": "7a0e09eb73560afccba3be67d9ce82f15ed92ac667d4291200d10c399e0e8b7a"
+        },
+        {
+          "path": "tests/validation/Buddy.TeachingUsefulness.Tests/TeachingUsefulnessOracle.cs",
+          "sha256": "82f6561fd5f028fb7121f846bc21f975422166b70449a1ca2b7fa40aae4b2dde"
+        },
+        {
+          "path": "tests/validation/Buddy.TeachingUsefulness.Tests/Program.cs",
+          "sha256": "8a10100f5e61bef331eec230e0d7fa3974fa40079b6347dcb3746d2aa4d7e5df"
+        },
+        {
+          "path": "tests/validation/Buddy.TeachingUsefulness.Tests/README.md",
+          "sha256": "50ee4f3bb9f62cc2b682d50a9386a8868c6027ac957cccefec87f3e11cfbe143"
+        },
+        {
+          "path": "tests/validation/Buddy.LocalTaskBoundary.Tests/Buddy.LocalTaskBoundary.Tests.csproj",
+          "sha256": "2fdcdd4ae645bacf83f51a9e522b4c77e5c1f192b0a5cac253d9e2ce3ce57bfc"
+        },
+        {
+          "path": "tests/validation/Buddy.LocalTaskBoundary.Tests/Program.cs",
+          "sha256": "e1a1250e75423fac254702d04e730699c016bb51a0c91138262269ac4905f446"
+        },
+        {
+          "path": "tests/validation/Buddy.LocalTaskBoundary.Tests/README.md",
+          "sha256": "3e8cf1996b43f138c1dc3190042ffbb4557f7301ecf702ca3b927a618e7c57e5"
+        },
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/LocalTaskLifecycleChecks.cs",
+          "sha256": "298ac47ced3e34dbf9399285c57bfd4a7cf3c33b290135e118958797f987185c"
+        }
+      ]
+    },
+    {
+      "id": "INT-50",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "quality46-integration",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/**",
+        "services/Buddy.Server/**",
+        "tests/**",
+        "docs/**"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Integrate local notch and general teaching fixes, run noninteractive exact-scenario checks, issue exact17 feedback matrix; preserve installed and all previews."
+      ],
+      "status": "running",
+      "deliverable": "Source/results/mapping and smallest next acceptance gate; no foreground until notified"
+    },
+    {
+      "id": "STATUS-51",
+      "attempt": 1,
+      "owner": "/root/docs43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "status50",
+      "writeScope": [
+        "docs/Feedback-status-50.md",
+        "docs/Local-notch-scope-50.md",
+        "docs/Feedback47-acceptance-plan.md"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Exact original17-item mapping with user successes and explicit untested controls preserved; bounded no-Camera real-app acceptance plan; installation authorization distinct from publication."
+      ],
+      "status": "accepted",
+      "deliverable": "Exact hashed handoff and scoped checks; limitations explicit; no foreground/installed/preview changes",
+      "seedSnapshot": "197836cd6b4cef72621f1aad1785f2dc6036d2b106f14ae15ed0eb8ba9190441",
+      "acceptedSnapshot": "7652ee6def5ab43cefc1a044a2258e0fb2cb1ec7501ce898471cbf0ecd0b0a0b",
+      "acceptedFiles": [
+        {
+          "path": "docs/Feedback-status-50.md",
+          "sha256": "a39a4813bc1d0d9f2fbe2327c13c9f5021219a7a2b0fcbbbd8266c6616e4d2e4"
+        },
+        {
+          "path": "docs/Local-notch-scope-50.md",
+          "sha256": "757093c70ae79cf226387e17bc5ebed9b00b678bd1b5321a167ab6890f3e4308"
+        },
+        {
+          "path": "docs/Feedback47-acceptance-plan.md",
+          "sha256": "e5f617f762da9c4ca0d0e7f6b6878bb5262a65d51920a1723efc979f5d6b5aaf"
+        }
+      ]
+    },
+    {
+      "id": "TEACH-51",
+      "attempt": 1,
+      "owner": "/root/provider43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "teach50",
+      "writeScope": [
+        "services/Buddy.Server/AssistantPlanning.cs",
+        "services/Buddy.Server/GuideLessons.cs",
+        "services/Buddy.Server/Teaching.cs",
+        "tests/Buddy.GeneralTeaching.Tests/*"
+      ],
+      "dependencies": {
+        "TEACH-50": 1
+      },
+      "acceptance": [
+        "Correct demonstrated structured-output truncation/verbosity and disabled-requested-target evidence gaps; retain source-bound safety and independent utility; final actual usefulness must be reported separately."
+      ],
+      "status": "accepted",
+      "deliverable": "Exact hashed handoff and scoped checks; limitations explicit; no foreground/installed/preview changes",
+      "seedSnapshot": "197836cd6b4cef72621f1aad1785f2dc6036d2b106f14ae15ed0eb8ba9190441",
+      "acceptedSnapshot": "fecc6a02629b16c1670199049e247eeedde6f930f96610a6150f71bf14414065",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/AssistantPlanning.cs",
+          "sha256": "1346ff56359aa2eb362e77835f83df095ae1c1108f66319d48dd2bc37c9bc739"
+        },
+        {
+          "path": "services/Buddy.Server/GuideLessons.cs",
+          "sha256": "ae18ea4fb23b5ea2ea4bb3e8173cd62c5df0b72b1ab965e30c43d400ec3c4d1c"
+        },
+        {
+          "path": "services/Buddy.Server/Teaching.cs",
+          "sha256": "fd376dfd0d0f374a62bf4804f4e516d35113105bafd8fac5f07ce45bddf2f839"
+        },
+        {
+          "path": "tests/Buddy.GeneralTeaching.Tests/Program.cs",
+          "sha256": "0a340bea706dbdcc717687758d170d6e8834fe9cfa713bd702a5fe840e0ee071"
+        }
+      ]
+    },
+    {
+      "id": "CORE-53",
+      "attempt": 1,
+      "owner": "/root/core53",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "core53",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/DesktopPreferences.cs",
+        "apps/windows/Buddy.Windows/MainWindow.Preferences.cs",
+        "apps/windows/Buddy.Windows/AssistantSettings.cs",
+        "apps/windows/Buddy.Windows/ShortcutRegistration.cs",
+        "apps/windows/Buddy.Windows/ShortcutTransaction*.cs",
+        "apps/windows/Buddy.Windows/InstalledAppResolver.cs",
+        "apps/windows/Buddy.Windows/AppLaunchPolicy.cs",
+        "tests/Buddy.CoreFollowup.Tests/**",
+        "tests/Buddy.Windows.IntegrationTests/CoreFollowupChecks.cs"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Repair evidenced transactional settings/hotkey rollback and swap gaps; preserve preferences and exact bounded app binding; injected meaningful fixtures."
+      ],
+      "status": "accepted",
+      "deliverable": "Hashed source handoff, exact focused test evidence, concrete APIs and unaccepted boundaries; root integrates",
+      "seedSnapshot": "b83cc17b955879efdd3be5684132d49a08ce98284bb790bf44c80568af902445",
+      "acceptedSnapshot": "e369eb4cf6cfc4964830c6edf61a44582b59f4a8e4adb35d46b09e9ca0bf08df",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/AssistantSettings.cs",
+          "sha256": "7a372c9f4505f16d6cffe946a4c51b365e5f4ca56ea625842edfe66c6c244b4c"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/DesktopPreferences.cs",
+          "sha256": "c7e41972ce25abd196ac315ed684dea64ddf2c32408daf7a4d93c193a8bdd225"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/MainWindow.Preferences.cs",
+          "sha256": "88bf51c468c945c235950c3e49203ce497420846f5dac87a4a184209c1578f0c"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/ShortcutTransaction.cs",
+          "sha256": "658b7b4dbe8dcc8c564c357f25d4e92fcc57012a595ebede82998ccb5b876909"
+        },
+        {
+          "path": "tests/Buddy.CoreFollowup.Tests/Buddy.CoreFollowup.Tests.csproj",
+          "sha256": "d5094858ee109f32fa8f2ab2e5a728b2143b84b8badbce2d94d39f87725a6800"
+        },
+        {
+          "path": "tests/Buddy.CoreFollowup.Tests/Program.cs",
+          "sha256": "a2d54c5b471a954bd36d65b9a697532a43312389243eb0d6303548aaf234b77d"
+        },
+        {
+          "path": "tests/Buddy.Windows.IntegrationTests/CoreFollowupChecks.cs",
+          "sha256": "40e7f56f8a5e04198f0d3494a2516d4e58a951e469b247d1e2c96007e5d13b9d"
+        }
+      ]
+    },
+    {
+      "id": "TEACH-53",
+      "attempt": 1,
+      "owner": "/root/teach53",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "teach53",
+      "writeScope": [
+        "services/Buddy.Server/AssistantPlanning.cs",
+        "services/Buddy.Server/GuideLessons.cs",
+        "services/Buddy.Server/Teaching.cs",
+        "services/Buddy.Server/ReviewedRegionResearch.cs",
+        "tests/Buddy.GeneralTeaching.Tests/**",
+        "tests/validation/Buddy.GeneralTeachingLive.Tests/**",
+        "tests/Buddy.TeachingFollowup.Tests/**",
+        "tests/Buddy.RegionResearch.Tests/**"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Useful source-grounded teaching and region/research completion without invented state, scope or targets; independent actual-model evaluation remains root-owned."
+      ],
+      "status": "accepted",
+      "deliverable": "Hashed source handoff, exact focused test evidence, concrete APIs and unaccepted boundaries; root integrates",
+      "seedSnapshot": "b83cc17b955879efdd3be5684132d49a08ce98284bb790bf44c80568af902445",
+      "acceptedSnapshot": "efa4a05dc9a9f3a830c97e66198c7f62903f78e1b89fd5549f01071353e9e6f0",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/AssistantPlanning.cs",
+          "sha256": "a1e94b51926f5432fbe7d09a361f38984e06705faa91ba9455e3b1716a015b48"
+        },
+        {
+          "path": "services/Buddy.Server/GuideLessons.cs",
+          "sha256": "c8f78036f1157fe8806f6e70efaae23b889ae466e0da8115e7b8d8e6524edca4"
+        },
+        {
+          "path": "services/Buddy.Server/Teaching.cs",
+          "sha256": "0612c0136441290ea09e86a58782169dd0f9212e5252163b0fdbc04ce8598d26"
+        },
+        {
+          "path": "services/Buddy.Server/ReviewedRegionResearch.cs",
+          "sha256": "4aea06b25dffa707a92c08cd0d9a0051118e9347f501c95114a3d2a9f36dee63"
+        },
+        {
+          "path": "tests/Buddy.TeachingFollowup.Tests/Buddy.TeachingFollowup.Tests.csproj",
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5"
+        },
+        {
+          "path": "tests/Buddy.TeachingFollowup.Tests/Program.cs",
+          "sha256": "33ffca9694c1b2c93edf0a6208be1b2c1310f8cd11dad383fb8442ab0f00c351"
+        }
+      ]
+    },
+    {
+      "id": "REFINE-53",
+      "attempt": 1,
+      "owner": "/root/refine53",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "refine53",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/MainWindow.Refine.cs",
+        "apps/windows/Buddy.Windows/RefineWindow.cs",
+        "apps/windows/Buddy.Windows/RefinementDraftOptions.cs",
+        "apps/windows/Buddy.Windows/RefinementOptionsPanel.cs",
+        "apps/windows/Buddy.Windows/LocalPromptWatcher.cs",
+        "apps/windows/Buddy.Windows/InlinePromptWindow.cs",
+        "apps/windows/Buddy.Windows/ExternalRefinementOptions*.cs",
+        "services/Buddy.Server/Refinement*.cs",
+        "tests/Buddy.RefinementFollowup.Tests/**"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Functional immutable external options preparation followed by fresh field capture and unchanged review/Apply/Undo ownership; meaningful lifecycle fixtures."
+      ],
+      "status": "accepted",
+      "deliverable": "Hashed source handoff, exact focused test evidence, concrete APIs and unaccepted boundaries; root integrates",
+      "seedSnapshot": "b83cc17b955879efdd3be5684132d49a08ce98284bb790bf44c80568af902445",
+      "acceptedSnapshot": "0022d97d1e567fcff345a2f3d39d09367c05b0e4a2ca699b080e95beef386091",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/MainWindow.Refine.cs",
+          "sha256": "541d9d0c6a68e90d8d19e90fdc0327f5c80431e4bfa99a2ce78b54f6f3b2b500"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/InlinePromptWindow.cs",
+          "sha256": "873f84eae8b30b16f538dbb7ceacccb0e255ca1dc13276531e2d28869fd5306b"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/LocalPromptWatcher.cs",
+          "sha256": "7b5a351f3075108253931b6e31361fb0c039ecdceac11437b34426fa18135783"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/RefinementDraftOptions.cs",
+          "sha256": "d822a6439ddd9d2fc367626b07240a0b72ef674d7154b80c7ecabfa42dfafec1"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/RefinementOptionsPanel.cs",
+          "sha256": "b539549215c8dbfadfdafa0b665e572f03e3bd058173e668ac16d428b6061c26"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/ExternalRefinementOptions.cs",
+          "sha256": "1d74a30b6b597a4872646b73303cf9069409b18edfcbbfbc70a60f5e4c6ce3ad"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/ExternalRefinementOptionsWindow.cs",
+          "sha256": "d7397dd18b0cb7d0b47f4350d3ded26e0c1b9a1409bedb9c1b4fa5c270ec92d7"
+        },
+        {
+          "path": "tests/Buddy.RefinementFollowup.Tests/Buddy.RefinementFollowup.Tests.csproj",
+          "sha256": "31210b85196c619eb6f8e647237cac64a0a1754d96f75478164dd337943f22e7"
+        },
+        {
+          "path": "tests/Buddy.RefinementFollowup.Tests/Program.cs",
+          "sha256": "87fd254e0b8ff4380db0b16b4805c564a980e4731eaf472bcd634cd0f281aee8"
+        },
+        {
+          "path": "tests/Buddy.RefinementFollowup.Tests/Unshown/Buddy.RefinementFollowup.Unshown.csproj",
+          "sha256": "d94b949d1b06c3a9cd8abb8c1c650618bb4041e21ba89be2cea38c6ad6abe12a"
+        },
+        {
+          "path": "tests/Buddy.RefinementFollowup.Tests/Unshown/Program.cs",
+          "sha256": "8add69d83c79d61d83adad183fe8affc20058979f9cfc39a036ac3474daf0e11"
+        }
+      ]
+    },
+    {
+      "id": "NOTCH-53",
+      "attempt": 2,
+      "owner": "/root/notch53",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "notch53",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/CompanionIsland.cs",
+        "apps/windows/Buddy.Windows/CompanionPresentation.cs",
+        "apps/windows/Buddy.Windows/Notch*.cs",
+        "tests/Buddy.LocalNotch.Tests/**",
+        "tests/Buddy.NotchFollowup.Tests/**",
+        "tests/Buddy.Windows.IntegrationTests/NotchFollowupChecks.cs"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Functional local interaction/pin/ticker/notes/embedded-chat/history/model/context callbacks and bounded explicit text drop, preserving art/nonactivation/cancellation and truthful task state."
+      ],
+      "status": "accepted",
+      "deliverable": "Hashed source handoff, exact focused test evidence, concrete APIs and unaccepted boundaries; root integrates",
+      "seedSnapshot": "b83cc17b955879efdd3be5684132d49a08ce98284bb790bf44c80568af902445",
+      "acceptedSnapshot": "4f1f1d50d79691f5ad6cfb1550d58864e10a489b0731f1fbaeee54ee6aa187a7",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/NotchChatSession.cs",
+          "sha256": "0a1e41968f95425a95cf16fecb7cf21471e2f194640af66fc0553f51f5c501b8"
+        },
+        {
+          "path": "tests/Buddy.NotchFollowup.Tests/Program.cs",
+          "sha256": "6e8d4ca0032d1fcf73d1ed4f8c75280b0f9ff3145cddc0afbc2a351c081e801e"
+        }
+      ]
+    },
+    {
+      "id": "PROVIDER-53",
+      "attempt": 1,
+      "owner": "/root/provider53",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "provider53",
+      "writeScope": [
+        "services/Buddy.Server/Provider*.cs",
+        "services/Buddy.Server/Connector*.cs",
+        "services/Buddy.Server/OAuth*.cs",
+        "services/Buddy.Server/LocalAgent*.cs",
+        "apps/windows/Buddy.Windows/ProviderSetup*.cs",
+        "apps/windows/Buddy.Windows/ConnectorSetup*.cs",
+        "apps/windows/Buddy.Windows/LocalAgent*.cs",
+        "tests/Buddy.Provider.Tests/**",
+        "tests/Buddy.ProviderRouting.Tests/**",
+        "tests/Buddy.LocalAgentFollowup.Tests/**"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Production selectable opt-in text-provider routing/setup with consent/disconnect; bounded local-agent event and approval contracts, no credentials/grants/hooks/live cloud activation."
+      ],
+      "status": "accepted",
+      "deliverable": "Hashed source handoff, exact focused test evidence, concrete APIs and unaccepted boundaries; root integrates",
+      "seedSnapshot": "b83cc17b955879efdd3be5684132d49a08ce98284bb790bf44c80568af902445",
+      "acceptedSnapshot": "671a5aa6abc8b766479e4cf5617d4cddfed8396b550c830706e3c866d422218d",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/LocalAgentSessionWindow.cs",
+          "sha256": "02108ec12bf42d253a6766251e8a4ba71f56ba099949a3fc65234e61d8135bd0"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/ProviderSetupWindow.cs",
+          "sha256": "68453bdddf694e0a1d3d91d878c9bd25fbbaff9a4ddfdf35e4bd2febafb66b27"
+        },
+        {
+          "path": "services/Buddy.Server/ConnectorSetup.cs",
+          "sha256": "a76bf6b3816b913619604f4368e234fce6b493f943d3e228414232ca0d1c38bd"
+        },
+        {
+          "path": "services/Buddy.Server/LocalAgentClient.cs",
+          "sha256": "fdd14b3d972d89c89abde684dab280472f784c008a057ff17b9fc95935ef871f"
+        },
+        {
+          "path": "services/Buddy.Server/LocalAgentPipe.cs",
+          "sha256": "e8c8f794d30628471791bf3d5fc48a4dec18e9afe2175406b6c0c0166c9ff45d"
+        },
+        {
+          "path": "services/Buddy.Server/LocalAgentProtocol.cs",
+          "sha256": "a3f37bc81a9afb92c17a739f4dbb82e0856818b0e4949ae884de85e2ed9ea4ab"
+        },
+        {
+          "path": "services/Buddy.Server/ProviderProtocols.cs",
+          "sha256": "566fbb45f8cc5669912f823096a11cf2385accdc69c8d96e8739c8f24d31062f"
+        },
+        {
+          "path": "services/Buddy.Server/ProviderRouting.cs",
+          "sha256": "917431ea46f4e513aaf8016a15c5f14756e66e0b10ba2f40cd76fa24d6a490e6"
+        },
+        {
+          "path": "services/Buddy.Server/ProviderTransports.cs",
+          "sha256": "55a6aef6c90ff77722ee96e59d234f7251c1cc12fe30d85825d60d623ece0e6a"
+        },
+        {
+          "path": "tests/Buddy.LocalAgentFollowup.Tests/Buddy.LocalAgentFollowup.Tests.csproj",
+          "sha256": "c80d5400daf38667932b32eae809b112c9b89da0fce3bc92a1d90ac0c78f1611"
+        },
+        {
+          "path": "tests/Buddy.LocalAgentFollowup.Tests/Program.cs",
+          "sha256": "470d2ec8a62bd974989afaaa9bea511869828b7ae8e6e16d36f80d69dd8d469f"
+        },
+        {
+          "path": "tests/Buddy.Provider.Tests/Program.cs",
+          "sha256": "7555c9a2b9c8dbd6c5be9712803efe2613884789a0916ee5e0f184b1511e9407"
+        },
+        {
+          "path": "tests/Buddy.ProviderRouting.Tests/Buddy.ProviderRouting.Tests.csproj",
+          "sha256": "c80d5400daf38667932b32eae809b112c9b89da0fce3bc92a1d90ac0c78f1611"
+        },
+        {
+          "path": "tests/Buddy.ProviderRouting.Tests/Program.cs",
+          "sha256": "9689a66e6456342193dc9ddc8a1d09537b7814fb29f2a6003e585f4e07c144ea"
+        }
+      ]
+    },
+    {
+      "id": "QA-53",
+      "attempt": 1,
+      "owner": "/root/qa43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "qa53",
+      "writeScope": [
+        "tests/validation/Buddy.Followup53Boundary.Tests/**",
+        "docs/Followup53-acceptance-matrix.md"
+      ],
+      "dependencies": {
+        "CORE-53": 1,
+        "REFINE-53": 1,
+        "TEACH-53": 1,
+        "PROVIDER-53": 1,
+        "NOTCH-53": 2
+      },
+      "acceptance": [
+        "Independent original17 scope/utility/privacy/cancellation and functional production-route regression review, separating source/mock/native/live/manual evidence."
+      ],
+      "status": "accepted",
+      "deliverable": "Hashed source handoff, exact focused test evidence, concrete APIs and unaccepted boundaries; root integrates",
+      "seedSnapshot": "b83cc17b955879efdd3be5684132d49a08ce98284bb790bf44c80568af902445",
+      "acceptedSnapshot": "560f97a4feb4d3efa3c46ac4d902de7de50976309f25de9ac0e6b6b0a766098b",
+      "acceptedFiles": [
+        {
+          "path": "docs/Followup53-acceptance-matrix.md",
+          "sha256": "63a3488a8c6b3eb3c58af4f728a8e6aed342cc595aeb21ab25be4e2e627fa780"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/aggregate-plan.json",
+          "sha256": "cd117ab61d66707eebf482b4ee772bef9974dabae88a45f3c7a2c71c1c3cb9ef"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/baseline-teaching-summary.json",
+          "sha256": "ad2b393844ea668d431349c8edbe7e8759d4f1673a76281c7a0882f255c42108"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/Buddy.Followup53Boundary.Tests.csproj",
+          "sha256": "43577be8e99ba15a603825764a8e2c187a85aea6e21a603823e13730823c2fa3"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/core-checkpoint.txt",
+          "sha256": "02d666e15fb45595c1e52c6f9aa2738953213c617e2f08637d6746e8c9265a99"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/core-checkpoint2.txt",
+          "sha256": "8208c2f3b0ff9ecd9a3d905485d1f4bd62426885cb1081596de1f62011f2cf72"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/core-final.txt",
+          "sha256": "596712e709b377f187187d9e7e7996fb0ee827c59cf14c396c2049c4ffb951e9"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/CoreCases.cs",
+          "sha256": "ff0e10080cb3145f393fffa1c8376bd4dfc9504a7a0d4e0241e4d6f3f8ec92ad"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/external-source-receipts.json",
+          "sha256": "bf581f89637eebf84a2db7cddebeda667c956db1b43aa361bde16ac896166856"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/notch-checkpoint.txt",
+          "sha256": "82834f58b066cce0f6e89815737c558c838e657e1cf82980b535061aebb1f0c9"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/notch-final.txt",
+          "sha256": "936ae7d5b077da43e8e6d01e7229f6380dd12d5222f6ccbfa5aca972b0a41fa1"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/NotchCases.cs",
+          "sha256": "4597c6c4ca17db845f973a19830f4727972a3b033fa80d62d749e939f59d9cc2"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/Program.cs",
+          "sha256": "036d2220c1eec7ff2795acc5d4918e6cc9420af3837427d0abeefb683c379460"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/provider-checkpoint.txt",
+          "sha256": "caa3f078b9bd31f77bd52eecedb4575866c7ae34680712cccb59742a666d019e"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/provider-checkpoint2.txt",
+          "sha256": "a405a38649c0ec72e7c1de6155135d57babe086b74838cc6b619777ddca7f5c6"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/provider-final.txt",
+          "sha256": "4cc9ebad00047fdeacf86a74dc11d2d6d0f8a9d9039d12b29ca57c23ee75fe6e"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/provider-final2.txt",
+          "sha256": "a2b94e64a14768a929fc0064bfde4fd0eaf245a14f83dc82cd6e310486dc8b35"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/ProviderCases.cs",
+          "sha256": "6212ba82c40bcf4d6475fb6d0c84a9280394f00bf58cce56c57f263a5910b9b4"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/README.md",
+          "sha256": "4c2c79a25b6432ed12cba914048ce90c972dafd150d497cf8b962ba03899384e"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/refine-checkpoint.txt",
+          "sha256": "3c1647e5c4d834ec32cda8509d9d2d4932f2300236d2bcf4d6b7bf34544478fe"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/refine-final.txt",
+          "sha256": "153cb4be874c98bb78c27e08ae197ab054d596eb2332d39a38db15c9063dff41"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/RefineCases.cs",
+          "sha256": "57ae017be36227be6695eef299995ea92824c34e520b9b88cfaac3479bce80d4"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/ReviewedSource.targets",
+          "sha256": "bdc873adc97bcdf2b17a6190160efc4ea705c94d65811e5b40ab77d248a44666"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/SourceReceipt.cs",
+          "sha256": "2734ea05b680a9ef8c4f2f4eb74fa2ef961b61afa6c929aa01aeca657b4e8983"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/teach-checkpoint.txt",
+          "sha256": "79311b30982f7aa50fb22e616a196c7db98d26b87d96a743281c54724943f4b9"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/teaching-final.txt",
+          "sha256": "a5f77e90e78765cb39c6892dee4f76476ca1f63c80f854880b5a3b416b38e950"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup53Boundary.Tests/TeachingCases.cs",
+          "sha256": "623a356ea35283c2ad13a7f66385aa7a346b1e6be70b5f1e05d614e573b8cb5f"
+        }
+      ]
+    },
+    {
+      "id": "INT-53",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "quality46-integration",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/**",
+        "services/Buddy.Server/**",
+        "tests/**",
+        "docs/**"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Integrate independently reviewed functional paths and regressions; keep installed0.4.4 and candidate47 immutable; no foreground or publication"
+      ],
+      "status": "running",
+      "deliverable": "New staging source and original17 feature/test/acceptance matrix"
+    },
+    {
+      "id": "MODEL-53",
+      "attempt": 1,
+      "owner": "/root/core53",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "core53",
+      "writeScope": [
+        "tests/Buddy.LocalModelSelection.Tests/**"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Actual BuddyService.Chat injected transport tests enforce installed local model choice, metadata locality, replay binding, no preference change or pull."
+      ],
+      "status": "accepted",
+      "deliverable": "Tests only with root production dependency hashes",
+      "acceptedSnapshot": "2d9a5d30002e57d5fec8b125d798603cb03bc00ab069344f9d02bff97b6138a9",
+      "acceptedFiles": [
+        {
+          "path": "tests/Buddy.LocalModelSelection.Tests/Buddy.LocalModelSelection.Tests.csproj",
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5"
+        },
+        {
+          "path": "tests/Buddy.LocalModelSelection.Tests/Program.cs",
+          "sha256": "cbe0f9799aaec10cb14eb8364e2fd76d82eb22b88754e5497f7d01ddfcd5304e"
+        }
+      ]
+    },
+    {
+      "id": "CORE-54",
+      "attempt": 1,
+      "owner": "/root/core53",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "core53",
+      "writeScope": [
+        "tests/Buddy.SharedSurface.Tests/**"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Unshown integrated surface lifetime/cancellation fixtures with exact root-source receipts."
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed scoped source/tests or diagnosis proposal, exact hashes and limitations",
+      "acceptedSnapshot": "002596b1f22c854db48f7aed2738d016ce1a6275eaf4c6c9aa0887bfc71be87f",
+      "acceptedFiles": [
+        {
+          "path": "tests/Buddy.SharedSurface.Tests/Buddy.SharedSurface.Tests.csproj",
+          "sha256": "33fd83c7a563fd88dd1b0b916412a9a1364aa4b6d880e27ff3c5b4f153cbfea4"
+        },
+        {
+          "path": "tests/Buddy.SharedSurface.Tests/Program.cs",
+          "sha256": "d78cc9bc00bc766a8429d2d3d0054314a337f1b0b3e2859e2068506e5668173e"
+        }
+      ]
+    },
+    {
+      "id": "PROVIDER-54",
+      "attempt": 1,
+      "owner": "/root/provider53",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "provider53",
+      "writeScope": [
+        "tests/Buddy.LocalAgentPipe.Tests/**",
+        "services/Buddy.Server/LocalAgent*.cs"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Owned IPC interoperability fixture and lifecycle; root runs actual ephemeral fixture; no hooks/accounts/cloud."
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed scoped source/tests or diagnosis proposal, exact hashes and limitations",
+      "acceptedSnapshot": "e593c170eb0fe90915318d89180ea8787e0c162a5efbb4c57c66cc1366d269e1",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/LocalAgentClient.cs",
+          "sha256": "3c0cb381fbc603df5885aa93267ba9979d07f2313b753ea93e43dc9be2134590"
+        },
+        {
+          "path": "services/Buddy.Server/LocalAgentPipe.cs",
+          "sha256": "f6ce6c40135e69be24af19b9912c0b31e5b1458b0164d025f20371694e96d6b5"
+        },
+        {
+          "path": "tests/Buddy.LocalAgentPipe.Tests/Buddy.LocalAgentPipe.Tests.csproj",
+          "sha256": "c80d5400daf38667932b32eae809b112c9b89da0fce3bc92a1d90ac0c78f1611"
+        },
+        {
+          "path": "tests/Buddy.LocalAgentPipe.Tests/Program.cs",
+          "sha256": "3b493f038d70fd62e41b02bacaa3c15666dcff8cb580c163196c05af7ac78ddb"
+        },
+        {
+          "path": "tests/Buddy.LocalAgentPipe.Tests/README.md",
+          "sha256": "c649c578b3c150c7fc4b40228979dc2bf178f19a877c3a18c5740409573aadf4"
+        }
+      ]
+    },
+    {
+      "id": "REFINE-54",
+      "attempt": 1,
+      "owner": "/root/refine53",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "refine53",
+      "writeScope": [
+        "services/Buddy.Server/Refinement*.cs",
+        "tests/Buddy.RefinementMeaning.Tests/**",
+        "apps/windows/Buddy.Windows/MainWindow.Refine.cs",
+        "apps/windows/Buddy.Windows/LocalPromptWatcher.cs",
+        "tests/Buddy.RefinementFollowup.Tests/**"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Diagnosis/proposal first for evidenced useful grammar/semantic improvement with unchanged fidelity gates."
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed scoped source/tests or diagnosis proposal, exact hashes and limitations",
+      "acceptedSnapshot": "bd2fc8a1e0834317938d17e05a0373cea57fdefdd526b51c041a89eb0173256d",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/LocalPromptWatcher.cs",
+          "sha256": "39c9c5bf986457c5b26600a5e8b98c6bfc8d8bbeef6c31c6f44dc09299fe2f1c"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/MainWindow.Refine.cs",
+          "sha256": "943662f746676386d1bd476641edcbb0aa78467bd9a9cda61cafe24add062012"
+        },
+        {
+          "path": "services/Buddy.Server/RefinementContract.cs",
+          "sha256": "76d953ce3f8551425db5c75bba5dedb80ce97e53b72e8f0d7023b80949b6031c"
+        },
+        {
+          "path": "services/Buddy.Server/RefinementGrammar.cs",
+          "sha256": "ea3cd5f5ce45fcbc55b2ea1d38b3830ca56d04293fb9387f037b7cf815039699"
+        },
+        {
+          "path": "tests/Buddy.RefinementFollowup.Tests/Unshown/Program.cs",
+          "sha256": "f8b4cc707109dc809c84da591a278229974ef5b4218e5ee7d12dbca4d70c4fb6"
+        },
+        {
+          "path": "tests/Buddy.RefinementMeaning.Tests/GrammarChecks.cs",
+          "sha256": "32e09fd946aef26c63a6767389f7c0ed2fd58fd274d1fc24117a27881b943606"
+        },
+        {
+          "path": "tests/Buddy.RefinementMeaning.Tests/Program.cs",
+          "sha256": "beae33fc843901fd6c1457f2e299be456f96b1ec8f57e627f016458729ec1f0d"
+        }
+      ]
+    },
+    {
+      "id": "TEACH-54",
+      "attempt": 1,
+      "owner": "/root/teach53",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "teach53",
+      "writeScope": [
+        "services/Buddy.Server/AssistantPlanning.cs",
+        "services/Buddy.Server/GuideLessons.cs",
+        "services/Buddy.Server/Teaching.cs",
+        "services/Buddy.Server/AuthoredConcept*.cs",
+        "tests/Buddy.TeachingFollowup.Tests/**",
+        "tests/Buddy.GeneralTeaching.Tests/**",
+        "services/Buddy.Server/KnownControlConcepts.cs",
+        "services/Buddy.Server/ConceptReferences.cs",
+        "tests/Buddy.ControlConcept.Tests/**"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Evidence-grounded bounded concept proposal and independent unseen/unsupported scenario validation; general model failures remain unaccepted."
+      ],
+      "status": "accepted",
+      "deliverable": "Reviewed scoped source/tests or diagnosis proposal, exact hashes and limitations",
+      "acceptedSnapshot": "6c85381df605fb45e7bdf19364f50315094166c2f03d36dd8b29f78967762b24",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/AssistantPlanning.cs",
+          "sha256": "ff10f4ed35b7fe7adf816b698c821b646af5408932e6b2283ea69a3854d3a1ab"
+        },
+        {
+          "path": "services/Buddy.Server/GuideLessons.cs",
+          "sha256": "b96759ddfdfd3cdb2fdd677525df413c78fd1f09c4fdf6dd42441e433bf5eec1"
+        },
+        {
+          "path": "services/Buddy.Server/Teaching.cs",
+          "sha256": "be09b2af76e1879fc4a3d42e6a65a3904dc95a83b4ef979c56f43c05363570cd"
+        },
+        {
+          "path": "services/Buddy.Server/KnownControlConcepts.cs",
+          "sha256": "c48f635128a9623b757e6ad3e4613def78b841b946be0f9cf664c7815e3c14f8"
+        },
+        {
+          "path": "services/Buddy.Server/ConceptReferences.cs",
+          "sha256": "b8fa589149e6ac4eaad60fed0b73dc806a17b0426f84d5db0fd6f0e90b851444"
+        },
+        {
+          "path": "tests/Buddy.ControlConcept.Tests/Buddy.ControlConcept.Tests.csproj",
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5"
+        },
+        {
+          "path": "tests/Buddy.ControlConcept.Tests/Program.cs",
+          "sha256": "70978fa1777f3f4849e0519135ee2f56f9f4d04a11f90f4db90fdbed0fd5d6cc"
+        },
+        {
+          "path": "tests/Buddy.GeneralTeaching.Tests/Program.cs",
+          "sha256": "a08057d94e5bb57c7d94249434492c213bfc3ff445df8847ad7b1172868a3374"
+        },
+        {
+          "path": "tests/Buddy.TeachingFollowup.Tests/Program.cs",
+          "sha256": "d7deccd002e2a579d8a2a21fa9c29c2359f5078d3712f015975fb5906e224851"
+        }
+      ]
+    },
+    {
+      "id": "NOTCH-54",
+      "attempt": 1,
+      "owner": "/root/notch53",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "notch53",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/NotchPlacement*.cs",
+        "apps/windows/Buddy.Windows/CompanionIsland.cs",
+        "tests/Buddy.NotchPlacement.Tests/**"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Explicit detached local bar placement/return, physical bounds and DPI clamps, passive idle focus; no implicit target capture."
+      ],
+      "status": "accepted",
+      "deliverable": "Scoped source and pure math/state fixtures, native unrun",
+      "acceptedSnapshot": "cfb5357e5e73ccd8260a8894b5123f4ae8635cb023d144cdef288b4ce110f365",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/CompanionIsland.cs",
+          "sha256": "2ec0d8743805b3a56229bb5118a43eb8b4ba1979021b9fc8c46597880e5fa145"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/NotchPlacementPolicy.cs",
+          "sha256": "5907005e95ef5e4c2ddb8f14404af8f3de122b738051dadbfd5032786796d8ee"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/NotchPlacementState.cs",
+          "sha256": "df8b388598177ef96656fea65181d751cdd4ea62dd56a5f9f191aab11033ab38"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/NotchPlacementNative.cs",
+          "sha256": "7d886dc2857afaf0a1f2da21906e9396621cffdb8075effebb49a7f0d76028fb"
+        },
+        {
+          "path": "tests/Buddy.NotchPlacement.Tests/Buddy.NotchPlacement.Tests.csproj",
+          "sha256": "6a696709434fbf9ce5aa1cf0275535b3c5a63784157038df8f3add59b9ff778a"
+        },
+        {
+          "path": "tests/Buddy.NotchPlacement.Tests/Program.cs",
+          "sha256": "2c964e52209ae852bc9b49bbff3e0f041d245abb99e32268248dec503c553584"
+        }
+      ]
+    },
+    {
+      "id": "QA-54",
+      "attempt": 1,
+      "owner": "/root/qa43",
+      "baseRevision": "ced111d78a4e4230e53d8d359ca167b231e29e56",
+      "worktree": "qa53",
+      "writeScope": [
+        "tests/validation/Buddy.Followup54Boundary.Tests/**",
+        "docs/Followup54-acceptance-matrix.md"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Independent held-out authored-concept, semantic fidelity, placement, provider and context-provenance checks with external source hash binding."
+      ],
+      "status": "accepted",
+      "deliverable": "Scoped tests, explicit coverage versus fallback and source-bound receipts",
+      "acceptedSnapshot": "01a25ba63103faf6832789a2283909823048f921c501781f6b313f18511397f9",
+      "acceptedFiles": [
+        {
+          "path": "docs/Followup54-acceptance-matrix.md",
+          "sha256": "76d5b356d5df7271652990fdd97f61fccdab24d5d9fcdbafe3ecb06a8cf65e0f"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/Buddy.Followup54Boundary.Tests.csproj",
+          "sha256": "45d82de78f1364d633761000f659df005a1394a30d9cd37e98101cb73405bf57"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/external-source-receipts.json",
+          "sha256": "2f6fc749dac927e0da8133164141a380e9fd9c2bab0975be21e58a05e5593117"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/grammar-final.txt",
+          "sha256": "0272e46829ff6d5fcb3ceab98f24b9a948f470c8ac28ffc10a827429c8fbaa71"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/GrammarCases.cs",
+          "sha256": "48f69985eb5d146d94f00cee55f85438cbf911ce0a2104d0cc5ad6e357d719b7"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/placement-final.txt",
+          "sha256": "977adac01602a154c2ca8b0f3c314fa811c76aa49a447000474c32b80f7613f8"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/PlacementCases.cs",
+          "sha256": "ab63c03eafc6c4a66c3bf965416a6bf1503c85424ca160f2886c2b2f70058d89"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/Program.cs",
+          "sha256": "54a3fec0d44bb3b1c33ea424326ed297a52096e018c78772a3420f046544d138"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/provenance-checkpoint.txt",
+          "sha256": "f269b6d09f3eacdea1dd4ea7cdc5d125386c657964c06da5014732330f0b50fd"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/provenance-final.txt",
+          "sha256": "c790678e2ee8a78a73fb9714a82d1371ef2d307f0507b0a4ef8f0301805f3c57"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/ProvenanceCases.cs",
+          "sha256": "6b9e3592be237a115250925c098d3857f08931a4290da6a360f5255b75dd7313"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/provider-final.txt",
+          "sha256": "ca585e1a30c2daec0a7d4536d7aa5fb326f2aa815d3b0b48345de46a86b5e331"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/ProviderCases.cs",
+          "sha256": "4ac82119df5cb83f249a66ac0ff518d07099475a8ef52ab1c43d06539adc54d3"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/README.md",
+          "sha256": "d4924f458122cb8f38d348208a44867ac32be2f6ea7ddcf9b83dafb12651081d"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/ReviewedSource.targets",
+          "sha256": "0e271b7d32e582fec91f306132faa98b6f235e6095d3ae68eaa9f644608d6686"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/SourceReceipt.cs",
+          "sha256": "c79e5ed8f568660228d767684796401761b35fff75b1529fd1c3843bca44840e"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/teaching-checkpoint.txt",
+          "sha256": "58d5e408877990aa0ab185a879a6113d5356cf03bd562de5cc333a860df16d5e"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/teaching-final.txt",
+          "sha256": "6992d4b61c40d9b494ef38005ac5712b18e2d0af8845c1a5fe33966a2102c5c9"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/teaching-heldouts.json",
+          "sha256": "77adb1608e9b5bfa80c2b377c6e9689cedf11d4f116c0067d7b1e20c289d8996"
+        },
+        {
+          "path": "tests/validation/Buddy.Followup54Boundary.Tests/TeachingCases.cs",
+          "sha256": "bfd6af8c21c5446d8df260138699bc9988c9f7895777d2e08343dccb0750b7b7"
+        }
+      ]
+    }
+  ],
+  "executionMode": "active",
+  "installation": "continuing_authorization_after_relevant_acceptance_and_fresh_recoverable_backup; no_installation_in_current_noninteractive_batch"
+}

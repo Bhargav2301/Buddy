@@ -1,0 +1,21 @@
+# Bounded app-opening adapter
+
+This Buddy-owned adapter is inspired by the observe/action/verify structure of computer-use systems; it imports no upstream runtime. Its implemented action is only an exact explicit app launch. It does not implement arbitrary navigation, typing, clicking, pixel reasoning, UIA completion or a general agent.
+
+`RoutineAppOpen.TryGetAlias(query, out alias)` accepts whole `open Notepad`, `open Calculator`, `open Explorer`/`open File Explorer`, and `open Comet`/`open Comet Browser`, case-insensitively, with an optional initial `please` and terminal period/exclamation. Mixed goals, executable paths, `.exe` aliases, URLs, arguments and other verbs do not use the fast path. Root retains the existing plan/approval workflow for those requests.
+
+`RunAsync(query, agentEnabled, blockedApps, ct)` returns `ComputerUseResult` with Verified, ActionDispatched, Message and request/observation diagnostics. Root must pass live settings delegates and its visible status/Stop/Escape cancellation owner. The production entry checks Agent enabled and suppresses overlapping calls. Voice still needs the existing reviewed transcript; this reader does not turn tentative speech into a command.
+
+The pure `BoundedComputerUse` controller obtains a request-bound metadata observation, checks its complete HWND/PID/thread/process-creation identity and freshness, gets a matching checkpoint, dispatches at most once, and performs at most 30 read-only verification polls under a 15-second owner. An error or unverified result never replays an action. A cancelled late observer/dispatcher/verifier cannot return successful completion. Both the controller and global routine entry block overlap while an abandoned backend task remains pending. Backends must check the token immediately before their side effect; cancellation cannot undo an app launch that already occurred.
+
+The actual Windows backend uses WindowSelection plus existing secure-desktop/elevation/privacy checks. Observing the foreground initiator allows Buddy itself and captures metadata only. Checkpoint and dispatch revalidate that same foreground identity. It uses fixed Windows paths and Microsoft publisher checks for Notepad/Calculator/Explorer, and the existing fixed-path/product/signature/publisher resolver for Comet; no shell, PATH lookup, URL or arguments. Windows packaged Notepad/Calculator handoff is accepted only for the expected protected package family, executable name and Microsoft signer. Postcondition requires a fresh visible foreground window with verified executable and process identity; an old background process alone is insufficient. An existing verified app window becoming foreground may satisfy this condition; no claim of creating a new window or finishing an in-app task is made.
+
+The executable lease pins the file and every ancestor without write/delete sharing, checks no-follow handle path/volume identity, and then repeats publisher validation while pinned before dispatch. Legitimate hardlinks used by Windows servicing are allowed; the open file identity is still locked against mutation. Root-only actual launch acceptance must check how these conservative checks interact with installed Windows app packages.
+
+Focused tests source-link the production files but inject all backend actions. They never instantiate an enabled production backend, launch an app, inspect a user window or run a native UI fixture. The file-identity lease is separately exercised on inert owned temporary files and links. During isolated development, supply `-p:BuddyWindowRoot=<WINDOW-45 worker apps/windows/Buddy.Windows>` to read its shared WindowSelection/InputNative/Native files without editing either checkout. After integration the default is the current source tree.
+
+```powershell
+dotnet run --project tests/Buddy.ComputerUse.Tests -c Release -r win-x64 --self-contained true -p:BuddyWindowRoot=<shared-source-directory>
+```
+
+`ComputerUseChecks.Run()` is a separate root-only owned WPF metadata fixture; it dispatches no app launch. Root separately owns any actual app-opening acceptance and integrated Stop/banner wiring. Native and real-app results must be reported separately from mock counts. No permissions are elevated, no account or external hook is installed, and no observation is sent to a model or stored.

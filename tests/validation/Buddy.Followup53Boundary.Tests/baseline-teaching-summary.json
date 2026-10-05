@@ -1,0 +1,16 @@
+{
+  "evidenceKind": "independent pure production boundary run",
+  "command": "dotnet run --project tests/validation/Buddy.Followup53Boundary.Tests/Buddy.Followup53Boundary.Tests.csproj -c Release -r win-x64 --self-contained true -- --lane=teaching",
+  "executionSession": 3883,
+  "source": "qa53 source50 seed b83cc17b955879efdd3be5684132d49a08ce98284bb790bf44c80568af902445",
+  "guideLessonsSha256": "ae18ea4fb23b5ea2ea4bb3e8173cd62c5df0b72b1ab965e30c43d400ec3c4d1c",
+  "teachingCasesSha256": "623a356ea35283c2ad13a7f66385aa7a346b1e6be70b5f1e05d614e573b8cb5f",
+  "exitCode": 1,
+  "passed": 11,
+  "failed": 4,
+  "failures": ["TEACH-AVAILABILITY", "TEACH-MUTE-SCOPE", "TEACH-MUTE-STATE", "TEACH-PRIVATE-QUALIFICATION"],
+  "actualModel": false,
+  "native": false,
+  "network": false,
+  "note": "Summarized from captured tool output, not represented as a persisted raw console log. Subsequent checkpoints must retain this baseline failure."
+}

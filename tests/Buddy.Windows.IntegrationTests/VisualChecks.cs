@@ -79,7 +79,7 @@ internal static class VisualChecks
         refine.Show(); refine.UpdateLayout(); Render((FrameworkElement)refine.Content, Path.Combine(output, "Refine-Light.png")); refine.Close();
         using var assistant = new DesktopAssistant(() => null, () => new(), () => IntPtr.Zero, _ => { });
         assistant.Open("guide", "").GetAwaiter().GetResult();
-        var guide = Application.Current.Windows.Cast<Window>().Single(w => w.Title == "Buddy · Guide"); guide.UpdateLayout();
+        var guide = (Window)typeof(DesktopAssistant).GetField("panel", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(assistant)!; guide.UpdateLayout();
         Render((FrameworkElement)guide.Content, Path.Combine(output, "Guide-Light.png"));
         assistant.Open("agent", "").GetAwaiter().GetResult(); guide.UpdateLayout();
         Render((FrameworkElement)guide.Content, Path.Combine(output, "Agent-Light.png"));

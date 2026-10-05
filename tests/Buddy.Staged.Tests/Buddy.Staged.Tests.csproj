@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../services/Buddy.Server/Buddy.Server.csproj" />
+    <Compile Include="../../apps/windows/Buddy.Windows/SentencePlayback.cs" Link="SentencePlayback.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/AudioRouteGuard.cs" Link="AudioRouteGuard.cs" />
+  </ItemGroup>
+</Project>

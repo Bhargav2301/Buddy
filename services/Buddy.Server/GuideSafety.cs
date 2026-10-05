@@ -4,7 +4,7 @@ namespace Buddy.Server;
 
 public static class GuideSafety
 {
-    public static string? RequestedApp(string query)=>Regex.IsMatch(query,@"\b(?:use)?amoeba\b",RegexOptions.IgnoreCase|RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(100))?"amoeba":Regex.IsMatch(query,@"\bnotepad\b",RegexOptions.IgnoreCase|RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(100))?"notepad":null;
+    public static string? RequestedApp(string query)=>Regex.IsMatch(query,@"\b(?:use)?amoeba\b",RegexOptions.IgnoreCase|RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(100))?"amoeba":Regex.IsMatch(query,@"\bnotepad\b",RegexOptions.IgnoreCase|RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(100))?"notepad":Regex.IsMatch(query,@"\bcomet(?:\s+browser)?\b",RegexOptions.IgnoreCase|RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(100))?"comet":null;
     public static bool IsPointRequest(string query)=>Regex.IsMatch(query,@"\b(point|locate|highlight|underline|circle|where)\b",RegexOptions.IgnoreCase|RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(100));
     public static string? RequestedText(string query){
         if(!IsPointRequest(query)||!Regex.IsMatch(query,@"\b(word|text|phrase|document|notepad)\b",RegexOptions.IgnoreCase|RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(100)))return null;

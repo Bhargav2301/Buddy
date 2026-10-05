@@ -1,0 +1,1285 @@
+{
+  "teaching": {
+    "sourceRoot": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53",
+    "inputs": [
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\GrammarCases.cs",
+        "sha256": "48f69985eb5d146d94f00cee55f85438cbf911ce0a2104d0cc5ad6e357d719b7"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\PlacementCases.cs",
+        "sha256": "ab63c03eafc6c4a66c3bf965416a6bf1503c85424ca160f2886c2b2f70058d89"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\Program.cs",
+        "sha256": "54a3fec0d44bb3b1c33ea424326ed297a52096e018c78772a3420f046544d138"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ProvenanceCases.cs",
+        "sha256": "6b9e3592be237a115250925c098d3857f08931a4290da6a360f5255b75dd7313"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ProviderCases.cs",
+        "sha256": "4ac82119df5cb83f249a66ac0ff518d07099475a8ef52ab1c43d06539adc54d3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\SourceReceipt.cs",
+        "sha256": "c79e5ed8f568660228d767684796401761b35fff75b1529fd1c3843bca44840e"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\TeachingCases.cs",
+        "sha256": "bfd6af8c21c5446d8df260138699bc9988c9f7895777d2e08343dccb0750b7b7"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\AppLaunchIntent.cs",
+        "sha256": "dedae13afdd6bbb0ce70ac47f63e3cc8db1fbf0b1511573f6fc2d7952f0f4085"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\AssistantModels.cs",
+        "sha256": "e30a3abaa9838d4d806a92ad31af2ef51fc1fad383465f86a72f9af62ca31870"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\AssistantPlanning.cs",
+        "sha256": "ff10f4ed35b7fe7adf816b698c821b646af5408932e6b2283ea69a3854d3a1ab"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\BrainRouter.cs",
+        "sha256": "ae04a54a24361eaf1f196ba94de34ddafa87998432b68e4f6ba1a7806c3e05cd"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\BrowserGuideLessons.cs",
+        "sha256": "17b344afc4219301dda68ef29e79f4b4941caa4de903d166e780d03f6ab2dbb8"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\BuddyHost.cs",
+        "sha256": "1f4a7e29153c030e3b52db4acd21058a03c11fcf9ce82bd4913d6e1f6f61e45c"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\BuddyService.cs",
+        "sha256": "db60d5203a1e1b7b7c587bdeb065b17654f024ada1f44017a90335358dcb3294"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\ConceptReferences.cs",
+        "sha256": "b8fa589149e6ac4eaad60fed0b73dc806a17b0426f84d5db0fd6f0e90b851444"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\ConnectorPlumbing.cs",
+        "sha256": "4ebb26cb144101b07a96916bd5b16ef4724bebbbe31f482c02faddd31ce1ff59"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\ConversationalReply.cs",
+        "sha256": "84098815501bc453b492d2a03a3f493387561d0844061caff0d2d9ed41992333"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\ExecutionSpecialists.cs",
+        "sha256": "3c90d20cd6a0c68208bb98df18af6545834edd5b2fd081d3a4138316800346f6"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\GuideLessons.cs",
+        "sha256": "b96759ddfdfd3cdb2fdd677525df413c78fd1f09c4fdf6dd42441e433bf5eec1"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\GuideSafety.cs",
+        "sha256": "b79a61ed5bb5e69bb7d5fcc6a33a5cf75209b5f15fc53244cac10cc8a293a294"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\KnownControlConcepts.cs",
+        "sha256": "c48f635128a9623b757e6ad3e4613def78b841b946be0f9cf664c7815e3c14f8"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\LocalJobs.cs",
+        "sha256": "f78fb1ec91945b01ae66f8cc529eaa3cd3ea590ffba026d2f0892c1d017eee19"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\LocalKnowledge.cs",
+        "sha256": "4ca450979871e52bf54932ed95f2b5843820163390abb139bafaca1ed09e2a20"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\Models.cs",
+        "sha256": "dcad227b3d0bab6bed014975ef4ddd4fa32bd89f52efc0c227c0d03c68be3b9f"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\OAuthLifecycle.cs",
+        "sha256": "6cf0d338de302e1ef9a22f29be9d85a20873f523f1c4ca468b59ed9915a6dec2"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\OAuthLoopbackReceiver.cs",
+        "sha256": "2b7da309eac204311f04bd52177826164110681fb65a9733936dcf485ffcdf96"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\OllamaEngine.cs",
+        "sha256": "a0a8194c31fd9b14b5e898faad981577cab998eca3b5fa5bf199d3506a7db257"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\PromptSuggestionPolicy.cs",
+        "sha256": "ae4fc8cff9836327a79b22b540b80a924152fc6d67d0e946fa4c0cb7eb0200bb"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\ProviderProtocols.cs",
+        "sha256": "fee2908c6594be4641a3d0fb2d5398caf4236b155c6ee41e84f2a7a3e7fe7faa"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\ProviderTransports.cs",
+        "sha256": "03038fae7e7b7de045cc6453fb17b77042e9b9aa3da06973a4245808070cdc88"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\RealtimeTextTransport.cs",
+        "sha256": "402f88e1598ab3b2e5590070385ffe5c01b0dcf1fdf3e068c23c3f0aee073ff8"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\Refinement.cs",
+        "sha256": "bd750e1ee350611fb973c8b7482ec970433238c60c426ce16431d73a4e3d92d3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\RefinementChange.cs",
+        "sha256": "5e55026aa2649a18bccb7b12ce86cf4fdf1a6ab687a29ec46b7b7b2d6ccde55f"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\RefinementContext.cs",
+        "sha256": "8704e0ee84f1ea657f5c1e7c42d5191d3e722f4b22efbac51a698f9a69382b95"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\RefinementContract.cs",
+        "sha256": "22db27251324a3c5f336e7a129fa706a4c702f05e3e06d3d4e967359d0c8e8d0"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\RefinementCore.cs",
+        "sha256": "810ead402ef2c72bef2c5f36e44dc263e5f421a5b5e88bb9a57b53ddfc827012"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\RefinementPreparation.cs",
+        "sha256": "feb305069f4634b5f7311aa7198336072fce6d593a2dd2a85b00956b1f969aad"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\ReplyConstraints.cs",
+        "sha256": "20394c26b79ea14925472c42a836cc610c344617eac93d21a1736b670b550aab"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\ResearchCuration.cs",
+        "sha256": "2521638c0bbfd360d7bc7e9518226a5131ec3ea27108f0235f750d89c90110c3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\ResearchIntent.cs",
+        "sha256": "732e1b4516da33888322e9d3c9697a9b63a27a40306e2aa7ca1c5ed3359e2690"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\ReviewedRegionResearch.cs",
+        "sha256": "4aea06b25dffa707a92c08cd0d9a0051118e9347f501c95114a3d2a9f36dee63"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\Security.cs",
+        "sha256": "06deef8d4c35818f8fdca44509757b69589a540448e3e737a0cb315abc6dd541"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\SpecialistWork.cs",
+        "sha256": "b9e0743f2eca80e78ef26f04f5ca0d3db1b2f09477c6f680b85ecfd5da404635"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\StagedConversation.cs",
+        "sha256": "fc1c57b1b6972ac2a7a0a44c848c442ba4be3637bcbb2b65cbe725737067356c"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\StateStore.cs",
+        "sha256": "8a8a79a40a5d804793b09f632f0848bb27bf9ba12615b6eec307eb4a064cc0a4"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\Teaching.cs",
+        "sha256": "be09b2af76e1879fc4a3d42e6a65a3904dc95a83b4ef979c56f43c05363570cd"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\TeachingMemoryStore.cs",
+        "sha256": "76fca85df499fce3d2f6be726499b615b10603682c88c7a504f654a983d66a00"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\VisualGrounding.cs",
+        "sha256": "0d065d481729cde29d583f6370ce1851a43c16dd9a5ba9a4818d813678e8dea3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\WebResearch.cs",
+        "sha256": "9d97e39be2ddd3978ce548ed663dfdf204534594a6d3dc138be627557445af1e"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\services\\Buddy.Server\\WorkflowIntent.cs",
+        "sha256": "9d5c82fceacf2763456050d2dc2a925e32f866355157cec981a0d9d56309cbb2"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\obj\\Release\\net8.0\\win-x64\\Buddy.Followup54Boundary.Tests.GlobalUsings.g.cs",
+        "sha256": "a3c6048bb4d922b1799a9977f84362a3787b68810cac67aa86ac3aa23295f227"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\Buddy.Followup54Boundary.Tests.csproj",
+        "sha256": "45d82de78f1364d633761000f659df005a1394a30d9cd37e98101cb73405bf57"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ReviewedSource.targets",
+        "sha256": "0e271b7d32e582fec91f306132faa98b6f235e6095d3ae68eaa9f644608d6686"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\teaching-heldouts.json",
+        "sha256": "77adb1608e9b5bfa80c2b377c6e9689cedf11d4f116c0067d7b1e20c289d8996"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\Directory.Build.props",
+        "sha256": "67195d85ca884bd578fa53be05399a4d5b80dd4bfe630ce905e99fb3c1c89864"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\teach53\\VERSION",
+        "sha256": "832eddd23d57d755885475df2e64d0c4cd4fc65842e3a21d8379475d4be01c50"
+      }
+    ],
+    "digest": "96c6a3cd2346bfe10da0d4f7e516035e3db50543e915af9577cfb37bc89383a3",
+    "summary": {
+      "kind": "summary",
+      "lane": "teaching",
+      "Passed": 57,
+      "Failed": 0,
+      "model": false,
+      "native": false,
+      "network": false,
+      "ipc": false,
+      "installedProfile": false,
+      "manualReviewRequired": true
+    },
+    "logSha256": "6992d4b61c40d9b494ef38005ac5712b18e2d0af8845c1a5fe33966a2102c5c9"
+  },
+  "provider": {
+    "sourceRoot": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53",
+    "inputs": [
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\GrammarCases.cs",
+        "sha256": "48f69985eb5d146d94f00cee55f85438cbf911ce0a2104d0cc5ad6e357d719b7"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\PlacementCases.cs",
+        "sha256": "ab63c03eafc6c4a66c3bf965416a6bf1503c85424ca160f2886c2b2f70058d89"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\Program.cs",
+        "sha256": "54a3fec0d44bb3b1c33ea424326ed297a52096e018c78772a3420f046544d138"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ProvenanceCases.cs",
+        "sha256": "6b9e3592be237a115250925c098d3857f08931a4290da6a360f5255b75dd7313"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ProviderCases.cs",
+        "sha256": "4ac82119df5cb83f249a66ac0ff518d07099475a8ef52ab1c43d06539adc54d3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\SourceReceipt.cs",
+        "sha256": "c79e5ed8f568660228d767684796401761b35fff75b1529fd1c3843bca44840e"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\TeachingCases.cs",
+        "sha256": "bfd6af8c21c5446d8df260138699bc9988c9f7895777d2e08343dccb0750b7b7"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\AppLaunchIntent.cs",
+        "sha256": "dedae13afdd6bbb0ce70ac47f63e3cc8db1fbf0b1511573f6fc2d7952f0f4085"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\AssistantModels.cs",
+        "sha256": "e30a3abaa9838d4d806a92ad31af2ef51fc1fad383465f86a72f9af62ca31870"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\AssistantPlanning.cs",
+        "sha256": "d4ee195f7bd2bb338fe97868cd5f69bd9248eb6c3d4adc5c59c177a1a4e79e19"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\BrainRouter.cs",
+        "sha256": "ae04a54a24361eaf1f196ba94de34ddafa87998432b68e4f6ba1a7806c3e05cd"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\BrowserGuideLessons.cs",
+        "sha256": "17b344afc4219301dda68ef29e79f4b4941caa4de903d166e780d03f6ab2dbb8"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\BuddyHost.cs",
+        "sha256": "1f4a7e29153c030e3b52db4acd21058a03c11fcf9ce82bd4913d6e1f6f61e45c"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\BuddyService.cs",
+        "sha256": "db60d5203a1e1b7b7c587bdeb065b17654f024ada1f44017a90335358dcb3294"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ConnectorPlumbing.cs",
+        "sha256": "4ebb26cb144101b07a96916bd5b16ef4724bebbbe31f482c02faddd31ce1ff59"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ConnectorSetup.cs",
+        "sha256": "a76bf6b3816b913619604f4368e234fce6b493f943d3e228414232ca0d1c38bd"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ConversationalReply.cs",
+        "sha256": "84098815501bc453b492d2a03a3f493387561d0844061caff0d2d9ed41992333"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ExecutionSpecialists.cs",
+        "sha256": "3c90d20cd6a0c68208bb98df18af6545834edd5b2fd081d3a4138316800346f6"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\GuideLessons.cs",
+        "sha256": "ae18ea4fb23b5ea2ea4bb3e8173cd62c5df0b72b1ab965e30c43d400ec3c4d1c"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\GuideSafety.cs",
+        "sha256": "b79a61ed5bb5e69bb7d5fcc6a33a5cf75209b5f15fc53244cac10cc8a293a294"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\LocalAgentClient.cs",
+        "sha256": "3c0cb381fbc603df5885aa93267ba9979d07f2313b753ea93e43dc9be2134590"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\LocalAgentPipe.cs",
+        "sha256": "f6ce6c40135e69be24af19b9912c0b31e5b1458b0164d025f20371694e96d6b5"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\LocalAgentProtocol.cs",
+        "sha256": "a3f37bc81a9afb92c17a739f4dbb82e0856818b0e4949ae884de85e2ed9ea4ab"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\LocalJobs.cs",
+        "sha256": "f78fb1ec91945b01ae66f8cc529eaa3cd3ea590ffba026d2f0892c1d017eee19"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\LocalKnowledge.cs",
+        "sha256": "4ca450979871e52bf54932ed95f2b5843820163390abb139bafaca1ed09e2a20"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\Models.cs",
+        "sha256": "dcad227b3d0bab6bed014975ef4ddd4fa32bd89f52efc0c227c0d03c68be3b9f"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\OAuthLifecycle.cs",
+        "sha256": "6cf0d338de302e1ef9a22f29be9d85a20873f523f1c4ca468b59ed9915a6dec2"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\OAuthLoopbackReceiver.cs",
+        "sha256": "2b7da309eac204311f04bd52177826164110681fb65a9733936dcf485ffcdf96"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\OllamaEngine.cs",
+        "sha256": "a0a8194c31fd9b14b5e898faad981577cab998eca3b5fa5bf199d3506a7db257"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\PromptSuggestionPolicy.cs",
+        "sha256": "ae4fc8cff9836327a79b22b540b80a924152fc6d67d0e946fa4c0cb7eb0200bb"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ProviderProtocols.cs",
+        "sha256": "566fbb45f8cc5669912f823096a11cf2385accdc69c8d96e8739c8f24d31062f"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ProviderRouting.cs",
+        "sha256": "917431ea46f4e513aaf8016a15c5f14756e66e0b10ba2f40cd76fa24d6a490e6"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ProviderTransports.cs",
+        "sha256": "55a6aef6c90ff77722ee96e59d234f7251c1cc12fe30d85825d60d623ece0e6a"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\RealtimeTextTransport.cs",
+        "sha256": "402f88e1598ab3b2e5590070385ffe5c01b0dcf1fdf3e068c23c3f0aee073ff8"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\Refinement.cs",
+        "sha256": "bd750e1ee350611fb973c8b7482ec970433238c60c426ce16431d73a4e3d92d3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\RefinementChange.cs",
+        "sha256": "5e55026aa2649a18bccb7b12ce86cf4fdf1a6ab687a29ec46b7b7b2d6ccde55f"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\RefinementContext.cs",
+        "sha256": "8704e0ee84f1ea657f5c1e7c42d5191d3e722f4b22efbac51a698f9a69382b95"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\RefinementContract.cs",
+        "sha256": "22db27251324a3c5f336e7a129fa706a4c702f05e3e06d3d4e967359d0c8e8d0"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\RefinementCore.cs",
+        "sha256": "810ead402ef2c72bef2c5f36e44dc263e5f421a5b5e88bb9a57b53ddfc827012"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\RefinementPreparation.cs",
+        "sha256": "feb305069f4634b5f7311aa7198336072fce6d593a2dd2a85b00956b1f969aad"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ReplyConstraints.cs",
+        "sha256": "20394c26b79ea14925472c42a836cc610c344617eac93d21a1736b670b550aab"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ResearchCuration.cs",
+        "sha256": "2521638c0bbfd360d7bc7e9518226a5131ec3ea27108f0235f750d89c90110c3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ResearchIntent.cs",
+        "sha256": "732e1b4516da33888322e9d3c9697a9b63a27a40306e2aa7ca1c5ed3359e2690"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ReviewedRegionResearch.cs",
+        "sha256": "f4aef4114c9a40734e147d49cf11a7b593a82fb5c6234072702141e82ae38a75"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\Security.cs",
+        "sha256": "06deef8d4c35818f8fdca44509757b69589a540448e3e737a0cb315abc6dd541"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\SpecialistWork.cs",
+        "sha256": "b9e0743f2eca80e78ef26f04f5ca0d3db1b2f09477c6f680b85ecfd5da404635"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\StagedConversation.cs",
+        "sha256": "fc1c57b1b6972ac2a7a0a44c848c442ba4be3637bcbb2b65cbe725737067356c"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\StateStore.cs",
+        "sha256": "8a8a79a40a5d804793b09f632f0848bb27bf9ba12615b6eec307eb4a064cc0a4"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\Teaching.cs",
+        "sha256": "fd376dfd0d0f374a62bf4804f4e516d35113105bafd8fac5f07ce45bddf2f839"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\TeachingMemoryStore.cs",
+        "sha256": "76fca85df499fce3d2f6be726499b615b10603682c88c7a504f654a983d66a00"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\VisualGrounding.cs",
+        "sha256": "0d065d481729cde29d583f6370ce1851a43c16dd9a5ba9a4818d813678e8dea3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\WebResearch.cs",
+        "sha256": "9d97e39be2ddd3978ce548ed663dfdf204534594a6d3dc138be627557445af1e"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\WorkflowIntent.cs",
+        "sha256": "9d5c82fceacf2763456050d2dc2a925e32f866355157cec981a0d9d56309cbb2"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\obj\\Release\\net8.0\\win-x64\\Buddy.Followup54Boundary.Tests.GlobalUsings.g.cs",
+        "sha256": "a3c6048bb4d922b1799a9977f84362a3787b68810cac67aa86ac3aa23295f227"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\Buddy.Followup54Boundary.Tests.csproj",
+        "sha256": "45d82de78f1364d633761000f659df005a1394a30d9cd37e98101cb73405bf57"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ReviewedSource.targets",
+        "sha256": "0e271b7d32e582fec91f306132faa98b6f235e6095d3ae68eaa9f644608d6686"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\teaching-heldouts.json",
+        "sha256": "77adb1608e9b5bfa80c2b377c6e9689cedf11d4f116c0067d7b1e20c289d8996"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\Directory.Build.props",
+        "sha256": "67195d85ca884bd578fa53be05399a4d5b80dd4bfe630ce905e99fb3c1c89864"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\VERSION",
+        "sha256": "832eddd23d57d755885475df2e64d0c4cd4fc65842e3a21d8379475d4be01c50"
+      }
+    ],
+    "digest": "e5408045014e010923d8405be48abeb07ebadb8bfae89765c5b413bdfb622ef7",
+    "summary": {
+      "kind": "summary",
+      "lane": "provider",
+      "Passed": 25,
+      "Failed": 0,
+      "model": false,
+      "native": false,
+      "network": false,
+      "ipc": false,
+      "installedProfile": false,
+      "manualReviewRequired": true
+    },
+    "logSha256": "ca585e1a30c2daec0a7d4536d7aa5fb326f2aa815d3b0b48345de46a86b5e331"
+  },
+  "placement": {
+    "sourceRoot": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53",
+    "inputs": [
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\GrammarCases.cs",
+        "sha256": "48f69985eb5d146d94f00cee55f85438cbf911ce0a2104d0cc5ad6e357d719b7"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\PlacementCases.cs",
+        "sha256": "ab63c03eafc6c4a66c3bf965416a6bf1503c85424ca160f2886c2b2f70058d89"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\Program.cs",
+        "sha256": "54a3fec0d44bb3b1c33ea424326ed297a52096e018c78772a3420f046544d138"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ProvenanceCases.cs",
+        "sha256": "6b9e3592be237a115250925c098d3857f08931a4290da6a360f5255b75dd7313"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ProviderCases.cs",
+        "sha256": "4ac82119df5cb83f249a66ac0ff518d07099475a8ef52ab1c43d06539adc54d3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\SourceReceipt.cs",
+        "sha256": "c79e5ed8f568660228d767684796401761b35fff75b1529fd1c3843bca44840e"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\TeachingCases.cs",
+        "sha256": "bfd6af8c21c5446d8df260138699bc9988c9f7895777d2e08343dccb0750b7b7"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\AppLaunchIntent.cs",
+        "sha256": "dedae13afdd6bbb0ce70ac47f63e3cc8db1fbf0b1511573f6fc2d7952f0f4085"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\AssistantModels.cs",
+        "sha256": "e30a3abaa9838d4d806a92ad31af2ef51fc1fad383465f86a72f9af62ca31870"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\AssistantPlanning.cs",
+        "sha256": "d4ee195f7bd2bb338fe97868cd5f69bd9248eb6c3d4adc5c59c177a1a4e79e19"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\BrainRouter.cs",
+        "sha256": "ae04a54a24361eaf1f196ba94de34ddafa87998432b68e4f6ba1a7806c3e05cd"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\BrowserGuideLessons.cs",
+        "sha256": "17b344afc4219301dda68ef29e79f4b4941caa4de903d166e780d03f6ab2dbb8"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\BuddyHost.cs",
+        "sha256": "1f4a7e29153c030e3b52db4acd21058a03c11fcf9ce82bd4913d6e1f6f61e45c"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\BuddyService.cs",
+        "sha256": "db60d5203a1e1b7b7c587bdeb065b17654f024ada1f44017a90335358dcb3294"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ConnectorPlumbing.cs",
+        "sha256": "4ebb26cb144101b07a96916bd5b16ef4724bebbbe31f482c02faddd31ce1ff59"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ConnectorSetup.cs",
+        "sha256": "a76bf6b3816b913619604f4368e234fce6b493f943d3e228414232ca0d1c38bd"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ConversationalReply.cs",
+        "sha256": "84098815501bc453b492d2a03a3f493387561d0844061caff0d2d9ed41992333"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ExecutionSpecialists.cs",
+        "sha256": "3c90d20cd6a0c68208bb98df18af6545834edd5b2fd081d3a4138316800346f6"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\GuideLessons.cs",
+        "sha256": "ae18ea4fb23b5ea2ea4bb3e8173cd62c5df0b72b1ab965e30c43d400ec3c4d1c"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\GuideSafety.cs",
+        "sha256": "b79a61ed5bb5e69bb7d5fcc6a33a5cf75209b5f15fc53244cac10cc8a293a294"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\LocalAgentClient.cs",
+        "sha256": "3c0cb381fbc603df5885aa93267ba9979d07f2313b753ea93e43dc9be2134590"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\LocalAgentPipe.cs",
+        "sha256": "f6ce6c40135e69be24af19b9912c0b31e5b1458b0164d025f20371694e96d6b5"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\LocalAgentProtocol.cs",
+        "sha256": "a3f37bc81a9afb92c17a739f4dbb82e0856818b0e4949ae884de85e2ed9ea4ab"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\LocalJobs.cs",
+        "sha256": "f78fb1ec91945b01ae66f8cc529eaa3cd3ea590ffba026d2f0892c1d017eee19"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\LocalKnowledge.cs",
+        "sha256": "4ca450979871e52bf54932ed95f2b5843820163390abb139bafaca1ed09e2a20"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\Models.cs",
+        "sha256": "dcad227b3d0bab6bed014975ef4ddd4fa32bd89f52efc0c227c0d03c68be3b9f"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\OAuthLifecycle.cs",
+        "sha256": "6cf0d338de302e1ef9a22f29be9d85a20873f523f1c4ca468b59ed9915a6dec2"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\OAuthLoopbackReceiver.cs",
+        "sha256": "2b7da309eac204311f04bd52177826164110681fb65a9733936dcf485ffcdf96"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\OllamaEngine.cs",
+        "sha256": "a0a8194c31fd9b14b5e898faad981577cab998eca3b5fa5bf199d3506a7db257"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\PromptSuggestionPolicy.cs",
+        "sha256": "ae4fc8cff9836327a79b22b540b80a924152fc6d67d0e946fa4c0cb7eb0200bb"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ProviderProtocols.cs",
+        "sha256": "566fbb45f8cc5669912f823096a11cf2385accdc69c8d96e8739c8f24d31062f"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ProviderRouting.cs",
+        "sha256": "917431ea46f4e513aaf8016a15c5f14756e66e0b10ba2f40cd76fa24d6a490e6"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ProviderTransports.cs",
+        "sha256": "55a6aef6c90ff77722ee96e59d234f7251c1cc12fe30d85825d60d623ece0e6a"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\RealtimeTextTransport.cs",
+        "sha256": "402f88e1598ab3b2e5590070385ffe5c01b0dcf1fdf3e068c23c3f0aee073ff8"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\Refinement.cs",
+        "sha256": "bd750e1ee350611fb973c8b7482ec970433238c60c426ce16431d73a4e3d92d3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\RefinementChange.cs",
+        "sha256": "5e55026aa2649a18bccb7b12ce86cf4fdf1a6ab687a29ec46b7b7b2d6ccde55f"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\RefinementContext.cs",
+        "sha256": "8704e0ee84f1ea657f5c1e7c42d5191d3e722f4b22efbac51a698f9a69382b95"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\RefinementContract.cs",
+        "sha256": "22db27251324a3c5f336e7a129fa706a4c702f05e3e06d3d4e967359d0c8e8d0"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\RefinementCore.cs",
+        "sha256": "810ead402ef2c72bef2c5f36e44dc263e5f421a5b5e88bb9a57b53ddfc827012"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\RefinementPreparation.cs",
+        "sha256": "feb305069f4634b5f7311aa7198336072fce6d593a2dd2a85b00956b1f969aad"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ReplyConstraints.cs",
+        "sha256": "20394c26b79ea14925472c42a836cc610c344617eac93d21a1736b670b550aab"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ResearchCuration.cs",
+        "sha256": "2521638c0bbfd360d7bc7e9518226a5131ec3ea27108f0235f750d89c90110c3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ResearchIntent.cs",
+        "sha256": "732e1b4516da33888322e9d3c9697a9b63a27a40306e2aa7ca1c5ed3359e2690"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\ReviewedRegionResearch.cs",
+        "sha256": "f4aef4114c9a40734e147d49cf11a7b593a82fb5c6234072702141e82ae38a75"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\Security.cs",
+        "sha256": "06deef8d4c35818f8fdca44509757b69589a540448e3e737a0cb315abc6dd541"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\SpecialistWork.cs",
+        "sha256": "b9e0743f2eca80e78ef26f04f5ca0d3db1b2f09477c6f680b85ecfd5da404635"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\StagedConversation.cs",
+        "sha256": "fc1c57b1b6972ac2a7a0a44c848c442ba4be3637bcbb2b65cbe725737067356c"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\StateStore.cs",
+        "sha256": "8a8a79a40a5d804793b09f632f0848bb27bf9ba12615b6eec307eb4a064cc0a4"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\Teaching.cs",
+        "sha256": "fd376dfd0d0f374a62bf4804f4e516d35113105bafd8fac5f07ce45bddf2f839"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\TeachingMemoryStore.cs",
+        "sha256": "76fca85df499fce3d2f6be726499b615b10603682c88c7a504f654a983d66a00"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\VisualGrounding.cs",
+        "sha256": "0d065d481729cde29d583f6370ce1851a43c16dd9a5ba9a4818d813678e8dea3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\WebResearch.cs",
+        "sha256": "9d97e39be2ddd3978ce548ed663dfdf204534594a6d3dc138be627557445af1e"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\services\\Buddy.Server\\WorkflowIntent.cs",
+        "sha256": "9d5c82fceacf2763456050d2dc2a925e32f866355157cec981a0d9d56309cbb2"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\notch53\\apps\\windows\\Buddy.Windows\\NotchPlacementPolicy.cs",
+        "sha256": "5907005e95ef5e4c2ddb8f14404af8f3de122b738051dadbfd5032786796d8ee"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\notch53\\apps\\windows\\Buddy.Windows\\NotchPlacementState.cs",
+        "sha256": "df8b388598177ef96656fea65181d751cdd4ea62dd56a5f9f191aab11033ab38"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\notch53\\apps\\windows\\Buddy.Windows\\OverlayPlacement.cs",
+        "sha256": "91288eec1cac93d605b7c77dc554379cd343f6ea106d364a9b4b62fe25d5293b"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\obj\\Release\\net8.0\\win-x64\\Buddy.Followup54Boundary.Tests.GlobalUsings.g.cs",
+        "sha256": "a3c6048bb4d922b1799a9977f84362a3787b68810cac67aa86ac3aa23295f227"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\Buddy.Followup54Boundary.Tests.csproj",
+        "sha256": "45d82de78f1364d633761000f659df005a1394a30d9cd37e98101cb73405bf57"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ReviewedSource.targets",
+        "sha256": "0e271b7d32e582fec91f306132faa98b6f235e6095d3ae68eaa9f644608d6686"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\teaching-heldouts.json",
+        "sha256": "77adb1608e9b5bfa80c2b377c6e9689cedf11d4f116c0067d7b1e20c289d8996"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\Directory.Build.props",
+        "sha256": "67195d85ca884bd578fa53be05399a4d5b80dd4bfe630ce905e99fb3c1c89864"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\provider53\\VERSION",
+        "sha256": "832eddd23d57d755885475df2e64d0c4cd4fc65842e3a21d8379475d4be01c50"
+      }
+    ],
+    "digest": "bb0947023afd4026a4c73fb1d4907afb01488b91b59fa7d279f080e32b0118bf",
+    "summary": {
+      "kind": "summary",
+      "lane": "placement",
+      "Passed": 22,
+      "Failed": 0,
+      "model": false,
+      "native": false,
+      "network": false,
+      "ipc": false,
+      "installedProfile": false,
+      "manualReviewRequired": true
+    },
+    "logSha256": "977adac01602a154c2ca8b0f3c314fa811c76aa49a447000474c32b80f7613f8"
+  },
+  "grammar": {
+    "sourceRoot": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53",
+    "inputs": [
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\GrammarCases.cs",
+        "sha256": "48f69985eb5d146d94f00cee55f85438cbf911ce0a2104d0cc5ad6e357d719b7"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\PlacementCases.cs",
+        "sha256": "ab63c03eafc6c4a66c3bf965416a6bf1503c85424ca160f2886c2b2f70058d89"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\Program.cs",
+        "sha256": "54a3fec0d44bb3b1c33ea424326ed297a52096e018c78772a3420f046544d138"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ProvenanceCases.cs",
+        "sha256": "6b9e3592be237a115250925c098d3857f08931a4290da6a360f5255b75dd7313"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ProviderCases.cs",
+        "sha256": "4ac82119df5cb83f249a66ac0ff518d07099475a8ef52ab1c43d06539adc54d3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\SourceReceipt.cs",
+        "sha256": "c79e5ed8f568660228d767684796401761b35fff75b1529fd1c3843bca44840e"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\TeachingCases.cs",
+        "sha256": "bfd6af8c21c5446d8df260138699bc9988c9f7895777d2e08343dccb0750b7b7"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\AppLaunchIntent.cs",
+        "sha256": "dedae13afdd6bbb0ce70ac47f63e3cc8db1fbf0b1511573f6fc2d7952f0f4085"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\AssistantModels.cs",
+        "sha256": "e30a3abaa9838d4d806a92ad31af2ef51fc1fad383465f86a72f9af62ca31870"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\AssistantPlanning.cs",
+        "sha256": "d4ee195f7bd2bb338fe97868cd5f69bd9248eb6c3d4adc5c59c177a1a4e79e19"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\BrainRouter.cs",
+        "sha256": "ae04a54a24361eaf1f196ba94de34ddafa87998432b68e4f6ba1a7806c3e05cd"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\BrowserGuideLessons.cs",
+        "sha256": "17b344afc4219301dda68ef29e79f4b4941caa4de903d166e780d03f6ab2dbb8"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\BuddyHost.cs",
+        "sha256": "1f4a7e29153c030e3b52db4acd21058a03c11fcf9ce82bd4913d6e1f6f61e45c"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\BuddyService.cs",
+        "sha256": "db60d5203a1e1b7b7c587bdeb065b17654f024ada1f44017a90335358dcb3294"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\ConnectorPlumbing.cs",
+        "sha256": "4ebb26cb144101b07a96916bd5b16ef4724bebbbe31f482c02faddd31ce1ff59"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\ConversationalReply.cs",
+        "sha256": "84098815501bc453b492d2a03a3f493387561d0844061caff0d2d9ed41992333"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\ExecutionSpecialists.cs",
+        "sha256": "3c90d20cd6a0c68208bb98df18af6545834edd5b2fd081d3a4138316800346f6"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\GuideLessons.cs",
+        "sha256": "ae18ea4fb23b5ea2ea4bb3e8173cd62c5df0b72b1ab965e30c43d400ec3c4d1c"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\GuideSafety.cs",
+        "sha256": "b79a61ed5bb5e69bb7d5fcc6a33a5cf75209b5f15fc53244cac10cc8a293a294"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\LocalJobs.cs",
+        "sha256": "f78fb1ec91945b01ae66f8cc529eaa3cd3ea590ffba026d2f0892c1d017eee19"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\LocalKnowledge.cs",
+        "sha256": "4ca450979871e52bf54932ed95f2b5843820163390abb139bafaca1ed09e2a20"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\Models.cs",
+        "sha256": "dcad227b3d0bab6bed014975ef4ddd4fa32bd89f52efc0c227c0d03c68be3b9f"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\OAuthLifecycle.cs",
+        "sha256": "6cf0d338de302e1ef9a22f29be9d85a20873f523f1c4ca468b59ed9915a6dec2"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\OAuthLoopbackReceiver.cs",
+        "sha256": "2b7da309eac204311f04bd52177826164110681fb65a9733936dcf485ffcdf96"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\OllamaEngine.cs",
+        "sha256": "a0a8194c31fd9b14b5e898faad981577cab998eca3b5fa5bf199d3506a7db257"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\PromptSuggestionPolicy.cs",
+        "sha256": "ae4fc8cff9836327a79b22b540b80a924152fc6d67d0e946fa4c0cb7eb0200bb"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\ProviderProtocols.cs",
+        "sha256": "fee2908c6594be4641a3d0fb2d5398caf4236b155c6ee41e84f2a7a3e7fe7faa"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\ProviderTransports.cs",
+        "sha256": "03038fae7e7b7de045cc6453fb17b77042e9b9aa3da06973a4245808070cdc88"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\RealtimeTextTransport.cs",
+        "sha256": "402f88e1598ab3b2e5590070385ffe5c01b0dcf1fdf3e068c23c3f0aee073ff8"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\Refinement.cs",
+        "sha256": "bd750e1ee350611fb973c8b7482ec970433238c60c426ce16431d73a4e3d92d3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\RefinementChange.cs",
+        "sha256": "5e55026aa2649a18bccb7b12ce86cf4fdf1a6ab687a29ec46b7b7b2d6ccde55f"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\RefinementContext.cs",
+        "sha256": "8704e0ee84f1ea657f5c1e7c42d5191d3e722f4b22efbac51a698f9a69382b95"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\RefinementContract.cs",
+        "sha256": "76d953ce3f8551425db5c75bba5dedb80ce97e53b72e8f0d7023b80949b6031c"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\RefinementCore.cs",
+        "sha256": "810ead402ef2c72bef2c5f36e44dc263e5f421a5b5e88bb9a57b53ddfc827012"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\RefinementGrammar.cs",
+        "sha256": "ea3cd5f5ce45fcbc55b2ea1d38b3830ca56d04293fb9387f037b7cf815039699"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\RefinementPreparation.cs",
+        "sha256": "feb305069f4634b5f7311aa7198336072fce6d593a2dd2a85b00956b1f969aad"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\ReplyConstraints.cs",
+        "sha256": "20394c26b79ea14925472c42a836cc610c344617eac93d21a1736b670b550aab"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\ResearchCuration.cs",
+        "sha256": "2521638c0bbfd360d7bc7e9518226a5131ec3ea27108f0235f750d89c90110c3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\ResearchIntent.cs",
+        "sha256": "732e1b4516da33888322e9d3c9697a9b63a27a40306e2aa7ca1c5ed3359e2690"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\ReviewedRegionResearch.cs",
+        "sha256": "f4aef4114c9a40734e147d49cf11a7b593a82fb5c6234072702141e82ae38a75"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\Security.cs",
+        "sha256": "06deef8d4c35818f8fdca44509757b69589a540448e3e737a0cb315abc6dd541"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\SpecialistWork.cs",
+        "sha256": "b9e0743f2eca80e78ef26f04f5ca0d3db1b2f09477c6f680b85ecfd5da404635"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\StagedConversation.cs",
+        "sha256": "fc1c57b1b6972ac2a7a0a44c848c442ba4be3637bcbb2b65cbe725737067356c"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\StateStore.cs",
+        "sha256": "8a8a79a40a5d804793b09f632f0848bb27bf9ba12615b6eec307eb4a064cc0a4"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\Teaching.cs",
+        "sha256": "fd376dfd0d0f374a62bf4804f4e516d35113105bafd8fac5f07ce45bddf2f839"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\TeachingMemoryStore.cs",
+        "sha256": "76fca85df499fce3d2f6be726499b615b10603682c88c7a504f654a983d66a00"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\VisualGrounding.cs",
+        "sha256": "0d065d481729cde29d583f6370ce1851a43c16dd9a5ba9a4818d813678e8dea3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\WebResearch.cs",
+        "sha256": "9d97e39be2ddd3978ce548ed663dfdf204534594a6d3dc138be627557445af1e"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\services\\Buddy.Server\\WorkflowIntent.cs",
+        "sha256": "9d5c82fceacf2763456050d2dc2a925e32f866355157cec981a0d9d56309cbb2"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\obj\\Release\\net8.0\\win-x64\\Buddy.Followup54Boundary.Tests.GlobalUsings.g.cs",
+        "sha256": "a3c6048bb4d922b1799a9977f84362a3787b68810cac67aa86ac3aa23295f227"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\Buddy.Followup54Boundary.Tests.csproj",
+        "sha256": "45d82de78f1364d633761000f659df005a1394a30d9cd37e98101cb73405bf57"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ReviewedSource.targets",
+        "sha256": "0e271b7d32e582fec91f306132faa98b6f235e6095d3ae68eaa9f644608d6686"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\teaching-heldouts.json",
+        "sha256": "77adb1608e9b5bfa80c2b377c6e9689cedf11d4f116c0067d7b1e20c289d8996"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\Directory.Build.props",
+        "sha256": "67195d85ca884bd578fa53be05399a4d5b80dd4bfe630ce905e99fb3c1c89864"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\refine53\\VERSION",
+        "sha256": "832eddd23d57d755885475df2e64d0c4cd4fc65842e3a21d8379475d4be01c50"
+      }
+    ],
+    "digest": "e18db8372a95d7c5fabbb4f2d54984e1f2e4a239ae3037b9ac156c15437fa1b4",
+    "summary": {
+      "kind": "summary",
+      "lane": "grammar",
+      "Passed": 33,
+      "Failed": 0,
+      "model": false,
+      "native": false,
+      "network": false,
+      "ipc": false,
+      "installedProfile": false,
+      "manualReviewRequired": true
+    },
+    "logSha256": "0272e46829ff6d5fcb3ceab98f24b9a948f470c8ac28ffc10a827429c8fbaa71"
+  },
+  "provenance": {
+    "sourceRoot": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46",
+    "inputs": [
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\GrammarCases.cs",
+        "sha256": "48f69985eb5d146d94f00cee55f85438cbf911ce0a2104d0cc5ad6e357d719b7"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\PlacementCases.cs",
+        "sha256": "ab63c03eafc6c4a66c3bf965416a6bf1503c85424ca160f2886c2b2f70058d89"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\Program.cs",
+        "sha256": "54a3fec0d44bb3b1c33ea424326ed297a52096e018c78772a3420f046544d138"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ProvenanceCases.cs",
+        "sha256": "6b9e3592be237a115250925c098d3857f08931a4290da6a360f5255b75dd7313"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ProviderCases.cs",
+        "sha256": "4ac82119df5cb83f249a66ac0ff518d07099475a8ef52ab1c43d06539adc54d3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\SourceReceipt.cs",
+        "sha256": "c79e5ed8f568660228d767684796401761b35fff75b1529fd1c3843bca44840e"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\TeachingCases.cs",
+        "sha256": "bfd6af8c21c5446d8df260138699bc9988c9f7895777d2e08343dccb0750b7b7"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\AppLaunchIntent.cs",
+        "sha256": "dedae13afdd6bbb0ce70ac47f63e3cc8db1fbf0b1511573f6fc2d7952f0f4085"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\AssistantModels.cs",
+        "sha256": "e30a3abaa9838d4d806a92ad31af2ef51fc1fad383465f86a72f9af62ca31870"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\AssistantPlanning.cs",
+        "sha256": "ff10f4ed35b7fe7adf816b698c821b646af5408932e6b2283ea69a3854d3a1ab"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\BrainRouter.cs",
+        "sha256": "ae04a54a24361eaf1f196ba94de34ddafa87998432b68e4f6ba1a7806c3e05cd"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\BrowserGuideLessons.cs",
+        "sha256": "17b344afc4219301dda68ef29e79f4b4941caa4de903d166e780d03f6ab2dbb8"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\BuddyHost.cs",
+        "sha256": "1f4a7e29153c030e3b52db4acd21058a03c11fcf9ce82bd4913d6e1f6f61e45c"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\BuddyService.cs",
+        "sha256": "cde1ef996635687dbaf776ba31f2b592b2e226a1cecbdfbacbefce03c844f584"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\ConceptReferences.cs",
+        "sha256": "b8fa589149e6ac4eaad60fed0b73dc806a17b0426f84d5db0fd6f0e90b851444"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\ConnectorPlumbing.cs",
+        "sha256": "4ebb26cb144101b07a96916bd5b16ef4724bebbbe31f482c02faddd31ce1ff59"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\ConnectorSetup.cs",
+        "sha256": "a76bf6b3816b913619604f4368e234fce6b493f943d3e228414232ca0d1c38bd"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\ConversationalReply.cs",
+        "sha256": "84098815501bc453b492d2a03a3f493387561d0844061caff0d2d9ed41992333"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\ExecutionSpecialists.cs",
+        "sha256": "3c90d20cd6a0c68208bb98df18af6545834edd5b2fd081d3a4138316800346f6"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\GuideLessons.cs",
+        "sha256": "b96759ddfdfd3cdb2fdd677525df413c78fd1f09c4fdf6dd42441e433bf5eec1"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\GuideSafety.cs",
+        "sha256": "b79a61ed5bb5e69bb7d5fcc6a33a5cf75209b5f15fc53244cac10cc8a293a294"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\KnownControlConcepts.cs",
+        "sha256": "c48f635128a9623b757e6ad3e4613def78b841b946be0f9cf664c7815e3c14f8"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\LocalAgentClient.cs",
+        "sha256": "3c0cb381fbc603df5885aa93267ba9979d07f2313b753ea93e43dc9be2134590"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\LocalAgentPipe.cs",
+        "sha256": "f6ce6c40135e69be24af19b9912c0b31e5b1458b0164d025f20371694e96d6b5"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\LocalAgentProtocol.cs",
+        "sha256": "a3f37bc81a9afb92c17a739f4dbb82e0856818b0e4949ae884de85e2ed9ea4ab"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\LocalJobs.cs",
+        "sha256": "f78fb1ec91945b01ae66f8cc529eaa3cd3ea590ffba026d2f0892c1d017eee19"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\LocalKnowledge.cs",
+        "sha256": "4ca450979871e52bf54932ed95f2b5843820163390abb139bafaca1ed09e2a20"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\LocalModelSelection.cs",
+        "sha256": "21bd3b26341c2e1177b7027ff8d549b467408601a1a7a041c0a5b6b811f77fb6"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\Models.cs",
+        "sha256": "8626ee83b85bc14ac5e331efbc152a4cbe675a88448cd2995c2cecd0dedcfe39"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\OAuthLifecycle.cs",
+        "sha256": "6cf0d338de302e1ef9a22f29be9d85a20873f523f1c4ca468b59ed9915a6dec2"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\OAuthLoopbackReceiver.cs",
+        "sha256": "2b7da309eac204311f04bd52177826164110681fb65a9733936dcf485ffcdf96"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\OllamaEngine.cs",
+        "sha256": "465d71c5f5882a5f9bfe91ef7b125145920b0d476013ea9ad130b95ae53f7d59"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\PromptSuggestionPolicy.cs",
+        "sha256": "ae4fc8cff9836327a79b22b540b80a924152fc6d67d0e946fa4c0cb7eb0200bb"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\ProviderProtocols.cs",
+        "sha256": "566fbb45f8cc5669912f823096a11cf2385accdc69c8d96e8739c8f24d31062f"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\ProviderRouting.cs",
+        "sha256": "917431ea46f4e513aaf8016a15c5f14756e66e0b10ba2f40cd76fa24d6a490e6"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\ProviderTransports.cs",
+        "sha256": "55a6aef6c90ff77722ee96e59d234f7251c1cc12fe30d85825d60d623ece0e6a"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\RealtimeTextTransport.cs",
+        "sha256": "402f88e1598ab3b2e5590070385ffe5c01b0dcf1fdf3e068c23c3f0aee073ff8"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\Refinement.cs",
+        "sha256": "bd750e1ee350611fb973c8b7482ec970433238c60c426ce16431d73a4e3d92d3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\RefinementChange.cs",
+        "sha256": "5e55026aa2649a18bccb7b12ce86cf4fdf1a6ab687a29ec46b7b7b2d6ccde55f"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\RefinementContext.cs",
+        "sha256": "8704e0ee84f1ea657f5c1e7c42d5191d3e722f4b22efbac51a698f9a69382b95"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\RefinementContract.cs",
+        "sha256": "22db27251324a3c5f336e7a129fa706a4c702f05e3e06d3d4e967359d0c8e8d0"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\RefinementCore.cs",
+        "sha256": "810ead402ef2c72bef2c5f36e44dc263e5f421a5b5e88bb9a57b53ddfc827012"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\RefinementPreparation.cs",
+        "sha256": "feb305069f4634b5f7311aa7198336072fce6d593a2dd2a85b00956b1f969aad"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\ReplyConstraints.cs",
+        "sha256": "20394c26b79ea14925472c42a836cc610c344617eac93d21a1736b670b550aab"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\ResearchCuration.cs",
+        "sha256": "2521638c0bbfd360d7bc7e9518226a5131ec3ea27108f0235f750d89c90110c3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\ResearchIntent.cs",
+        "sha256": "732e1b4516da33888322e9d3c9697a9b63a27a40306e2aa7ca1c5ed3359e2690"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\ReviewedRegionResearch.cs",
+        "sha256": "4aea06b25dffa707a92c08cd0d9a0051118e9347f501c95114a3d2a9f36dee63"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\Security.cs",
+        "sha256": "06deef8d4c35818f8fdca44509757b69589a540448e3e737a0cb315abc6dd541"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\SpecialistWork.cs",
+        "sha256": "b9e0743f2eca80e78ef26f04f5ca0d3db1b2f09477c6f680b85ecfd5da404635"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\StagedConversation.cs",
+        "sha256": "fc1c57b1b6972ac2a7a0a44c848c442ba4be3637bcbb2b65cbe725737067356c"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\StateStore.cs",
+        "sha256": "8a8a79a40a5d804793b09f632f0848bb27bf9ba12615b6eec307eb4a064cc0a4"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\Teaching.cs",
+        "sha256": "be09b2af76e1879fc4a3d42e6a65a3904dc95a83b4ef979c56f43c05363570cd"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\TeachingMemoryStore.cs",
+        "sha256": "76fca85df499fce3d2f6be726499b615b10603682c88c7a504f654a983d66a00"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\VisualGrounding.cs",
+        "sha256": "0d065d481729cde29d583f6370ce1851a43c16dd9a5ba9a4818d813678e8dea3"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\WebResearch.cs",
+        "sha256": "9d97e39be2ddd3978ce548ed663dfdf204534594a6d3dc138be627557445af1e"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\services\\Buddy.Server\\WorkflowIntent.cs",
+        "sha256": "9d5c82fceacf2763456050d2dc2a925e32f866355157cec981a0d9d56309cbb2"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\apps\\windows\\Buddy.Windows\\NotchPlacementPolicy.cs",
+        "sha256": "5907005e95ef5e4c2ddb8f14404af8f3de122b738051dadbfd5032786796d8ee"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\apps\\windows\\Buddy.Windows\\NotchPlacementState.cs",
+        "sha256": "df8b388598177ef96656fea65181d751cdd4ea62dd56a5f9f191aab11033ab38"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\apps\\windows\\Buddy.Windows\\OverlayPlacement.cs",
+        "sha256": "91288eec1cac93d605b7c77dc554379cd343f6ea106d364a9b4b62fe25d5293b"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\obj\\Release\\net8.0\\win-x64\\Buddy.Followup54Boundary.Tests.GlobalUsings.g.cs",
+        "sha256": "a3c6048bb4d922b1799a9977f84362a3787b68810cac67aa86ac3aa23295f227"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\Buddy.Followup54Boundary.Tests.csproj",
+        "sha256": "45d82de78f1364d633761000f659df005a1394a30d9cd37e98101cb73405bf57"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\ReviewedSource.targets",
+        "sha256": "0e271b7d32e582fec91f306132faa98b6f235e6095d3ae68eaa9f644608d6686"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\workers\\qa53\\tests\\validation\\Buddy.Followup54Boundary.Tests\\teaching-heldouts.json",
+        "sha256": "77adb1608e9b5bfa80c2b377c6e9689cedf11d4f116c0067d7b1e20c289d8996"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\Directory.Build.props",
+        "sha256": "67195d85ca884bd578fa53be05399a4d5b80dd4bfe630ce905e99fb3c1c89864"
+      },
+      {
+        "path": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46\\VERSION",
+        "sha256": "832eddd23d57d755885475df2e64d0c4cd4fc65842e3a21d8379475d4be01c50"
+      }
+    ],
+    "digest": "b8e1919dfa38de3d3d71ba22a5c5cbb45313de7c1163ac790d555ef5ae9b6c07",
+    "summary": {
+      "kind": "summary",
+      "lane": "provenance",
+      "Passed": 23,
+      "Failed": 0,
+      "model": false,
+      "native": false,
+      "network": false,
+      "ipc": false,
+      "installedProfile": false,
+      "manualReviewRequired": true
+    },
+    "logSha256": "c790678e2ee8a78a73fb9714a82d1371ef2d307f0507b0a4ef8f0301805f3c57"
+  }
+}

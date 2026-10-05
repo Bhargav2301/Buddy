@@ -19,7 +19,7 @@ internal sealed class DictationWindow : Window
     private readonly Action? starting;
     private readonly TextBlock status = new() { FontSize = 12, Foreground = BuddyTheme.Deep, TextWrapping = TextWrapping.Wrap };
     private readonly System.Windows.Controls.TextBox transcript = new() { IsReadOnly = true, TextWrapping = TextWrapping.Wrap, MinHeight = 60, MaxHeight = 150, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
-    private readonly ProgressBar level = new() { Maximum = 100, Height = 4, Foreground = BuddyTheme.Accent, Margin = new(0, 8, 0, 8) };
+    private readonly ProgressBar level = new() { Maximum = 100, Height = 4, Foreground = BuddyTheme.Deep, Margin = new(0, 8, 0, 8) };
     private readonly Button start, finish, insert, undo;
     private readonly StringBuilder recognized = new();
     private readonly DispatcherTimer monitor = new() { Interval = TimeSpan.FromMilliseconds(50) };

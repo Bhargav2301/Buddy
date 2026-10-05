@@ -26,15 +26,19 @@ internal sealed class CursorCompanionWindow : Window, IDisposable
     private bool triangleEnabled, triangleActive;
     private System.Windows.Controls.Button menuButton = null!;
     private Border brainBadge = null!;
+    private bool compactPointerMode;
+    private readonly CompanionActivity activity = new();
+    private readonly TextBlock activityLabel = new() { FontSize = 11, Foreground = BuddyTheme.Ink, HorizontalAlignment = HorizontalAlignment.Center };
+    private readonly StackPanel activityPanel = new() { Visibility = Visibility.Collapsed };
 
     internal CursorCompanionWindow(Func<bool> suppressed, Action<string>? action = null)
     {
         this.suppressed = suppressed;
-        Title = "Buddy companion"; Width = 96; Height = 100;
+        Title = "Buddy companion"; Width = 104; Height = 116;
         WindowStyle = WindowStyle.None; ResizeMode = ResizeMode.NoResize;
         AllowsTransparency = true; Background = Brushes.Transparent;
         Topmost = true; ShowInTaskbar = false; ShowActivated = false;
-        var button = new System.Windows.Controls.Button { Content = glyph, Padding = new(0), Background = Brushes.Transparent, BorderThickness = new(0), ToolTip = "Open Buddy companion menu" };
+        var button = new System.Windows.Controls.Button { Content = glyph, Padding = new(0), Background = Brushes.Transparent, BorderThickness = new(0), HorizontalContentAlignment = HorizontalAlignment.Center, VerticalContentAlignment = VerticalAlignment.Center, ToolTip = "Open Buddy companion menu" };
         menuButton=button;
         AutomationProperties.SetName(button, "Open Buddy companion menu");
         void Add(string label, Action click) { var item = new MenuItem { Header = label, MinHeight = 44 }; item.Click += (_, _) => click(); menu.Items.Add(item); }
@@ -45,7 +49,14 @@ internal sealed class CursorCompanionWindow : Window, IDisposable
         Add("Dock", () => SetDocked(true)); Add("Follow pointer", () => SetDocked(false)); Add("Snooze 15 minutes", Snooze);
         button.ContextMenu = menu;button.ToolTip="Talk with Buddy; right-click for Type, Guide and optional tools";AutomationProperties.SetName(button,"Talk with Buddy; right-click for tools");
         button.Click += (_, _) => action?.Invoke("Voice");
-        var presence = new StackPanel(); button.Width = 72; button.Height = 72; presence.Children.Add(button);
+        var presence = new StackPanel(); button.Width = button.Height = CompanionPresentation.FaceButtonSize(false); presence.Children.Add(button);
+        activityPanel.Children.Add(activity); activityPanel.Children.Add(activityLabel);
+        presence.Children.Add(new Border { Background = BuddyTheme.Surface, CornerRadius = new(8), Padding = new(4, 2, 4, 2), Child = activityPanel });
+        // The activity caption is content, unlike the mascot silhouette: never put light text directly on wallpaper.
+        var activitySurface = (Border)presence.Children[presence.Children.Count - 1];
+        activitySurface.SetBinding(VisibilityProperty, new System.Windows.Data.Binding(nameof(Visibility)) { Source = activityPanel });
+        activityPanel.ToolTip = "Decorative activity, not measured microphone volume.";
+        AutomationProperties.SetLiveSetting(activityLabel, AutomationLiveSetting.Polite);
         var brainLabel = new TextBlock { Text = "on this PC", FontSize = 12, Foreground = BuddyTheme.Deep, HorizontalAlignment = HorizontalAlignment.Center };
         AutomationProperties.SetName(brainLabel, "Brain: on this PC"); AutomationProperties.SetLiveSetting(brainLabel, AutomationLiveSetting.Polite);
         brainBadge=new Border { Background = BuddyTheme.Soft, CornerRadius = new(8), Padding = new(6, 2, 6, 2), Child = brainLabel };presence.Children.Add(brainBadge);
@@ -69,11 +80,29 @@ internal sealed class CursorCompanionWindow : Window, IDisposable
         if (enabled) { timer.Start(); Follow(); }
         else { timer.Stop(); Hide(); }
     }
-    internal void SetMood(CompanionMood mood) { currentMood = mood; glyph.SetMood(mood); }
+    internal void SetMood(CompanionMood mood) { currentMood = mood; glyph.SetMood(mood); activity.Mood = mood; RefreshPresentation(); }
+    internal void SetCompactPointerMode(bool value)
+    {
+        compactPointerMode = value; glyph.SetCompactPointer(value);
+        if (!value && !triangleEnabled) Triangle(false);
+        Width = value ? 88 : 104; Height = 116;
+        menuButton.Width = menuButton.Height = CompanionPresentation.FaceButtonSize(value);
+        if (value && !triangleActive) glyph.PointAngle(-45);
+        RefreshPresentation(); spring.Reset();
+    }
+    private void RefreshPresentation()
+    {
+        bool showActivity = compactPointerMode && currentMood is CompanionMood.Listening or CompanionMood.Thinking or CompanionMood.Researching or CompanionMood.Speaking;
+        activityPanel.Visibility = showActivity ? Visibility.Visible : Visibility.Collapsed;
+        activityLabel.Text = currentMood.ToString();
+        AutomationProperties.SetName(activityLabel, $"{currentMood}; decorative activity, not microphone level");
+        brainBadge.Visibility = triangleActive || showActivity ? Visibility.Collapsed : Visibility.Visible;
+    }
     internal void SetTriangleEnabled(bool enabled) { triangleEnabled=enabled; if(!enabled) Triangle(false); }
     private void Triangle(bool active)
     {
-        if(triangleActive==active)return;triangleActive=active;glyph.SetPointer(active);menuButton.IsHitTestVisible=!active;brainBadge.Visibility=active?Visibility.Collapsed:Visibility.Visible;
+        if(triangleActive==active)return;triangleActive=active;glyph.SetPointer(active);menuButton.IsHitTestVisible=!active;RefreshPresentation();
+        if (!active && compactPointerMode) glyph.PointAngle(-45);
         var handle=new WindowInteropHelper(this).Handle;if(handle!=IntPtr.Zero)OverlayNative.Configure(handle,active,noActivate:true);
     }
     internal void PointTo(ScreenElement? target)
@@ -90,13 +119,13 @@ internal sealed class CursorCompanionWindow : Window, IDisposable
         if (menu.IsOpen || IsMouseOver) return;
         var pointer=point;
         bool pointing = groundedTarget is not null && currentMood is CompanionMood.Pointing or CompanionMood.Speaking;
-        Triangle(triangleEnabled&&pointing);
+        Triangle((triangleEnabled || compactPointerMode)&&pointing);
         if (pointing) point = new() { X = (int)(groundedTarget!.X + groundedTarget.Width), Y = (int)(groundedTarget.Y + groundedTarget.Height / 2) };
         else if (docked) { point = dockPoint; var work = OverlayNative.WorkArea(point); point.X = (int)(work.Left + work.Width - 16); point.Y = (int)(work.Top + work.Height - 16); }
         if (!IsVisible) { new WindowInteropHelper(this).EnsureHandle(); OverlayNative.Place(this, point); Show(); spring.Reset(); }
         var destination = OverlayNative.Position(this, point);
-        glyph.LookToward(pointer.X-(spring.Position.X+48),pointer.Y-(spring.Position.Y+36));
-        if(triangleActive&&groundedTarget is { } target){double scale=OverlayNative.Scale(new WindowInteropHelper(this).Handle);glyph.PointAngle(Math.Atan2(target.Y+target.Height/2-(destination.Y+36*scale),target.X+target.Width/2-(destination.X+48*scale))*180/Math.PI+180);}
+        glyph.LookToward(pointer.X-(spring.Position.X+Width/2),pointer.Y-(spring.Position.Y+menuButton.Height/2));
+        if(triangleActive&&groundedTarget is { } target){double scale=OverlayNative.Scale(new WindowInteropHelper(this).Handle);glyph.PointAngle(Math.Atan2(target.Y+target.Height/2-(destination.Y+menuButton.Height/2*scale),target.X+target.Width/2-(destination.X+Width/2*scale))*180/Math.PI+180);}
         if (pointing) {
             double t = BuddyTheme.Animate ? Math.Clamp((Environment.TickCount64 - flightStarted) / 300.0, 0, 1) : 1;
             double eased = 1 - Math.Pow(1 - t, 3);

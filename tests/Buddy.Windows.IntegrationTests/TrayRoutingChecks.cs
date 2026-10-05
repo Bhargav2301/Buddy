@@ -48,10 +48,13 @@ internal static class TrayRoutingChecks
                 Check(!voice.IsListening && !voice.IsBusy && !quick.IsBusy, "Home Stop cancels pending voice startup and both interaction surfaces");
                 voice.Dismiss();
                 var hwnd = new WindowInteropHelper(home).Handle;
-                var chatChord = new ShortcutRegistration((id, modifiers) => Native.RegisterHotKey(hwnd, id, modifiers, 0x20), id => Native.UnregisterHotKey(hwnd, id), 101, 102);
-                var voiceChord = new ShortcutRegistration((id, modifiers) => Native.RegisterHotKey(hwnd, id, modifiers, 0x20), id => Native.UnregisterHotKey(hwnd, id), 103, 104);
+                Read<ShortcutRegistration>(home, "shortcut")?.Dispose(); Read<ShortcutRegistration>(home, "voiceShortcut")?.Dispose();
+                // Real registrations use uncommon F23/F24 fixture keys so the running installed app
+                // and other applications keep their actual Space shortcuts. No key is injected.
+                var chatChord = new ShortcutRegistration((id, modifiers) => Native.RegisterHotKey(hwnd, id, modifiers, 0x86), id => Native.UnregisterHotKey(hwnd, id), 101, 102);
+                var voiceChord = new ShortcutRegistration((id, modifiers) => Native.RegisterHotKey(hwnd, id, modifiers, 0x87), id => Native.UnregisterHotKey(hwnd, id), 103, 104);
                 Write(home, "shortcut", chatChord); Write(home, "voiceShortcut", voiceChord);
-                Check(chatChord.TrySet(ShortcutChoice.Find("Ctrl + Alt + Shift + Space")) && voiceChord.TrySet(ShortcutChoice.Find("Alt + Shift + Space")), "Windows independently registers the two preview chords");
+                Check(chatChord.TrySet(ShortcutChoice.Find("Ctrl + Alt + Shift + Space")) && voiceChord.TrySet(ShortcutChoice.Find("Alt + Shift + Space")), "Windows independently registers two fixture chords without taking installed Space shortcuts");
                 SendMessage(hwnd, 0x0312, (IntPtr)chatChord.ActiveId, IntPtr.Zero);
                 Check(quick.IsVisible && !voice.IsListening && draft.IsKeyboardFocusWithin, "Native WM_HOTKEY chat message routes to typed chat");
                 SendMessage(hwnd, 0x0312, (IntPtr)voiceChord.ActiveId, IntPtr.Zero);

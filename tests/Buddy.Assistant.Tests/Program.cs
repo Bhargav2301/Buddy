@@ -69,7 +69,10 @@ try {
     model.Replies.Enqueue(JsonSerializer.Serialize(new AssistantPlan("Click", [new("click", Ref:"a", Description:"Click Export", Risk:"low")]), StateStore.Json));
     var plan = await service.PlanAgent(planning, default);
     Check(plan.Actions![0].Risk == "high", "Structured Ollama output is validated before it reaches Windows");
-    model.Replies.Enqueue("not-json"); await Reject(async () => await service.PlanAgent(planning, default), "INVALID_PLAN", "Malformed structured output never becomes a plan");
+    model.Replies.Enqueue("not-json"); model.Replies.Enqueue("not-json");
+    var clarification = await service.PlanAgent(planning, default);
+    Check(clarification.Actions is { Count: 0 } && !string.IsNullOrWhiteSpace(clarification.Summary), "Repeated malformed structured output becomes a non-executable clarification");
+    await Reject(() => { ActionPolicy.Validate(clarification); return Task.CompletedTask; }, "INVALID_PLAN", "Clarification cannot pass strict execution validation");
     model.Delay = true; using var cancelledPlan = new CancellationTokenSource(); var pending = service.PlanAgent(planning, cancelledPlan.Token);
     await model.Started.Task.WaitAsync(TimeSpan.FromSeconds(5)); service.StopAll(); bool stopped = false;
     try { await pending; } catch (OperationCanceledException) { stopped = true; } Check(stopped, "Global stop cancels planning inference"); model.Delay = false;

@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework>
+    <BuddySourceRoot Condition="'$(BuddySourceRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..\</BuddySourceRoot>
+    <BuddyCoreRoot Condition="'$(BuddyCoreRoot)' == ''">$(BuddySourceRoot)</BuddyCoreRoot>
+    <BuddyRefineRoot Condition="'$(BuddyRefineRoot)' == ''">$(BuddySourceRoot)</BuddyRefineRoot>
+    <BuddyNotchRoot Condition="'$(BuddyNotchRoot)' == ''">$(BuddySourceRoot)</BuddyNotchRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(BuddySourceRoot)services\Buddy.Server\*.cs" Link="Production\%(Filename)%(Extension)" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="AngleSharp" Version="1.8.2" />
+    <AssemblyMetadata Include="BuddySourceRoot" Value="$([System.IO.Path]::GetFullPath('$(BuddySourceRoot)'))" />
+  </ItemGroup>
+  <PropertyGroup Condition="Exists('$(BuddySourceRoot)services\Buddy.Server\ProviderRouting.cs')"><DefineConstants>$(DefineConstants);HAS_PROVIDER53</DefineConstants></PropertyGroup>
+  <PropertyGroup Condition="Exists('$(BuddyNotchRoot)apps\windows\Buddy.Windows\NotchChatSession.cs')"><DefineConstants>$(DefineConstants);HAS_NOTCH53</DefineConstants></PropertyGroup>
+  <ItemGroup Condition="Exists('$(BuddyNotchRoot)apps\windows\Buddy.Windows\NotchChatSession.cs')">
+    <Compile Include="$(BuddyNotchRoot)apps\windows\Buddy.Windows\NotchChatSession.cs;$(BuddyNotchRoot)apps\windows\Buddy.Windows\NotchNoteStore.cs;$(BuddyNotchRoot)apps\windows\Buddy.Windows\NotchTextInbox.cs;$(BuddyNotchRoot)apps\windows\Buddy.Windows\NotchInteractionState.cs;$(BuddyNotchRoot)apps\windows\Buddy.Windows\CompanionPresentation.cs;$(BuddyNotchRoot)apps\windows\Buddy.Windows\LocalTaskJournal.cs;$(BuddyNotchRoot)apps\windows\Buddy.Windows\RefinementResourceReader.cs" Link="Production\%(Filename)%(Extension)" />
+  </ItemGroup>
+  <PropertyGroup Condition="Exists('$(BuddyCoreRoot)apps\windows\Buddy.Windows\ShortcutTransaction.cs')"><DefineConstants>$(DefineConstants);HAS_CORE53</DefineConstants></PropertyGroup>
+  <ItemGroup Condition="Exists('$(BuddyCoreRoot)apps\windows\Buddy.Windows\ShortcutTransaction.cs')">
+    <Compile Include="$(BuddyCoreRoot)apps\windows\Buddy.Windows\DesktopPreferences.cs" Link="Production\DesktopPreferences.cs" />
+    <Compile Include="$(BuddyCoreRoot)apps\windows\Buddy.Windows\ShortcutTransaction.cs" Link="Production\ShortcutTransaction.cs" />
+    <Compile Include="$(BuddyCoreRoot)apps\windows\Buddy.Windows\PreviewEnvironment.cs" Link="Production\PreviewEnvironment.cs" />
+  </ItemGroup>
+  <PropertyGroup Condition="Exists('$(BuddyRefineRoot)apps\windows\Buddy.Windows\ExternalRefinementOptions.cs')"><DefineConstants>$(DefineConstants);HAS_REFINE53</DefineConstants></PropertyGroup>
+  <ItemGroup Condition="Exists('$(BuddyRefineRoot)apps\windows\Buddy.Windows\ExternalRefinementOptions.cs')">
+    <Compile Include="$(BuddyRefineRoot)apps\windows\Buddy.Windows\ExternalRefinementOptions.cs" Link="Production\ExternalRefinementOptions.cs" />
+    <Compile Include="$(BuddyRefineRoot)apps\windows\Buddy.Windows\RefinementDraftOptions.cs" Link="Production\RefinementDraftOptions.cs" />
+  </ItemGroup>
+  <Import Project="ReviewedSource.targets" />
+</Project>

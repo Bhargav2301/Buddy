@@ -20,14 +20,22 @@ public sealed partial class MainWindow
     private int pageRevision;
     internal string VisibleHomeSection => homeSection;
     internal string VisibleSettingsSection => settingsSection;
+    private void ApplyCoreNavigation()
+    {
+        foreach (var entry in navigationButtons)
+            entry.Value.Visibility = desktop.CoreControlsOnly && entry.Key is "Devices" or "Memories" or "Prompts" ? Visibility.Collapsed : Visibility.Visible;
+    }
 
     private void ShowChat()
     {
+        if (!FlushPendingPreferences()) return;
+        ClearPreferenceEditor();
         homeSection = "Conversations"; pageRevision++; homeBody.Content = chatView; MarkNavigation(); input.Focus();
     }
     internal void NavigateHome(string section)
     {
-        if (!HomeSections.Contains(section)) return;
+        if (!HomeSections.Contains(section) || !FlushPendingPreferences()) return;
+        if (section != "Settings") ClearPreferenceEditor();
         homeSection = section; int revision = ++pageRevision; MarkNavigation(); homeBody.Content = null;
         if (section == "Settings") { BuildSettings(); return; }
         var p = new StackPanel(); homeBody.Content = new ScrollViewer { Content = p, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
@@ -47,7 +55,14 @@ public sealed partial class MainWindow
     private void BuildConversations(StackPanel p, int revision)
     {
         p.Children.Add(Text("Conversations", 28));
-        var actions = new WrapPanel(); actions.Children.Add(Btn("New conversation", () => _ = NewChat(), true)); actions.Children.Add(Btn("Guide this screen", () => StartWorkflow("guide", input.Text))); actions.Children.Add(Btn("Agent task", () => StartWorkflow("agent", input.Text))); p.Children.Add(actions);
+        var actions = new WrapPanel(); actions.Children.Add(Btn("New conversation", () => _ = NewChat(), true)); actions.Children.Add(Btn("Guide this screen", () => StartWorkflow("guide", input.Text))); actions.Children.Add(Btn("Refine source field", () => _ = RefineFocusedField()));
+        actions.Children.Add(Btn("Show Buddy bar", () => {
+            try { StoreIslandMode("Compact"); island?.SetMode("Compact"); status.Text = !companionPresenceAvailable ? "The other Buddy instance owns the companion. Quit that copy to show this bar." : island is null ? "Buddy bar is enabled. It will appear when Buddy finishes starting." : "Buddy bar stays visible until you hide it."; }
+            catch (Exception e) { status.Text = e.Message; }
+        }));
+        if (!desktop.CoreControlsOnly) actions.Children.Add(Btn("Agent task", () => StartWorkflow("agent", input.Text)));
+        p.Children.Add(actions);
+        if (desktop.CoreControlsOnly) p.Children.Add(Text("Core controls are shown. Restore all tools in General settings; your saved history and settings are retained.", 12, Muted));
         var search = new TextBox { Text = conversationQuery, Margin = new(0, 0, 0, 12) }; StyleBox(search); AutomationProperties.SetName(search, "Search conversations"); search.ToolTip = "Search conversation titles and messages"; p.Children.Add(search);
         var archived = new CheckBox { Content = "Show archived conversations", IsChecked = showArchived }; p.Children.Add(archived);
         var cards = new StackPanel(); p.Children.Add(cards); int queryRevision = 0;

@@ -74,7 +74,7 @@ try{
  var word=context with{Elements=[..controls,new("word:edit:0","HI","Text",20,50,16,18)]};
  Check((await service.PlanGuide(new("point to the word HI in Notepad",word,true),default)).Steps!.Single().Ref=="word:edit:0","Verified document range can be underlined directly with no model guess");
  var docsQuery=@"Teach me Amoeba setup using https\://useamoeba.com/ | Video | Intro to Amoeba | no URL |";
- model.Add(new GuidePlan("Focus Amoeba before a setup step; documentation is reference only.",[]));
+ model.Add(new ConceptualExplanation("Amoeba documentation can explain the setup process.", "Documentation does not establish the installed app version or current controls, and setup permissions require a separate user decision.", "A manual check compares the focused app and its version with the fetched documentation before any setup decision."));
  var docs=await service.PlanGuide(new(docsQuery,new("amoeba","Amoeba",[]),true),default);
  Check(web.Calls.First()=="fetch:https://useamoeba.com/"&&!web.Calls.Any(x=>x.StartsWith("search:")),"User-supplied Amoeba URL bypasses search entirely");
  Check(web.Calls.Contains("fetch:https://useamoeba.com/docs/getting-started")&&docs.Sources!.Count==2,"Discovered official getting-started page is actually fetched and cited");

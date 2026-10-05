@@ -13,7 +13,7 @@ using System.Windows.Media;
 internal static class PreviewChecks
 {
     [DllImport("user32.dll")] private static extern bool GetWindowDisplayAffinity(IntPtr window, out uint affinity);
-    internal static int Run()
+    internal static int Run(bool initializeMicrophone = true)
     {
         var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown }; int count = 0, exit = 1;
         void Check(bool value, string label) { if (!value) throw new Exception("FAIL: " + label); count++; Console.WriteLine("PASS: " + label); }
@@ -61,7 +61,7 @@ internal static class PreviewChecks
                     bool muted = false; try { await output.SpeakAsync("Must stay silent.", new() { HeadphonesOnly = true }); } catch (InvalidOperationException) { muted = true; }
                     Check(muted, "Headphones-only output with no selected endpoint stays silent instead of using speakers");
                 }
-                using (var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(10))) {
+                if (initializeMicrophone) using (var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(10))) {
                     var language = WindowsSpeechInput.Languages().First();
                     var selectedMicrophone = MicrophoneStream.Devices().First();
                     var recognition = await WindowsSpeechInput.Create(deadline.Token, new() { RecognitionLanguage = language, MicrophoneId = selectedMicrophone.Id });
@@ -70,6 +70,7 @@ internal static class PreviewChecks
                     await Task.Delay(250); WindowsSpeechInput.Stop(recognition);
                     Check(true, "Microphone stream starts and Stop releases it without submitting a transcript");
                 }
+                else Console.WriteLine("NOT RUN: physical microphone initialization; this policy fixture records and plays no audio.");
                 using var voice = new VoiceOverlayWindow(() => null, () => Task.FromResult<string?>(null), () => new(), _ => { }, () => handle, new ScreenPerception(() => new()), (_, _) => { }, () => { });
                 voice.Show(); voice.Cancel(); Check(!voice.IsListening && !voice.IsBusy, "Stop leaves voice recognition and generation inactive");
                 voice.Dismiss(); voice.Show(); Check(voice.IsVisible && !voice.IsListening, "Voice surface can reopen after Stop without starting the microphone");

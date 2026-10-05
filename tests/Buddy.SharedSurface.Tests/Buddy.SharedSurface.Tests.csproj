@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net8.0-windows10.0.19041.0</TargetFramework><UseWPF>true</UseWPF>
+    <AssemblyName>Buddy.Windows.IntegrationTests</AssemblyName><RuntimeIdentifier>win-x64</RuntimeIdentifier><SelfContained>true</SelfContained>
+    <BuddySourceRoot Condition="'$(BuddySourceRoot)' == ''">$(MSBuildThisFileDirectory)..\..</BuddySourceRoot>
+  </PropertyGroup>
+  <ItemGroup><ProjectReference Include="$(BuddySourceRoot)\apps\windows\Buddy.Windows\Buddy.Windows.csproj" /></ItemGroup>
+</Project>

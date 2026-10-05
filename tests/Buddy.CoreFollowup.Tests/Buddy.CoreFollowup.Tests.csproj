@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../apps/windows/Buddy.Windows/DesktopPreferences.cs" Link="DesktopPreferences.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/ShortcutTransaction.cs" Link="ShortcutTransaction.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/PreviewEnvironment.cs" Link="PreviewEnvironment.cs" />
+  </ItemGroup>
+</Project>

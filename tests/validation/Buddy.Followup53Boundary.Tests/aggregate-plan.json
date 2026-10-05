@@ -1,0 +1,934 @@
+{
+  "task": "QA-53",
+  "purpose": "Read-only reviewed allowlist for root-owned serial aggregate; plan was not executed by QA.",
+  "runStatus": "not_run",
+  "sourceRoot": "C:\\Users\\bharg\\Documents\\Codex\\2026-10-03\\task\\Buddy-quality46",
+  "projectInventoryCount": 49,
+  "dotnetRunCount": 47,
+  "prerequisites": [
+    "Integrate frozen sources and QA artifact; use the final source tree as cwd.",
+    "Restore/build once using existing authorized caches; do not fetch models, install packages or change credentials to make tests pass.",
+    "Serialize dotnet commands because project references share server outputs. No inherited --live flags.",
+    "Record exact final build/source snapshot before and after, command, exit code, log and passed/failed/blocked/skipped for every row.",
+    "Stop on source changes and rerun only affected checks. Keep first failures, distinguish stale fixture expectations from production regressions."
+  ],
+  "pythonChecks": [
+    {
+      "arguments": [
+        "C:\\Users\\bharg\\anaconda3\\python.exe",
+        "-B",
+        "tests/team_ledger_test.py"
+      ],
+      "scope": "Temporary ledger/path fixtures only."
+    },
+    {
+      "arguments": [
+        "C:\\Users\\bharg\\anaconda3\\python.exe",
+        "-B",
+        "scripts/check-source-safety.py"
+      ],
+      "scope": "Static source scan; inspect arguments before invocation if script contract changes."
+    }
+  ],
+  "runs": [
+    {
+      "project": "tests/Buddy.AppBinding.Tests/Buddy.AppBinding.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.AppBinding.Tests/Buddy.AppBinding.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.Assistant.Tests/Buddy.Assistant.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.Assistant.Tests/Buddy.Assistant.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.CompanionFeedback.Tests/Buddy.CompanionFeedback.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.CompanionFeedback.Tests/Buddy.CompanionFeedback.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.ComputerUse.Tests/Buddy.ComputerUse.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.ComputerUse.Tests/Buddy.ComputerUse.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "owned-nonforeground-os",
+      "scope": "Owned filesystem executable lease/symlink checks; injected app backend, no app launch."
+    },
+    {
+      "project": "tests/Buddy.CoreFollowup.Tests/Buddy.CoreFollowup.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.CoreFollowup.Tests/Buddy.CoreFollowup.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.Desktop.Tests/Buddy.Desktop.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.Desktop.Tests/Buddy.Desktop.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "owned-nonforeground-os",
+      "scope": "Starts owned console subprocesses and temporary activation pipes; no WPF surface."
+    },
+    {
+      "project": "tests/Buddy.Execution.Tests/Buddy.Execution.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.Execution.Tests/Buddy.Execution.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.GeneralTeaching.Tests/Buddy.GeneralTeaching.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.GeneralTeaching.Tests/Buddy.GeneralTeaching.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.GuideFeedback.Tests/Buddy.GuideFeedback.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.GuideFeedback.Tests/Buddy.GuideFeedback.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.LocalAgentFollowup.Tests/Buddy.LocalAgentFollowup.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.LocalAgentFollowup.Tests/Buddy.LocalAgentFollowup.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.LocalModelSelection.Tests/Buddy.LocalModelSelection.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.LocalModelSelection.Tests/Buddy.LocalModelSelection.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.LocalNotch.Tests/Buddy.LocalNotch.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.LocalNotch.Tests/Buddy.LocalNotch.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.LocalTask.Tests/Buddy.LocalTask.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.LocalTask.Tests/Buddy.LocalTask.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.Mvp.Tests/Buddy.Mvp.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.Mvp.Tests/Buddy.Mvp.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.NotchFollowup.Tests/Buddy.NotchFollowup.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.NotchFollowup.Tests/Buddy.NotchFollowup.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "owned-nonforeground-os",
+      "scope": "Owned temporary notes and hardened local file reader; no UI or model."
+    },
+    {
+      "project": "tests/Buddy.Optional.Tests/Buddy.Optional.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.Optional.Tests/Buddy.Optional.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.PlanningRepair.Tests/Buddy.PlanningRepair.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.PlanningRepair.Tests/Buddy.PlanningRepair.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.Preview.Tests/Buddy.Preview.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.Preview.Tests/Buddy.Preview.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.Provider.Tests/Buddy.Provider.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.Provider.Tests/Buddy.Provider.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.ProviderRouting.Tests/Buddy.ProviderRouting.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.ProviderRouting.Tests/Buddy.ProviderRouting.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.Qa.Tests/Buddy.Qa.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.Qa.Tests/Buddy.Qa.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.RefinementCore.Tests/Buddy.RefinementCore.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.RefinementCore.Tests/Buddy.RefinementCore.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.RefinementFollowup.Tests/Buddy.RefinementFollowup.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.RefinementFollowup.Tests/Buddy.RefinementFollowup.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.RefinementLifecycle.Tests/Buddy.RefinementLifecycle.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.RefinementLifecycle.Tests/Buddy.RefinementLifecycle.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.RefinementMeaning.Tests/Buddy.RefinementMeaning.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.RefinementMeaning.Tests/Buddy.RefinementMeaning.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.RefinementRepair.Tests/Buddy.RefinementRepair.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.RefinementRepair.Tests/Buddy.RefinementRepair.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.RefinementResources.Tests/Buddy.RefinementResources.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.RefinementResources.Tests/Buddy.RefinementResources.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "owned-nonforeground-os",
+      "scope": "Owned temporary files and Win32 handle/reparse/link checks; no UI."
+    },
+    {
+      "project": "tests/Buddy.RegionCompletion.Tests/Buddy.RegionCompletion.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.RegionCompletion.Tests/Buddy.RegionCompletion.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.RegionResearch.Tests/Buddy.RegionResearch.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.RegionResearch.Tests/Buddy.RegionResearch.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.SpeechFeedback.Tests/Buddy.SpeechFeedback.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.SpeechFeedback.Tests/Buddy.SpeechFeedback.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.Staged.Tests/Buddy.Staged.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.Staged.Tests/Buddy.Staged.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.Teaching.Tests/Buddy.Teaching.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.Teaching.Tests/Buddy.Teaching.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.TeachingFollowup.Tests/Buddy.TeachingFollowup.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.TeachingFollowup.Tests/Buddy.TeachingFollowup.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/Buddy.Tests/Buddy.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Buddy.Tests/Buddy.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "owned-nonforeground-os",
+      "scope": "Starts an owned ephemeral loopback TLS host; no real model or external network."
+    },
+    {
+      "project": "tests/validation/Buddy.FeedbackBoundary.Tests/Buddy.FeedbackBoundary.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/validation/Buddy.FeedbackBoundary.Tests/Buddy.FeedbackBoundary.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/validation/Buddy.LocalTaskBoundary.Tests/Buddy.LocalTaskBoundary.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/validation/Buddy.LocalTaskBoundary.Tests/Buddy.LocalTaskBoundary.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/validation/Buddy.ParityBoundary.Tests/Buddy.ParityBoundary.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/validation/Buddy.ParityBoundary.Tests/Buddy.ParityBoundary.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/validation/Buddy.RefinementMeaningBoundary.Tests/Buddy.RefinementMeaningBoundary.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/validation/Buddy.RefinementMeaningBoundary.Tests/Buddy.RefinementMeaningBoundary.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/validation/Buddy.RefinementOptionsBoundary.Tests/Buddy.RefinementOptionsBoundary.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/validation/Buddy.RefinementOptionsBoundary.Tests/Buddy.RefinementOptionsBoundary.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "owned-nonforeground-os",
+      "scope": "Owned file-reader checks alongside pure preparation; no UI."
+    },
+    {
+      "project": "tests/validation/Buddy.ReliabilityBoundary.Tests/Buddy.ReliabilityBoundary.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/validation/Buddy.ReliabilityBoundary.Tests/Buddy.ReliabilityBoundary.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/validation/Buddy.TeachingUsefulness.Tests/Buddy.TeachingUsefulness.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/validation/Buddy.TeachingUsefulness.Tests/Buddy.TeachingUsefulness.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/validation/Buddy.UserFailureBoundary.Tests/Buddy.UserFailureBoundary.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/validation/Buddy.UserFailureBoundary.Tests/Buddy.UserFailureBoundary.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Canned/injected fixture or pure logic; use default mode only. No model/live/native opt-in flags."
+    },
+    {
+      "project": "tests/validation/Buddy.Followup53Boundary.Tests/Buddy.Followup53Boundary.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/validation/Buddy.Followup53Boundary.Tests/Buddy.Followup53Boundary.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore",
+        "--",
+        "--lane=core"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Independent QA53 source-linked lane. No default native file reader, actual network/model or pipe."
+    },
+    {
+      "project": "tests/validation/Buddy.Followup53Boundary.Tests/Buddy.Followup53Boundary.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/validation/Buddy.Followup53Boundary.Tests/Buddy.Followup53Boundary.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore",
+        "--",
+        "--lane=refine"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Independent QA53 source-linked lane. No default native file reader, actual network/model or pipe."
+    },
+    {
+      "project": "tests/validation/Buddy.Followup53Boundary.Tests/Buddy.Followup53Boundary.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/validation/Buddy.Followup53Boundary.Tests/Buddy.Followup53Boundary.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore",
+        "--",
+        "--lane=teaching"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Independent QA53 source-linked lane. No default native file reader, actual network/model or pipe."
+    },
+    {
+      "project": "tests/validation/Buddy.Followup53Boundary.Tests/Buddy.Followup53Boundary.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/validation/Buddy.Followup53Boundary.Tests/Buddy.Followup53Boundary.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore",
+        "--",
+        "--lane=provider"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Independent QA53 source-linked lane. No default native file reader, actual network/model or pipe."
+    },
+    {
+      "project": "tests/validation/Buddy.Followup53Boundary.Tests/Buddy.Followup53Boundary.Tests.csproj",
+      "arguments": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/validation/Buddy.Followup53Boundary.Tests/Buddy.Followup53Boundary.Tests.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "true",
+        "--no-restore",
+        "--",
+        "--lane=notch"
+      ],
+      "classification": "pure-or-injected-default",
+      "scope": "Independent QA53 source-linked lane. No default native file reader, actual network/model or pipe."
+    }
+  ],
+  "excluded": [
+    {
+      "project": "tests/Buddy.Windows.IntegrationTests/Buddy.Windows.IntegrationTests.csproj",
+      "reason": "All foreground/native modes excluded. Its observation46-pure branch may be separately authorized; do not run default dispatch."
+    },
+    {
+      "project": "tests/Buddy.Windows.PackageChecks/Buddy.Windows.PackageChecks.csproj",
+      "reason": "Run separately only with the explicit new candidate directory; this is artifact verification, not behavioral acceptance."
+    },
+    {
+      "project": "tests/validation/Buddy.GeneralTeachingLive.Tests/Buddy.GeneralTeachingLive.Tests.csproj",
+      "reason": "Actual-model/web runner. A default refusal or dry-run is not functional acceptance. Keep out of this aggregate."
+    },
+    {
+      "project": "tests/validation/Buddy.RefinementMeaningLive.Tests/Buddy.RefinementMeaningLive.Tests.csproj",
+      "reason": "Actual-model/web runner. A default refusal or dry-run is not functional acceptance. Keep out of this aggregate."
+    },
+    {
+      "project": "tests/validation/Buddy.RegionCompletionLive.Tests/Buddy.RegionCompletionLive.Tests.csproj",
+      "reason": "Actual-model/web runner. A default refusal or dry-run is not functional acceptance. Keep out of this aggregate."
+    },
+    {
+      "project": "tests/validation/Buddy.ReliabilityLive.Tests/Buddy.ReliabilityLive.Tests.csproj",
+      "reason": "Actual-model/web runner. A default refusal or dry-run is not functional acceptance. Keep out of this aggregate."
+    },
+    {
+      "project": "tests/validation/Buddy.UserFailureLive.Tests/Buddy.UserFailureLive.Tests.csproj",
+      "reason": "Actual-model/web runner. A default refusal or dry-run is not functional acceptance. Keep out of this aggregate."
+    }
+  ],
+  "additionalExclusions": [
+    "Android/device fixtures, microphone/audio/Piper playback, installed-profile routes, actual package discovery/activation, Comet observation, UIA/focus/input/screenshot tests, cloud/account calls, named-agent-pipe acceptance and model live modes.",
+    "Windows Integration compile is allowed separately; unshown WPF fixtures still require explicit separate classification and are not silently included."
+  ],
+  "fixtureRisks": [
+    "Provider factory now exposes explicit production setup availability; parameterless factory must remain disconnected. Preserve both assertions.",
+    "Model override fixtures must supply /api/show local gguf/architecture metadata before any selected-model inference. Do not relax local-only checks to satisfy an old fake.",
+    "Conceptual teaching now uses Purpose/Limitation/ManualCheck, with availability/state/privacy guards. Old mock GuidePlan envelopes or incomplete prose may require faithful fixture updates; no utility pass from safe fallback.",
+    "Source-linked fixtures embed input receipts. Rebuild after integration; copying stale binaries or rerunning with --no-build against changed source must refuse.",
+    "Package checks need exact new assets/candidate path. Previous missing Assets failure was a harness dependency issue, not browser acceptance.",
+    "Native OS file tests can legitimately report unavailable symlink privilege; preserve skips and do not weaken reader guards."
+  ],
+  "acceptanceLimit": "Passing this plan establishes only the named regression boundaries. Original17 functional/native/model/manual criteria remain separate."
+}

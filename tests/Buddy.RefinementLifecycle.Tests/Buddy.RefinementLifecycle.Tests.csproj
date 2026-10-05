@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../services/Buddy.Server/Buddy.Server.csproj" />
+    <Compile Include="../../apps/windows/Buddy.Windows/RefinementRequest.cs" Link="RefinementRequest.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/LocalPromptWatcher.cs" Link="LocalPromptWatcher.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/ExternalRefinementOptions.cs" Link="ExternalRefinementOptions.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/RefinementDraftOptions.cs" Link="RefinementDraftOptions.cs" />
+  </ItemGroup>
+</Project>

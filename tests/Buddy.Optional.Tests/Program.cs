@@ -6,6 +6,7 @@ using System.Text.Json;
 
 int count=0;
 void Check(bool ok,string name){if(!ok)throw new Exception("FAIL: "+name);count++;Console.WriteLine("PASS: "+name);}
+ProviderChecks.Run(Check);
 void Reject(Action action,string name){try{action();}catch(InvalidOperationException){Check(true,name);return;}throw new Exception("FAIL: "+name);}
 async Task RejectAsync(Func<Task> action,string name){try{await action();}catch(Exception e)when(e is InvalidOperationException or BuddyException or OperationCanceledException or DecoderFallbackException){Check(true,name);return;}throw new Exception("FAIL: "+name);}
 var jobs=new JobLedger();var id=jobs.Begin("action","Open a verified application","fixture");
@@ -54,13 +55,16 @@ try{
     Check(!Encoding.UTF8.GetString(await File.ReadAllBytesAsync(Path.Combine(root,"state","buddy.v1.encrypted"))).Contains("Choose Export"),"Knowledge text is not plaintext in the state file");
     await store.Update(s=>{LocalKnowledge.StorePack(s,updated);return true;});Check((await store.Read(s=>s.Knowledge)).Count==1,"Reimport replaces one source pack instead of duplicating stale versions");
     using var model=new FakeModel();using var localHttp=new HttpClient(model){BaseAddress=new("http://127.0.0.1:11434")};var service=new BuddyService(store,new(localHttp));
-    var turn=await service.Teach(new("Explain save",new("notepad","fixture",[])),default);
+    var observedSave = new ScreenContext("notepad", "fixture", [new("owned-save", "Save", "Button", 0, 0, 20, 20)]);
+    var missing = await service.Teach(new("Explain save",new("notepad","fixture",[])),default);
+    Check(model.Calls==0 && missing.Knowledge is null && missing.Targets.Count==0, "Missing current controls clarify before imported notes or inference");
+    var turn=await service.Teach(new("Explain save",observedSave),default);
     Check(turn.Knowledge?.Count==1&&model.Last.Contains("untrustedImportedNotes")&&model.Last.Contains("11.1"),"Teaching includes only scoped imported reference and returns visible provenance");
     Check(!model.Last.Contains("nested")&&model.Calls==1,"Imported references use local inference without web or extra tool calls");
     model.During=async()=>{await store.Update(s=>{s.Knowledge.Clear();return true;});};
-    turn=await service.Teach(new("Explain save",new("notepad","fixture",[])),default);
+    turn=await service.Teach(new("Explain save",observedSave),default);
     Check(turn.Step is null&&turn.Knowledge is null&&turn.Speech.Contains("references changed"),"Removing references during inference prevents the stale sourced answer from being presented");model.During=null;
-    await store.Update(s=>{s.Knowledge.Clear();return true;});turn=await service.Teach(new("Explain save",new("notepad","fixture",[])),default);Check(turn.Knowledge?.Count==0,"Removed knowledge no longer enters the next teaching request");
+    await store.Update(s=>{s.Knowledge.Clear();return true;});turn=await service.Teach(new("Explain save",observedSave),default);Check(turn.Knowledge?.Count==0,"Removed knowledge no longer enters the next teaching request");
 
     Check(!ConnectorCatalog.AccountGrantsEnabled,"The release hard-disables real account grants");
     await RejectAsync(()=>{ConnectorCatalog.RequireGrantApproval();return Task.CompletedTask;},"Consent gate rejects before opening any provider flow");
@@ -94,7 +98,7 @@ Console.WriteLine($"ALL {count} OPTIONAL JOB / KNOWLEDGE / CONNECTOR CHECKS PASS
 sealed class FakeModel:HttpMessageHandler
 {
     public int Calls;public string Last="";public Func<Task>? During;
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken ct){Calls++;Last=await request.Content!.ReadAsStringAsync(ct);if(During is not null)await During();return new(HttpStatusCode.OK){Content=new StringContent(JsonSerializer.Serialize(new{message=new{content="{\"summary\":\"Check your imported notes and the current screen.\",\"steps\":[]}"},done=true}))};}
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken ct){Calls++;Last=await request.Content!.ReadAsStringAsync(ct);if(During is not null)await During();return new(HttpStatusCode.OK){Content=new StringContent(JsonSerializer.Serialize(new{message=new{content=JsonSerializer.Serialize(new ConceptualExplanation("Save commonly persists document changes.", "The destination and saved state are not established by this view.", "Compare an already visible saved-state indicator with the intended document and destination without editing or saving."),StateStore.Json)},done=true}))};}
 }
 sealed class ProviderMock:HttpMessageHandler
 {

@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Buddy.Windows;
 
@@ -7,6 +8,11 @@ internal static class AssistantIntent
     internal static string Mode(string text)
     {
         var t = text.Trim().ToLowerInvariant();
+        var polite = t;
+        foreach (var prefix in new[] { "please ", "can you ", "could you ", "would you " })
+            if (polite.StartsWith(prefix, StringComparison.Ordinal)) { polite = polite[prefix.Length..].TrimStart(); break; }
+        if (polite.StartsWith("please ", StringComparison.Ordinal)) polite = polite[7..].TrimStart();
+        if (new[] { "teach ", "help me learn ", "guide ", "show me ", "walk me ", "open " }.Any(prefix => polite.StartsWith(prefix, StringComparison.Ordinal))) t = polite;
         if(Buddy.Server.WorkflowIntent.NeedsSpecialists(text))return "agent";
         if(t.StartsWith("search my app notes ")) return "knowledge";
         if(t.StartsWith("start an agent ") || t.StartsWith("spawn an agent ") || t.StartsWith("start agent "))return "agent";
@@ -15,6 +21,15 @@ internal static class AssistantIntent
         return "talk";
     }
     internal static string KnowledgeQuery(string text)=>text.Trim()["search my app notes ".Length..].Trim();
+    internal static string PlanningMode(string currentMode, string text)
+    {
+        var intent = Mode(text);
+        // Teaching plus a requested action still needs the Agent plan and its approvals.
+        bool mixed = intent == "guide" && Regex.IsMatch(text,
+            @"\b(and|then|also)\s+(?:(?:please|you)\s+)*(open|click|type|insert|write|create|do|perform|delete|send|submit|save|set up)\b",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
+        return mixed || intent == "agent" ? "agent" : intent == "guide" ? "guide" : currentMode == "agent" ? "agent" : "guide";
+    }
     internal static string ActionQuery(string text) { foreach(var prefix in new[]{"start an agent to ","spawn an agent to ","start agent to ","buddy agent "})if(text.StartsWith(prefix,StringComparison.OrdinalIgnoreCase))return text[prefix.Length..];return text; }
 }
 internal sealed class SentenceBuffer
