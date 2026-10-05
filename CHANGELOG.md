@@ -10,6 +10,12 @@ The root [VERSION](VERSION) file controls both applications. See
 - Bind reviewed app actions to the exact task; add verified Camera/Spotify signed registrations and grounded authored browser lessons; clean local speech without changing speaker85/F3.
 - Keep this separate from installed0.4.4. [Feedback preview report](docs/Windows-feedback47.md) records actual-model checks, acceptance limits and remaining Coucou features.
 
+## [0.4.7] - 2026-10-05
+
+- Verify Calculator's signed main process inside its Windows application frame with bounded direct-child ownership and fresh host/package identity checks.
+- End reviewed action batches after a verified framed launch; further in-app work requires a fresh selection and review.
+- Retain the focused comparison-refinement and task-history improvements from0.4.6. Native acceptance and installation are tracked separately in [the hotfix report](docs/Windows-hotfix57.md).
+
 ## [0.4.6] - 2026-10-05
 
 - Structure explicit List/Compare comparisons from verified source spans, preserving both operands, quantifiers and order. Explain cosmetic-output and assessment no-change results distinctly; retain rejected-result details.

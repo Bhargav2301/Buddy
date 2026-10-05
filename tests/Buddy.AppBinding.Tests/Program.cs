@@ -23,6 +23,20 @@ if (args.SequenceEqual(new[] { "--readonly-calculator-resolver" })) {
         launchCalls = 0, foregroundCalls = 0, modelCalls = 0, profileCalls = 0 }));
     return;
 }
+// Opt-in only, pinned to the already recorded APP-57 window. No top-level
+// enumeration, activation, focus, pixels, UIA text, profile or input calls.
+if (args.SequenceEqual(new[] { "--readonly-calculator-frame-57" })) {
+    using var stop = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+    var backend = new WindowsRoutineAppBackend(() => true, () => "");
+    var frame = await backend.ReadOnlyCalculatorFrameAsync(new IntPtr(19466806), stop.Token);
+    if (frame is not null && (frame.Host.ProcessId != 27628 || frame.Child.ProcessId != 24952 || frame.Child.Window != new IntPtr(68200)))
+        throw new InvalidOperationException("The previously recorded frame identities changed.");
+    Console.WriteLine(JsonSerializer.Serialize(new { kind = "readonlyCalculatorFrame", bound = frame is not null,
+        host = frame?.Host.Window.ToInt64(), hostPid = frame?.Host.ProcessId, hostThread = frame?.Host.ThreadId, hostStarted = frame?.Host.ProcessStarted,
+        child = frame?.Child.Window.ToInt64(), childPid = frame?.Child.ProcessId, childThread = frame?.Child.ThreadId, childStarted = frame?.Child.ProcessStarted,
+        package = frame?.PackageFullName, launchCalls = 0, focusCalls = 0, titleOutput = 0, contentReads = 0 }));
+    return;
+}
 if (args.Length != 0) throw new ArgumentException("Unknown test mode.");
 
 int checks = 0;
@@ -168,6 +182,130 @@ foreach (var partial in new[] {
 using (var stopped = new CancellationTokenSource()) {
     stopped.Cancel(); await RejectAsync(() => camera.StartAsync(stopped.Token), "Stop precedes every package activation check");
 }
+
+// Pure frame fixtures: no process, window, signature or package APIs are called.
+var instant = DateTimeOffset.UtcNow;
+string hostPath = @"C:\Windows\System32\ApplicationFrameHost.exe";
+var hostNode = new AppFrameNode(new(new(100), 101, 102, 103, "ApplicationFrameHost"), IntPtr.Zero, new(100),
+    "ApplicationFrameWindow", true, false, true, hostPath, "");
+var childNode = new AppFrameNode(new(new(200), 201, 202, 203, "CalculatorApp"), new(100), new(100),
+    "Windows.UI.Core.CoreWindow", true, false, true, calculator.MainExecutable, calculator.PackageFullName);
+var sample = new AppFrameSample(instant, new(100), hostNode, new[] { childNode }, true, true);
+ComputerFrameBinding? Bind(AppFrameSample value) => AppFrameBinding.Bind(calculator, value, hostPath, instant);
+var frameReceipt = Bind(sample) ?? throw new InvalidOperationException("Expected the valid pure frame fixture to bind.");
+Check(frameReceipt.Child == childNode.Identity && frameReceipt.Host == hostNode.Identity,
+    "Framed Calculator retains actual child HWND/PID separately from Windows host");
+Check(AppFrameBinding.Confirm(calculator, sample, sample, hostPath, instant, default) == frameReceipt,
+    "Two unchanged trusted same-root direct-child samples confirm exact binding");
+Check(AppFrameBinding.Recheck(sample, (window, packaged) => packaged ? childNode : hostNode, default),
+    "Within-sample reread preserves unchanged full host and child metadata");
+foreach (var changed in new[] { hostNode with { Parent = new(999) }, hostNode with { Root = new(999) },
+    hostNode with { ClassName = "Other" }, hostNode with { Visible = false }, hostNode with { Cloaked = true } })
+    Check(!AppFrameBinding.Recheck(sample, (window, packaged) => packaged ? childNode : changed, default),
+        "Live host topology/visibility change after enumeration invalidates the whole sample");
+{
+    bool childInspected = false;
+    Check(!AppFrameBinding.Recheck(sample, (window, packaged) => {
+        if (packaged) { childInspected = true; return childNode; }
+        return childInspected ? hostNode with { Visible = false } : hostNode;
+    }, default), "Host mutation during final child reread is rejected before sample completion");
+}
+foreach (var changed in new[] { childNode with { Parent = new(999) }, childNode with { Root = new(999) },
+    childNode with { Visible = false }, childNode with { Identity = childNode.Identity with { ProcessStarted = 999 } } })
+    Check(!AppFrameBinding.Recheck(sample, (window, packaged) => packaged ? changed : hostNode, default),
+        "Child mutation after initial node read cannot survive final topology/identity reread");
+using (var stopDuringReread = new CancellationTokenSource()) {
+    await RejectAsync(() => Task.FromResult(AppFrameBinding.Recheck(sample, (window, packaged) => {
+        if (packaged) { stopDuringReread.Cancel(); return childNode; }
+        return hostNode;
+    }, stopDuringReread.Token)), "Stop during metadata reread prevents a completed frame sample");
+}
+Check(!BoundedComputerUse.MatchesAppName("calculator", "ApplicationFrameHost"), "Generic host name never becomes Calculator alias");
+foreach (var (altered, name) in new (AppFrameSample, string)[] {
+    (sample with { Foreground = new(900) }, "other foreground root"),
+    (sample with { Complete = false }, "incomplete sibling enumeration"),
+    (sample with { TrustedHost = false }, "unverified host catalog"),
+    (sample with { At = instant.AddSeconds(-6) }, "stale metadata"),
+    (sample with { At = instant.AddTicks(1) }, "future metadata"),
+    (sample with { Children = Array.Empty<AppFrameNode>() }, "missing child"),
+    (sample with { Children = Enumerable.Repeat(childNode, 33).ToArray() }, "unbounded child set"),
+    (sample with { Children = new[] { childNode, childNode with { Identity = childNode.Identity with { Window = new(201), ProcessId = 301 } } } }, "two visible CoreWindows"),
+    (sample with { Children = new[] { childNode, childNode with { Identity = childNode.Identity with { Window = new(201), App = "Other" }, PackageFullName = "other" } } }, "ambiguous foreign visible CoreWindow")
+}) Check(Bind(altered) is null, "Frame rejects " + name);
+foreach (var (altered, name) in new (AppFrameNode, string)[] {
+    (hostNode with { Parent = new(999) }, "nested host"), (hostNode with { Root = new(999) }, "wrong host root"),
+    (hostNode with { Visible = false }, "hidden/minimized/zero-sized host"), (hostNode with { Cloaked = true }, "cloaked host"),
+    (hostNode with { AccessAllowed = false }, "unknown host elevation/access"), (hostNode with { ClassName = "Other" }, "foreign host class"),
+    (hostNode with { Executable = @"C:\Other\ApplicationFrameHost.exe" }, "same basename outside System32"),
+    (hostNode with { Executable = hostPath + ":stream" }, "host path stream"),
+    (hostNode with { Identity = hostNode.Identity with { App = "Other" } }, "unrelated host process"),
+    (hostNode with { Identity = hostNode.Identity with { ProcessId = 0 } }, "missing host PID"),
+    (hostNode with { Identity = hostNode.Identity with { ThreadId = 0 } }, "missing host thread"),
+    (hostNode with { Identity = hostNode.Identity with { ProcessStarted = 0 } }, "missing host creation time")
+}) Check(Bind(sample with { Host = altered }) is null, "Frame rejects " + name);
+foreach (var (altered, name) in new (AppFrameNode, string)[] {
+    (childNode with { Parent = new(999) }, "non-direct descendant"), (childNode with { Root = new(999) }, "cross-window child"),
+    (childNode with { Visible = false }, "hidden/zero-sized child"), (childNode with { Cloaked = true }, "cloaked child"),
+    (childNode with { AccessAllowed = false }, "unknown child elevation/access"), (childNode with { ClassName = "Other" }, "foreign child class"),
+    (childNode with { Identity = childNode.Identity with { Window = hostNode.Identity.Window } }, "host masquerading as child"),
+    (childNode with { Identity = childNode.Identity with { ProcessId = hostNode.Identity.ProcessId } }, "host PID masquerading as child"),
+    (childNode with { Identity = childNode.Identity with { ProcessId = 0 } }, "missing child PID"),
+    (childNode with { Identity = childNode.Identity with { ThreadId = 0 } }, "missing child thread"),
+    (childNode with { Identity = childNode.Identity with { ProcessStarted = 0 } }, "missing child creation time"),
+    (childNode with { Identity = childNode.Identity with { App = "Other" } }, "foreign child process"),
+    (childNode with { Executable = @"C:\Other\CalculatorApp.exe" }, "same basename outside package root"),
+    (childNode with { Executable = packageRoot + @"\calc.exe" }, "launcher instead of main executable"),
+    (childNode with { PackageFullName = calculator.PackageFullName.Replace("11.2607", "11.2608") }, "updated package version"),
+    (childNode with { PackageFullName = "Other_11.2607.0.0_x64__8wekyb3d8bbwe" }, "different package family"),
+    (childNode with { PackageFullName = "" }, "missing package identity")
+}) Check(Bind(sample with { Children = new[] { altered } }) is null, "Frame rejects " + name);
+foreach (var (second, name) in new (AppFrameSample, string)[] {
+    (sample with { Host = hostNode with { Identity = hostNode.Identity with { ProcessId = 401 } } }, "host PID reuse"),
+    (sample with { Host = hostNode with { Identity = hostNode.Identity with { ThreadId = 402 } } }, "host thread substitution"),
+    (sample with { Host = hostNode with { Identity = hostNode.Identity with { ProcessStarted = 403 } } }, "host process replacement"),
+    (sample with { Children = new[] { childNode with { Identity = childNode.Identity with { ProcessId = 501 } } } }, "child PID substitution"),
+    (sample with { Children = new[] { childNode with { Identity = childNode.Identity with { ThreadId = 502 } } } }, "child thread substitution"),
+    (sample with { Children = new[] { childNode with { Identity = childNode.Identity with { ProcessStarted = 503 } } } }, "same PID with later process creation"),
+    (sample with { Children = new[] { childNode with { Identity = childNode.Identity with { Window = new(504) } } } }, "replacement child HWND"),
+    (sample with { Children = new[] { childNode with { Parent = new(999) } } }, "child reparenting during verification"),
+    (sample with { Children = new[] { childNode with { Root = new(999) } } }, "child moved to another root"),
+    (sample with { At = instant.AddTicks(-1) }, "reversed sample order")
+}) Check(AppFrameBinding.Confirm(calculator, sample, second, hostPath, instant, default) is null, "Repeated binding rejects " + name);
+foreach (var other in new[] { camera, spotify, calculator with { Alias = "notepad" }, calculator with { AppUserModelId = "Microsoft.WindowsCalculator_8wekyb3d8bbwe!Other" } })
+    Check(AppFrameBinding.Bind(other, sample, hostPath, instant) is null, "Frame exception cannot broaden to another app or AppId");
+foreach (var changed in new[] { calculator with { PackageFullName = calculator.PackageFullName.Replace("11.2607", "11.2608") },
+    calculator with { PackageRoot = @"C:\Other" }, calculator with { MainExecutable = @"C:\Other\CalculatorApp.exe" },
+    calculator with { AppUserModelId = "Microsoft.WindowsCalculator_8wekyb3d8bbwe!Other" } })
+    Check(!AppFrameBinding.MatchesPackage(frameReceipt, changed), "Consumer cannot adopt updated package/root/main path/AppId");
+using (var stopped = new CancellationTokenSource()) {
+    stopped.Cancel(); await RejectAsync(() => Task.FromResult(AppFrameBinding.Confirm(calculator, sample, sample, hostPath, instant, stopped.Token)), "Stop rejects otherwise-valid final frame confirmation");
+    await RejectAsync(() => Task.FromResult(FixedFrameHostTrust.Acquire(FixedFrameHostTrust.ExpectedPath, stopped.Token)), "Stopped host trust performs no native file/trust checks");
+}
+Reject(() => FixedFrameHostTrust.Acquire(@"C:\Other\ApplicationFrameHost.exe", default), "Host trust rejects foreign path before native calls");
+Check(FixedFrameHostTrust.ExpectedPublisher("Microsoft Windows") && !FixedFrameHostTrust.ExpectedPublisher("Other") &&
+    !FixedFrameHostTrust.ExpectedPublisher("Microsoft Corporation"), "Catalog publisher policy remains the exact Windows signer");
+{
+    var fake = new Backend { TransformAfter = value => value with { Window = frameReceipt.Child, Frame = frameReceipt } };
+    var result = await RoutineAppOpen.RunAsync("Open Calculator", () => true, () => "", default, fake);
+    Check(result.Verified && result.After!.Window == frameReceipt.Child && result.After.Frame == frameReceipt && fake.Dispatches == 1,
+        "Bounded controller preserves honest child identity on one framed launch");
+}
+foreach (var malformed in new[] { frameReceipt with { Host = frameReceipt.Child }, frameReceipt with { Child = frameReceipt.Host },
+    frameReceipt with { Host = frameReceipt.Host with { ProcessStarted = 0 } }, frameReceipt with { AppUserModelId = "other!App" } }) {
+    var fake = new Backend { TransformAfter = value => value with { Window = frameReceipt.Child, Frame = malformed } };
+    var result = await RoutineAppOpen.RunAsync("Open Calculator", () => true, () => "", default, fake);
+    Check(!result.Verified && fake.Dispatches == 1 && result.After is null, "Malformed frame receipt never authorizes replay or selection");
+}
+{
+    var fake = new Backend { TransformAfter = value => value with { Window = value.Window with { App = "WindowsCamera" }, Frame = frameReceipt } };
+    var result = await RoutineAppOpen.RunAsync("Open Camera", () => true, () => "", default, fake);
+    Check(!result.Verified && fake.Dispatches == 1, "Calculator frame cannot satisfy another app's dispatch");
+}
+using (var stopped = new CancellationTokenSource()) {
+    var fake = new Backend { StopAtVerify = stopped, TransformAfter = value => value with { Window = frameReceipt.Child, Frame = frameReceipt } };
+    await RejectAsync(() => RoutineAppOpen.RunAsync("Open Calculator", () => true, () => "", stopped.Token, fake), "Stop after framed verification discards completion");
+    Check(fake.Dispatches == 1, "Late Stop never repeats an already dispatched launch");
+}
 Console.WriteLine($"APP BINDING MOCK/PURE CHECKS PASSED: {checks}; no native discovery, application launches, profiles, models or network");
 
 sealed class Fixture : IAsyncDisposable
@@ -200,8 +338,14 @@ sealed class Backend : IComputerUseBackend
     internal int Dispatches;
     internal string Alias = "";
     internal CancellationTokenSource? StopAtCheckpoint;
+    internal CancellationTokenSource? StopAtVerify;
+    internal Func<ComputerObservation, ComputerObservation>? TransformAfter;
     public Task<ComputerObservation> ObserveAsync(Guid request, CancellationToken ct) { Trace.Add("observe"); return Task.FromResult(new ComputerObservation(request, Guid.NewGuid(), DateTimeOffset.UtcNow, new(new(1), 2, 3, 4, "owned"))); }
     public Task<ComputerObservation> CheckpointAsync(ComputerObservation before, string alias, CancellationToken ct) { Trace.Add("checkpoint"); StopAtCheckpoint?.Cancel(); return Task.FromResult(before); }
     public Task<ComputerDispatch> DispatchAsync(ComputerObservation before, string alias, CancellationToken ct) { Trace.Add("dispatch"); Dispatches++; Alias = alias; return Task.FromResult(new ComputerDispatch(before.RequestId, before.Id, alias)); }
-    public Task<ComputerVerification> VerifyAsync(ComputerObservation before, ComputerDispatch dispatched, CancellationToken ct) { Trace.Add("verify"); return Task.FromResult(new ComputerVerification(true, new(before.RequestId, Guid.NewGuid(), DateTimeOffset.UtcNow, new(new(5), 6, 7, 8, dispatched.Alias == "camera" ? "WindowsCamera" : dispatched.Alias)), "Owned fake verification")); }
+    public Task<ComputerVerification> VerifyAsync(ComputerObservation before, ComputerDispatch dispatched, CancellationToken ct) {
+        Trace.Add("verify"); var after = new ComputerObservation(before.RequestId, Guid.NewGuid(), DateTimeOffset.UtcNow, new(new(5), 6, 7, 8, dispatched.Alias == "camera" ? "WindowsCamera" : dispatched.Alias));
+        after = TransformAfter?.Invoke(after) ?? after; StopAtVerify?.Cancel();
+        return Task.FromResult(new ComputerVerification(true, after, "Owned fake verification"));
+    }
 }

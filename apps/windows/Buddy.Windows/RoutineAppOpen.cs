@@ -122,6 +122,12 @@ internal sealed class WindowsRoutineAppBackend(Func<bool> agentEnabled, Func<str
         IntPtr foreground = Native.GetForegroundWindow();
         if (foreground == IntPtr.Zero || !Visible(foreground)) return new ComputerVerification(false, null, "Waiting for the requested app window.");
         var selection = WindowSelection.Capture(foreground);
+        if (dispatch.Alias == "calculator" && plan.Start.IsPackaged && selection.App.Equals("ApplicationFrameHost", StringComparison.OrdinalIgnoreCase)) {
+            var frame = await BindCalculatorFrameAsync(plan.Start, foreground, ct);
+            ct.ThrowIfCancellationRequested(); EnsureEnabled();
+            if (frame is null) return new ComputerVerification(false, null, "The Calculator frame and signed app process could not be bound to this foreground window.");
+            return new ComputerVerification(true, new(before.RequestId, Guid.NewGuid(), DateTimeOffset.UtcNow, frame.Child, Frame: frame), "Requested Calculator frame and app process verified.");
+        }
         if (!BoundedComputerUse.MatchesAppName(dispatch.Alias, selection.App)) return new ComputerVerification(false, null, "The foreground app does not match the request.");
         CheckWindow(selection); CheckBlocked(dispatch.Alias);
         string path = ProcessPath(selection.ProcessId);
@@ -142,6 +148,107 @@ internal sealed class WindowsRoutineAppBackend(Func<bool> agentEnabled, Func<str
         if (Native.GetForegroundWindow() != foreground || !Visible(foreground)) return new ComputerVerification(false, null, "The requested app window changed during verification.");
         return new ComputerVerification(true, new(before.RequestId, Guid.NewGuid(), DateTimeOffset.UtcNow, Identity(selection)), "Requested foreground app verified.");
     }, ct);
+
+    // Read-only consumer boundary. Never silently adopts a new package version,
+    // root, child, PID/thread or process creation time from a previous result.
+    internal static Task<bool> ValidateFrameAsync(ComputerFrameBinding frame, Func<bool> agentEnabled,
+        Func<string> blockedApps, CancellationToken ct) => Task.Run(async () => {
+        // Native trust calls cannot be hard-cancelled. Keep them off the UI
+        // dispatcher, and await this entire operation's settlement before the
+        // owning action gate is released; do not abandon it with WaitAsync.
+        ct.ThrowIfCancellationRequested();
+        var backend = new WindowsRoutineAppBackend(agentEnabled, blockedApps);
+        backend.EnsureEnabled();
+        var expected = await ResolveAsync("calculator", ct);
+        ct.ThrowIfCancellationRequested(); backend.EnsureEnabled();
+        if (!AppFrameBinding.MatchesPackage(frame, expected)) return false;
+        var fresh = await backend.BindCalculatorFrameAsync(expected, frame.Host.Window, ct);
+        ct.ThrowIfCancellationRequested(); backend.EnsureEnabled();
+        return fresh is not null && AppFrameBinding.Same(frame, fresh);
+    }, ct);
+
+    // Diagnostic entry for one caller-supplied, already known frame HWND. It
+    // resolves and observes metadata only; it cannot dispatch or create a receipt.
+    internal async Task<ComputerFrameBinding?> ReadOnlyCalculatorFrameAsync(IntPtr knownRoot, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested(); EnsureEnabled();
+        var expected = await ResolveAsync("calculator", ct);
+        return await BindCalculatorFrameAsync(expected, knownRoot, ct);
+    }
+
+    private async Task<ComputerFrameBinding?> BindCalculatorFrameAsync(VerifiedAppLaunch expected, IntPtr root, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested(); EnsureEnabled(); CheckBlocked("calculator");
+        if (root == IntPtr.Zero || Native.GetForegroundWindow() != root) return null;
+        var first = CaptureFrame(root, ct);
+        // The lease verifies hash membership, Windows chain/publisher and pins
+        // exact host bytes until after the final frame/child/package checks.
+        using var hostLease = FixedFrameHostTrust.Acquire(first.Host.Executable, ct);
+        first = first with { TrustedHost = true };
+        var binding = AppFrameBinding.Bind(expected, first, FixedFrameHostTrust.ExpectedPath, DateTimeOffset.UtcNow);
+        if (binding is null) return null;
+        var current = await ResolveAsync("calculator", ct);
+        ct.ThrowIfCancellationRequested(); EnsureEnabled();
+        if (!current.SameIdentity(expected)) return null;
+        var second = CaptureFrame(root, ct) with { TrustedHost = true };
+        var refreshed = AppFrameBinding.Confirm(expected, first, second, FixedFrameHostTrust.ExpectedPath, DateTimeOffset.UtcNow, ct);
+        ct.ThrowIfCancellationRequested(); EnsureEnabled(); CheckBlocked("calculator");
+        return refreshed is not null &&
+            Native.GetForegroundWindow() == root ? refreshed : null;
+    }
+
+    private AppFrameSample CaptureFrame(IntPtr root, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested(); EnsureEnabled();
+        var started = DateTimeOffset.UtcNow;
+        var host = FrameNode(root, false, ct);
+        var children = new List<AppFrameNode>(); var seen = new HashSet<IntPtr>();
+        IntPtr child = FrameGetWindow(root, 5); // GW_CHILD, then direct siblings only.
+        bool complete = true;
+        while (child != IntPtr.Zero) {
+            ct.ThrowIfCancellationRequested();
+            if (seen.Count == AppFrameBinding.MaximumChildren || !seen.Add(child)) { complete = false; break; }
+            string kind = FrameClass(child);
+            if (kind == "Windows.UI.Core.CoreWindow") children.Add(FrameNode(child, true, ct));
+            child = FrameGetWindow(child, 2); // GW_HWNDNEXT; never descend or scan top-level windows.
+        }
+        var sample = new AppFrameSample(started, Native.GetForegroundWindow(), host, children.AsReadOnly(), complete, false);
+        // Re-read full host metadata after sibling inspection, then the child
+        // identities/topology, then the host again. A live process alone does
+        // not establish that its window stayed visible, direct and unchanged.
+        complete = AppFrameBinding.Recheck(sample, (window, packaged) => FrameNode(window, packaged, ct), ct);
+        ct.ThrowIfCancellationRequested();
+        return sample with { Foreground = Native.GetForegroundWindow(), Complete = complete };
+    }
+
+    private AppFrameNode FrameNode(IntPtr window, bool packaged, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        var selected = WindowSelection.Capture(window); CheckWindow(selected);
+        string path = ProcessPath(selected.ProcessId);
+        string package = packaged ? InstalledAppResolver.ProcessPackageFullName(selected.ProcessId) : "";
+        bool visible = Visible(window);
+        bool cloakKnown = DwmGetWindowAttribute(window, 14, out int cloaked, sizeof(int)) == 0;
+        string kind = FrameClass(window);
+        IntPtr parent = FrameGetParent(window), root = FrameGetAncestor(window, 2);
+        selected.Validate(); ct.ThrowIfCancellationRequested();
+        // Identity and relationship are independent: a still-live child can be
+        // reparented without changing PID/start time. Re-read the relationship.
+        if (FrameGetParent(window) != parent || FrameGetAncestor(window, 2) != root || FrameClass(window) != kind ||
+            !Visible(window) || DwmGetWindowAttribute(window, 14, out int finalCloak, sizeof(int)) != 0 || finalCloak != cloaked)
+            visible = false;
+        return new(Identity(selected), parent, root, kind, visible && cloakKnown, cloaked != 0, true, path, package);
+    }
+    private static string FrameClass(IntPtr window)
+    {
+        var text = new StringBuilder(128);
+        return FrameGetClassName(window, text, text.Capacity) > 0 ? text.ToString() : "";
+    }
+    [DllImport("user32.dll", EntryPoint = "GetWindow", ExactSpelling = true)] private static extern IntPtr FrameGetWindow(IntPtr window, uint command);
+    [DllImport("user32.dll", EntryPoint = "GetParent", ExactSpelling = true)] private static extern IntPtr FrameGetParent(IntPtr window);
+    [DllImport("user32.dll", EntryPoint = "GetAncestor", ExactSpelling = true)] private static extern IntPtr FrameGetAncestor(IntPtr window, uint flags);
+    [DllImport("user32.dll", EntryPoint = "GetClassNameW", ExactSpelling = true, CharSet = CharSet.Unicode)] private static extern int FrameGetClassName(IntPtr window, StringBuilder value, int maximum);
+    [DllImport("dwmapi.dll", ExactSpelling = true)] private static extern int DwmGetWindowAttribute(IntPtr window, uint attribute, out int value, int size);
 
     private (ComputerObservation Observation, WindowSelection Selection) Observe(Guid requestId, Guid observationId, CancellationToken ct)
     {

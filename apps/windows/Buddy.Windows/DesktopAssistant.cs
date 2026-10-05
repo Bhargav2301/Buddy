@@ -395,7 +395,7 @@ internal sealed class DesktopAssistant : IDisposable
         if(job is not null&&jobs?.Snapshot.FirstOrDefault(j=>j.Id==job)?.State!=JobState.AwaitingApproval){state.Text="This plan was stopped or expired. Choose Make plan to review a fresh job.";run!.IsEnabled=false;return;}
         starting?.Invoke();
         var host = service()!; var cts = new CancellationTokenSource(); operation = cts; executing = true; run!.IsEnabled = false;
-        var results = new List<ActionResult>(); int replans = 0; var runningJob=job;
+        var results = new List<ActionResult>(); int replans = 0; var runningJob=job; bool framedBatchEnded = false;
         executionJobs.Clear();using var specialists=new ExecutionSpecialists(new Progress<ExecutionJob>(item=>{
             if(cts.IsCancellationRequested || !ReferenceEquals(operation,cts) || !binding.Matches(taskRevision,goal.Text,mode))return;
             executionJobs[item.Id]=item;ShowExecutionJobs();
@@ -413,11 +413,33 @@ internal sealed class DesktopAssistant : IDisposable
                 var action = pending.Dequeue(); state.Text = $"Buddy is controlling — Esc to stop · action {results.Count+1}/25"; stepText.Text = action.Description; mood(CompanionMood.AgentWorking);
                 state.Text = "Buddy is controlling — Esc to stop · " + action.Description;
                 if(runningJob is not null)jobs?.Progress(runningJob,$"Action {results.Count+1}/25: {action.Description}");
-                var receipt=await specialists.Dispatch(action,results.Count+1,token=>DispatchAssignment(binding,action,results.Count+1,token),cts.Token);
+                bool framedLaunch = false;
+                var receipt=await specialists.Dispatch(action,results.Count+1,token=>DispatchAssignment(binding,action,results.Count+1,token, () => framedLaunch = true),cts.Token);
                 RequireCurrentTask(binding, cts.Token);
                 if(receipt is null)break;
                 results.Add(receipt);if(!receipt.Success)pending.Clear();
-                executionBanner?.Hide(); interruption.DisarmPointer(); overlay.Clear(); await host.Audit(action.Kind, action.Target, results[^1].Success ? "completed" : "not executed: target unavailable");
+                executionBanner?.Hide(); interruption.DisarmPointer(); overlay.Clear();
+                if (framedLaunch) {
+                    // A verified app launch grants no authority to inspect or act
+                    // through its host frame. End before CaptureSelected/replanning.
+                    var completion = FramedLaunchCompletion.Decide(binding.Query, approvedPlan.Actions!, receipt, results.Count, pending.Count);
+                    pending.Clear(); plan = null; plannedTask = null;
+                    sourceSelection = null; sourceWindow = IntPtr.Zero; framedBatchEnded = true;
+                    selectedApp.Text = "Choose an app again for further work.";
+                    if(runningJob is not null)jobs?.Receipt(runningJob,receipt.Observation,receipt.Success);
+                    await FramedLaunchCompletion.AfterAudit(
+                        () => host.Audit(action.Kind, action.Target, receipt.Success ? "completed" : "not executed: target unavailable"),
+                        () => ReferenceEquals(operation, cts) && binding.Matches(taskRevision, goal.Text, mode),
+                        () => {
+                            state.Text = completion.Message;
+                            if (runningJob is not null) {
+                                if (completion.Completed) jobs?.Move(runningJob, JobState.Verifying, "Verified the requested framed application.");
+                                jobs?.Move(runningJob, completion.Completed ? JobState.Completed : JobState.ReviewNeeded, completion.Message);
+                            }
+                        }, cts.Token);
+                    break;
+                }
+                await host.Audit(action.Kind, action.Target, results[^1].Success ? "completed" : "not executed: target unavailable");
                 if(runningJob is not null)jobs?.Receipt(runningJob,results[^1].Observation,results[^1].Success);
                 // Observe actual state before completing a batch or proposing its replacement.
                 var observed = await specialists.Read("Observer",results.Count,token=>CaptureSelected(token),cts.Token);
@@ -444,14 +466,14 @@ internal sealed class DesktopAssistant : IDisposable
                     pending = new(nextPlan.Actions!);
                 }
             }
-            if(runningJob is not null)jobs?.Move(runningJob,JobState.ReviewNeeded,"Run ended; verify the recorded results before another task.");
+            if(!framedBatchEnded && runningJob is not null)jobs?.Move(runningJob,JobState.ReviewNeeded,"Run ended; verify the recorded results before another task.");
             stepText.Text = string.Join("\n", results.Select(r => r.Observation[..Math.Min(300, r.Observation.Length)]));
             if (edit is not null) undo!.Visibility = Visibility.Visible;
-        } catch (OperationCanceledException) { if(runningJob is not null)jobs?.Move(runningJob,JobState.Cancelled,"Stopped. Verify any step already dispatched; no further actions run."); state.Text = "Stopped. No further actions will run."; await host.Audit("stop", "agent", "cancelled"); }
-        catch (Exception ex) { cts.Cancel(); if(runningJob is not null)jobs?.Move(runningJob,JobState.ReviewNeeded,"Stopped; verify the last dispatched action. "+ex.Message); state.Text = "Stopped · " + ex.Message; await host.Audit("stop", "agent", ex is TimeoutException ? "provider timeout; verify the last action" : "action failed"); }
+        } catch (OperationCanceledException) { if(runningJob is not null)jobs?.Move(runningJob,JobState.Cancelled,"Stopped. Verify any step already dispatched; no further actions run."); if(ReferenceEquals(operation,cts) && binding.Matches(taskRevision,goal.Text,mode))state.Text = "Stopped. No further actions will run."; await host.Audit("stop", "agent", "cancelled"); }
+        catch (Exception ex) { cts.Cancel(); if(runningJob is not null)jobs?.Move(runningJob,JobState.ReviewNeeded,"Stopped; verify the last dispatched action. "+ex.Message); if(ReferenceEquals(operation,cts) && binding.Matches(taskRevision,goal.Text,mode))state.Text = "Stopped · " + ex.Message; await host.Audit("stop", "agent", ex is TimeoutException ? "provider timeout; verify the last action" : "action failed"); }
         finally { foreach(var item in specialists.Snapshot)executionJobs[item.Id]=item;ShowExecutionJobs(); interruption?.Dispose(); interruption = null; executionBanner?.Hide(); executing = false; overlay.Clear(); mood(CompanionMood.Idle); if (ReferenceEquals(operation, cts)) operation = null; cts.Dispose(); run.IsEnabled = false; }
     }
-    private async Task<ActionResult?> DispatchAssignment(AssistantTaskBinding binding,AssistantAction action,int sequence,CancellationToken ct)
+    private async Task<ActionResult?> DispatchAssignment(AssistantTaskBinding binding,AssistantAction action,int sequence,CancellationToken ct, Action onFramedLaunch)
     {
                 RequireCurrentTask(binding, ct);
                 if (action.Kind == "open") {
@@ -467,6 +489,14 @@ internal sealed class DesktopAssistant : IDisposable
                             var result = await RoutineAppOpen.RunApprovedAsync(binding.Query, action, () => preferences().AgentEnabled, () => preferences().BlockedApps, ct);
                             RequireCurrentTask(binding, ct);
                             if (!result.Verified || result.After is null) throw new InvalidOperationException(result.Message);
+                            if (result.After.Frame is { } frame) {
+                                if (!await WindowsRoutineAppBackend.ValidateFrameAsync(frame, () => preferences().AgentEnabled, () => preferences().BlockedApps, ct))
+                                    throw new InvalidOperationException("The verified app frame changed; no next action will run.");
+                                RequireCurrentTask(binding, ct);
+                                sourceSelection = null; sourceWindow = IntPtr.Zero;
+                                onFramedLaunch();
+                                return new(sequence, action, true, result.Message);
+                            }
                             var after = result.After.Window;
                             var selected = new WindowSelection(after.Window, after.ThreadId, after.ProcessId, after.ProcessStarted, after.App);
                             selected.Validate(); Perception.Check(selected.Window, true); selected.Validate();

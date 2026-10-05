@@ -24,6 +24,10 @@ internal static class InstalledAppResolver
 }
 internal sealed record VerifiedAppLaunch(string Alias, string Executable, System.Diagnostics.ProcessStartInfo? Start = null)
 {
+    internal string PackageFullName => throw new InvalidOperationException("Package identity is forbidden in the policy fixture.");
+    internal string PackageRoot => throw new InvalidOperationException("Package identity is forbidden in the policy fixture.");
+    internal string MainExecutable => throw new InvalidOperationException("Package identity is forbidden in the policy fixture.");
+    internal string AppUserModelId => throw new InvalidOperationException("Package identity is forbidden in the policy fixture.");
     internal bool IsPackaged => throw new InvalidOperationException("Package identity is forbidden in the policy fixture.");
     internal bool SameIdentity(VerifiedAppLaunch _) => throw new InvalidOperationException("App identity access is forbidden in the policy fixture.");
     internal Task StartAsync(CancellationToken _) => throw new InvalidOperationException("App launch is forbidden in the policy fixture.");

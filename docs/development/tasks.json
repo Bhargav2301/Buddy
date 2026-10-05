@@ -3275,6 +3275,30 @@
       "status": "validated",
       "deliverable": "Reviewed hash-verified source handoff and explicit fixture/read-only resolver receipts; root owns integration and foreground gates",
       "acceptedSnapshot": "dfb6f8542ea7025d39de0d180338800005a0c7c0a7e4680438077a3fad936f60"
+    },
+    {
+      "id": "APP-57",
+      "attempt": 1,
+      "owner": "/root/app47",
+      "baseRevision": "cebb4650c12de0376dd6cb0bceeee26c32c6a41d",
+      "worktree": "app57",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/RoutineAppOpen.cs",
+        "apps/windows/Buddy.Windows/BoundedComputerUse.cs",
+        "apps/windows/Buddy.Windows/AppFrameBinding.cs",
+        "tests/Buddy.AppBinding.Tests/*",
+        "tests/Buddy.AppFrameBinding.Tests/*",
+        "apps/windows/Buddy.Windows/FixedFrameHostTrust.cs"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Verify only the fixed signed Calculator package main-process direct CoreWindow child of a verified Windows frame host, with fresh same-root/window/process ownership and no broad descendant or name trust",
+        "Reject cross-window, stale, reparented, invisible, ambiguous, unrelated host and package substitutions while preserving privacy, elevation, cancellation and one-use dispatch",
+        "Pure and read-only evidence are separate from new foreground acceptance"
+      ],
+      "status": "validated",
+      "deliverable": "Scoped source/tests hash handoff; no native activation, installation or publication",
+      "acceptedSnapshot": "7134149bb31321039f9ebe2ae7cddb3011300f6015b7df3c16fc1c5a2cd42238"
     }
   ],
   "executionMode": "active",

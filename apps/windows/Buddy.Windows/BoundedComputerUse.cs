@@ -7,7 +7,9 @@ namespace Buddy.Windows;
 // This first adapter observes window/process metadata only. It neither reads UIA
 // or pixels nor claims that any in-app task is complete.
 internal sealed record ComputerWindowIdentity(IntPtr Window, uint ProcessId, uint ThreadId, long ProcessStarted, string App);
-internal sealed record ComputerObservation(Guid RequestId, Guid Id, DateTimeOffset At, ComputerWindowIdentity Window, bool Complete = true);
+internal sealed record ComputerFrameBinding(ComputerWindowIdentity Host, ComputerWindowIdentity Child,
+    string PackageFullName, string PackageRoot, string MainExecutable, string AppUserModelId);
+internal sealed record ComputerObservation(Guid RequestId, Guid Id, DateTimeOffset At, ComputerWindowIdentity Window, bool Complete = true, ComputerFrameBinding? Frame = null);
 internal sealed record ComputerDispatch(Guid RequestId, Guid ObservationId, string Alias);
 internal sealed record ComputerVerification(bool Satisfied, ComputerObservation? Observation, string Message);
 internal sealed record ComputerUseResult(bool Verified, bool ActionDispatched, string Message, Guid RequestId,
@@ -84,7 +86,8 @@ internal sealed class BoundedComputerUse(IComputerUseBackend backend, ComputerUs
                 if (verified is { Satisfied: true, Observation: { } after }) {
                     try {
                         RequireObservation(after, requestId);
-                        if (after.Id == observation.Id || after.At < checkpoint.At || !MatchesAppName(alias, after.Window.App))
+                        if (after.Id == observation.Id || after.At < checkpoint.At || !MatchesAppName(alias, after.Window.App) ||
+                            after.Frame is not null && alias != "calculator")
                             throw new InvalidOperationException("Postcondition was not freshly observed for the requested app.");
                     } catch (InvalidOperationException) {
                         return Unverified("The returned app window was stale or incomplete; no launch was repeated.", observation, attempt + 1);
@@ -118,6 +121,14 @@ internal sealed class BoundedComputerUse(IComputerUseBackend backend, ComputerUs
         var age = now() - observation.At;
         if (age < TimeSpan.Zero || age > policy.ObservationAge)
             throw new InvalidOperationException("The window observation expired; make a fresh request.");
+        if (observation.Frame is { } frame && (frame.Child != observation.Window || frame.Host is null ||
+            frame.Host.Window == IntPtr.Zero || frame.Host.Window == frame.Child.Window || frame.Host.ProcessId == 0 ||
+            frame.Host.ProcessId == frame.Child.ProcessId || frame.Host.ThreadId == 0 || frame.Host.ProcessStarted <= 0 ||
+            !string.Equals(frame.Host.App, "ApplicationFrameHost", StringComparison.OrdinalIgnoreCase) ||
+            !frame.Child.App.Equals("CalculatorApp", StringComparison.OrdinalIgnoreCase) ||
+            string.IsNullOrEmpty(frame.PackageFullName) || string.IsNullOrEmpty(frame.PackageRoot) || string.IsNullOrEmpty(frame.MainExecutable) ||
+            frame.AppUserModelId != "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App"))
+            throw new InvalidOperationException("The framed app observation did not preserve its separate host and application identities.");
     }
     private static ComputerUseResult Unverified(string message, ComputerObservation before, int checks) =>
         new(false, true, message, before.RequestId, before.Id, null, 1, checks);

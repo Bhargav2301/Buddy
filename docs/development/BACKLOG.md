@@ -1,3 +1,10 @@
+# Hotfix57 ownership
+
+- APP-57 /root/app47: isolated workers/app57; exact host/package/child verification and adversarial fixtures.
+- CORE57 /root/core53: private acceptance helper preparation only, fixed0.4.7 bindings supplied by root after sealing; no native execution.
+- QA57 /root/qa43: read-only independent trust and child-binding review.
+- Root: consumer integration, version/docs, final checks, exact-DLL read-only probe and sealing. Installation remains authorized but foreground requires coordination; publication remains blocked.
+
 # Hotfix56 ownership
 
 - REFINE-56 attempt1 /root/refine53: comparison grammar and meaning tests; accepted.
