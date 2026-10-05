@@ -1,3 +1,7 @@
+# Hotfix56 decisions — 2026-10-05
+
+Use the existing signed-package policy for Calculator rather than broaden generic signature verification. Preserve comparison operands with a bounded source grammar. Retain fixed failure reasons/codes without private exception content. Prepare0.4.6 as a distinguishable focused candidate; preserve installed0.4.5 and exclude unfinished55 work. Actual activation and installation remain coordinated acceptance gates.
+
 # Decisions and context
 
 | Date | Decision | Reason and consequence |

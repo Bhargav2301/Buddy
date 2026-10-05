@@ -7,6 +7,24 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 
+// Explicit diagnostic mode only. Resolve metadata through the production
+// route; never observe the desktop, call StartAsync or dispatch an application.
+if (args.SequenceEqual(new[] { "--readonly-calculator-resolver" })) {
+    using var stop = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+    var method = typeof(WindowsRoutineAppBackend).GetMethod("ResolveAsync", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!;
+    var pending = (Task<VerifiedAppLaunch>)method.Invoke(null, new object[] { "calculator", stop.Token })!;
+    var launch = await pending.WaitAsync(stop.Token);
+    if (!launch.IsPackaged || launch.Start is not null || launch.Registration is null || launch.PackageRegistration is null ||
+        launch.AppUserModelId != "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App" || Path.GetFileName(launch.MainExecutable) != "CalculatorApp.exe")
+        throw new Exception("Calculator did not resolve the exact signed registration.");
+    Console.WriteLine(JsonSerializer.Serialize(new { kind = "readonlyCalculatorResolver", launch.Alias, launch.IsPackaged, launch.PackageFullName,
+        launch.AppUserModelId, executable = Path.GetFileName(launch.Executable), mainExecutable = Path.GetFileName(launch.MainExecutable),
+        packageSignature = launch.PackageRegistration.SignatureKind.ToString(), packageHealthy = launch.PackageRegistration.Status.VerifyIsOK(),
+        launchCalls = 0, foregroundCalls = 0, modelCalls = 0, profileCalls = 0 }));
+    return;
+}
+if (args.Length != 0) throw new ArgumentException("Unknown test mode.");
+
 int checks = 0;
 void Check(bool value, string label) { if (!value) throw new Exception("FAIL: " + label); checks++; Console.WriteLine("PASS: " + label); }
 void Reject(Action run, string label) { try { run(); } catch (Exception ex) when (ex is BuddyException or InvalidOperationException) { Check(true, label); return; } throw new Exception("FAIL: " + label); }
@@ -68,7 +86,7 @@ using (var stop = new CancellationTokenSource()) {
     Check(f.Model.Calls == 0, "Pre-cancel has no model call");
 }
 
-foreach (var alias in new[] { "camera", "spotify" }) {
+foreach (var alias in new[] { "calculator", "camera", "spotify" }) {
     var fake = new Backend();
     var result = await RoutineAppOpen.RunAsync("Open " + alias, () => true, () => "", default, fake);
     Check(result.Verified && fake.Dispatches == 1 && fake.Alias == alias, "Mock direct route dispatches exactly requested " + alias + " once");
@@ -92,6 +110,24 @@ foreach (var alias in new[] { "camera", "spotify" }) {
 Check(BoundedComputerUse.MatchesAppName("camera", "WindowsCamera") && !BoundedComputerUse.MatchesAppName("camera", "calculator"), "Camera postcondition recognizes only its actual process name");
 Check(BoundedComputerUse.MatchesAppName("spotify", "Spotify") && !BoundedComputerUse.MatchesAppName("spotify", "comet"), "Spotify postcondition cannot be satisfied by Comet");
 string packageRoot = @"C:\Program Files\WindowsApps\OwnedPackage";
+Check(InstalledAppResolver.RegisteredIdentity("calculator") == ("Microsoft.WindowsCalculator_8wekyb3d8bbwe", "8wekyb3d8bbwe", "App"), "Calculator has one fixed Microsoft family/publisher/App identity");
+Reject(() => InstalledAppResolver.RegisteredIdentity("CalculatorApp.exe"), "Executable names cannot choose another registered identity");
+Check(InstalledAppResolver.RegisteredExecutable("calculator", packageRoot, "CalculatorApp.exe") == packageRoot + @"\CalculatorApp.exe", "Calculator manifest resolves only its fixed main executable");
+foreach (var path in new[] { "calc.exe", "Calculator.exe", "WindowsCamera.exe", @"Other\CalculatorApp.exe", @"..\CalculatorApp.exe", @"C:\CalculatorApp.exe", "CalculatorApp.exe --flag", "CalculatorApp.exe:stream" })
+    Reject(() => InstalledAppResolver.RegisteredExecutable("calculator", packageRoot, path), "Calculator rejects launcher/foreign/traversal/argument substitutions: " + path);
+var calculator = new VerifiedAppLaunch("calculator", packageRoot + @"\CalculatorApp.exe", PackageFullName: "Microsoft.WindowsCalculator_11.2607.0.0_x64__8wekyb3d8bbwe",
+    AppUserModelId: "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App", PackageRoot: packageRoot, MainExecutable: packageRoot + @"\CalculatorApp.exe");
+Check(InstalledAppResolver.MatchesRegisteredProcess(calculator, calculator.MainExecutable, calculator.PackageFullName), "Calculator postcondition binds exact OS package full name and main executable");
+foreach (var package in new[] { "", "Microsoft.WindowsCalculator_11.2608.0.0_x64__8wekyb3d8bbwe", "Microsoft.WindowsCalculator_11.2607.0.0_x64__foreign", "Microsoft.WindowsCamera_11.2607.0.0_x64__8wekyb3d8bbwe" })
+    Check(!InstalledAppResolver.MatchesRegisteredProcess(calculator, calculator.MainExecutable, package), "Calculator rejects missing/updated/foreign process package identity");
+foreach (var path in new[] { packageRoot + @"\calc.exe", packageRoot + @"\WindowsCamera.exe", @"C:\Other\CalculatorApp.exe", packageRoot + @"\Other\CalculatorApp.exe" })
+    Check(!InstalledAppResolver.MatchesRegisteredProcess(calculator, path, calculator.PackageFullName), "Calculator rejects same-name foreign path and helper process");
+Check(!calculator.SameIdentity(calculator with { AppUserModelId = "Microsoft.WindowsCalculator_8wekyb3d8bbwe!Other" }) &&
+    !calculator.SameIdentity(calculator with { PackageFullName = "Microsoft.WindowsCalculator_11.2608.0.0_x64__8wekyb3d8bbwe" }), "Calculator AppId/version changes invalidate the approved checkpoint");
+await RejectAsync(() => calculator.StartAsync(default), "Calculator metadata without OS registration cannot activate or fall back to calc.exe");
+using (var stoppedCalculator = new CancellationTokenSource()) {
+    stoppedCalculator.Cancel(); await RejectAsync(() => calculator.StartAsync(stoppedCalculator.Token), "Stop wins before Calculator activation metadata checks");
+}
 Check(InstalledAppResolver.RegisteredExecutable("camera", packageRoot, "WindowsCamera.exe") == packageRoot + @"\WindowsCamera.exe", "Camera manifest resolves its fixed executable");
 Check(InstalledAppResolver.RegisteredExecutable("spotify", packageRoot, @"Spotify\Spotify.exe") == packageRoot + @"\Spotify\Spotify.exe", "Spotify manifest supports a contained installed subdirectory");
 Check(InstalledAppResolver.RegisteredExecutable("spotify", packageRoot, "SpotifyMigrator.exe") == packageRoot + @"\SpotifyMigrator.exe", "Audited Spotify App Id may activate its fixed Store migration entry");

@@ -10,6 +10,13 @@ The root [VERSION](VERSION) file controls both applications. See
 - Bind reviewed app actions to the exact task; add verified Camera/Spotify signed registrations and grounded authored browser lessons; clean local speech without changing speaker85/F3.
 - Keep this separate from installed0.4.4. [Feedback preview report](docs/Windows-feedback47.md) records actual-model checks, acceptance limits and remaining Coucou features.
 
+## [0.4.6] - 2026-10-05
+
+- Structure explicit List/Compare comparisons from verified source spans, preserving both operands, quantifiers and order. Explain cosmetic-output and assessment no-change results distinctly; retain rejected-result details.
+- Resolve Calculator through its fixed signed Windows package registration, preserving exact package/process verification, privacy and single-launch guards.
+- Retain app names and bounded failure reasons in task history and sanitized diagnostics; reopen selected results without replaying launches.
+- Exclude unfinished followup55 work. See [Hotfix56](docs/Windows-hotfix56.md) for verification and coordinated installation limits.
+
 ## [0.4.5] - 2026-10-04
 
 - Bind Guide observations to a live window, thread, process and process creation identity. Report inaccessible or expired selections with a fresh-focus retry, keeping access and privacy restrictions in place.

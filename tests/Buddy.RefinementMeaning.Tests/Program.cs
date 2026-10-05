@@ -7,6 +7,17 @@ internal static partial class Program
 {
     private const string Poem = "Write a poem on a boat sailing in a sea on a lonely night";
     private const string StructuredPoem = "Request: Write a poem.\n\nSubject: a boat sailing in a sea on a lonely night.";
+    private const string CapabilityComparison = "List all the features of Atlas and everything Atlas can currently do versus what is still left to build in Atlas";
+    private static readonly (string Original, string Command, string Left, string Relation, string Right, string Tail)[] Comparisons = [
+        (CapabilityComparison, "List", "all the features of Atlas and everything Atlas can currently do", "versus", "what is still left to build in Atlas", ""),
+        ("List every supported Atlas function versus all work still required for Atlas.", "List", "every supported Atlas function", "versus", "all work still required for Atlas.", ""),
+        ("List what is still left to build in Kestrel versus everything Kestrel currently supports.", "List", "what is still left to build in Kestrel", "versus", "everything Kestrel currently supports.", ""),
+        ("Compare version 2.3 with 4 fixes versus version 2.4 with 7 fixes.", "Compare", "version 2.3 with 4 fixes", "versus", "version 2.4 with 7 fixes.", ""),
+        ("List \"A versus B\" versus \"C \u8239\".", "List", "\"A versus B\"", "versus", "\"C \u8239\".", ""),
+        ("Compare `mode=3; name=\"Sky\"` VERSUS `mode=7; name=\"Sea\"`.", "Compare", "`mode=3; name=\"Sky\"`", "VERSUS", "`mode=7; name=\"Sea\"`.", ""),
+        ("Please list what Orion cannot do versus what Orion can already do.", "Please list", "what Orion cannot do", "versus", "what Orion can already do.", ""),
+        ("List all completed tasks versus every pending task in 2 sentences. Do not guess.", "List", "all completed tasks", "versus", "every pending task", "\n\nConstraints: in 2 sentences.\nDo not guess.")
+    ];
     private static int assertions;
     private static readonly string[] Golden = [Poem,
         "Write a polite email requesting Friday off.",
@@ -21,12 +32,98 @@ internal static partial class Program
     {
         PureChecks();
         GrammarChecks();
+        ComparisonChecks();
         using var fixture = new Fixture();
         await ServiceChecks(fixture);
         await GrammarServiceChecks(fixture);
+        await ComparisonServiceChecks(fixture);
         await CancellationChecks(fixture);
         Check(await fixture.Store.Read(s => s.Conversations.Count) == 0, "refinement never persists/sends a conversation");
         Console.WriteLine($"PASS: {assertions} source-structure assertions; {Golden.Length}/8 canned drafts have certified structural operations in deterministic/mock checks. No live model, native UI or installed profile used.");
+    }
+    private static string ComparisonText((string Original, string Command, string Left, string Relation, string Right, string Tail) item) =>
+        "Request: " + item.Command + "\n\nComparison:\n" + item.Left + "\n" + item.Relation + "\n" + item.Right + item.Tail;
+    private static void ComparisonChecks()
+    {
+        foreach (var item in Comparisons) {
+            var ledger = RefinementContract.Analyze(item.Original); var plan = Plan(ledger); var result = RefinementContract.Compose(ledger, plan);
+            Check(ledger.CanStructure && result.Valid && result.Useful && result.Text == ComparisonText(item), "comparison separates exact operands and literal relation: " + item.Original);
+            var comparison = ledger.Spans.Single(s => s.Kind == "comparison");
+            Check(comparison.Text == item.Left + " " + item.Relation + " " + item.Right && result.Certificate!.CoveredCharacters == item.Original.Length,
+                "both complete operands and relation remain one fully covered immutable span");
+            Check(result.Certificate!.Operations.Any(x => x.Contains("comparison sides")) && RefinementChange.HasMeaningfulChange(item.Original, result.Text), "comparison utility is a specific structural operation, not a cosmetic echo");
+            Check(RefinementContract.Verify(item.Original, result.Text, plan).Valid && RefinementPolicy.PreservesLiterals(item.Original, result.Text), "comparison rerender and literal gate are exact");
+            Check(!RefinementCore.Fidelity(item.Original, result.Text).Allowed, "canonical wording gate is unchanged; comparison requires its source certificate");
+            Check(!RefinementContract.Analyze(result.Text).CanStructure, "already structured comparison cannot be relabelled as another improvement");
+            foreach (var mutation in new[] {
+                result.Text.Replace(item.Left + "\n" + item.Relation + "\n" + item.Right, item.Right + "\n" + item.Relation + "\n" + item.Left),
+                result.Text.Replace("\n" + item.Relation + "\n", "\nand\n"),
+                result.Text.Replace(item.Right, "invented features and deadlines"),
+                result.Text + "\nReturn a priority table.", result.Text.Replace(item.Left, item.Left + " and a new integration")
+            }) Check(!RefinementContract.Verify(item.Original, mutation, plan).Valid, "operand swap, relation change, invented content or format cannot be certified");
+            foreach (var bad in new[] {
+                new RefinementContractPlan([new("task", ["s0"])]),
+                new RefinementContractPlan([new("comparison", ["s1"]), new("task", ["s0"])]),
+                new RefinementContractPlan([new("task", ["s0"]), new("subject", ["s1"])]),
+                new RefinementContractPlan([new("task", ["s0"]), new("comparison", ["s1", "s1"])])
+            }) Check(!RefinementContract.Compose(ledger, bad).Valid, "comparison source IDs cannot be omitted, reordered, relabelled or duplicated");
+            var numbers = System.Text.RegularExpressions.Regex.Matches(item.Original, @"\d+").Select(m => m.Value);
+            Check(System.Text.RegularExpressions.Regex.Matches(result.Text, @"\d+").Select(m => m.Value).SequenceEqual(numbers), "comparison labels add no numbers and preserve numeric order");
+        }
+        var reportPlan = Plan(RefinementContract.Analyze(CapabilityComparison)); var report = RefinementContract.Compose(RefinementContract.Analyze(CapabilityComparison), reportPlan);
+        foreach (string word in new[] { "all ", "everything ", "currently ", "still " })
+            Check(!RefinementContract.Verify(CapabilityComparison, report.Text.Replace(word, "", StringComparison.Ordinal), reportPlan).Valid, "comparison quantifier and temporal markers cannot be discarded: " + word);
+        Check(!RefinementContract.Verify(CapabilityComparison, report.Text.Replace("in Atlas", "in it"), reportPlan).Valid, "repeated entity references are not deduplicated or resolved");
+        foreach (string unsupported in new[] {
+            "List A and B.", "List A versus B versus C.", "List versus B.", "List A versus", "List A versus .", "List A not versus B.",
+            "List A versus B vs C.", "List A versus B or C.", "List not A versus B.", "Do not list A versus B.",
+            "List A versus B only if permission is granted.", "List A versus B; then send C.", "List A versus B. Then send C.",
+            "List A versus B after C finishes.", "List A versus B otherwise C.", "List A versus B. Preserve the original wording.",
+            "List A versus B and explain C.", "Compare A versus B and also summarize C.", "List A and describe C versus B.",
+            "List A versus B and list C.", "List A versus B and provide a table.", "Compare A versus B and do not send C.",
+            "List A versus B. Keep everything unchanged.", "List \"A versus B\".", "Compare `A versus B`.",
+            "List https://example.org/A/versus/B", "List A versus `unterminated code", "Explain A versus B.",
+            "List A-versus-B.", "List A versus B instead of C."
+        }) Check(!RefinementContract.Analyze(unsupported).Spans.Any(s => s.Kind == "comparison"), "unsupported scope does not gain comparison authority: " + unsupported);
+        string spaced = "List  all Atlas functions  versus  everything still pending.";
+        var spaceLedger = RefinementContract.Analyze(spaced); var spacedResult = RefinementContract.Compose(spaceLedger, Plan(spaceLedger));
+        Check(spacedResult.Valid && spacedResult.Text == "Request: List\n\nComparison:\nall Atlas functions\nversus\neverything still pending.", "only delimiter whitespace becomes operand line separation");
+        Console.WriteLine(JsonSerializer.Serialize(new { kind = "pure-comparison", original = CapabilityComparison, candidate = report.Text, report.Certificate!.Operations }, StateStore.Json));
+    }
+    private static async Task ComparisonServiceChecks(Fixture f)
+    {
+        foreach (var item in Comparisons) {
+            f.Model.Reset(); var result = await f.Service.RefineDetailed(new(item.Original), default);
+            Check(result.Accepted && result.Method == "source-structure" && result.RefinedPrompt == ComparisonText(item) && result.Structure is not null, "comparison service returns exact certified operands after verification");
+            Check(f.Model.Plans == 1 && f.Model.ChatCalls == 0 && f.Model.Assessments == 1 && f.Model.Embeddings == 1, "comparison uses one source plan and retains both verification calls");
+            Check(result.ScoreBefore is null && result.ScoreAfter is null && f.Model.LastAssessedRewrite == result.RefinedPrompt && f.Model.LastEmbeddingRewrite == result.RefinedPrompt, "comparison quality is not inferred from scores and final candidate is assessed/embedded");
+        }
+        foreach (string failure in new[] { "preservation", "embedding", "similarity" }) {
+            f.Model.Reset(); f.Model.Preserved = failure != "preservation"; f.Model.EmbeddingAvailable = failure != "embedding"; f.Model.SimilarityOverride = failure == "similarity" ? .799f : 1f;
+            var result = await f.Service.RefineDetailed(new(CapabilityComparison), default);
+            Check(!result.Accepted && result.RefinedPrompt == CapabilityComparison && result.Structure is null && result.Changes.Count == 0, "failed comparison verification retains original: " + failure);
+        }
+        f.Model.Reset(); f.Model.SimilarityOverride = .801f;
+        Check((await f.Service.RefineDetailed(new(CapabilityComparison), default)).Accepted, "comparison retains unchanged0.80 similarity boundary");
+        f.Model.Reset(); var tiny = await f.Service.RefineDetailed(new(CapabilityComparison, Budget: new("fixture", 5, "utf16-code-units")), default);
+        Check(!tiny.Accepted && f.Model.Plans == 0, "comparison required source overflow prevents model work");
+        f.Model.Reset(); var finalOverflow = await f.Service.RefineDetailed(new(CapabilityComparison, Budget: new("fixture", CapabilityComparison.Length, "utf16-code-units")), default);
+        Check(!finalOverflow.Accepted && finalOverflow.RefinedPrompt == CapabilityComparison && finalOverflow.DestinationBudget?.Fits == false, "comparison headings and separators count in final destination budget");
+        f.Model.Reset(); f.Model.PlanOverride = "{\"sections\":[{\"kind\":\"task\",\"sourceIds\":[\"s0\"]},{\"kind\":\"subject\",\"sourceIds\":[\"s1\"]}]}";
+        var relabelled = await f.Service.RefineDetailed(new(CapabilityComparison), default);
+        Check(!relabelled.Accepted && f.Model.Assessments == 0 && f.Model.Embeddings == 0 && f.Model.ChatCalls == 0, "comparison cannot silently degrade into a subject or wording fallback");
+        foreach (string stage in new[] { "Task structure", "Checking intent and constraints" }) {
+            f.Model.Reset(); bool stopped = false, done = false;
+            try { await foreach (var item in f.Service.RefineStream(new(CapabilityComparison), default)) { if (item.Text == stage) f.Service.StopAll(); if (item.Result is not null) done = true; } }
+            catch (OperationCanceledException) { stopped = true; }
+            Check(stopped && !done && f.Model.Assessments == 0, "Stop at comparison stage prevents stale approval");
+        }
+        f.Model.Reset(); f.Model.Hold = true; bool late = false, cancelled = false;
+        var pending = Task.Run(async () => { try { late = (await f.Service.RefineDetailed(new(CapabilityComparison), default)).Accepted; } catch (OperationCanceledException) { cancelled = true; } });
+        try { await f.Model.Entered.Task.WaitAsync(TimeSpan.FromSeconds(10)); f.Service.StopAll(); } finally { f.Model.Release.TrySetResult(); }
+        await pending.WaitAsync(TimeSpan.FromSeconds(10));
+        Check(cancelled && !late && f.Model.Assessments == 0, "late comparison plan after Stop cannot enter verification or succeed");
+        f.Model.Reset(); Check((await f.Service.RefineDetailed(new(CapabilityComparison), default)).Accepted, "comparison slot can be reused after cancellation settles");
     }
     private static void Check(bool condition, string name)
     {

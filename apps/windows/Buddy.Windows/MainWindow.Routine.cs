@@ -18,7 +18,7 @@ public sealed partial class MainWindow
         quick?.Dismiss(); voiceOverlay?.Dismiss();
         using var request = new CancellationTokenSource(TimeSpan.FromSeconds(20));
         routineRequest = request;
-        var activity = localTasks.Begin("routine", "Open requested app", "Checking the exact supported app request.");
+        var activity = localTasks.Begin("routine", RoutineLaunchReport.Title(alias), "Checking the exact supported app request.");
         routineTask = query; routineStatus = "Opening " + alias + ".";
         status.Text = routineStatus; stop.IsEnabled = true;
         companionState.Set("routine", CompanionMood.AgentWorking);
@@ -31,25 +31,35 @@ public sealed partial class MainWindow
             var result = await runRoutine(query, request.Token);
             request.Token.ThrowIfCancellationRequested();
             completed = true;
-            localTasks.Finish(activity, result.Verified ? LocalTaskPhase.Completed : LocalTaskPhase.Failed,
-                result.Verified ? "Requested app window verified." : result.ActionDispatched ? "Launch dispatched; requested window not verified. No retry." : "No launch completed; review the result.", observedStep: true);
-            routineStatus = result.Message; status.Text = routineStatus;
-            companionState.Set("routine", result.Verified ? CompanionMood.Idle : CompanionMood.Unsure);
+            var report = RoutineLaunchReport.Result(alias, result);
+            bool verified = report.Code == "APP_VERIFIED";
+            localTasks.Finish(activity, verified ? LocalTaskPhase.Completed : LocalTaskPhase.Failed, report.Detail, observedStep: true);
+            routineStatus = report.Detail; status.Text = routineStatus;
+            Diagnostics.Write("App launch " + alias + ": " + report.Detail);
+            companionState.Set("routine", verified ? CompanionMood.Idle : CompanionMood.Unsure);
             indicator.Show(routineStatus);
             // Only a verified result is represented as success. No relaunch on failure.
             if (host is not null) await host.Service.Audit("explicit-app-open", alias,
-                result.Verified ? "Verified requested application window" : result.ActionDispatched ? "Launch dispatched; requested window not verified" : "Nothing launched");
+                verified ? "Verified requested application window" : result.ActionDispatched ? "Launch dispatched; requested window not verified" : "Nothing launched");
             await Task.Delay(1800, request.Token);
         } catch (OperationCanceledException) {
-            if (!completed) localTasks.Finish(activity, LocalTaskPhase.Cancelled, "Stopped. An already dispatched launch cannot be undone.");
+            if (!completed) {
+                var report = RoutineLaunchReport.Failure(alias, new OperationCanceledException());
+                localTasks.Finish(activity, LocalTaskPhase.Cancelled, report.Detail, observedStep: true);
+                Diagnostics.Write("App launch " + alias + ": " + report.Detail);
+            }
             if (!completed && desktopActivity == "routine") {
                 routineStatus = "Stopped. An already dispatched app launch cannot be undone; no further action will run.";
                 status.Text = routineStatus;
             }
         } catch (Exception ex) {
-            if (!completed) localTasks.Finish(activity, LocalTaskPhase.Failed, "App opening failed; review the result before retrying.");
+            var report = RoutineLaunchReport.Failure(alias, ex);
+            if (!completed) {
+                localTasks.Finish(activity, LocalTaskPhase.Failed, report.Detail, observedStep: true);
+                Diagnostics.Write("App launch " + alias + ": " + report.Detail);
+            }
             if (desktopActivity == "routine") {
-                routineStatus = ex.Message; status.Text = routineStatus;
+                routineStatus = report.Detail; status.Text = routineStatus;
                 companionState.Set("routine", CompanionMood.Unsure);
             }
         } finally {

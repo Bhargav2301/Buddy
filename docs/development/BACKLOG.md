@@ -1,3 +1,10 @@
+# Hotfix56 ownership
+
+- REFINE-56 attempt1 /root/refine53: comparison grammar and meaning tests; accepted.
+- APP-56 attempt1 /root/app47: fixed Calculator resolution and bounded task reports/source review; eight-file handoff accepted.
+- /root/qa43: independent read-only trust/no-replay review; no blocking finding.
+- Root: error-result UI, integrated checks, exact-source publication, fresh recovery snapshot and coordinated native/update gates. Followup55 remains paused. Private intake receipts remain outside Git under validation/hotfix56.
+
 # Backlog and ownership
 
 Only the orchestrator changes assignment/status columns. Specialists report completion with evidence.

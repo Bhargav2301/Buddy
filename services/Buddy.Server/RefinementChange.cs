@@ -6,6 +6,8 @@ namespace Buddy.Server;
 public static class RefinementChange
 {
     public const string NoChangeMessage = "No refinement was produced. Your original prompt is unchanged.";
+    public const string EchoMessage = "The local model returned only formatting changes or the original wording after two attempts. Your original prompt is unchanged.";
+    public const string NoImprovementMessage = "The local check could not establish a useful wording improvement. Your original prompt is unchanged.";
 
     // A period, capital letter or whitespace change alone is not a wording refinement.
     // Compare the ordered remaining Unicode characters without changing the proposal.

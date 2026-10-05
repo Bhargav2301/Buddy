@@ -1,3 +1,7 @@
+# Hotfix56 current evidence
+
+The installed refinement engine returned punctuation-only then verbatim candidates; no provider error. The initial fixed preview accepted the exact reported comparison with the actual local model, similarity0.9005715024022094. Installed Calculator resolution failed at the file-only publisher guard; the candidate resolved its exact healthy Store registration read-only. Worker comparison465, report58 and launcher160 checks passed. Root final aggregate58/58, final package/runtime checks and both exact0.4.6 binary probes pass; comparison similarity0.9005715024022094 in16.8seconds. Fresh backup verified4,416application files,9profile files and4shortcuts without stopping the installed app. Independent review found no trust bypass. No foreground launch or installed replacement occurred. See [hotfix report](../Windows-hotfix56.md); private receipts remain outside Git.
+
 # Evidence ledger
 
 Logs are kept in the local execution workspace, outside source. This ledger is sanitized. A test claim names its scope and must not substitute for physical or live application acceptance.

@@ -49,7 +49,7 @@ internal static class InstalledAppResolver
     internal static async Task<VerifiedAppLaunch> ResolveAdditionalAsync(string alias, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        if (alias is not ("camera" or "spotify")) throw new InvalidOperationException("Unsupported installed-app alias.");
+        if (alias is not ("calculator" or "camera" or "spotify")) throw new InvalidOperationException("Unsupported installed-app alias.");
         var candidates = new List<VerifiedAppLaunch>();
         if (alias == "spotify") {
             var locations = new[] {
@@ -62,8 +62,7 @@ internal static class InstalledAppResolver
                 candidates.Add(new(alias, path, new(path) { UseShellExecute = false, WorkingDirectory = Path.GetDirectoryName(path)! }));
             }
         }
-        string family = alias == "camera" ? "Microsoft.WindowsCamera_8wekyb3d8bbwe" : "SpotifyAB.SpotifyMusic_zpdnekdrzrea0";
-        string publisher = alias == "camera" ? "8wekyb3d8bbwe" : "zpdnekdrzrea0";
+        var (family, publisher, entryId) = RegisteredIdentity(alias);
         var packages = new PackageManager().FindPackagesForUser("", family).Take(3).ToArray();
         if (packages.Length > 1) throw new InvalidOperationException("Multiple registered versions of the requested app were found; no app was chosen or launched.");
         foreach (var package in packages) {
@@ -80,7 +79,6 @@ internal static class InstalledAppResolver
             using var reader = XmlReader.Create(manifest, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 262144 });
             var document = XDocument.Load(reader);
             var entries = await package.GetAppListEntriesAsync().AsTask(ct);
-            string entryId = alias == "camera" ? "App" : "Spotify";
             string expectedAumid = family + "!" + entryId;
             var registrations = entries.Where(e => e.AppUserModelId == expectedAumid).Take(2).ToArray();
             var applications = document.Descendants().Where(e => e.Name.LocalName == "Application" && (string?)e.Attribute("Id") == entryId).Take(2).ToArray();
@@ -102,11 +100,18 @@ internal static class InstalledAppResolver
             : "More than one verified installation of this app was found. No installation was chosen or launched.");
         return candidates[0];
     }
+    internal static (string Family, string Publisher, string EntryId) RegisteredIdentity(string alias) => alias switch {
+        "calculator" => ("Microsoft.WindowsCalculator_8wekyb3d8bbwe", "8wekyb3d8bbwe", "App"),
+        "camera" => ("Microsoft.WindowsCamera_8wekyb3d8bbwe", "8wekyb3d8bbwe", "App"),
+        "spotify" => ("SpotifyAB.SpotifyMusic_zpdnekdrzrea0", "zpdnekdrzrea0", "Spotify"),
+        _ => throw new InvalidOperationException("Unsupported registered app.")
+    };
     internal static string RegisteredExecutable(string alias, string root, string relative)
     {
-        // Audited exact App Ids are App (Camera) and Spotify (Spotify). Do not
+        // Audited exact App Ids are App (Calculator/Camera) and Spotify. Do not
         // accept SpotifyLauncher, SpotifyCli, widgets or arbitrary manifest apps.
         string[] allowed = alias switch {
+            "calculator" => ["CalculatorApp.exe"],
             "camera" => ["WindowsCamera.exe"],
             "spotify" => ["Spotify.exe", @"Spotify\Spotify.exe", "SpotifyMigrator.exe"],
             _ => throw new InvalidOperationException("Unsupported registered app.")
@@ -120,6 +125,7 @@ internal static class InstalledAppResolver
         return path;
     }
     internal static IReadOnlyList<string> RegisteredMainExecutables(string alias, string root) => alias switch {
+        "calculator" => [RegisteredExecutable(alias, root, "CalculatorApp.exe")],
         "camera" => [RegisteredExecutable(alias, root, "WindowsCamera.exe")],
         "spotify" => [RegisteredExecutable(alias, root, "Spotify.exe"), RegisteredExecutable(alias, root, @"Spotify\Spotify.exe")],
         _ => throw new InvalidOperationException("Unsupported registered app.")

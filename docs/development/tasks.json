@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "integrationOwner": "/root",
-  "publication": "blocked_pending_trusted_direct_approval",
-  "installedBaseline": "0.4.4 / 950095dc1f8d1ce86b0f17bf8919a3465344e369",
+  "publication": "focused_hotfix56_authorized_after_exact_source_validation_no_merge_or_release",
+  "installedBaseline": "0.4.5 / 63ca5e9b6b8d2785b6941ce4ad216b627b960d8c",
   "tasks": [
     {
       "id": "DEV-01",
@@ -3231,6 +3231,50 @@
           "sha256": "bfd6af8c21c5446d8df260138699bc9988c9f7895777d2e08343dccb0750b7b7"
         }
       ]
+    },
+    {
+      "id": "REFINE-56",
+      "attempt": 1,
+      "owner": "/root/refine53",
+      "baseRevision": "63ca5e9b6b8d2785b6941ce4ad216b627b960d8c",
+      "worktree": "../Buddy-refine-worker56",
+      "writeScope": [
+        "services/Buddy.Server/RefinementContract.cs",
+        "tests/Buddy.RefinementMeaning.Tests/Program.cs"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Bounded explicit comparison rendering preserves every operand, relation, quantifier and order; rejects ambiguous scope",
+        "Focused synthetic meaning/service tests preserve assessment, literal, similarity, budget and cancellation gates"
+      ],
+      "status": "validated",
+      "deliverable": "Two-file hash-verified handoff and focused test receipt; root owns live model validation and integration",
+      "acceptedSnapshot": "73bbf9cd294358bc94cefc8789d0706c1b5bb1c117abc24b2536fd43a39f917c"
+    },
+    {
+      "id": "APP-56",
+      "attempt": 1,
+      "owner": "/root/app47",
+      "baseRevision": "63ca5e9b6b8d2785b6941ce4ad216b627b960d8c",
+      "worktree": "app56",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/MainWindow.Routine.cs",
+        "apps/windows/Buddy.Windows/MainWindow.LocalTasks.cs",
+        "apps/windows/Buddy.Windows/RoutineLaunchReport.cs",
+        "apps/windows/Buddy.Windows/RoutineAppOpen.cs",
+        "apps/windows/Buddy.Windows/InstalledAppResolver.cs",
+        "tests/Buddy.RoutineLaunchReport.Tests/*",
+        "tests/Buddy.AppBinding.Tests/Program.cs"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Repair verified Calculator resolution using existing signed package registration, fixed identity and fresh pre/post-dispatch validation without weaker trust",
+        "Retain per-task target and bounded failure reason in desktop task journal and navigable read-only review",
+        "Validate through noninteractive production resolution and adversarial mocked fixtures; no foreground launch until coordinated"
+      ],
+      "status": "validated",
+      "deliverable": "Reviewed hash-verified source handoff and explicit fixture/read-only resolver receipts; root owns integration and foreground gates",
+      "acceptedSnapshot": "dfb6f8542ea7025d39de0d180338800005a0c7c0a7e4680438077a3fad936f60"
     }
   ],
   "executionMode": "active",

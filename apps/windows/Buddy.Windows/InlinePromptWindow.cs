@@ -82,23 +82,26 @@ internal sealed class InlinePromptWindow:Window
             if(!optionsCurrent()){Close();return;}
             if(outcome.Result is {Accepted:true} result){
                 ShowProposal(result.RefinedPrompt);
-                if(proposal is not null){
-                    var messages=result.Warnings.ToList();
-                    if(result.DestinationBudget is {} budget){
-                        if(budget.Limit is {} maximum)messages.Insert(0,$"Proposal: {budget.Count:N0} / {maximum:N0} {budget.Unit}; user-supplied limit.");
-                        if(budget.Removed.Count>0)messages.Add("Omitted optional references: "+string.Join(", ",budget.Removed.Select(DescribeBlock)));
-                    }
-                    resultDetails.Text=string.Join("\n",messages.Distinct());
-                }
+                if(proposal is not null)ShowResultDetails(result);
             }
-            else Retry(outcome.Message);
+            else Retry(outcome.Message,outcome.Result);
         } catch(Exception ex){if(!closed&&ReferenceEquals(refinement,request))Retry(ex is OperationCanceledException?"Stopped; original unchanged.":ex.Message);}
         finally{if(ReferenceEquals(refinement,request))refinement=null;request.Dispose();}
     }
-    private void Retry(string message){
+    private void Retry(string message,RefinementResult? result=null){
         proposal=null;started=false;accept.IsEnabled=false;accept.Visibility=Visibility.Collapsed;resultDetails.Text="";
+        if(result is not null)ShowResultDetails(result);
         diff.Text=draft.Edit.Original;previewLabel.Text="Original prompt";status.Text=message;
         yes.Content="Try again";yes.IsEnabled=true;yes.Visibility=Visibility.Visible;Reanchor(fieldBounds);
+    }
+    private void ShowResultDetails(RefinementResult result){
+        var messages=result.Warnings.ToList();
+        if(result.DestinationBudget is {} budget){
+            if(budget.Limit is {} maximum)messages.Insert(0,$"{(result.Accepted?"Proposal":"Attempt")}: {budget.Count:N0} / {maximum:N0} {budget.Unit}; user-supplied limit.");
+            if(budget.Conflict is {} conflict)messages.Add(conflict);
+            if(budget.Removed.Count>0)messages.Add("Omitted optional references: "+string.Join(", ",budget.Removed.Select(DescribeBlock)));
+        }
+        resultDetails.Text=string.Join("\n",messages.Distinct());
     }
     private string DescribeBlock(string id)=>id.StartsWith("source-",StringComparison.Ordinal)
         ?preparation.Request.Inputs?.Context?.FirstOrDefault(x=>"source-"+x.Id==id)?.Title??id:id;

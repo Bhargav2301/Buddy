@@ -223,7 +223,8 @@ public sealed partial class BuddyService
                     };
                     if (!RefinementPolicy.FitsContext(retryMessages)) {
                         warnings.Add("The additional wording attempt did not fit the local refinement context budget.");
-                        yield return UnchangedRefinement(request, mode, technique, passes, choice, candidateBudget, warnings); yield break;
+                        yield return UnchangedRefinement(request, mode, technique, passes, choice, candidateBudget, warnings,
+                            "The local model made no useful wording change, and another attempt exceeds the local context limit. Your original prompt is unchanged."); yield break;
                     }
                     var retried = new StringBuilder();
                     await foreach (var delta in Engine.Chat(state.Model, retryMessages, cancel.Token)) {
@@ -235,7 +236,7 @@ public sealed partial class BuddyService
                     passes.Add(new("Wording retry", candidate, "One bounded wording attempt after an unchanged proposal; all intent checks still apply."));
                     candidateBudget = RefinementCore.ApplyBudget(RefinementContext.RequestBlocks(request, candidate, context), request.Budget);
                     if (candidateBudget.Fits && !RefinementChange.HasMeaningfulChange(request.Prompt, candidateBudget.Text)) {
-                        yield return UnchangedRefinement(request, mode, technique, passes, choice, candidateBudget, warnings); yield break;
+                        yield return UnchangedRefinement(request, mode, technique, passes, choice, candidateBudget, warnings, RefinementChange.EchoMessage); yield break;
                     }
                 }
                 }
@@ -272,7 +273,7 @@ public sealed partial class BuddyService
                 bool reviewedAddition = RefinementChange.HasMeaningfulChange(candidate, finalBudget.Text);
                 if (accepted && structure is null && !reviewedAddition && Math.Clamp(assessment!.ScoreAfter, 0, 100) <= Math.Clamp(assessment.ScoreBefore, 0, 100)) {
                     warnings.Add("The local assessment did not establish a useful wording improvement.");
-                    yield return UnchangedRefinement(request, mode, technique, passes, choice, finalBudget, warnings); yield break;
+                    yield return UnchangedRefinement(request, mode, technique, passes, choice, finalBudget, warnings, RefinementChange.NoImprovementMessage); yield break;
                 }
                 if (finalBudget.Removed.Count > 0 && prepared.Removed.Count == 0) warnings.Add("Optional context was omitted to meet the selected destination limit.");
                 yield return new("done", Result: new(accepted ? finalBudget.Text : request.Prompt, "buddy_local", mode, technique, accepted,
@@ -289,8 +290,8 @@ public sealed partial class BuddyService
             "Original kept: the local model could not produce a verified task structure. " + reason + " No wording fallback was attempted.")
             { Method = "source-structure", TechniqueRationale = choice.Rationale, Warnings = warnings, DestinationBudget = budget });
     private static RefinementEvent UnchangedRefinement(RefineRequest request, string mode, string technique,
-        List<RefinementPass> passes, RefinementTechniqueChoice choice, RefinementBudgetResult budget, List<string> warnings) =>
-        new("done", Result: new(request.Prompt, "buddy_local", mode, technique, false, null, null, null, [], passes, RefinementChange.NoChangeMessage)
+        List<RefinementPass> passes, RefinementTechniqueChoice choice, RefinementBudgetResult budget, List<string> warnings, string reason) =>
+        new("done", Result: new(request.Prompt, "buddy_local", mode, technique, false, null, null, null, [], passes, reason)
             { NoChange = true, TechniqueRationale = choice.Rationale, Warnings = warnings, DestinationBudget = budget });
     private static RefinementEvent KeptOriginal(RefineRequest request, string mode, string technique, List<RefinementPass> passes, string reason,
         RefinementTechniqueChoice? choice = null, RefinementBudgetResult? budget = null, List<string>? warnings = null) =>

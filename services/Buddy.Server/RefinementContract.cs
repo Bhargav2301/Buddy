@@ -39,7 +39,7 @@ public static class RefinementContract
 {
     private const RegexOptions Options = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
     private static readonly TimeSpan MatchTimeout = TimeSpan.FromMilliseconds(150);
-    private static readonly string[] Kinds = ["task", "subject", "purpose", "constraints", "steps", "context"];
+    private static readonly string[] Kinds = ["task", "subject", "purpose", "comparison", "constraints", "steps", "context"];
     private static readonly Regex Protected = new("```[\\s\\S]*?```|`[^`\\r\\n]+`|\"[^\"\\r\\n]*\"|\u201c[^\u201d\\r\\n]*\u201d|(?<![\\p{L}\\p{N}])'[^'\\r\\n]+'(?![\\p{L}\\p{N}])|https?://[^\\s<>\"']+", RegexOptions.CultureInvariant, MatchTimeout);
 
     public static JsonElement PlanSchema { get; } = JsonSerializer.SerializeToElement(new {
@@ -68,6 +68,7 @@ public static class RefinementContract
             return Unsupported(original, "The prompt already has structure or contains a condition/ambiguous literal that must remain together.");
 
         var spans = new List<RefinementContractSpan>();
+        bool comparisonScope = !Regex.IsMatch(visible, @"\b(?:first|then|next|finally|verbatim|unchanged)\b|\b(?:keep|preserve|retain)\s+(?:(?:the|this|original|exact)\s+)*(?:format|formatting|layout|wording)\b|\b(?:do not|don't|never)\s+(?:reformat|restructure)\b", Options, MatchTimeout);
         foreach (var (start, length) in Clauses(original, protectedChars))
         {
             var text = original.Substring(start, length);
@@ -85,6 +86,17 @@ public static class RefinementContract
             if (limit.Success && !protectedChars[start + limit.Index + 1]) taskLength = TrimEnd(original, start, limit.Index);
             var taskText = original.Substring(start, taskLength);
             bool split = false;
+            var comparisonHead = Regex.Match(taskText, @"^(?:please\s+)?(?:list|compare)\s+", Options, MatchTimeout);
+            if (comparisonScope && comparisonHead.Success && TryComparisonBody(taskText[comparisonHead.Length..], out _, out _, out _))
+            {
+                int headLength = TrimEnd(original, start, comparisonHead.Length);
+                int bodyStart = start + comparisonHead.Length;
+                Add("task", start, headLength, start, headLength);
+                // Both operands and their literal relation remain one source span.
+                // A model cannot relabel or reorder the operands independently.
+                Add("comparison", bodyStart, start + taskLength - bodyStart, bodyStart, start + taskLength - bodyStart);
+                split = true;
+            }
             if (Regex.IsMatch(taskText, @"^(?:please\s+)?(?:write|draft|compose|create|prepare|generate|make|design)\s+", Options, MatchTimeout))
             {
                 foreach (Match connector in Regex.Matches(taskText, @"\s+(about|on|regarding|requesting|asking\s+for)\s+", Options, MatchTimeout))
@@ -151,8 +163,19 @@ public static class RefinementContract
         foreach (var section in plan.Sections)
             if (normalized.Count > 0 && normalized[^1].Kind == section.Kind) normalized[^1].SourceIds.AddRange(section.SourceIds);
             else normalized.Add(new(section.Kind, section.SourceIds.ToList()));
-        foreach (var section in normalized)
+        for (int sectionIndex = 0; sectionIndex < normalized.Count; sectionIndex++)
         {
+            var section = normalized[sectionIndex];
+            if (section.Kind == "comparison") {
+                foreach (string id in section.SourceIds) {
+                    var span = map[id];
+                    string content = ledger.Original.Substring(span.ContentStart, span.ContentLength);
+                    if (!TryComparisonBody(content, out string left, out string relation, out string right))
+                        return Invalid("The supplied comparison relation could not be re-derived.");
+                    sections.Add("Comparison:\n" + left + "\n" + relation + "\n" + right);
+                }
+                continue;
+            }
             var values = section.SourceIds.Select(id => map[id]).Select(span => {
                 string content = ledger.Original.Substring(span.ContentStart, span.ContentLength);
                 if (RefinementGrammar.Propose(ledger.Original, span.Kind, content) is { } edit) {
@@ -160,7 +183,8 @@ public static class RefinementContract
                     grammarRules.Add(edit.RuleId);
                     operations.Add("Added a missing article in the requested task.");
                 }
-                return RenderContent(content, span.Kind);
+                bool comparisonCommand = span.Kind == "task" && sectionIndex + 1 < normalized.Count && normalized[sectionIndex + 1].Kind == "comparison";
+                return comparisonCommand ? content : RenderContent(content, span.Kind);
             }).ToArray();
             // Use the same plain heading for every request. Headings are display
             // metadata only; the source roles, coverage and fidelity gates stay fixed.
@@ -194,6 +218,7 @@ public static class RefinementContract
         var result = new List<string>();
         if (spans.Any(s => s.Kind == "task") && spans.Any(s => s.Kind == "subject")) result.Add("Separated the requested task from its supplied subject; kept the subject relation together.");
         if (spans.Any(s => s.Kind == "task") && spans.Any(s => s.Kind == "purpose")) result.Add("Separated the requested deliverable from its supplied purpose.");
+        if (spans.Any(s => s.Kind == "task") && spans.Any(s => s.Kind == "comparison")) result.Add("Separated the two supplied comparison sides while preserving their order, complete wording and comparison relation.");
         if (spans.Any(s => s.Kind is "task" or "steps") && spans.Any(s => s.Kind == "constraints")) result.Add("Separated explicit constraints from the requested task without adding requirements.");
         if (spans.Count(s => s.Kind == "steps") > 1) result.Add("Enumerated the explicitly ordered stages without changing their order.");
         if (spans.Any(s => s.Kind == "task") && spans.Any(s => s.Kind == "context")) result.Add("Separated the requested task from supplied literal or code context.");
@@ -204,6 +229,29 @@ public static class RefinementContract
     {
         if (kind == "context") return text;
         return text.Length > 0 && ".!?;:".Contains(text[^1]) ? text : text + ".";
+    }
+
+    private static bool TryComparisonBody(string text, out string left, out string relation, out string right)
+    {
+        left = relation = right = "";
+        string visible = Protected.Replace(text, match => new string(' ', match.Length));
+        // Refuse ambiguous scope rather than assigning a condition, alternative or
+        // later operation to one side. Conjunctions inside each side stay intact.
+        if (HasCondition(visible) || Regex.IsMatch(visible,
+            @"[;:\r\n]|\b(?:first|then|next|finally|before|after|until|while|whether|only|except|instead|rather|or|vs|against)\b|\bcompared\s+(?:with|to)\b",
+            Options, MatchTimeout)) return false;
+        if (Regex.IsMatch(visible, @"\band\s+(?:(?:also|then)\s+)?(?:please\s+)?(?:explain|summarize|list|compare|contrast|describe|write|draft|compose|prepare|generate|make|design|send|delete|open|run|execute|show|include|add|remove|return|give|calculate|analyze|find|build|create|evaluate|recommend|review|check|tell|state|report|outline|translate|rewrite|answer|provide|do)\b", Options, MatchTimeout))
+            return false;
+        var separators = Regex.Matches(visible, @"(?<!\S)versus(?!\S)", Options, MatchTimeout);
+        if (separators.Count != 1 || Regex.Matches(visible, @"\bversus\b", Options, MatchTimeout).Count != 1) return false;
+        var separator = separators[0];
+        string lhs = text[..separator.Index].TrimEnd(), rhs = text[(separator.Index + separator.Length)..].TrimStart();
+        if (!lhs.Any(char.IsLetterOrDigit) || !rhs.Any(char.IsLetterOrDigit)) return false;
+        string visibleLeft = visible[..separator.Index].Trim(), visibleRight = visible[(separator.Index + separator.Length)..].Trim();
+        if (Regex.IsMatch(visibleLeft, @"^(?:not|never|no)\b|\b(?:not|never|no|and|but)$", Options, MatchTimeout) ||
+            Regex.IsMatch(visibleRight, @"^(?:not|never|no|and|but)\b", Options, MatchTimeout)) return false;
+        left = lhs; relation = text.Substring(separator.Index, separator.Length); right = rhs;
+        return true;
     }
 
     private static bool SceneSubject(string body) =>

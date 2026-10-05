@@ -51,7 +51,7 @@ internal static class Program
             f.Model.Changes = ["No changes detected. The prompt is identical."];
             var result = await f.Service.RefineDetailed(new(LegacyDraft), default);
             Check(!result.Accepted && result.NoChange && result.RefinedPrompt == LegacyDraft, "two echoes keep exact original with explicit no-refinement state");
-            Check(result.Message == RefinementChange.NoChangeMessage && result.ScoreBefore is null && result.ScoreAfter is null && result.Similarity is null && result.Changes.Count == 0, "no fabricated quality or change claim for echo");
+            Check(result.Message == RefinementChange.EchoMessage && result.ScoreBefore is null && result.ScoreAfter is null && result.Similarity is null && result.Changes.Count == 0, "two cosmetic attempts explain the cause without fabricated quality or error claim");
             Check(f.Model.ChatCalls == 2 && f.Model.Assessments == 0 && f.Model.Embeddings == 0, "cosmetic echo cannot be approved by misleading 100-score identical assessment");
         }
         f.Model.Reset(LegacyDraft, Polished);
@@ -88,6 +88,7 @@ internal static class Program
             f.Model.Changes = ["Minor stylistic preference does not impact the task."];
             var result = await f.Service.RefineDetailed(new(LegacyDraft), default);
             Check(!result.Accepted && result.NoChange && result.RefinedPrompt == LegacyDraft, "faithful lexical change without assessed improvement keeps exact original");
+            Check(result.Message == RefinementChange.NoImprovementMessage && result.Message != RefinementChange.EchoMessage, "assessment veto is explained separately from repeated cosmetic output");
             Check(result.Similarity is null && result.ScoreBefore is null && result.ScoreAfter is null && result.Changes.Count == 0, "no quality or change claims survive the improvement veto");
             Check(f.Model.ChatCalls == (retry ? 2 : 1) && f.Model.Assessments == 1 && f.Model.Embeddings == 1, "quality veto retains existing validation and never starts another retry");
         }

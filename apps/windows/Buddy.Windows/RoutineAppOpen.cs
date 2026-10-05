@@ -131,7 +131,7 @@ internal sealed class WindowsRoutineAppBackend(Func<bool> agentEnabled, Func<str
                 ? path.Equals(plan.Start.Executable, StringComparison.OrdinalIgnoreCase)
                 : MatchesBuiltin(dispatch.Alias, path, plan.Start.Executable);
         if (!matches) return new ComputerVerification(false, null, "The app executable identity could not be verified.");
-        if (dispatch.Alias is "comet" or "camera" or "spotify") {
+        if (dispatch.Alias is "calculator" or "comet" or "camera" or "spotify") {
             using var executable = plan.Start.IsPackaged ? null : ExecutableLease.Acquire(path, ct);
             var installed = await ResolveAsync(dispatch.Alias, ct);
             if (!installed.SameIdentity(plan.Start)) return new ComputerVerification(false, null, "The installed app identity changed after launch.");
@@ -170,13 +170,16 @@ internal sealed class WindowsRoutineAppBackend(Func<bool> agentEnabled, Func<str
 
     private static async Task<VerifiedAppLaunch> ResolveAsync(string alias, CancellationToken ct)
     {
-        if (alias is "camera" or "spotify") return await InstalledAppResolver.ResolveAdditionalAsync(alias, ct);
+        // Calculator's System32 launcher may be catalog-signed rather than
+        // embedded-signed. Use its exact signed OS package registration, with the
+        // same package/main-process postconditions as the other packaged apps.
+        // There is no weakened signature fallback or direct payload execution.
+        if (alias is "calculator" or "camera" or "spotify") return await InstalledAppResolver.ResolveAdditionalAsync(alias, ct);
         if (alias == "comet") {
             var comet = InstalledAppResolver.CometStartInfo(); return new(alias, comet.FileName, comet);
         }
         string path = alias switch {
             "notepad" => Path.Combine(Environment.SystemDirectory, "notepad.exe"),
-            "calculator" => Path.Combine(Environment.SystemDirectory, "calc.exe"),
             "explorer" => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"),
             _ => throw new InvalidOperationException("Unsupported routine app.")
         };
@@ -186,9 +189,9 @@ internal sealed class WindowsRoutineAppBackend(Func<bool> agentEnabled, Func<str
     private static bool MatchesBuiltin(string alias, string actual, string launchPath)
     {
         if (actual.Equals(launchPath, StringComparison.OrdinalIgnoreCase)) { VerifyMicrosoftFile(actual); return true; }
-        // Windows 11's signed system launchers can hand off to installed packaged
-        // Notepad/Calculator. Accept only that package family, executable and signer.
-        string family = alias switch { "notepad" => "Microsoft.WindowsNotepad_", "calculator" => "Microsoft.WindowsCalculator_", _ => "" };
+        // Windows 11's signed Notepad launcher can hand off to installed packaged
+        // Notepad. Calculator uses its separately verified package registration.
+        string family = alias == "notepad" ? "Microsoft.WindowsNotepad_" : "";
         if (family.Length == 0) return false;
         string root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "WindowsApps") + Path.DirectorySeparatorChar;
         if (!actual.StartsWith(root, StringComparison.OrdinalIgnoreCase)) return false;

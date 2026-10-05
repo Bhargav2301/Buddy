@@ -1,3 +1,7 @@
+# Current: focused hotfix56, version 0.4.6 candidate
+
+Published base:63ca5e9b6b8d2785b6941ce4ad216b627b960d8c. Installed baseline:0.4.5/followup54. REFINE-56 and APP-56 passed hash-verified intake and root review; independent QA found no blocking trust/no-replay issue. All 58 combined aggregate commands, final Windows publish/package checks, exact local-model refinement and exact-desktop-DLL read-only Calculator resolution pass. A fresh recoverable backup is verified. No followup55 source is included. Publication of the tested focused fix is authorized; foreground launch and installed replacement remain pending coordination. No merge/release. See [current report](../Windows-hotfix56.md). Older entries below are historical.
+
 # Followup54: integrated gates and separate packaged checks passed
 
 All CORE54, PROVIDER54, TEACH54, REFINE54, NOTCH54 and QA54 handoffs are accepted. Root fixed context replay/provenance, optional-session ownership, placement persistence/cancellation and verified procedural Guide routing. Final57-command aggregate is reconciled in validation/followup54/final-validation.json; source build snapshot db79b29ce736d80671f85a1c4b858e407675594361969792bb604d99f7c770cf. Windows/native-harness build0warnings/errors,12ledger tests and571-file source scan pass. Actual local refinement14case round:13useful structural candidates plus1expected clarification; four finite grammar improvements. Actual general model teaching remains unaccepted; bounded static local-reference concepts are separate limited coverage.
