@@ -1,4 +1,20 @@
-# Hotfix56 current evidence
+# Version 0.4.8 package evidence
+
+Final59-command regression passes with build snapshot5e1a33d557e42857c853305e9ed12dc4e81634797478ae309e6394d74428f074. Static package validation and exact packaged --check-package pass; no desktop startup. Packaged Server comparison refinement accepted in18.505seconds, similarity0.9005715024022094, no profile/field writes; current credentials were not decoded. Private package/provenance/helper timing records are under validation/hotfix58. Native acceptance and installed replacement remain pending.
+
+# Calculator activation58 evidence
+
+User observation: Calculator opened minimized during the prior failed run. New isolated repair: AppBinding432 mock/pure checks, ComputerUse132 mock/owned-file checks, RoutineLaunchReport82 pure checks and UserFailureBoundary56 mocked cases pass. Four test builds and Windows Release compile: zero warnings/errors. Native interop compiled but was not invoked. app47 policy handoff is four fixed hashes; qa43 reviewed root native/target/policy and exact-message privacy, caught a within-sample root race, then confirmed the repaired production recheck and injected regression.
+
+Logs and receipts: private validation/hotfix58/activation-*. Earlier failed-run investigation/FINAL-OUTCOME and all hotfix57 artifacts remain intact. No new live installed-state, foreground, microphone, audio, model or activation measurement is claimed. See [repair report](../Windows-calculator-activation58.md).
+
+# Historical launch investigation58 evidence
+
+Original local START run8292aba49a0240dd9ec15ac365b77a87: one production dispatch,30 false verification outcomes,263 unchanged input samples, settled=true, guardFailed=false, preferencesStable=true. Coordinator childSettled=true, stagecalculator, recovered=false. Only calculator.started exists; installation and recovery did not begin. Read-only process metadata confirms new Calculator process creation during dispatch and the unchanged original Buddy process. All4,416 installed application files match the pinned prepared baseline, including earlier official rollback metadata.
+
+Root final focused checks: ComputerUse116 mock/owned-file checks; RoutineLaunchReport72 pure checks; both builds and Windows Release compilation0warnings/errors. APP47 independently confirmed callback accounting; QA43 found no source blocker. The early inspection's static-only manifest omitted known installed rollback metadata; the corrected inspection uses the complete pinned prepared application manifest and passed. Both inspection logs remain preserved. Source/reporting repair remains distinct from unresolved native activation acceptance. See [investigation](../Windows-launch-investigation58.md) and private validation/hotfix58 evidence.
+
+# Historical hotfix56 evidence
 
 The installed refinement engine returned punctuation-only then verbatim candidates; no provider error. The initial fixed preview accepted the exact reported comparison with the actual local model, similarity0.9005715024022094. Installed Calculator resolution failed at the file-only publisher guard; the candidate resolved its exact healthy Store registration read-only. Worker comparison465, report58 and launcher160 checks passed. Root final aggregate58/58, final package/runtime checks and both exact0.4.6 binary probes pass; comparison similarity0.9005715024022094 in16.8seconds. Fresh backup verified4,416application files,9profile files and4shortcuts without stopping the installed app. Independent review found no trust bypass. No foreground launch or installed replacement occurred. See [hotfix report](../Windows-hotfix56.md); private receipts remain outside Git.
 

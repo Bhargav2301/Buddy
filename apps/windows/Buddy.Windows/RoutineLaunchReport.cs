@@ -48,7 +48,19 @@ internal sealed record RoutineLaunchReport(string Code, string Reason)
         ["The launch receipt did not match this request; no follow-up action ran."] = "RECEIPT_MISMATCH",
         ["The launch was attempted, but the requested app window could not be verified; no launch was repeated."] = "WINDOW_UNVERIFIED",
         ["The returned app window was stale or incomplete; no launch was repeated."] = "WINDOW_STALE",
-        ["The launch was attempted but no requested foreground app window was verified; focus the app and inspect it before retrying."] = "FOREGROUND_UNVERIFIED"
+        ["The launch was attempted but no requested foreground app window was verified; focus the app and inspect it before retrying."] = "FOREGROUND_UNVERIFIED",
+        ["The launch was attempted, but the final check found no visible foreground window. No launch was repeated."] = "FOREGROUND_UNAVAILABLE",
+        ["The launch was attempted, but the final foreground app did not match the request. No launch was repeated."] = "FOREGROUND_APP_MISMATCH",
+        ["The launch was attempted, but the final Calculator frame could not be bound to its signed app process. No launch was repeated."] = "CALCULATOR_FRAME_UNVERIFIED",
+        ["The launch was attempted, but the final app executable identity could not be verified. No launch was repeated."] = "EXECUTABLE_UNVERIFIED",
+        ["The launch was attempted, but the installed app identity changed afterward. No launch was repeated."] = "INSTALLATION_CHANGED",
+        ["The launch was attempted, but the final foreground process did not match the signed package's main app. No launch was repeated."] = "PACKAGE_PROCESS_MISMATCH",
+        ["The launch was attempted, but the requested window changed during the final check. No launch was repeated."] = "WINDOW_IDENTITY_CHANGED",
+        ["Windows denied the Calculator foreground request; no activation was repeated."] = "CALCULATOR_FOREGROUND_DENIED",
+        ["Calculator activation could not be safely completed; no launch was repeated."] = "CALCULATOR_ACTIVATION_REFUSED",
+        ["The Calculator activation target changed or disappeared; no replacement was selected."] = "CALCULATOR_TARGET_CHANGED",
+        ["The Calculator window changed before foreground confirmation; no activation was repeated."] = "CALCULATOR_TARGET_CHANGED",
+        ["Calculator did not reach a verified visible foreground state within the activation limit; no launch was repeated."] = "CALCULATOR_ACTIVATION_TIMEOUT"
     };
     internal static RoutineLaunchReport Failure(string alias, Exception error)
     {

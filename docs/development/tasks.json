@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "integrationOwner": "/root",
-  "publication": "focused_hotfix56_authorized_after_exact_source_validation_no_merge_or_release",
+  "publication": "blocked_prior_auto_review_denial_no_retry_no_push_merge_or_release",
   "installedBaseline": "0.4.5 / 63ca5e9b6b8d2785b6941ce4ad216b627b960d8c",
   "tasks": [
     {
@@ -3299,6 +3299,119 @@
       "status": "validated",
       "deliverable": "Scoped source/tests hash handoff; no native activation, installation or publication",
       "acceptedSnapshot": "7134149bb31321039f9ebe2ae7cddb3011300f6015b7df3c16fc1c5a2cd42238"
+    },
+    {
+      "id": "REPORT-58",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "f8c56b90f6d80479717d0988182ba37492d998f1",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/BoundedComputerUse.cs",
+        "apps/windows/Buddy.Windows/RoutineLaunchReport.cs",
+        "tests/Buddy.ComputerUse.Tests/Program.cs",
+        "tests/Buddy.RoutineLaunchReport.Tests/Program.cs",
+        "docs/development/*",
+        "docs/Windows-launch-investigation58.md"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Preserve only the final exact allowlisted failed verification reason; unknown/malformed last results reset generic",
+        "Keep dispatch, foreground, identity, signature, cancellation, settlement and recovery guards unchanged",
+        "Run focused mocked/owned-file and pure tests plus Windows compilation; preserve old source/package/run evidence and installed baseline"
+      ],
+      "status": "validated",
+      "deliverable": "Isolated uncommitted reporting fix; 188 checks and clean Windows build; native activation cause remains unproven"
+    },
+    {
+      "id": "POLICY-58",
+      "attempt": 1,
+      "owner": "/root/app47",
+      "baseRevision": "f8c56b90f6d80479717d0988182ba37492d998f1",
+      "worktree": "calculator-activation58",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/CalculatorWindowActivation.cs",
+        "tests/Buddy.AppBinding.Tests/CalculatorActivationChecks.cs",
+        "tests/Buddy.AppBinding.Tests/Buddy.AppBinding.Tests.csproj",
+        "tests/Buddy.AppBinding.Tests/Program.cs"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "One-use pure lifecycle pins one target, bounds observations, permits at most one restore/focus and awaits pending work through interruption; no native effects in fixtures"
+      ],
+      "status": "validated",
+      "deliverable": "Four-file frozen policy/test handoff, root integration and source-bound headless checks",
+      "acceptedSnapshot": "ebe85b419c9ebc3a4ea7d38f38092ba2ad2a876598ead120bae4634a514af31b",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/CalculatorWindowActivation.cs",
+          "sha256": "d1fa33e84a32187296aeb6fe50bf6ce3ce68ab7661b4b4c51427d61b62a4b008"
+        },
+        {
+          "path": "tests/Buddy.AppBinding.Tests/CalculatorActivationChecks.cs",
+          "sha256": "08e872f43d994a2c3e17c02251663aecb623202b32bc1ab32337862b335a34a1"
+        },
+        {
+          "path": "tests/Buddy.AppBinding.Tests/Buddy.AppBinding.Tests.csproj",
+          "sha256": "2034df7ad1386fe1b5e1ba74f9cb3d048331c564d24bbbbf855cf9f4efda4586"
+        },
+        {
+          "path": "tests/Buddy.AppBinding.Tests/Program.cs",
+          "sha256": "82a73dc84f585ed15dee6f08490afa3a5ca1854dc0b9847364530ede2158fe08"
+        }
+      ]
+    },
+    {
+      "id": "ACTIVATE-58",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "f8c56b90f6d80479717d0988182ba37492d998f1",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/CalculatorActivationNative.cs",
+        "apps/windows/Buddy.Windows/CalculatorTargetBinding.cs",
+        "apps/windows/Buddy.Windows/RoutineAppOpen.cs",
+        "apps/windows/Buddy.Windows/InstalledAppResolver.cs",
+        "apps/windows/Buddy.Windows/BoundedComputerUse.cs",
+        "apps/windows/Buddy.Windows/RoutineLaunchReport.cs",
+        "tests/Buddy.AppBinding.Tests/*",
+        "tests/Buddy.ComputerUse.Tests/*",
+        "tests/Buddy.RoutineLaunchReport.Tests/*",
+        "tests/validation/Buddy.UserFailureBoundary.Tests/*",
+        "docs/development/*",
+        "docs/Windows-calculator-activation58.md",
+        "docs/Windows-launch-investigation58.md"
+      ],
+      "dependencies": {
+        "POLICY-58": 1,
+        "REPORT-58": 1
+      },
+      "acceptance": [
+        "Exact signed OS activation PID is pinned; unique minimized identity target permits bounded restoration and ordinary foreground request, without weaker strict success, ownership, input, secure desktop or deadline checks",
+        "Independent source review, adversarial injected checks and Windows compilation; native acceptance expressly separate and pending"
+      ],
+      "status": "validated",
+      "deliverable": "Reviewed uncommitted source plus builds/tests and exact future native acceptance matrix; no package/install/publication"
+    },
+    {
+      "id": "BUILD-58",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "f8c56b90f6d80479717d0988182ba37492d998f1",
+      "writeScope": [
+        "VERSION",
+        "CHANGELOG.md",
+        "apps/windows/Buddy.Windows/app.manifest",
+        "docs/Windows-hotfix58.md",
+        "docs/development/*"
+      ],
+      "dependencies": {
+        "ACTIVATE-58": 1
+      },
+      "acceptance": [
+        "Preserve reviewed activation source and approved refinement; exact-source0.4.8 package passes59 nonforeground commands and packaged checks",
+        "Fresh source archive and local-only commit; live acceptance/install/publication remain separate"
+      ],
+      "status": "validated",
+      "deliverable": "Focused source/package provenance and private readiness handoff; no native update execution"
     }
   ],
   "executionMode": "active",

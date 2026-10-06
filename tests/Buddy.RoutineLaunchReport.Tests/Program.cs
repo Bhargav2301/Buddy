@@ -48,6 +48,24 @@ Check(RoutineLaunchReport.Result("calculator", success with { ActionDispatched =
 var uncertainty = success with { Verified = false, After = null, Message = "The launch was attempted but its result is uncertain; inspect the app before trying again." };
 Check(RoutineLaunchReport.Result("calculator", uncertainty).Code == "LAUNCH_UNCERTAIN", "Actual uncertain dispatch reason survives.");
 Check(RoutineLaunchReport.Result("calculator", uncertainty with { Message = "private exception" }).Code == "LAUNCH_UNVERIFIED", "Unknown result cannot manufacture a failure reason or success.");
+foreach (var (reason, code) in new[] {
+    ("The launch was attempted, but the final check found no visible foreground window. No launch was repeated.", "FOREGROUND_UNAVAILABLE"),
+    ("The launch was attempted, but the final foreground app did not match the request. No launch was repeated.", "FOREGROUND_APP_MISMATCH"),
+    ("The launch was attempted, but the final Calculator frame could not be bound to its signed app process. No launch was repeated.", "CALCULATOR_FRAME_UNVERIFIED"),
+    ("The launch was attempted, but the final app executable identity could not be verified. No launch was repeated.", "EXECUTABLE_UNVERIFIED"),
+    ("The launch was attempted, but the installed app identity changed afterward. No launch was repeated.", "INSTALLATION_CHANGED"),
+    ("The launch was attempted, but the final foreground process did not match the signed package's main app. No launch was repeated.", "PACKAGE_PROCESS_MISMATCH"),
+    ("The launch was attempted, but the requested window changed during the final check. No launch was repeated.", "WINDOW_IDENTITY_CHANGED"),
+    ("Windows denied the Calculator foreground request; no activation was repeated.", "CALCULATOR_FOREGROUND_DENIED"),
+    ("Calculator activation could not be safely completed; no launch was repeated.", "CALCULATOR_ACTIVATION_REFUSED"),
+    ("The Calculator activation target changed or disappeared; no replacement was selected.", "CALCULATOR_TARGET_CHANGED"),
+    ("The Calculator window changed before foreground confirmation; no activation was repeated.", "CALCULATOR_TARGET_CHANGED"),
+    ("Calculator did not reach a verified visible foreground state within the activation limit; no launch was repeated.", "CALCULATOR_ACTIVATION_TIMEOUT")
+}) {
+    var report = RoutineLaunchReport.Result("calculator", uncertainty with { Message = reason });
+    Check(report.Code == code && report.Reason == reason && report.Detail.Length <= LocalTaskJournal.MaxDetailLength, "Final verification failure remains distinct and bounded in the task report.");
+    Check(RoutineLaunchReport.Result("calculator", uncertainty with { Message = reason + " private suffix" }).Code == "LAUNCH_UNVERIFIED", "Partial host-message matches cannot expose arbitrary backend text.");
+}
 
 var journal = new LocalTaskJournal();
 var old = journal.Begin("routine", RoutineLaunchReport.Title("calculator"), "Checking the exact supported app request.");

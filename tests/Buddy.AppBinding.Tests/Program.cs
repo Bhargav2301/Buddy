@@ -306,6 +306,8 @@ using (var stopped = new CancellationTokenSource()) {
     await RejectAsync(() => RoutineAppOpen.RunAsync("Open Calculator", () => true, () => "", stopped.Token, fake), "Stop after framed verification discards completion");
     Check(fake.Dispatches == 1, "Late Stop never repeats an already dispatched launch");
 }
+await CalculatorActivationChecks.Run(Check);
+CalculatorTargetBindingChecks.Run(Check);
 Console.WriteLine($"APP BINDING MOCK/PURE CHECKS PASSED: {checks}; no native discovery, application launches, profiles, models or network");
 
 sealed class Fixture : IAsyncDisposable

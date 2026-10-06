@@ -59,12 +59,13 @@ internal static class RoutineAppOpen
 
 // Actual Windows implementation. Observation is metadata only, not a screenshot,
 // UIA result, screenshot interpretation, or general computer-use capability.
-internal sealed class WindowsRoutineAppBackend(Func<bool> agentEnabled, Func<string> blockedApps) : IComputerUseBackend
+internal sealed partial class WindowsRoutineAppBackend(Func<bool> agentEnabled, Func<string> blockedApps) : IComputerUseBackend
 {
     private sealed record Prepared(ComputerObservation Checkpoint, WindowSelection Selection, string Alias, VerifiedAppLaunch Start);
     private Prepared? prepared;
     private ComputerDispatch? dispatched;
     private int dispatchClaimed;
+    private CalculatorWindowTarget? calculatorTarget;
 
     public Task<ComputerObservation> ObserveAsync(Guid requestId, CancellationToken ct) => Task.Run(() => {
         ct.ThrowIfCancellationRequested(); EnsureEnabled();
@@ -109,7 +110,8 @@ internal sealed class WindowsRoutineAppBackend(Func<bool> agentEnabled, Func<str
         ct.ThrowIfCancellationRequested();
         // Set the receipt before the effect: even an exception cannot authorize replay.
         dispatched = new(checkpoint.RequestId, checkpoint.Id, alias);
-        await pinned.StartAsync(ct);
+        if (alias == "calculator") calculatorTarget = await ActivateCalculatorAsync(pinned, plan.Selection, ct);
+        else await pinned.StartAsync(ct);
         ct.ThrowIfCancellationRequested();
         return dispatched;
     }, ct);
@@ -122,10 +124,13 @@ internal sealed class WindowsRoutineAppBackend(Func<bool> agentEnabled, Func<str
         IntPtr foreground = Native.GetForegroundWindow();
         if (foreground == IntPtr.Zero || !Visible(foreground)) return new ComputerVerification(false, null, "Waiting for the requested app window.");
         var selection = WindowSelection.Capture(foreground);
+        if (dispatch.Alias == "calculator" && (calculatorTarget is null || foreground != calculatorTarget.Root.Window))
+            return new ComputerVerification(false, null, "The requested app window changed during verification.");
         if (dispatch.Alias == "calculator" && plan.Start.IsPackaged && selection.App.Equals("ApplicationFrameHost", StringComparison.OrdinalIgnoreCase)) {
             var frame = await BindCalculatorFrameAsync(plan.Start, foreground, ct);
             ct.ThrowIfCancellationRequested(); EnsureEnabled();
             if (frame is null) return new ComputerVerification(false, null, "The Calculator frame and signed app process could not be bound to this foreground window.");
+            if (calculatorTarget?.Frame != frame) return new ComputerVerification(false, null, "The requested app window changed during verification.");
             return new ComputerVerification(true, new(before.RequestId, Guid.NewGuid(), DateTimeOffset.UtcNow, frame.Child, Frame: frame), "Requested Calculator frame and app process verified.");
         }
         if (!BoundedComputerUse.MatchesAppName(dispatch.Alias, selection.App)) return new ComputerVerification(false, null, "The foreground app does not match the request.");
@@ -145,6 +150,8 @@ internal sealed class WindowsRoutineAppBackend(Func<bool> agentEnabled, Func<str
                 return new ComputerVerification(false, null, "The foreground process is not the same signed package's main application.");
         }
         selection.Validate(); ct.ThrowIfCancellationRequested();
+        if (dispatch.Alias == "calculator" && (calculatorTarget?.Frame is not null || Identity(selection) != calculatorTarget?.App))
+            return new ComputerVerification(false, null, "The requested app window changed during verification.");
         if (Native.GetForegroundWindow() != foreground || !Visible(foreground)) return new ComputerVerification(false, null, "The requested app window changed during verification.");
         return new ComputerVerification(true, new(before.RequestId, Guid.NewGuid(), DateTimeOffset.UtcNow, Identity(selection)), "Requested foreground app verified.");
     }, ct);

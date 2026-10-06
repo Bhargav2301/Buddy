@@ -1,4 +1,8 @@
-# Hotfix56 decisions — 2026-10-05
+# Launch investigation58 decision - 2026-10-06
+
+Preserve the failed hotfix57 run and all existing guards. Callback evidence narrows the failure to an early foreground observation but cannot identify the exact observed app or activation restriction. Repair the demonstrated loss of fixed final verification reasons in the existing controller/report path; do not change frame binding, grant foreground rights or relax completion based on process creation alone. Keep the installed baseline and the used one-use launcher untouched. Source evidence and mock tests do not establish that the activation issue is fixed.
+
+# Hotfix56 decisions - 2026-10-05
 
 Use the existing signed-package policy for Calculator rather than broaden generic signature verification. Preserve comparison operands with a bounded source grammar. Retain fixed failure reasons/codes without private exception content. Prepare0.4.6 as a distinguishable focused candidate; preserve installed0.4.5 and exclude unfinished55 work. Actual activation and installation remain coordinated acceptance gates.
 
@@ -39,3 +43,7 @@ Unresolved: actual third-party editor capabilities; physical audio acceptance; e
 | 2026-10-05 | Qualify authored browser guidance from fresh chrome ancestry | Matching names alone are insufficient. Document descendants cannot qualify; every drawn action rechecks identity. Authored grounding is not general model teaching acceptance. |
 
 | 2026-10-05 | Keep Calculator frame and child identities separate, then stop reviewed batches before further capture | Actual Windows frames use a catalog-signed System32 host and a signed package child. Exact direct-child/package/trust observations verify an open operation but do not grant general framed-window input authority. |
+| 2026-10-06 | Bind Calculator restoration to the OS activation receipt, then require the unchanged strict postcondition | User confirmed a minimized result. One exact signed activation yields a process ID; a unique pinned window may be restored once and receive one ordinary foreground request. Denial/input/identity changes stop without workaround or replay. Identity-only minimized evidence never becomes success. |
+| 2026-10-06 | Keep activation58 source checks separate from live acceptance and installation | The old attempt/deadline is consumed. No native action is run during this repair; use a fresh coordinated one-use acceptance attempt only after the exact source is packaged. |
+
+| 2026-10-06 | Package only the reviewed activation repair and approved refinement as0.4.8 | Separate preview/acceptance/installable byte maps and exact source archive/local commit preserve provenance; fresh local START completes file preparation before the user releases controls. No old attempt or idle window is reused. |

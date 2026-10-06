@@ -56,6 +56,45 @@ foreach (var mutation in new Func<ComputerObservation, ComputerObservation>[] {
     var fake = new Fake { PendingVerifications = 20 }; var result = await Controller(fake).RunAsync("notepad", default);
     Check(!result.Verified && result.ActionDispatched && fake.Dispatches == 1 && fake.Verifications == 3, "Unverified app stays explicitly uncertain after bounded checks, with no blind replay");
 }
+foreach (var (reason, detail) in new[] {
+    ("Waiting for the requested app window.", "no visible foreground window"),
+    ("The foreground app does not match the request.", "final foreground app did not match"),
+    ("The Calculator frame and signed app process could not be bound to this foreground window.", "frame could not be bound"),
+    ("The app executable identity could not be verified.", "executable identity could not be verified"),
+    ("The installed app identity changed after launch.", "installed app identity changed"),
+    ("The foreground process is not the same signed package's main application.", "did not match the signed package"),
+    ("The requested app window changed during verification.", "window changed during the final check")
+}) {
+    var fake = new Fake { PendingVerifications = 30, PendingReason = _ => reason };
+    var result = await new BoundedComputerUse(fake, limits with { VerificationAttempts = 30 }, () => fake.Now).RunAsync("calculator", default);
+    Check(!result.Verified && result.After is null && result.Message.Contains(detail) && result.Message.EndsWith("No launch was repeated."), "The final host verification reason survives without claiming completion: " + detail);
+    Check(result.ActionDispatched && result.ActionCount == 1 && result.VerificationCount == 30 && fake.Dispatches == 1 && fake.Verifications == 30, "Thirty failed checks still cause exactly one dispatch");
+}
+foreach (string? unknown in new string?[] { "private document title", "C:\\private\\secret.txt", "https://private.invalid/?token=x", "The foreground app does not match the request. private suffix", "verified", null, new string('x', 20000) }) {
+    var fake = new Fake { PendingVerifications = 3, PendingReason = n => n < 3 ? "The foreground app does not match the request." : unknown };
+    var result = await Controller(fake).RunAsync("calculator", default);
+    Check(!result.Verified && result.Message == "The launch was attempted but no requested foreground app window was verified; focus the app and inspect it before retrying.", "Unknown final reason is not exposed or replaced by an earlier known reason");
+}
+foreach (bool reverse in new[] { false, true }) {
+    var fake = new Fake { PendingVerifications = 3, PendingReason = n => (n == 3) != reverse ? "Waiting for the requested app window." : "The foreground app does not match the request." };
+    var result = await Controller(fake).RunAsync("calculator", default);
+    Check(!result.Verified && result.Message.Contains(reverse ? "final foreground app did not match" : "no visible foreground window") && fake.Dispatches == 1, "The latest known observation replaces an earlier different reason");
+}
+{
+    var fake = new Fake { VerificationOverride = n => new ComputerVerification(n == 3, null, "The foreground app does not match the request.") };
+    var result = await Controller(fake).RunAsync("calculator", default);
+    Check(!result.Verified && result.After is null && result.Message.StartsWith("The launch was attempted but no requested foreground"), "Malformed success cannot retain an earlier failure or create a successful result");
+}
+{
+    var fake = new Fake { PendingVerifications = 2, PendingReason = _ => "The foreground app does not match the request." };
+    var result = await Controller(fake).RunAsync("calculator", default);
+    Check(result.Verified && result.After is not null && !result.Message.Contains("did not match") && fake.Dispatches == 1, "A fresh verified result supersedes earlier failed observations without another launch");
+}
+{
+    var fake = new Fake { PendingVerifications = 3, PendingReason = _ => "The foreground app does not match the request.", VerifyErrorAt = 3 };
+    var result = await Controller(fake).RunAsync("calculator", default);
+    Check(!result.Verified && result.VerificationCount == 3 && result.Message.Contains("requested app window could not be verified") && !result.Message.Contains("did not match"), "A final observation exception is distinct from an earlier foreground mismatch");
+}
 {
     var fake = new Fake { DispatchError = true }; var result = await Controller(fake).RunAsync("notepad", default);
     Check(!result.Verified && result.ActionDispatched && fake.Dispatches == 1 && fake.Verifications == 0, "Dispatch exception is uncertain and never retried");
@@ -67,6 +106,24 @@ foreach (var mutation in new Func<ComputerObservation, ComputerObservation>[] {
 foreach (var mutation in new Func<ComputerDispatch, ComputerDispatch>[] { d => d with { RequestId = Guid.NewGuid() }, d => d with { ObservationId = Guid.NewGuid() }, d => d with { Alias = "comet" } }) {
     var fake = new Fake { MutateDispatch = mutation }; var result = await Controller(fake).RunAsync("notepad", default);
     Check(!result.Verified && fake.Dispatches == 1 && fake.Verifications == 0, "Foreign dispatch receipt cannot authorize postcondition success");
+}
+foreach (var message in new[] {
+    "Windows denied the Calculator foreground request; no activation was repeated.",
+    "Calculator activation could not be safely completed.",
+    "The Calculator activation target changed or disappeared; no replacement was selected.",
+    "The Calculator window changed before foreground confirmation; no activation was repeated.",
+    "The activated Calculator window was not found within the observation limit.",
+    "Calculator did not become visible after the bounded restore attempt.",
+    "The activated Calculator window did not become visible within the observation limit.",
+    "Calculator did not become the visible foreground window within the observation limit."
+}) {
+    var fake = new Fake { DispatchError = true, DispatchErrorMessage = message };
+    var result = await Controller(fake).RunAsync("calculator", default);
+    Check(!result.Verified && result.After is null && result.ActionCount == 1 && fake.Dispatches == 1 && fake.Verifications == 0 &&
+        result.Message.Contains("Calculator") && !result.Message.Contains("its result is uncertain"), "Fixed Calculator activation failure remains truthful and never retries");
+    var privateFake = new Fake { DispatchError = true, DispatchErrorMessage = message + " private suffix" };
+    var privateResult = await Controller(privateFake).RunAsync("calculator", default);
+    Check(privateResult.Message == "The launch was attempted but its result is uncertain; inspect the app before trying again.", "Calculator activation failures use exact literals without exposing arbitrary exception payloads");
 }
 foreach (var mutation in new Func<ComputerObservation, ComputerObservation>[] {
     o => o with { RequestId = Guid.NewGuid() }, o => o with { Complete = false }, o => o with { At = o.At.AddSeconds(-10) },
@@ -169,8 +226,11 @@ internal sealed class Fake : IComputerUseBackend
 {
     internal DateTimeOffset Now = DateTimeOffset.UtcNow;
     internal readonly List<string> Trace = [];
-    internal int Dispatches, Verifications, PendingVerifications;
+    internal int Dispatches, Verifications, PendingVerifications, VerifyErrorAt;
+    internal Func<int, string?>? PendingReason;
+    internal Func<int, ComputerVerification>? VerificationOverride;
     internal bool DispatchError, VerifyError, ReuseObservation;
+    internal string DispatchErrorMessage = "owned fake dispatch error";
     internal ComputerObservation? Before;
     internal Func<ComputerObservation, ComputerObservation>? MutateObservation, MutateCheckpoint, MutateAfter;
     internal Func<ComputerDispatch, ComputerDispatch>? MutateDispatch;
@@ -184,14 +244,15 @@ internal sealed class Fake : IComputerUseBackend
     public Task<ComputerObservation> CheckpointAsync(ComputerObservation observation, string alias, CancellationToken ct) { Trace.Add("checkpoint"); return Task.FromResult(MutateCheckpoint?.Invoke(observation) ?? observation); }
     public Task<ComputerDispatch> DispatchAsync(ComputerObservation checkpoint, string alias, CancellationToken ct) {
         Trace.Add("dispatch"); Dispatches++; ActionEntered.TrySetResult();
-        if (DispatchError) throw new InvalidOperationException("owned fake dispatch error");
+        if (DispatchError) throw new InvalidOperationException(DispatchErrorMessage);
         var result = new ComputerDispatch(checkpoint.RequestId, checkpoint.Id, alias);
         return DispatchOverride?.Invoke(checkpoint, ct) ?? Task.FromResult(MutateDispatch?.Invoke(result) ?? result);
     }
     public Task<ComputerVerification> VerifyAsync(ComputerObservation before, ComputerDispatch dispatch, CancellationToken ct) {
         Trace.Add("verify"); Verifications++;
-        if (VerifyError) throw new InvalidOperationException("owned fake verify error");
-        if (Verifications <= PendingVerifications) return Task.FromResult(new ComputerVerification(false, null, "waiting"));
+        if (VerifyError || Verifications == VerifyErrorAt) throw new InvalidOperationException("owned fake verify error");
+        if (VerificationOverride is not null) return Task.FromResult(VerificationOverride(Verifications));
+        if (Verifications <= PendingVerifications) return Task.FromResult(new ComputerVerification(false, null, PendingReason is null ? "waiting" : PendingReason(Verifications)!));
         var after = new ComputerObservation(before.RequestId, ReuseObservation ? before.Id : Guid.NewGuid(), Now, new(new IntPtr(50), 60, 70, 80, dispatch.Alias));
         return Task.FromResult(new ComputerVerification(true, MutateAfter?.Invoke(after) ?? after, "fake verified"));
     }

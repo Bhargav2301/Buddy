@@ -1,4 +1,24 @@
-# Current: hotfix57 verified source, version0.4.7 candidate
+# Current: version 0.4.8 packaged source validated; coordinated update pending
+
+The focused candidate includes reviewed Calculator restoration plus the unchanged approved refinement fix. All59 nonforeground aggregate commands, static package checks and exact packaged native dependency probe pass. Exact final service/local-model comparison refinement passes in18.505seconds with similarity0.9005715024022094, no profile/field write or cloud route. Source/build hashes, local source commit and archive are sealed with the new package. No unfinished55 or wider feature work was included.
+
+Fresh private hotfix58 acceptance/update helpers are prepared independently; their measured readiness lives in validation/hotfix58, not older57 receipts. Installed0.4.5 and current settings remain preserved. No live activation/focus/install or publication now. The consumed57 launcher/deadline cannot be reused. See [candidate report](../Windows-hotfix58.md); await fresh desktop availability before the new one-use local START workflow.
+
+# Historical source-only activation58 checkpoint
+
+# Current: minimized Calculator source repair validated; native acceptance pending
+
+October 6: user confirmed the failed hotfix57 launch left Calculator minimized. Isolated Buddy-hotfix58 now activates the exact signed Calculator registration once through the supported Windows activation manager, pins its returned process/window identity, restores only that minimized root once, and requests ordinary foreground activation at most once. Existing strict success checks remain mandatory and bound to the same target. No focus workaround, input/deadline reset, automatic relaunch or stale receipt reuse.
+
+Root integrated app47's isolated pure lifecycle policy and added the guarded native adapter, restoration-only binding and failure reporting. Independent qa43 review caught and closed a sample race. AppBinding432, ComputerUse132, report82 and UserFailureBoundary56 checks/cases pass; all four builds and Windows Release compile have zero warnings/errors. No native desktop/activation test, package, version bump, installed replacement or publication. Installed0.4.5 and sealed hotfix57 evidence/attempt remain preserved. No active command remains at final handoff. See [repair and exact remaining native acceptance](../Windows-calculator-activation58.md).
+
+# Historical: failed local update diagnosed; focused reporting repair verified
+
+October 6: hotfix57 local START run 8292aba49a0240dd9ec15ac365b77a87 dispatched Calculator once but failed its foreground postcondition after 30 checks. No frame/package verification branch was reached, input stayed unchanged, and all update work settled. No installation or rollback ran; installed0.4.5 remains the same process and all4,416 application files match the prepared baseline. The old deadline/attempt is consumed and cannot be reused. No current foreground authorization.
+
+Isolated Buddy-hotfix58 / hotfix/launch-verification58 is based on f8c56b90f6d80479717d0988182ba37492d998f1. Root repaired discarded final verification reasons, with188 focused checks passing, Windows compile0warnings/errors and independent read-only review. Native activation cause remains unproven; no guard or activation-policy change. No new package, installation, publication or version bump. Current preferences and all historical evidence/previews remain preserved. See [investigation](../Windows-launch-investigation58.md).
+
+# Historical: hotfix57 verified source, version0.4.7 candidate
 
 Based on local-only cebb465; installed0.4.5 and sealed0.4.6 remain preserved. All59 aggregate commands, combined Windows publication/package checks, exact-DLL existing Calculator frame/consumer revalidation, and exact local-model refinement pass. APP57 and root consumer passed independent review. The actual0.4.6 launch exposed a Windows frame wrapper; this candidate fixes the bounded postcondition without granting later input authority. No unfinished55. Private acceptance helpers are being bound to the sealed candidate before a new coordinated window; no new activation or installation occurred. Installed update remains authorized after acceptance. Publication is blocked; the new source identity is not covered by approval naming only cebb465. No merge/release. See [current report](../Windows-hotfix57.md).
 

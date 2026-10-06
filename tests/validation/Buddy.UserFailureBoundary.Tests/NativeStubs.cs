@@ -1,6 +1,11 @@
 // Only the pure selection policy is linked here. Every test must inject its own
 // probe and policy; accidental fallback to any native default fails immediately.
 namespace Buddy.Windows;
+internal sealed partial class WindowsRoutineAppBackend
+{
+    private Task<CalculatorWindowTarget> ActivateCalculatorAsync(VerifiedAppLaunch _, WindowSelection __, CancellationToken ___)
+        => throw new InvalidOperationException("Native Calculator activation is forbidden in the policy fixture.");
+}
 internal static class InputNative
 {
     internal static WindowProbe InspectWindow(IntPtr _) => throw new InvalidOperationException("Native inspection is forbidden in the policy fixture.");

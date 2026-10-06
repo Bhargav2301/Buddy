@@ -10,6 +10,12 @@ The root [VERSION](VERSION) file controls both applications. See
 - Bind reviewed app actions to the exact task; add verified Camera/Spotify signed registrations and grounded authored browser lessons; clean local speech without changing speaker85/F3.
 - Keep this separate from installed0.4.4. [Feedback preview report](docs/Windows-feedback47.md) records actual-model checks, acceptance limits and remaining Coucou features.
 
+## [0.4.8] - 2026-10-06
+
+- Restore a minimized Calculator window only after binding it to the exact signed Windows activation result; request ordinary foreground activation once and retain strict final verification.
+- Preserve Stop, input ownership, original checkpoint/deadline and one-use launch safeguards; report bounded activation and final verification failures without exposing private exception text.
+- Include the previously approved bounded comparison-refinement fix. Physical/native acceptance and installed replacement remain separate gates for this local candidate.
+
 ## [0.4.7] - 2026-10-05
 
 - Verify Calculator's signed main process inside its Windows application frame with bounded direct-child ownership and fresh host/package identity checks.

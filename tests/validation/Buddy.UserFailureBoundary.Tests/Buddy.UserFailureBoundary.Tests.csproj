@@ -10,6 +10,7 @@
     <Compile Include="$(BuddyWindowRoot)apps\windows\Buddy.Windows\WindowSelection.cs" Link="Production\WindowSelection.cs" />
     <Compile Include="$(BuddyControlRoot)apps\windows\Buddy.Windows\BoundedComputerUse.cs" Link="Production\BoundedComputerUse.cs" />
     <Compile Include="$(BuddyControlRoot)apps\windows\Buddy.Windows\RoutineAppOpen.cs" Link="Production\RoutineAppOpen.cs" />
+    <Compile Include="$(BuddyControlRoot)apps\windows\Buddy.Windows\CalculatorWindowActivation.cs" Link="Production\CalculatorWindowActivation.cs" />
     <Compile Include="$(BuddyControlRoot)apps\windows\Buddy.Windows\AppFrameBinding.cs" Link="Production\AppFrameBinding.cs" />
     <Compile Include="$(BuddyControlRoot)apps\windows\Buddy.Windows\FixedFrameHostTrust.cs" Link="Production\FixedFrameHostTrust.cs" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" /><PackageReference Include="AngleSharp" Version="1.8.2" />

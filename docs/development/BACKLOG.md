@@ -1,4 +1,23 @@
-# Hotfix57 ownership
+# Focused 0.4.8 packaging
+
+- BUILD-58 /root: reviewed product source, version, exact local package/archive identity and root regression; validated.
+- CORE-58 /root/core53: fresh private helper source generation only under validation/hotfix58; root owns final pins, timing measurements and live scheduling. No old57 evidence reset.
+- QA58: independent package/refinement/transaction/helper reviews; mocked/owned-file evidence stays separate from live acceptance.
+
+# Calculator activation58 ownership
+
+- POLICY-58 /root/app47: isolated workers/calculator-activation58, pure one-use restoration lifecycle and injected fixtures; four-file handoff hash-verified and root integrated.
+- ACTIVATE-58 /root: native supported OS activation, exact PID/window restoration target, unchanged strict final success, bounded failure reports and integrated tests. Source/build validation complete; native acceptance remains open.
+- /root/qa43: independent source-only review; sample race fixed and re-reviewed, no remaining blocker. Root owns native scheduling, eventual package/installation gates and all Git operations.
+- NATIVE-58: user confirmed minimized Calculator. Require a fresh coordinated window and a new attempt after exact-source packaging. Do not reuse old launcher/deadline; no present foreground or install execution. Publication remains blocked.
+
+# Historical launch investigation58
+
+- REPORT-58 /root: isolated Buddy-hotfix58; final fixed verification reason propagation, bounded task-report mapping and two existing focused suites. Source repaired,188 checks and Windows build passed; uncommitted, unpackaged and uninstalled.
+- /root/app47: read-only historical branch/callback analysis. /root/qa43: read-only four-file reporting review. Neither edited or ran native work; root owns integration and all validation.
+- NATIVE-58: exact historical early foreground predicate remains unknown. Await the user's foreground/console observation; no current desktop-control authorization, no old-window retry and no publication.
+
+# Historical hotfix57 ownership
 
 - APP-57 /root/app47: isolated workers/app57; exact host/package/child verification and adversarial fixtures.
 - CORE57 /root/core53: private acceptance helper preparation only, fixed0.4.7 bindings supplied by root after sealing; no native execution.

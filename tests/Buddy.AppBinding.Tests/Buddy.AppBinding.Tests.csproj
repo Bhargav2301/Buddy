@@ -4,6 +4,9 @@
     <ProjectReference Include="../../services/Buddy.Server/Buddy.Server.csproj" />
     <Compile Include="../../apps/windows/Buddy.Windows/GlobalUsings.cs" Link="GlobalUsings.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/BoundedComputerUse.cs" Link="BoundedComputerUse.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/CalculatorWindowActivation.cs" Link="CalculatorWindowActivation.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/CalculatorTargetBinding.cs" Link="CalculatorTargetBinding.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/CalculatorActivationNative.cs" Link="CalculatorActivationNative.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/RoutineAppOpen.cs" Link="RoutineAppOpen.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/AppFrameBinding.cs" Link="AppFrameBinding.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/FixedFrameHostTrust.cs" Link="FixedFrameHostTrust.cs" />

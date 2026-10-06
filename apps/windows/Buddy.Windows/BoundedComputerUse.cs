@@ -70,10 +70,11 @@ internal sealed class BoundedComputerUse(IComputerUseBackend backend, ComputerUs
                 var acting = backend.DispatchAsync(checkpoint, alias, token); pending = acting;
                 dispatch = await acting.WaitAsync(token); token.ThrowIfCancellationRequested();
             } catch (Exception ex) when (ex is not OperationCanceledException) {
-                return Unverified("The launch was attempted but its result is uncertain; inspect the app before trying again.", observation, 0);
+                return Unverified(ActivationFailure(ex.Message) ?? "The launch was attempted but its result is uncertain; inspect the app before trying again.", observation, 0);
             }
             if (dispatch is null || dispatch.RequestId != requestId || dispatch.ObservationId != observation.Id || dispatch.Alias != alias)
                 return Unverified("The launch receipt did not match this request; no follow-up action ran.", observation, 0);
+            string? lastVerificationFailure = null;
             for (int attempt = 0; attempt < policy.VerificationAttempts; attempt++) {
                 token.ThrowIfCancellationRequested();
                 ComputerVerification verified;
@@ -95,9 +96,13 @@ internal sealed class BoundedComputerUse(IComputerUseBackend backend, ComputerUs
                     token.ThrowIfCancellationRequested();
                     return new(true, true, "Verified " + alias + " in a visible foreground window; no in-app action ran.", requestId, observation.Id, after, 1, attempt + 1);
                 }
+                // Retain only a fixed host explanation from the final unsuccessful
+                // observation. Never expose arbitrary backend text or let an earlier
+                // reason describe a different, later result.
+                lastVerificationFailure = verified is { Satisfied: false } ? VerificationFailure(verified.Message) : null;
                 if (attempt + 1 < policy.VerificationAttempts) await Task.Delay(policy.VerificationDelay, token);
             }
-            return Unverified("The launch was attempted but no requested foreground app window was verified; focus the app and inspect it before retrying.", observation, policy.VerificationAttempts);
+            return Unverified(lastVerificationFailure ?? "The launch was attempted but no requested foreground app window was verified; focus the app and inspect it before retrying.", observation, policy.VerificationAttempts);
         } catch (OperationCanceledException) when (!ct.IsCancellationRequested) {
             throw new TimeoutException("App launch verification timed out; the app may have opened. No launch will be repeated automatically.");
         } finally {
@@ -132,6 +137,28 @@ internal sealed class BoundedComputerUse(IComputerUseBackend backend, ComputerUs
     }
     private static ComputerUseResult Unverified(string message, ComputerObservation before, int checks) =>
         new(false, true, message, before.RequestId, before.Id, null, 1, checks);
+    private static string? ActivationFailure(string? message) => message switch {
+        "Windows denied the Calculator foreground request; no activation was repeated." => message,
+        "Calculator activation could not be safely completed." => "Calculator activation could not be safely completed; no launch was repeated.",
+        "The Calculator activation target changed or disappeared; no replacement was selected." => message,
+        "The Calculator window changed before foreground confirmation; no activation was repeated." => message,
+        "The activated Calculator window was not found within the observation limit." or
+        "Calculator did not become visible after the bounded restore attempt." or
+        "The activated Calculator window did not become visible within the observation limit." or
+        "Calculator did not become the visible foreground window within the observation limit."
+            => "Calculator did not reach a verified visible foreground state within the activation limit; no launch was repeated.",
+        _ => null
+    };
+    private static string? VerificationFailure(string? message) => message switch {
+        "Waiting for the requested app window." => "The launch was attempted, but the final check found no visible foreground window. No launch was repeated.",
+        "The foreground app does not match the request." => "The launch was attempted, but the final foreground app did not match the request. No launch was repeated.",
+        "The Calculator frame and signed app process could not be bound to this foreground window." => "The launch was attempted, but the final Calculator frame could not be bound to its signed app process. No launch was repeated.",
+        "The app executable identity could not be verified." => "The launch was attempted, but the final app executable identity could not be verified. No launch was repeated.",
+        "The installed app identity changed after launch." => "The launch was attempted, but the installed app identity changed afterward. No launch was repeated.",
+        "The foreground process is not the same signed package's main application." => "The launch was attempted, but the final foreground process did not match the signed package's main app. No launch was repeated.",
+        "The requested app window changed during verification." => "The launch was attempted, but the requested window changed during the final check. No launch was repeated.",
+        _ => null
+    };
     private static ComputerUseLimits Validate(ComputerUseLimits value)
     {
         if (value.ObservationAge <= TimeSpan.Zero || value.ObservationAge > TimeSpan.FromSeconds(10) ||

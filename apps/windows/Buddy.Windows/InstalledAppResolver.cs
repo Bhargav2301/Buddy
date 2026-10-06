@@ -20,6 +20,14 @@ internal sealed record VerifiedAppLaunch(string Alias, string Executable, Proces
         PackageFullName == other.PackageFullName && AppUserModelId == other.AppUserModelId &&
         PackageRoot.Equals(other.PackageRoot, StringComparison.OrdinalIgnoreCase) &&
         MainExecutable.Equals(other.MainExecutable, StringComparison.OrdinalIgnoreCase) && IsPackaged == other.IsPackaged;
+    internal void RequireRegistration()
+    {
+        if (!IsPackaged || Registration is null || Start is not null || Registration.AppUserModelId != AppUserModelId ||
+            PackageRegistration is null || PackageRegistration.Id.FullName != PackageFullName || PackageRoot.Length == 0 || MainExecutable.Length == 0 ||
+            PackageRegistration.IsDevelopmentMode || PackageRegistration.SignatureKind is not (PackageSignatureKind.Store or PackageSignatureKind.System) ||
+            !PackageRegistration.Status.VerifyIsOK())
+            throw new InvalidOperationException("The exact signed app registration is no longer available; nothing was launched.");
+    }
     internal async Task StartAsync(CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
@@ -27,13 +35,9 @@ internal sealed record VerifiedAppLaunch(string Alias, string Executable, Proces
             // Launch the exact signed Windows registration, never its manifest
             // executable via CreateProcess. Partial package metadata cannot fall
             // through to the classic executable path.
-            if (Registration is null || Start is not null || Registration.AppUserModelId != AppUserModelId ||
-                PackageRegistration is null || PackageRegistration.Id.FullName != PackageFullName || PackageRoot.Length == 0 || MainExecutable.Length == 0 ||
-                PackageRegistration.IsDevelopmentMode || PackageRegistration.SignatureKind is not (PackageSignatureKind.Store or PackageSignatureKind.System) ||
-                !PackageRegistration.Status.VerifyIsOK())
-                throw new InvalidOperationException("The exact signed app registration is no longer available; nothing was launched.");
+            RequireRegistration();
             ct.ThrowIfCancellationRequested();
-            if (!await Registration.LaunchAsync().AsTask(ct)) throw new InvalidOperationException("Windows did not accept the requested installed-app launch.");
+            if (!await Registration!.LaunchAsync().AsTask(ct)) throw new InvalidOperationException("Windows did not accept the requested installed-app launch.");
         } else {
             if (Start is null || Start.UseShellExecute || Start.ArgumentList.Count != 0 || Start.Arguments.Length != 0 || Start.FileName != Executable)
                 throw new InvalidOperationException("The launch is not a fixed argument-free executable.");
