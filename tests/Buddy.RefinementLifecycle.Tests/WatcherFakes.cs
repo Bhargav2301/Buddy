@@ -35,7 +35,7 @@ namespace Buddy.Windows
         internal bool ClosedState;
         internal event EventHandler? Closed;
         internal InlinePromptWindow(Buddy.Server.BuddyService service, FocusedFieldEditor editor, FocusedDraft draft, Action voice, string shortcut,
-            Buddy.Server.RefineRequest? request = null, Func<bool>? optionsCurrent = null, Action? configureOptions = null) => Cards.Add(this);
+            Buddy.Server.RefineRequest? request = null, Func<bool>? optionsCurrent = null, Action? configureOptions = null, ExternalContextSelection? contextSelection = null) => Cards.Add(this);
         internal bool Reply(string text) => false;
         internal Task Refine() => Task.CompletedTask;
         internal Task<bool> IsCurrent(CancellationToken ct) => Current(ct);

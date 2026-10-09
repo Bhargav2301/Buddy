@@ -26,6 +26,7 @@ public static class RefinementPreparation
         // the returned snapshot as owned by this preparation; do not mutate its lists.
         request = Snapshot(request);
         RefinementPolicy.Validate(request);
+        ValidateUnicode(request);
         var mode = RefinementPolicy.Mode(request);
         var choice = RefinementCore.SelectTechnique(request);
         var context = RefinementContext.Build(request.Inputs?.Context);
@@ -39,6 +40,27 @@ public static class RefinementPreparation
         ct.ThrowIfCancellationRequested();
         return new(request, mode, choice, context, budget, warnings.AsReadOnly(),
             choice.Ready && context.Ready && budget.Fits, assembled, blocks.AsReadOnly());
+    }
+
+    private static void ValidateUnicode(RefineRequest request)
+    {
+        // Do not let JSON's replacement of unpaired UTF-16 surrogates silently
+        // change a source name, code fragment or supporting input before review.
+        var values = new List<string?> { request.Prompt, request.Mode, request.Technique, request.Domain,
+            request.Budget?.Destination, request.Budget?.Unit, request.Budget?.Authority };
+        if (request.Inputs is { } inputs) {
+            values.AddRange(inputs.AvailableTools ?? []); values.AddRange(inputs.Stages ?? []);
+            values.AddRange(inputs.ConfirmedConstraints ?? []);
+            foreach (var example in inputs.Examples ?? []) if (example is not null) { values.Add(example.Input); values.Add(example.Output); }
+            foreach (var source in inputs.Context ?? []) if (source is not null) {
+                values.AddRange([source.Id, source.Title, source.Text, source.Provenance, source.Disposition, source.Url]);
+            }
+        }
+        var strict = new System.Text.UTF8Encoding(false, true);
+        try { foreach (string? value in values) if (value is not null) strict.GetByteCount(value); }
+        catch (System.Text.EncoderFallbackException) {
+            throw new BuddyException("INVALID_REFINE_UNICODE", "A refinement input contains an incomplete Unicode character. Correct that input before refining; your original is unchanged.");
+        }
     }
 
     private static RefineRequest Snapshot(RefineRequest request)

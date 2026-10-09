@@ -14,9 +14,11 @@ internal sealed class ExternalRefinementOptionsWindow : Window
     private readonly TextBlock status = Note("No source field has been captured. These options are kept only in memory.");
     private bool closed;
 
-    internal ExternalRefinementOptionsWindow(Action<RefinementDraftOptions, string> prepare)
+    internal ExternalRefinementOptionsWindow(Action<RefinementDraftOptions, string> prepare,
+        IReadOnlyList<RefinementContextSource>? sources = null, Func<bool>? contextCurrent = null)
     {
         BuddyTheme.Ensure();
+        foreach (var source in sources ?? []) options.AddReviewedResource(source, locked: true);
         Title = "Buddy - Prepare source-field refinement";
         Width = 610; MinWidth = 380; Height = 740; MinHeight = 420;
         MaxHeight = SystemParameters.WorkArea.Height;
@@ -29,7 +31,7 @@ internal sealed class ExternalRefinementOptionsWindow : Window
             if (options.IsReadingResource || options.HasPendingResource || options.HasUnaddedReference) {
                 status.Text = "Finish reviewing references, then add or discard the selected file and add or clear any pasted reference before preparing options."; return;
             }
-            try { prepare(options.Snapshot(), mode.SelectedItem?.ToString() ?? "auto"); Close(); }
+            try { if(contextCurrent?.Invoke()==false)throw new InvalidOperationException("Selected context changed. Review it again."); prepare(options.Snapshot(), mode.SelectedItem?.ToString() ?? "auto"); Close(); }
             catch (Exception ex) { status.Text = ex.Message; }
         }, true));
         actions.Children.Add(BuddyTheme.Button("Cancel", Close));

@@ -1,3 +1,21 @@
+# Browser61 decisions - 2026-10-07
+
+Keep provider admission host-owned and empty for production until account/workspace/chat and completion signals are verified. Structural readiness and user confirmation cannot substitute for provider identity. Preserve a real shared DOM/transport path but label its synthetic acceptance and live gaps precisely. No automatic Send; original file bytes require separate upload consent and a correlated ready receipt, with unknown/partial state stopping without replay.
+
+Separate minimum extension setup from native messaging persistence and from content disclosure. The first sealed probe requests only activeTab+scripting and counts controls; full host setup waits for an observed extension ID and exact per-user baseline. Fresh synthetic chat acceptance avoids broad history. Comet does not imply universal provider compatibility.
+
+Improve semicolon constraint readability only when a finite source grammar can retain the whole request and whole suffix exactly. Independent review found and reproduced display-text/content-introducer ambiguity; conservative refusal was added before model testing. Preserve the assessor,0.80 gate,budget and Stop. Final packaged model outputs are independently reviewed separately from deterministic assertion counts.
+
+# Refinement60 decisions - 2026-10-07
+
+Use separately owned builder, independent tester, ingestion researcher and context planner worktrees, with root-only integration. Measure actual output quality separately from assertion totals. Keep unchanged prompts honest and retain all failed corpus/native observations.
+
+Selected prior user and assistant messages travel as complete role-aware pairs. Supported originals are bounded immutable memory snapshots with separate text/extraction provenance; paths, OCR, URLs and base64 are not attachment delivery. Clear and selection changes invalidate pending one-use reviews. Links remain unfetched untrusted data. Original-required requests fail on a text-only destination.
+
+Keep the generic external text editor's review/Apply/Undo and no Submit. Real chat identity/history and binary delivery need a specific adapter and scoped authorization; a placeholder queue does not implement local-agent support. Preserve the original image beside OCR until review/discard because an actual digit misread proves the confidence threshold is insufficient as an accuracy guarantee.
+
+Package a fresh isolated preview without changing installed0.4.5 or the Calculator59 hold. The 12-case output measurement identifies its earlier integrated DLL; the four final context cases identify the final packaged DLL. Do not conflate them or rerun completed expensive checks merely to increase counts.
+
 # Launch investigation58 decision - 2026-10-06
 
 Preserve the failed hotfix57 run and all existing guards. Callback evidence narrows the failure to an early foreground observation but cannot identify the exact observed app or activation restriction. Repair the demonstrated loss of fixed final verification reasons in the existing controller/report path; do not change frame binding, grant foreground rights or relax completion based on process creation alone. Keep the installed baseline and the used one-use launcher untouched. Source evidence and mock tests do not establish that the activation issue is fixed.

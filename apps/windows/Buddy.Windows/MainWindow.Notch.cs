@@ -27,7 +27,10 @@ public sealed partial class MainWindow
     {
         notchChat = new NotchChatSession(() => notchModels, SendNotchChat,
             "Completed messages are saved in Buddy's local encrypted conversations and can be managed in Home. Reviewed file text accompanies one message; saved answers may quote or describe it.");
-        return new(notchChat, new NotchNoteStore(Path.Combine(PreviewEnvironment.DataDirectory, "companion-note.json")));
+        notchChat.Changed += SyncNotchContext; SyncNotchContext();
+        return new(notchChat, new NotchNoteStore(Path.Combine(PreviewEnvironment.DataDirectory, "companion-note.json")),
+            () => OpenNotchContext(), OpenManualContext,
+            path => OpenNotchContext().StageFile(path), text => OpenNotchContext().StageText(text));
     }
 
     private void SetNotchModels(EngineStatus status, string preferred, string embeddingModel)
@@ -46,6 +49,12 @@ public sealed partial class MainWindow
         if (shuttingDown || host is null) throw new InvalidOperationException("The local Buddy service is unavailable.");
         PrepareDesktopActivity("notch");
         var service = host.Service;
+        var selectedContext = ConsumeNotchContext(input.SessionId);
+        using var contextLifetime = CancellationTokenSource.CreateLinkedTokenSource(cancellation, selectedContext?.Invalidated ?? default);
+        cancellation = contextLifetime.Token; cancellation.ThrowIfCancellationRequested();
+        var reviewedContext = selectedContext?.Text;
+        if (reviewedContext is not null && input.Attachment is not null)
+            throw new InvalidOperationException("Choose either the reviewed context workspace or the single legacy attachment for this message; review a combined selection first.");
         var activity = localTasks.Begin("notch", "Companion chat", "Preparing a response on this PC.");
         notchTask = activity;
         try {
@@ -56,8 +65,8 @@ public sealed partial class MainWindow
             }
             var answer = new StringBuilder(); bool complete = false;
             await foreach (var item in service.Chat(new(notchConversationId, input.Text, input.RequestId,
-                Context: input.Attachment?.Text, UseWeb: false, BrainId: "local", LocalModel: input.ModelId,
-                ContextKind: input.Attachment is null ? null : "file"), cancellation)) {
+                Context: reviewedContext ?? input.Attachment?.Text, UseWeb: false, BrainId: "local", LocalModel: input.ModelId,
+                ContextKind: reviewedContext is null && input.Attachment is null ? null : "file"), cancellation)) {
                 cancellation.ThrowIfCancellationRequested();
                 if (item.Type == "delta") answer.Append(item.Text);
                 if (item.Type == "done") complete = true;

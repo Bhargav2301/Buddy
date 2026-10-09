@@ -1,3 +1,23 @@
+# Browser61 remaining work
+
+- Obtain only the concrete readiness-probe setup approval for a selected browser/profile; no native host registration or data access implied.
+- Establish source-owned verified ChatGPT account/workspace/chat/document/composer identity, complete active-chat coverage and correlated attachment-ready contract. Production remains readiness-only until proved. Later live validation may use one fresh synthetic chat, separately approved original test files and no Send.
+- Add other sites and Comet transport only through separate capability checks. Implement the actual chosen local-agent consumer when its client/version and contract are available.
+- OCR usefulness remains open after a preserved synthetic digit error; retain original-image and text review.
+- Coordinated visible Apply/Undo, Start/Stop/reopen, screenshot modes and physical mic/voice/headphone disconnect/default-device checks remain distinct acceptance. Installed replacement, live Calculator and publication remain held.
+
+The two previously unmet refinement targets are now locally measured as useful exact structural changes; original12 has10 faithful improvements/2 appropriate unchanged/0 unsafe accepted observed. Source and finite local-model acceptance do not guarantee arbitrary prompt quality. Report: [Windows-browser61](../Windows-browser61.md).
+
+# Historical: refinement60 remaining work
+
+- Complete the chosen destination's current-chat history and original attachment adapter after the user's destination choice. No generic labels or synthetic transport count as this completion.
+- Preserve exact tab/document/chat or agent identity, source roles/order, asset receipts, reviewed draft, cancellation and no Submit. Prepare implementation before seeking any concrete installation/read/upload authorization still needed.
+- Improve the two unmet finite-refinement utility cases (numbers/units and Unicode names) without weakening fidelity. Preserve the frozen corpus and unsafe-count regression.
+- OCR usefulness remains unaccepted after the synthetic digit misread. Keep original previews and explicit text review; do not hide the failure behind load checks.
+- Live field Apply/Undo, physical voice/headphone checks and visible Start/Stop/reopen require coordinated acceptance. Installation and live Calculator tests remain on hold.
+
+Completed source/test work and exact preview evidence are in [Windows-refinement60](../Windows-refinement60.md). The four specialist handoffs and root integration are source-accepted; those statuses do not close the adapter or native acceptance gaps.
+
 # Focused 0.4.8 packaging
 
 - BUILD-58 /root: reviewed product source, version, exact local package/archive identity and root regression; validated.

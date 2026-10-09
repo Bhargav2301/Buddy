@@ -2,6 +2,14 @@ using Buddy.Server;
 
 namespace Buddy.Windows;
 
+internal sealed class ExternalContextSelection(RefinementWorkspace workspace, FrozenRefinementContext selection, RefinementContextProjection projection)
+{
+    internal FrozenRefinementContext Selection { get; } = selection;
+    internal RefinementContextProjection Projection { get; } = projection;
+    internal ContextDeliveryReviews Reviews { get; } = new(workspace);
+    internal bool IsCurrent => workspace.IsCurrent(Selection) && Projection.Ready;
+}
+
 // Memory-only, one-use preparation. No field text, HWND, focus or authority to edit
 // is captured here. The user selects the actual field after preparing these inputs.
 internal sealed class ExternalRefinementOptionsSlot
@@ -12,11 +20,12 @@ internal sealed class ExternalRefinementOptionsSlot
     private long generation, armedAt;
     internal bool HasPending { get { lock (gate) return pending is not null; } }
 
-    internal void Arm(RefinementDraftOptions options, string mode, long nowMilliseconds)
+    internal void Arm(RefinementDraftOptions options, string mode, long nowMilliseconds, Func<bool>? contextCurrent = null, ExternalContextSelection? contextSelection = null)
     {
         lock (gate) {
             // Invalid replacement options must not leave an older preparation armed.
             generation++; pending = null;
+            if (contextCurrent?.Invoke() == false) throw new InvalidOperationException("Selected context changed. Review it again.");
             if (nowMilliseconds < 0) throw new InvalidOperationException("The options preparation clock is unavailable.");
             var copy = options with {
                 Examples = Array.AsReadOnly(options.Examples.Select(x => x with { }).ToArray()),
@@ -30,7 +39,7 @@ internal sealed class ExternalRefinementOptionsSlot
             _ = RefinementCore.ApplyBudget([], request.Budget);
             armedAt = nowMilliseconds;
             long selectedGeneration = generation;
-            pending = new(copy, mode, () => IsCurrent(selectedGeneration));
+            pending = new(copy, mode, () => IsCurrent(selectedGeneration) && contextCurrent?.Invoke() != false && contextSelection?.IsCurrent != false) { ContextSelection = contextSelection };
         }
     }
 
@@ -53,6 +62,7 @@ internal sealed class ExternalRefinementOptionsSlot
 
 internal sealed class ExternalRefinementPlan(RefinementDraftOptions options, string mode, Func<bool> current)
 {
+    internal ExternalContextSelection? ContextSelection { get; init; }
     private int bound;
     internal bool IsCurrent => current();
     internal RefinementPreparationResult Bind(string exactOriginal)

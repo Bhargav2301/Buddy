@@ -25,7 +25,8 @@ public sealed partial class MainWindow
         promptWatcher?.ClearPreparedOptionsPause();
         externalRefinementOptionsWindow?.Close(); externalRefinementOptionsWindow = null;
     }
-    private void PrepareExternalRefinementOptions()
+    private void PrepareExternalRefinementOptions() => PrepareExternalRefinementOptions(null, null);
+    private void PrepareExternalRefinementOptions(IReadOnlyList<Buddy.Server.RefinementContextSource>? sources, Func<bool>? contextCurrent, ExternalContextSelection? contextSelection = null)
     {
         if (host is null) return;
         // Editing options invalidates both an in-flight capture and an existing review.
@@ -33,10 +34,10 @@ public sealed partial class MainWindow
         promptWatcher?.Suspend(); CancelExternalRefinementOptions();
         PrepareDesktopActivity("external-refinement-options"); quick?.Dismiss(); voiceOverlay?.Dismiss();
         var window = new ExternalRefinementOptionsWindow((options, mode) => {
-            externalRefinementOptions.Arm(options, mode, Environment.TickCount64);
+            externalRefinementOptions.Arm(options, mode, Environment.TickCount64, contextCurrent, contextSelection);
             promptWatcher?.PauseForPreparedOptions();
             status.Text = "Source-field options prepared for one capture. Focus the original prompt and press Ctrl+Alt+R within five minutes.";
-        });
+        }, sources, contextCurrent);
         externalRefinementOptionsWindow = window;
         window.Closed += (_, _) => { if (ReferenceEquals(externalRefinementOptionsWindow, window)) externalRefinementOptionsWindow = null; };
         window.Show();
@@ -113,7 +114,7 @@ public sealed partial class MainWindow
                 var prepared = preparedOptions?.Bind(draft.Edit.Original);
                 promptWatcher??=new(fieldEditor,()=>host?.Service,()=>OpenQuick(true),()=>desktop.VoiceShortcut,PrepareExternalRefinementOptions);
                 await promptWatcher.ShowReview(draft, prepared?.Request, preparedOptions is null ? null : () => preparedOptions.IsCurrent,
-                    () => feedback.OwnsFieldActivity && !cts.IsCancellationRequested);
+                    () => feedback.OwnsFieldActivity && !cts.IsCancellationRequested, preparedOptions?.ContextSelection);
             }
         } catch (Exception e) {
             feedback.Report(e, cts.IsCancellationRequested, message => { Summon(); ShowChat(); status.Text = message; });

@@ -1,3 +1,23 @@
+# Browser61 and refinement61 evidence - 2026-10-07
+
+Exact packaged Server bc36d2ac614513dbcebb2e2f8a07bbc2951aa5b7c912919e7375ef2cef75ec8b: all18 synthetic local-model calls settled. Frozen original12:10 faithful useful changes/2 truthful unchanged/0 unsafe accepted observed; prior8 useful outputs unchanged. Six builder-authored additional cases pass independently as supporting evidence, not unseen heldouts. Root affected refinement checks:7 builds/8 runs,1,501 assertions; allpass,0warnings/errors. See private validation/refinement61.
+
+Final browser source:107JS cases,69broker+27wire-fixture assertions,48 independentC#cases/81assertions,12framing+14selectedcontext+15actualownedhost checks,56unshownWPF checks pass. Actual JS-to-C# wire passes normal/emptydraft cases with child settlement and exact originalbytes/stage/Undo/noSend. Actual isolatedChromeDOM17checks pass against final driver. All identity/history-completion/attachment receipts are synthetic; no live provider account or upload acceptance. Unrelated final refinement source change does not relabel these as exact-final-DLL browser tests; unchanged browser source/nativehost bytes are separately bound.
+
+Preview quiet package/dependency/native-OCR-load and branding pass. WindowsPowerShell preparation-only checks for Chrome/Edge pass with syntheticID, BOM-freeJSON, exactorigin/hosthash; no registry read/write/policycopy. Preserve wrongunshownDLL launcher failure, setupcmdlet compatibility failure, and reproduced/refused semicolon ambiguity. OCR ALPHA123->ALPHA125 remains unresolved.
+
+Fresh hashes match installed service0.4.5, all626sealedsource60 files, source60archive, two sealedpreview60assemblies and sixdisabledCalculator59diagnostic files. No wholeinstalled/settings manifest claim. Final source/archive/package/input seals in validation/browser61; [report](../Windows-browser61.md). No install, browsergrant, realhistory/upload, physicalaudio, liveCalculator or publication.
+
+# Refinement60 evidence - 2026-10-07
+
+Final focused batch: 12 clean builds and 13 successful runs, including pure/injected refinement, context, source reader and independent boundary/regression suites. The changed unshown WPF suite subsequently passed49 checks; its last added capacity-refusal regression preserves source errors without showing a window. The changed reader passed27 actual owned TXT/MD/PNG/JPEG checks. Static package/dependency/OCR-load and branding checks pass. No visible field, audio, microphone, physical headphone or Calculator acceptance occurred.
+
+Independent frozen12 integrated output review: eight faithful useful improvements, four unchanged, zero unsafe accepted rewrites; numbers/units and Unicode-name utility remain unmet. This lane binds service de8634750b1d79c108ccdf06bba4cd041cbd030d12fc77f0b2975ac76bdfe8a9. Four final packaged context cases pass independent review: three context assemblies and one bounded grammar repair with complete context. Final Server9538649bdda8bffc49df5c101ba53b6adbc6962794b87905a39429de1e5eda72; App9fd07657ed9658ddcd7ad162f05744f5e4319a301c15fb074b4de7af8bd7fcaf.
+
+OCR failure is preserved: synthetic ALPHA123 recognized as ALPHA125. Native byte-reader success is distinct from recognition accuracy. Exact final corpus/input/output and synthetic one-use payload hashes were independently reviewed; no real attachment/history delivery is claimed.
+
+Private validation/refinement60 contains final-checks-v2/receipts.json, final-unshown-observation.json, ingestion-owned-assets-v3/receipt.json, ingestion-owned-fixtures-v2/ocr-result.json, tester/INTEGRATED-REVIEW and PACKAGED-CONTEXT-REVIEW, context-final-model-results.json, package-checks.json, final-source-intake/receipts.json and FINAL-OUTCOME.json. Earlier failed commands remain intact. The final outcome binds the source archive and package manifest. No private settings or recovery archives enter Git.
+
 # Version 0.4.8 package evidence
 
 Final59-command regression passes with build snapshot5e1a33d557e42857c853305e9ed12dc4e81634797478ae309e6394d74428f074. Static package validation and exact packaged --check-package pass; no desktop startup. Packaged Server comparison refinement accepted in18.505seconds, similarity0.9005715024022094, no profile/field writes; current credentials were not decoded. Private package/provenance/helper timing records are under validation/hotfix58. Native acceptance and installed replacement remain pending.

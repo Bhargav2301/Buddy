@@ -9,7 +9,7 @@ internal sealed class RefinementOptionsPanel : StackPanel, IDisposable
 {
     private sealed record Choice(string Value, string Label) { public override string ToString() => Label; }
     private sealed record ExampleEntry(TextBox Input, TextBox Output, FrameworkElement Card);
-    private sealed class ReferenceEntry(RefinementContextSource source) { internal RefinementContextSource Source = source; }
+    private sealed class ReferenceEntry(RefinementContextSource source, bool locked) { internal RefinementContextSource Source = source; internal bool Locked = locked; }
     private readonly ComboBox technique, domain, unit;
     private readonly CheckBox important, revision, hasBudget;
     private readonly TextBox tools, stages, constraints, destination, limit, referenceTitle, referenceText;
@@ -77,6 +77,12 @@ internal sealed class RefinementOptionsPanel : StackPanel, IDisposable
         tools.Text, stages.Text, constraints.Text, examples.Select(x => new RefinementExample(x.Input.Text, x.Output.Text)).ToArray(),
         references.Select(x => x.Source with { }).ToArray(), hasBudget.IsChecked == true, destination.Text, limit.Text, Value(unit));
 
+    internal void SetDestinationBudget(string name, int maximum)
+    {
+        if(maximum is <1 or >20000)throw new ArgumentOutOfRangeException(nameof(maximum));
+        destination.Text=name;limit.Text=maximum.ToString(System.Globalization.CultureInfo.InvariantCulture);hasBudget.IsChecked=true;
+    }
+
     internal void AddExample(string input, string output)
     {
         if (disposed || !IsEnabled || examples.Count >= 8) return;
@@ -94,14 +100,14 @@ internal sealed class RefinementOptionsPanel : StackPanel, IDisposable
         AddReviewedResource(new("pasted_" + Guid.NewGuid().ToString("N"), referenceTitle.Text, referenceText.Text));
         referenceTitle.Clear(); referenceText.Clear();
     }
-    internal void AddReviewedResource(RefinementContextSource source)
+    internal void AddReviewedResource(RefinementContextSource source, bool locked = false)
     {
         if (disposed || !IsEnabled) return;
         if (references.Count >= 8) throw new InvalidOperationException("Remove a reference before adding another (maximum eight).");
-        if (source.Provenance is not ("user" or "document") || source.Url is not null) throw new InvalidOperationException("Add only pasted text or a reviewed local file.");
+        if (source.Provenance is not ("user" or "document" or "user-link" or "selected-data") || source.Url is not null && source.Provenance != "user-link") throw new InvalidOperationException("Add only reviewed text, local files or explicitly supplied link references.");
         _ = RefinementContext.Build([source]);
         if (references.Any(x => x.Source.Id == source.Id)) throw new InvalidOperationException("This reviewed reference is already included.");
-        references.Add(new(source with { })); RenderReferences(); resourceStatus.Text = "Reference added for this draft. Choose a refinement mode to prepare a new result."; NotifyChanged();
+        references.Add(new(source with { }, locked)); RenderReferences(); resourceStatus.Text = "Reference added for this draft. Choose a refinement mode to prepare a new result."; NotifyChanged();
     }
     internal async Task LoadSelectedResource()
     {
@@ -148,6 +154,7 @@ internal sealed class RefinementOptionsPanel : StackPanel, IDisposable
             var source = entry.Source; var row = new StackPanel();
             row.Children.Add(Text(source.Title + (source.Provenance == "document" ? " · selected local file · unverified" : " · pasted text · unverified"), 14));
             row.Children.Add(Preview(source.Text, "Full reference " + source.Title));
+            if(entry.Locked){row.Children.Add(Text("Frozen from your reviewed chat context. Reopen Context to change this selection."));referenceRows.Children.Add(BuddyTheme.Card(row,10));continue;}
             var disposition = new ComboBox { ItemsSource = new[] { new Choice("reference", "Reference data"), new Choice("suggestion", "Suggestion"), new Choice("confirmed-decision", "Confirmed decision (required)") }, SelectedValuePath = nameof(Choice.Value), SelectedValue = source.Disposition, Margin = new(0, 0, 0, 6) };
             AutomationProperties.SetName(disposition, "Reference use " + source.Title); row.Children.Add(disposition);
             var required = new CheckBox { Content = "Keep this reference in full", IsChecked = source.Required || source.Disposition == "confirmed-decision", IsEnabled = source.Disposition != "confirmed-decision", Margin = new(0, 0, 0, 6) };

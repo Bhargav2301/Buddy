@@ -1,3 +1,37 @@
+# Current: browser61 preview verified; live adapter and setup held
+
+October 7: Buddy-browser61 is the uncommitted integration at base cf38d5efc36792ae805fafd32e0a0ed2055b3a4a. Separate release/Buddy-0.4.8-browser61-review passes package/branding and local fixture checks. Installed0.4.5, sealed refinement60 and Calculator59/disabled diagnostic remain preserved. No install, extension loading, native registration, account/history read, upload, Send or publication.
+
+Exact packaged local-model corpus: original12 now10 useful faithful changes/2 truthful unchanged/0 unsafe accepted observed; earlier8 useful outputs identical. Both numbers/units and Unicode targets improved with exact source-span constraint separation. Six additional builder-authored cases pass separately; finite evidence is not a broad language guarantee. Independent source/output review complete.
+
+Browser protocol, local review UI, complete role-aware pairs and original-byte DOM staging are implemented and validated with synthetic identities/receipts, actual owned native host/pipe and JS-to-C# wire plus isolated Chromium DOM. Production ChatGPT remains readiness-only: live verified account/workspace/history/attachment contract is missing. Real local-agent consumer and OCR usefulness remain open. Do not call this adapter complete.
+
+Concrete next approval is the separately sealed readiness probe0.1.0, only activeTab+scripting on one selected ChatGPT tab in one user-selected profile. Native registration and content/upload approval are separate later gates. Exact private request: validation/browser61/MINIMUM-SETUP-REQUEST.md. No setup authorized/applied in this phase. See [full report](../Windows-browser61.md) and validation/browser61/FINAL-OUTCOME.json. Older entries below are historical.
+
+# Historical: browser61 integration start; installation held
+
+User choice received October7 09:45:58UTC: ChatGPT in browser, plus capability-checked other browser interfaces including sites used in Comet. Root Buddy-browser61 is seeded from sealed refinement60 source snapshot4a41fa2363e94b8e01df55530eb00007613e14ea48447d60c7cde14df714870a. Buddy-refinement60, its archive/evidence/preview, and Calculator59 remain preserved separately.
+
+Four dedicated roles continue. Implement MV3 activeTab/scripting/nativeMessaging, bounded current-user native transport, exact current document/account/workspace/chat binding, full selected pairs and original byte staging, reviewed draft replacement and confirmed attachment state, no Send. Synthetic DOM/local pages only; no extension/native-host registration, persistent permission grant, real account/chat read or upload. No paid/cloud speech, unrelated PC operations, installed replacement or publication.
+
+Public sources do not establish a current verified ChatGPT account/workspace DOM contract. Production identity admission must remain unavailable until concrete narrowly scoped characterization is approved and passes. A label, route, file input or synthetic fixture is not a verified production capability. Implement useful DOM/protocol primitives now and report this material limitation with minimum concrete setup needs.
+
+# Current: refinement60 preview validated; destination adapter pending
+
+October 7: isolated Buddy-refinement60 remains uncommitted at base cf38d5efc36792ae805fafd32e0a0ed2055b3a4a. Separate release/Buddy-0.4.8-refinement60-review is built, not installed. Installation and live Calculator testing remain HOLD. Preserved hotfix59 and its incomplete disabled activation diagnostic were not resumed. No push, merge, publication, external upload, account access or message submission.
+
+Four dedicated roles completed source handoffs and independent review. The frozen 12-case integrated local-model lane yielded eight faithful improvements and four unchanged originals; two utility targets remain unmet. The exact later package passed four additional context/model cases. Focused builds/tests, 27 owned-file native checks, package/dependency load and branding pass. OCR accuracy remains a recorded failure: ALPHA 123 became ALPHA 125. Neither assertion counts nor dependency loading establish recognition or real-app acceptance.
+
+Local same-chat full pairs, explicit manual external pairs, retained original TXT/MD/PNG/JPEG assets, reviewed text/link/image staging and scoped one-use text preparation are implemented. Automatic external history, binary attachment delivery and a real local-agent consumer are material implementation gaps. Await the user's first destination choice (ChatGPT browser, Grok in Comet, or exact local-agent client/version); do not infer permission for installation/history reads/uploads. See [full outcome](../Windows-refinement60.md) and private validation/refinement60/FINAL-OUTCOME.json. Older entries below are historical.
+
+# Current: refinement repair and source/context work; installation and live Calculator tests on hold
+
+October 7: the user requested four dedicated roles: refinement builder, independent refinement tester, source/context researcher and source/context planner. Their exact ownership is in tasks.json. Root integration is isolated at Buddy-refinement60 from clean cf38d5e; Calculator59 repairs and the incomplete activation diagnostic remain preserved separately. No installation, live Calculator testing or publication in this batch.
+
+First reproduce installed0.4.5 and candidate refinement behavior with synthetic/canned prompts and isolated state, then repair and independently validate varied prompts, no-op/empty/error/cancellation/limits/repeated turns. Previous single-prompt acceptance is insufficient. Latest user report has no specific failing input/error yet; do not invent one.
+
+Implement supported chat-scoped previous prompts AND AI responses, notch source staging and context delivery. Preserve privacy, exact app/chat identity, destination budgets, review, Apply/Undo and original text. No unrelated chat history, silent external source transmission or message submission. External adapters use synthetic fixtures; live field tests require fresh coordination. Research/planning must lead to concrete implementation, with unsupported binary attachments/destinations honestly labelled.
+
 # Current: version 0.4.8 packaged source validated; coordinated update pending
 
 The focused candidate includes reviewed Calculator restoration plus the unchanged approved refinement fix. All59 nonforeground aggregate commands, static package checks and exact packaged native dependency probe pass. Exact final service/local-model comparison refinement passes in18.505seconds with similarity0.9005715024022094, no profile/field write or cloud route. Source/build hashes, local source commit and archive are sealed with the new package. No unfinished55 or wider feature work was included.

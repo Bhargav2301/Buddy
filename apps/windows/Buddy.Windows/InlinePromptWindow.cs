@@ -18,6 +18,9 @@ internal sealed class InlinePromptWindow:Window
     private readonly TextBlock previewLabel=new(){Text="Original prompt",FontWeight=FontWeights.SemiBold,Margin=new(0,8,0,4)};
     private readonly TextBlock placementHint=new(){TextWrapping=TextWrapping.Wrap,FontSize=11,Margin=new(0,5,0,0)};
     private readonly TextBlock footerHint;
+    private readonly CheckBox? contextConsent;
+    private readonly ExternalContextSelection? contextSelection;
+    private ContextDeliveryReview? contextReview;
     private readonly Func<OverlayNative.Point,PixelBounds> workArea;
     private readonly RefinementPreparationResult preparation;
     private readonly Func<bool> optionsCurrent;
@@ -30,15 +33,20 @@ internal sealed class InlinePromptWindow:Window
     internal bool IsMutating=>mutating;
     internal bool IsInFieldPreview {get;private set;}
     internal Task<bool> IsCurrent(CancellationToken ct)=>optionsCurrent()?editor.Matches(draft,applied?proposal!:draft.Edit.Original,ct):Task.FromResult(false);
-    internal InlinePromptWindow(BuddyService service,FocusedFieldEditor editor,FocusedDraft draft,Action voice,string voiceShortcut="your voice shortcut",Func<OverlayNative.Point,PixelBounds>? workArea=null,RefineRequest? request=null,Func<bool>? optionsCurrent=null,Action? configureOptions=null)
+    internal InlinePromptWindow(BuddyService service,FocusedFieldEditor editor,FocusedDraft draft,Action voice,string voiceShortcut="your voice shortcut",Func<OverlayNative.Point,PixelBounds>? workArea=null,RefineRequest? request=null,Func<bool>? optionsCurrent=null,Action? configureOptions=null,ExternalContextSelection? contextSelection=null)
     {
         this.service=service;this.editor=editor;this.draft=draft;fieldBounds=draft.Anchor.Bounds;this.workArea=workArea??OverlayNative.WorkArea;
+        this.contextSelection=contextSelection;
         if(request is not null&&request.Prompt!=draft.Edit.Original)throw new InvalidOperationException("Prepared options do not match the captured field.");
         preparation=RefinementPreparation.Prepare(request??new(draft.Edit.Original,"quick"));
         this.optionsCurrent=optionsCurrent??(()=>true);
         Title="Buddy - inline prompt suggestion";Width=360;Height=400;SizeToContent=SizeToContent.Manual;WindowStyle=WindowStyle.None;ResizeMode=ResizeMode.NoResize;Topmost=true;ShowInTaskbar=false;ShowActivated=false;Background=BuddyTheme.Surface;Foreground=BuddyTheme.Ink;
         var header=new DockPanel();var face=AppBranding.Image(28);face.Margin=new(0,0,8,0);DockPanel.SetDock(face,Dock.Left);header.Children.Add(face);header.Children.Add(status);body.Children.Add(header);
         body.Children.Add(new TextBlock{Text="Source: "+draft.App+" / "+draft.FieldName,FontSize=11,TextWrapping=TextWrapping.Wrap,Margin=new(0,3,0,5)});
+        if(request?.Inputs?.Context is {Count:>0}) {
+            contextConsent=new CheckBox{Content="This is the intended chat. I reviewed the context below and allow it in this app's draft.",Focusable=false,Foreground=BuddyTheme.Ink,Margin=new(0,5,0,5)};
+            body.Children.Add(contextConsent);body.Children.Add(new TextBlock{Text="The app may sync draft text before Send. Buddy has not verified the account/chat identity and will not submit the message.",TextWrapping=TextWrapping.Wrap,FontSize=11});
+        }
         if(request is not null){
             var budget=preparation.Budget;
             var warnings=preparation.Warnings.ToList();
@@ -58,6 +66,7 @@ internal sealed class InlinePromptWindow:Window
         Button Add(string label,Action action){var button=new Button{Content=label,Focusable=false,Padding=new(7,4,7,4),Margin=new(0,6,5,0)};button.Click+=(_,_)=>action();buttons.Children.Add(button);return button;}
         yes=Add("Yes, refine",()=>_ = Refine());Add("Voice reply",voice);Add("Stop",StopRefinement);Add("Dismiss / reject",Close);accept=Add("Accept",()=>_ = Apply());undo=Add("Undo",()=>_ = Undo());accept.Visibility=undo.Visibility=Visibility.Collapsed;accept.IsEnabled=false;
         if(configureOptions is not null)Add("Prepare new options",()=>{Close();configureOptions();});
+        if(contextConsent is not null){contextConsent.Checked+=(_,_)=>{if(proposal is not null&&!applied&&!closed)accept.IsEnabled=true;};contextConsent.Unchecked+=(_,_)=>accept.IsEnabled=false;}
         footerHint=new TextBlock{Text="Esc dismisses | Voice reply: "+voiceShortcut+" | Never sends",TextWrapping=TextWrapping.Wrap,FontSize=11,Margin=new(0,6,0,0)};
         var footer=new StackPanel{Margin=new(12,0,12,12)};footer.Children.Add(buttons);footer.Children.Add(footerHint);
         AutomationProperties.SetName(footer,"Refinement actions");AutomationProperties.SetName(status,"Refinement status");AutomationProperties.SetName(diff,"Prompt review");
@@ -66,7 +75,7 @@ internal sealed class InlinePromptWindow:Window
         Content=new Border{BorderBrush=BuddyTheme.Deep,BorderThickness=new(1),CornerRadius=new(12),Child=layout};
         SourceInitialized+=(_,_)=>{var handle=new WindowInteropHelper(this).Handle;OverlayNative.Configure(handle,false,noActivate:true);escapeRegistered=Native.RegisterHotKey(handle,0x4250,0x4000,27);if(!escapeRegistered)footerHint.Text=footerHint.Text.Replace("Esc dismisses","Dismiss / reject closes");HwndSource.FromHwnd(handle).AddHook((IntPtr h,int m,IntPtr w,IntPtr l,ref bool handled)=>{if(m==0x312&&w.ToInt32()==0x4250){handled=true;Close();return IntPtr.Zero;}if(m==0x21){handled=true;return new IntPtr(3);}return IntPtr.Zero;});Reanchor(fieldBounds);};
         Loaded+=(_,_)=>Reanchor(fieldBounds);
-        Closed+=(_,_)=>{if(escapeRegistered)Native.UnregisterHotKey(new WindowInteropHelper(this).Handle,0x4250);closed=true;refinement?.Cancel();refinement=null;lifetime.Cancel();proposal=null;accept.IsEnabled=false;diff.Inlines.Clear();};
+        Closed+=(_,_)=>{contextReview?.Dispose();contextReview=null;if(escapeRegistered)Native.UnregisterHotKey(new WindowInteropHelper(this).Handle,0x4250);closed=true;refinement?.Cancel();refinement=null;lifetime.Cancel();proposal=null;accept.IsEnabled=false;diff.Inlines.Clear();};
     }
     internal bool Reply(string text){if(!AwaitingConsent||PromptSuggestionPolicy.Reply(text) is not {} consent)return false;if(consent)_=Refine();else Close();return true;}
     internal async Task Refine(){
@@ -74,7 +83,8 @@ internal sealed class InlinePromptWindow:Window
         if(!optionsCurrent()){Close();return;}
         if(!preparation.Ready){Retry("Prepared inputs need attention. Prepare new options and capture the original field again; no refinement ran.");return;}
         started=true;yes.IsEnabled=false;yes.Visibility=Visibility.Collapsed;accept.IsEnabled=false;proposal=null;status.Text="Preparing a refinement locally. The original below is unchanged.";
-        var request=new RefinementRequest(token:lifetime.Token);refinement=request;
+        using var selectedLifetime=CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token,contextSelection?.Selection.Invalidated??default);
+        var request=new RefinementRequest(token:selectedLifetime.Token);refinement=request;
         try {
             var outcome=await request.Run(token=>service.RefineStream(preparation.Request,token),
                 onProgress:text=>{if(!closed&&ReferenceEquals(refinement,request))status.Text=text;});
@@ -89,6 +99,7 @@ internal sealed class InlinePromptWindow:Window
         finally{if(ReferenceEquals(refinement,request))refinement=null;request.Dispose();}
     }
     private void Retry(string message,RefinementResult? result=null){
+        contextReview?.Dispose();contextReview=null;
         proposal=null;started=false;accept.IsEnabled=false;accept.Visibility=Visibility.Collapsed;resultDetails.Text="";
         if(result is not null)ShowResultDetails(result);
         diff.Text=draft.Edit.Original;previewLabel.Text="Original prompt";status.Text=message;
@@ -114,9 +125,10 @@ internal sealed class InlinePromptWindow:Window
         if(!RefinementChange.HasMeaningfulChange(draft.Edit.Original,text)){
             Retry(RefinementChange.NoChangeMessage);return;
         }
+        contextReview?.Dispose();contextReview=contextSelection?.Reviews.Create(contextSelection.Selection,contextSelection.Projection,ContextTarget(),draft.Edit.Original,text);
         proposal=text;var delta=PromptSuggestionPolicy.Difference(draft.Edit.Original,text);diff.Inlines.Clear();
         diff.Inlines.Add(new Run(delta.Prefix));diff.Inlines.Add(BuddyTheme.DiffRun(delta.Removed,false));diff.Inlines.Add(BuddyTheme.DiffRun(delta.Added,true));diff.Inlines.Add(new Run(delta.Suffix));
-        previewLabel.Text="Proposed changes";status.Text="Refinement ready. Review the changes; the original field is unchanged.";accept.IsEnabled=true;accept.Visibility=Visibility.Visible;Reanchor(fieldBounds);
+        previewLabel.Text="Proposed changes";status.Text="Refinement ready. Review the changes; the original field is unchanged.";accept.IsEnabled=contextConsent is null||contextConsent.IsChecked==true;accept.Visibility=Visibility.Visible;Reanchor(fieldBounds);
     }
     internal void Reanchor(Rect bounds){
         fieldBounds=bounds;var handle=new WindowInteropHelper(this).Handle;if(handle==IntPtr.Zero)return;
@@ -131,11 +143,21 @@ internal sealed class InlinePromptWindow:Window
         else {var position=OverlayPlacement.NearPointer(point.X,point.Y,Width*scale,Height*scale,work,scale);OverlayNative.SetBounds(this,(int)position.X,(int)position.Y,(int)(Width*scale),(int)(Height*scale));}
     }
     private async Task Apply(){
-        if(proposal is null||!RefinementChange.HasMeaningfulChange(draft.Edit.Original,proposal)||applied||closed||mutating||!accept.IsEnabled)return;
+        if(proposal is null||!RefinementChange.HasMeaningfulChange(draft.Edit.Original,proposal)||applied||closed||mutating||!accept.IsEnabled||contextConsent is not null&&contextConsent.IsChecked!=true)return;
         if(!optionsCurrent()){Close();return;}
         accept.IsEnabled=false;mutating=true;
-        try {await editor.Apply(draft,proposal,lifetime.Token);applied=true;status.Text="Applied without sending. Undo is available for 30 seconds.";undo.Visibility=Visibility.Visible;}
-        catch(Exception ex){status.Text=ex.Message;}finally{mutating=false;}
+        try {
+            using var linked=CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token,contextReview?.Invalidated??default);
+            string payload=proposal;
+            if(contextSelection is not null){
+                if(contextReview is null||!contextSelection.IsCurrent||!await editor.Matches(draft,draft.Edit.Original,linked.Token))throw new InvalidOperationException("Context or destination changed. Prepare a new review.");
+                payload=contextSelection.Reviews.Consume(contextReview,ContextTarget(),draft.Edit.Original,linked.Token);
+            }
+            await editor.Apply(draft,payload,linked.Token);applied=true;status.Text="Applied without sending. Undo is available for 30 seconds.";undo.Visibility=Visibility.Visible;
+        }
+        catch(Exception ex){status.Text=ex.Message;}finally{contextReview?.Dispose();contextReview=null;mutating=false;}
     }
+    private ContextDestinationBinding ContextTarget()=>new("uia-exact-draft-v1",draft.App,draft.Anchor.Identity,
+        Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes("uia-valuepattern-exact-readback-undo-v1"))).ToLowerInvariant(),contextSelection!.Selection.Scope.Id,false);
     private async Task Undo(){if(mutating||closed||!applied)return;mutating=true;undo.IsEnabled=false;try{await editor.Undo(draft,lifetime.Token);applied=false;proposal=null;accept.IsEnabled=false;diff.Text=draft.Edit.Original;previewLabel.Text="Original prompt";status.Text="Exact original restored without sending.";}catch(Exception ex){status.Text=ex.Message;}finally{mutating=false;}}
 }

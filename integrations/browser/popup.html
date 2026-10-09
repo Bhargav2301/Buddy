@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Buddy browser preview</title><link rel="stylesheet" href="popup.css"></head>
+<body><h1>Buddy browser preview</h1>
+<p>Check this tab, then pair it with Buddy. ChatGPT identity and upload signals still need live validation.</p>
+<button data-op="readiness">Check this tab’s readiness</button>
+<button data-op="pair">Pair this tab with Buddy</button>
+<button data-op="capture">Capture verified completed turns</button>
+<button data-op="stage">Stage the reviewed draft</button>
+<button data-op="undo">Undo the reviewed text change</button>
+<button data-op="disconnect">Disconnect</button>
+<p id="status" role="status" aria-live="polite">No tab connected.</p>
+<p>Draft staging and attachments require a fresh review in Buddy. Messages are never sent by this extension.</p>
+<script src="popup.js"></script></body></html>

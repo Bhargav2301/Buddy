@@ -1,6 +1,7 @@
 using Buddy.Server;
 using Buddy.Windows;
 using System.Reflection;
+using System.IO;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
@@ -93,7 +94,9 @@ internal static class Program
             Invoke(inline,"ShowProposal",Original);
             Check(!Button(inline,"Accept").IsEnabled&&Button(inline,"Accept").Visibility==Visibility.Collapsed,"No-change result cannot enable Accept in actual inline controls");
             Invoke(inline,"ShowProposal",Proposal);
-            Check(Button(inline,"Accept").IsEnabled&&field.Writes==0,"Changed proposal enables review only and performs no source write");
+            Check(!Button(inline,"Accept").IsEnabled&&field.Writes==0,"Context proposal requires explicit recipient confirmation before Accept");
+            ((CheckBox)Field(inline,"contextConsent")).IsChecked=true;
+            Check(Button(inline,"Accept").IsEnabled&&field.Writes==0,"Confirmed changed proposal enables review only and performs no source write");
             slot.Clear(); ((Task)Invoke(inline,"Apply")!).GetAwaiter().GetResult();
             Check(field.Writes==0&&!Button(inline,"Accept").IsEnabled,"Stale options authority refuses forced Apply before any field adapter call");
 
@@ -106,12 +109,74 @@ internal static class Program
             bool mismatch=false;try{_ =new InlinePromptWindow(null!,editor,draft,()=>{},request:new RefineRequest("Different source","quick"));}catch(InvalidOperationException){mismatch=true;}
             Check(mismatch,"Request prepared for different source is refused at review construction");
             Check(new WindowInteropHelper(blocked).Handle==IntPtr.Zero&&field.Writes==0,"All unshown review checks finish without HWND, source write or submission");
+            ContextReviewChecks(windows);
+            BrowserContextUiChecks(windows);
             Console.WriteLine($"{checks} unshown WPF refinement checks passed. No native field, foreground, model, browser or physical acceptance.");return 0;
         }catch(Exception ex){Console.Error.WriteLine(ex);return 1;}
         finally{foreach(var window in windows){try{window.Close();}catch{}}app.Shutdown();}
     }
     private static RefinementDraftOptions Basic()=>new("auto","general",false,false,"","","",[],[],false,"","","utf16-code-units");
+    private static void ContextReviewChecks(List<Window> windows)
+    {
+        using var workspace=new RefinementWorkspace();var scope=new RefinementChatScope("buddy-local","synthetic-ocr-review");workspace.Open(scope);
+        var encoder=new System.Windows.Media.Imaging.PngBitmapEncoder();
+        encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(System.Windows.Media.Imaging.BitmapSource.Create(1,1,96,96,System.Windows.Media.PixelFormats.Bgra32,null,new byte[]{255,255,255,255},4)));
+        using var bytes=new MemoryStream();encoder.Save(bytes);var snapshot=new ContextImageSnapshot(bytes.ToArray(),new("image/png",1,1));
+        var image=new ContextSourceReadResult("synthetic-image","owned-fixture.png",ContextSourceKind.LocalImage,"image/png","",snapshot.Sha256,ContextSourceReader.DigestText(""),snapshot.ByteCount,"synthetic-image",Image:snapshot,OriginalAsset:snapshot.RetainOriginalAsset());
+        int dispatched=0,ocrCalls=0;
+        var window=new ContextWorkspaceWindow(workspace,scope,"Synthetic context",(_,_)=>dispatched++,readSelected:(_,_)=>Task.FromResult(image),
+            extractSelected:(source,_)=>{ocrCalls++;return Task.FromResult(ContextSourceReader.FromOcr(source,"ALPHA 125","injected-ocr-review-fixture"));});windows.Add(window);
+        window.StageFile("owned-fixture.png").GetAwaiter().GetResult();
+        Check(new WindowInteropHelper(window).Handle==IntPtr.Zero&&!window.IsVisible,"Context review remains unshown and has no HWND");
+        Click(window,"Prepare for an external chat");Check(dispatched==0,"Unreviewed original image cannot dispatch text context");
+        ((Task)Invoke(window,"ExtractImage")!).GetAwaiter().GetResult();
+        var source=workspace.Snapshot(scope).Sources.Single();
+        Check(source.Text=="ALPHA 125"&&!source.Reviewed&&source.Kind==RefinementSourceKind.LocalOcr,"Fallible injected OCR remains explicitly unreviewed text");
+        Check(Field(window,"pendingImage") is not null&&((StackPanel)Field(window,"imageReview")).Children.OfType<Image>().Any(),"Original image stays beside extracted text until review or discard");
+        Check(Tree(window).OfType<TextBlock>().Any(t=>t.Text.Contains("misread letters and numbers")),"Review explicitly warns that OCR may change letters and numbers");
+        ((Task)Invoke(window,"ExtractImage")!).GetAwaiter().GetResult();Check(ocrCalls==1,"Repeated extraction cannot replace an unreviewed result");
+        Click(window,"Prepare for an external chat");Check(dispatched==0,"OCR text cannot dispatch before separate source review");
+        Click(window,"Add reviewed source");Check(workspace.Snapshot(scope).Sources.Single().Reviewed,"Explicit source review records only the selected extracted text");
+        Check(Field(window,"pendingImage") is null&&((StackPanel)Field(window,"imageReview")).Children.Count==0,"Completed extraction review releases pending preview ownership");
+        var reviewed=workspace.Snapshot(scope);var frozen=workspace.Freeze(scope,reviewed.Revision,[reviewed.Sources.Single().Id],[]);
+        using(var original=workspace.RetainOriginalAsset(frozen,reviewed.Sources.Single().Id))Check(original.CopyBytes().SequenceEqual(bytes.ToArray()),"Review retains exact original image bytes independently from OCR text");
+        var requireOriginal=Tree(window).OfType<CheckBox>().Single(c=>c.Content is string s&&s.StartsWith("Require the original"));requireOriginal.IsChecked=true;requireOriginal.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+        Check(!workspace.Snapshot(scope).Sources.Single().Reviewed&&frozen.Invalidated.IsCancellationRequested,"Changing original-delivery requirement invalidates the old selection and requires review again");
+        Click(window,"Add reviewed source");Click(window,"Prepare for an external chat");Check(dispatched==0,"Text destination refuses original-required image context instead of substituting OCR");
+        Click(window,"Clear this context");Check(workspace.Snapshot(scope).Sources.Count==0&&dispatched==0,"Clear removes local reviewed context without a destination write");
+        window.Close();
+        var fullScope=new RefinementChatScope("buddy-local","synthetic-full-context");workspace.Open(fullScope);
+        for(int i=0;i<8;i++){var s=workspace.StageSource(fullScope,new("Source "+i,"Reviewed text "+i),workspace.Snapshot(fullScope).Revision);var item=s.Sources.Last();workspace.ReviewSource(fullScope,item.Id,item.ReviewDigest,s.Revision);}
+        var rejected=ContextSourceReader.FromSelectedTextBytes("ninth.txt",System.Text.Encoding.UTF8.GetBytes("Ninth source"),"text/plain");
+        var fullWindow=new ContextWorkspaceWindow(workspace,fullScope,"Full synthetic context",(_,_)=>dispatched++,readSelected:(_,_)=>Task.FromResult(rejected));windows.Add(fullWindow);
+        fullWindow.StageFile("ninth.txt").GetAwaiter().GetResult();
+        Check(((TextBlock)Field(fullWindow,"status")).Text.Contains("Remove a source"),"Source-capacity refusal remains visible after asynchronous read cleanup");
+        Check(workspace.Snapshot(fullScope).Sources.Count==8&&dispatched==0,"Refused new file leaves the existing reviewed selection unchanged");
+        bool released=false;try{rejected.OriginalAsset!.EnsureAvailable();}catch(ObjectDisposedException){released=true;}
+        Check(released,"Refused file staging releases the newly read original asset");fullWindow.Close();
+    }
     private static void Check(bool value,string text){if(!value)throw new Exception("FAIL: "+text);checks++;Console.WriteLine("PASS: "+text);}
+    private static void BrowserContextUiChecks(List<Window> windows)
+    {
+        using var workspace=new RefinementWorkspace();
+        FrozenRefinementContext Source(string id,string text){var scope=new RefinementChatScope("manual-external",id);workspace.Open(scope);var staged=workspace.StageSource(scope,new("Selected source",text),0);var item=staged.Sources.Single();workspace.ReviewSource(scope,item.Id,item.ReviewDigest,staged.Revision);return workspace.Freeze(scope,workspace.Snapshot(scope).Revision,[item.Id],[]);}
+        var old=Source("browser-old","Old selected data");var next=Source("browser-new","New selected data");
+        int callbacks=0;FrozenRefinementContext? prepared=null;
+        var context=new ContextWorkspaceWindow(workspace,next.Scope,"Owned browser context",(_,_)=>throw new Exception("Unexpected text dispatch"),browser:f=>{prepared=f;callbacks++;});windows.Add(context);
+        Click(context,"Review with browser adapter");
+        Check(callbacks==1&&prepared?.Sources.Single().Text=="New selected data","Browser preparation carries the exact selected frozen context without a text destination effect");
+        var browser=new BrowserContextReviewWindow(workspace);windows.Add(browser);
+        Check(new WindowInteropHelper(browser).Handle==IntPtr.Zero&&!browser.IsVisible,"Browser review window remains unshown with no HWND");
+        browser.SetSelection(old);workspace.Clear(old.Scope);browser.SetSelection(next);
+        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Background,new Action(()=>{}));
+        Check(((BrowserSelectedContext)Field(browser,"selected")).Selection==next,"Queued old selection invalidation cannot replace or revoke the new selected context");
+        Check(!((TextBlock)Field(browser,"notice")).Text.Contains("changed or was cleared"),"Stale queued invalidation cannot overwrite the replacement review status");
+        Check(((TextBox)Field(browser,"draft")).Text.Contains("New selected data")&&!((TextBox)Field(browser,"draft")).Text.Contains("Old selected data"),"Replacement review shows only the new selected context");
+        Click(browser,"Prepare exact browser review");
+        Check(Field(browser,"review") is null,"Unpaired production browser cannot prepare a mutation review");
+        var listener=(BrowserPipeListener)Field(browser,"listener");browser.Close();listener.Completion.GetAwaiter().GetResult();
+        Check(listener.Completion.IsCompletedSuccessfully,"Closing unshown browser review settles its owned empty pipe listener");
+    }
     private static IEnumerable<DependencyObject> Tree(DependencyObject root){yield return root;foreach(var child in LogicalTreeHelper.GetChildren(root).OfType<DependencyObject>())foreach(var item in Tree(child))yield return item;}
     private static T Named<T>(DependencyObject root,string name)where T:DependencyObject=>Tree(root).OfType<T>().Single(x=>AutomationProperties.GetName(x)==name);
     private static Button Button(DependencyObject root,string label)=>Tree(root).OfType<Button>().Single(x=>Equals(x.Content,label));

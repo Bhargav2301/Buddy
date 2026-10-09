@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Buddy browser context preview",
+  "description": "Explicitly reviewed browser context and draft staging. Never sends a message.",
+  "version": "0.1.0",
+  "minimum_chrome_version": "106",
+  "permissions": ["activeTab", "scripting", "nativeMessaging"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": { "default_title": "Review Buddy browser readiness", "default_popup": "popup.html" },
+  "content_security_policy": { "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'none'" }
+}

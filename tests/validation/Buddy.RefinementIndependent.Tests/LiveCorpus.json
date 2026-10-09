@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "cases": [
+    {
+      "id": "known-standalone-poem",
+      "prompt": "Write poem.",
+      "mode": "quick",
+      "domain": "general"
+    },
+    {
+      "id": "known-standalone-difference",
+      "prompt": "Explain difference between RAM and storage.",
+      "mode": "quick",
+      "domain": "general"
+    },
+    {
+      "id": "reported-buddy-comparison",
+      "prompt": "List all the features of Buddy and everything Buddy can currently do versus what is still left to build in Buddy",
+      "mode": "quick",
+      "domain": "general"
+    },
+    {
+      "id": "rough-summary",
+      "prompt": "Prepare brief summary about last week's test results.",
+      "mode": "quick",
+      "domain": "general"
+    },
+    {
+      "id": "subject-verb",
+      "prompt": "The release notes needs a short summary for reviewers.",
+      "mode": "quick",
+      "domain": "general"
+    },
+    {
+      "id": "numbers-units",
+      "prompt": "Compare 2 plans costing $19.50 and $25 per month for 12 users; keep latency below 150 ms and do not round the prices.",
+      "mode": "quick",
+      "domain": "general"
+    },
+    {
+      "id": "code-literal",
+      "prompt": "Explain why `x <= 10 && y != 0` is false for x=12 and y=4. Do not change the expression.",
+      "mode": "quick",
+      "domain": "general"
+    },
+    {
+      "id": "unicode-names",
+      "prompt": "Draft a short invitation to Zoë and 李明 for café night on 8 May; retain the emoji 🌙 and do not translate their names.",
+      "mode": "quick",
+      "domain": "general"
+    },
+    {
+      "id": "conditional-negative",
+      "prompt": "If the backup fails, keep the original file and report the error; otherwise replace only the temporary copy. Never delete the original.",
+      "mode": "quick",
+      "domain": "general"
+    },
+    {
+      "id": "distinct-counts",
+      "prompt": "Write exactly 3 sentences about the first proposal and exactly 5 sentences about the second proposal.",
+      "mode": "quick",
+      "domain": "general"
+    },
+    {
+      "id": "typo-and-negation",
+      "prompt": "Pleae write a short mesage saying we cannot attend on Tuesday, not that we refuse the invitation.",
+      "mode": "quick",
+      "domain": "general"
+    },
+    {
+      "id": "already-structured",
+      "prompt": "Request: Draft a short email.\n\nSubject: A request for Friday off.\n\nConstraint: Do not give a reason for the request.",
+      "mode": "quick",
+      "domain": "general"
+    }
+  ]
+}

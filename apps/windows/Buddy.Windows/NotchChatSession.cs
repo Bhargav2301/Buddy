@@ -10,7 +10,8 @@ internal sealed record NotchChatRequest(string SessionId, string RequestId, stri
 internal sealed record NotchChatReply(string Text);
 internal enum NotchInboxPhase { Empty, Reading, Review, Attached, Failed }
 internal sealed record NotchChatSnapshot(long Revision, string SessionId, string Draft, string ModelId, bool Busy, string Status,
-    IReadOnlyList<NotchChatMessage> Messages, IReadOnlyList<NotchModelChoice> Models, NotchInboxPhase InboxPhase, NotchTextAttachment? File, string InboxStatus);
+    IReadOnlyList<NotchChatMessage> Messages, IReadOnlyList<NotchModelChoice> Models, NotchInboxPhase InboxPhase, NotchTextAttachment? File, string InboxStatus)
+{ internal string ContextNotice { get; init; } = ""; internal long HistoryRevision { get; init; } }
 
 // Actual model/service work is injected by the production owner. This session
 // cannot capture a screen, use the network, open an app, or infer completion.
@@ -26,10 +27,11 @@ internal sealed class NotchChatSession : IDisposable
     private string sessionId = Guid.NewGuid().ToString("N"), draft = "", selectedModel = "", status = "Choose a local model and write a message.";
     private string inboxStatus = "TXT or Markdown only. Review the contents before attaching.";
     private string? displayError;
+    private string contextNotice = "";
     private NotchTextAttachment? file;
     private NotchInboxPhase inboxPhase;
     private CancellationTokenSource? request, reading;
-    private long generation, fileGeneration, revision;
+    private long generation, fileGeneration, revision, historyRevision;
     private bool disposed;
     internal event Action? Changed;
     internal string RetentionNotice { get; }
@@ -54,7 +56,7 @@ internal sealed class NotchChatSession : IDisposable
             var choices = Choices();
             lock (gate) {
                 if (selectedModel.Length == 0) selectedModel = choices.FirstOrDefault(m => m.Available && m.Local)?.Id ?? "";
-                return new(revision, sessionId, draft, selectedModel, request is not null, DisplayStatus(status), messages.ToArray(), choices, inboxPhase, file, DisplayStatus(inboxStatus));
+                return new(revision, sessionId, draft, selectedModel, request is not null, DisplayStatus(status), messages.ToArray(), choices, inboxPhase, file, DisplayStatus(inboxStatus)) { ContextNotice = contextNotice, HistoryRevision = historyRevision };
             }
         }
     }
@@ -80,6 +82,12 @@ internal sealed class NotchChatSession : IDisposable
         lock (gate) { if (disposed || request is not null || text.Length > 4000) return false; draft = text; }
         return true; // Keystrokes do not rebuild the rest of the editor.
     }
+    internal bool ReplaceDraft(string expectedSession, string expected, string value)
+    {
+        lock(gate){if(disposed||request is not null||sessionId!=expectedSession||draft!=expected||value.Length>4000)return false;draft=value;}
+        Notify();return true;
+    }
+    internal void SetContextNotice(string value){lock(gate){if(disposed||contextNotice==value)return;contextNotice=value;}Notify();}
     internal bool SelectModel(string id)
     {
         var choice = Choices().SingleOrDefault(m => m.Id == id);
@@ -115,6 +123,7 @@ internal sealed class NotchChatSession : IDisposable
             lock (gate) {
                 if (disposed || request != owner || version != generation) return false;
                 messages.Add(new("You", input.Text, clock())); messages.Add(new("Buddy", reply.Text, clock()));
+                historyRevision++;
                 while (messages.Count > 40) messages.RemoveRange(0, 2);
                 draft = ""; status = "Answer ready. Local history stays here until you start a new chat.";
                 // Attachments are one-message context, never silently reused.
@@ -158,7 +167,7 @@ internal sealed class NotchChatSession : IDisposable
     {
         lock (gate) {
             if (disposed || request is not null || reading is not null) return false;
-            sessionId = Guid.NewGuid().ToString("N"); messages.Clear(); draft = ""; file = null; inboxPhase = NotchInboxPhase.Empty;
+            sessionId = Guid.NewGuid().ToString("N"); messages.Clear(); historyRevision++; draft = ""; file = null; inboxPhase = NotchInboxPhase.Empty; contextNotice="";
             status = "New local chat. Previous saved conversations remain in Home."; inboxStatus = "No file attached.";
         }
         Notify(); return true;
@@ -216,4 +225,6 @@ internal sealed class NotchChatSession : IDisposable
     public void Dispose() { lock (gate) { if (disposed) return; disposed = true; } Stop(); lock (gate) Changed = null; }
 }
 
-internal sealed record NotchWorkspace(NotchChatSession Chat, NotchNoteStore Notes);
+internal sealed record NotchWorkspace(NotchChatSession Chat, NotchNoteStore Notes,
+    Action? OpenContext = null, Action? OpenExternalContext = null,
+    Func<string, Task>? StageContextFile = null, Action<string>? StageContextText = null);

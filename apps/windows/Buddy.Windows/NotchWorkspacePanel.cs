@@ -25,6 +25,7 @@ internal sealed class NotchWorkspacePanel : StackPanel, IDisposable
     private readonly TextBlock modelStatus = Label("");
     private readonly TextBlock fileStatus = Label("");
     private readonly TextBlock fileName = Label("No local file context");
+    private readonly TextBlock contextStatus = Label("");
     private readonly Button save, reload, send, choose, attach, remove, newChat;
     private NotchNote? saved;
     private bool editing, painting, disposed;
@@ -43,6 +44,7 @@ internal sealed class NotchWorkspacePanel : StackPanel, IDisposable
         };
         Children.Add(models); AutomationProperties.SetName(modelStatus, "Notch model availability"); Children.Add(modelStatus);
         Children.Add(Label(workspace.Chat.RetentionNotice));
+        Children.Add(contextStatus);
         history.IsReadOnly = true; history.MaxHeight = 240; Children.Add(history);
         Children.Add(fileName); Children.Add(fileStatus); preview.IsReadOnly = true; preview.Visibility = Visibility.Collapsed; Children.Add(preview);
         var files = new WrapPanel(); choose = Add(files, "Choose text file", ChooseFile); attach = Add(files, "Attach reviewed text", () => {
@@ -51,6 +53,8 @@ internal sealed class NotchWorkspacePanel : StackPanel, IDisposable
         Children.Add(draft);
         var actions = new WrapPanel(); send = Add(actions, "Send local message", () => { if (editing) _ = workspace.Chat.Send(); });
         newChat = Add(actions, "New local chat", () => { if (editing) workspace.Chat.NewChat(); }); Children.Add(actions); Children.Add(status);
+        if (workspace.OpenContext is not null) Add(actions, "Context & refine", () => { if (editing && !workspace.Chat.Snapshot.Busy) workspace.OpenContext(); });
+        if (workspace.OpenExternalContext is not null) Add(actions, "External chat context", () => { if (editing && !workspace.Chat.Snapshot.Busy) workspace.OpenExternalContext(); });
         AutomationProperties.SetName(status, "Notch chat status"); AutomationProperties.SetLiveSetting(status, AutomationLiveSetting.Polite);
         AutomationProperties.SetName(fileStatus, "Notch file status"); AutomationProperties.SetName(noteStatus, "Notch note status");
         note.TextChanged += (_, _) => { if (!painting) noteStatus.Text = saved is not null && note.Text == saved.Text ? "Saved note unchanged." : "Unsaved local note. Choose Save note to keep it."; };
@@ -66,14 +70,22 @@ internal sealed class NotchWorkspacePanel : StackPanel, IDisposable
         PreviewDragOver += (_, e) => { e.Effects = CanDrop(e) ? DragDropEffects.Copy : DragDropEffects.None; e.Handled = true; };
         Drop += (_, e) => {
             e.Handled = true;
-            if (CanDrop(e) && e.Data.GetData(DataFormats.FileDrop) is string[] { Length: 1 } paths) _ = workspace.Chat.StageFile(paths[0]);
-            else fileStatus.Text = "Choose one local TXT or Markdown file while editing.";
+            try {
+                if (CanDrop(e) && e.Data.GetDataPresent(DataFormats.FileDrop,false) && e.Data.GetData(DataFormats.FileDrop,false) is string[] { Length: 1 } paths) _ = workspace.StageContextFile?.Invoke(paths[0]) ?? workspace.Chat.StageFile(paths[0]);
+                else if (CanDrop(e) && e.Data.GetDataPresent(DataFormats.UnicodeText,false) && e.Data.GetData(DataFormats.UnicodeText,false) is string text && workspace.StageContextText is not null) workspace.StageContextText(text);
+                else fileStatus.Text = "Drop one supported local file, browser text or HTTPS link while editing. Review it before use.";
+            } catch { fileStatus.Text = "The offered drop could not be read. Save one supported file locally or paste text into Context."; }
         };
         workspace.Chat.Changed += ChatChanged;
         ReloadNote(); SetEditing(false); Refresh(true);
     }
-    private bool CanDrop(System.Windows.DragEventArgs e) => editing && !workspace.Chat.Snapshot.Busy && e.Data.GetDataPresent(DataFormats.FileDrop)
-        && e.Data.GetData(DataFormats.FileDrop) is string[] { Length: 1 };
+    private bool CanDrop(System.Windows.DragEventArgs e)
+    {
+        try { return editing && !workspace.Chat.Snapshot.Busy &&
+            (e.Data.GetDataPresent(DataFormats.FileDrop,false) && e.Data.GetData(DataFormats.FileDrop,false) is string[] { Length: 1 }
+            || workspace.StageContextText is not null && e.Data.GetDataPresent(DataFormats.UnicodeText,false)); }
+        catch { return false; }
+    }
     private static TextBox Editor(string name, int limit, double height)
     {
         var text = new TextBox { AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MaxLength = limit, MinHeight = height, MaxHeight = height + 80,
@@ -115,7 +127,7 @@ internal sealed class NotchWorkspacePanel : StackPanel, IDisposable
                 : selected?.UnavailableReason ?? "No ready local model is available. Check Buddy Home.";
             if (draft.Text != state.Draft) draft.Text = state.Draft;
             history.Text = state.Messages.Count == 0 ? "No messages in this local chat yet." : string.Join("\n\n", state.Messages.Select(m => m.Role + " · " + m.At.ToLocalTime().ToString("HH:mm") + "\n" + m.Text));
-            status.Text = state.Status; fileStatus.Text = state.InboxStatus;
+            status.Text = state.Status; fileStatus.Text = state.InboxStatus; contextStatus.Text=state.ContextNotice;
             fileName.Text = state.File is { } item ? (state.InboxPhase == NotchInboxPhase.Attached ? "Attached for next message: " : "Review local text: ") + item.Name : "No local file context";
             preview.Text = state.File?.Text ?? ""; preview.Visibility = state.File is null ? Visibility.Collapsed : Visibility.Visible;
             draft.IsReadOnly = !editing || state.Busy; models.IsEnabled = editing && !state.Busy;

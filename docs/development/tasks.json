@@ -3412,8 +3412,596 @@
       ],
       "status": "validated",
       "deliverable": "Focused source/package provenance and private readiness handoff; no native update execution"
+    },
+    {
+      "id": "REFINEBUILD-60",
+      "attempt": 1,
+      "owner": "/root/app47",
+      "baseRevision": "cf38d5efc36792ae805fafd32e0a0ed2055b3a4a",
+      "writeScope": [
+        "services/Buddy.Server/Refinement.cs",
+        "services/Buddy.Server/RefinementContract.cs",
+        "services/Buddy.Server/RefinementChange.cs",
+        "services/Buddy.Server/RefinementPreparation.cs",
+        "tests/Buddy.RefinementBuilder.Tests/*",
+        "services/Buddy.Server/RefinementGrammar.cs",
+        "tests/Buddy.RefinementMeaning.Tests/GrammarChecks.cs",
+        "tests/Buddy.RefinementMeaning.Tests/Program.cs"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Repair actual refinement utility/lifecycle with preserved fidelity and explicit outcome semantics"
+      ],
+      "status": "accepted",
+      "deliverable": "Hash-verified integrated source; focused root tests and independent output review. Live external history/binary/local-agent adapters remain incomplete.",
+      "worktree": "../Buddy-refinement60-builder",
+      "roleAlias": "REFINE-BUILD60",
+      "acceptedSnapshot": "59286ff055dc4ccfadb94a3717aef8c8e2498a5400e850f9f33506937a40ff64",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/Refinement.cs",
+          "sha256": "b4b04b18b9f0f8ea35e80fb9e798fdb8853759499bcb88f067d6803ea2fe7dcf"
+        },
+        {
+          "path": "services/Buddy.Server/RefinementChange.cs",
+          "sha256": "de51c21c4bbd10c8eedc3493057dd2424505c5090460130598a2663ed7761efa"
+        },
+        {
+          "path": "services/Buddy.Server/RefinementContract.cs",
+          "sha256": "627e84e78e98f1c514608b348b888f28066eb4e7e6b0b1bbe47f2b95792ded18"
+        },
+        {
+          "path": "services/Buddy.Server/RefinementGrammar.cs",
+          "sha256": "7492444b8d2712dc37fb0563750cdb960a6bf707736abf7b7c2f5666a9ab75ac"
+        },
+        {
+          "path": "services/Buddy.Server/RefinementPreparation.cs",
+          "sha256": "ea2f5e2fe8d62be4056b981d8b6a2851e776ef6eb7b9c8dbb861fc8cbb86a02f"
+        },
+        {
+          "path": "tests/Buddy.RefinementBuilder.Tests/Buddy.RefinementBuilder.Tests.csproj",
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5"
+        },
+        {
+          "path": "tests/Buddy.RefinementBuilder.Tests/Program.cs",
+          "sha256": "152d8b095868b0901978a9a61a23df0e13e4cc6c3edea5c526d44d0b1029433b"
+        },
+        {
+          "path": "tests/Buddy.RefinementMeaning.Tests/GrammarChecks.cs",
+          "sha256": "60114ac1b6e199ab85342fb97acf4f89387076ac711396031b22000199f2e536"
+        },
+        {
+          "path": "tests/Buddy.RefinementMeaning.Tests/Program.cs",
+          "sha256": "b36b85602d9e4536b906a115fea0e8fd13ad05e2bbd97b4a5f0c26d1ff9e433f"
+        }
+      ],
+      "finalEvidence": "validation/refinement60/FINAL-OUTCOME.json"
+    },
+    {
+      "id": "REFINETEST-60",
+      "attempt": 1,
+      "owner": "/root/qa43",
+      "baseRevision": "cf38d5efc36792ae805fafd32e0a0ed2055b3a4a",
+      "writeScope": [
+        "tests/validation/Buddy.RefinementIndependent.Tests/*"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Independent frozen varied corpus, failure/cancellation/budget/repeated-turn tests; distinguish utility from safe rejection"
+      ],
+      "status": "accepted",
+      "deliverable": "Hash-verified integrated source; focused root tests and independent output review. Live external history/binary/local-agent adapters remain incomplete.",
+      "worktree": "../Buddy-refinement60-tester",
+      "roleAlias": "REFINE-TEST60",
+      "acceptedSnapshot": "a89d5c723d8428cbd8a536b2f3be0efc4d733265fcbc6e15d6450300d3962053",
+      "acceptedFiles": [
+        {
+          "path": "tests/validation/Buddy.RefinementIndependent.Tests/BoundaryCases.cs",
+          "sha256": "4833510de84ddf49d2a0395afdc74227b2ef85fc24dd535a3548d9c3bb373c84"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementIndependent.Tests/Buddy.RefinementIndependent.Tests.csproj",
+          "sha256": "d37b9f759bc295b0b334629b52976df1e863d3cffb2ce0cf87ecda655107e946"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementIndependent.Tests/Corpus.json",
+          "sha256": "e11f725422e9f6e5a4ce0fdcbe2a2fe42a9546cb302e478eed95d85667b71a73"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementIndependent.Tests/CorpusReview.cs",
+          "sha256": "ef552ad0f7c7a3c279d7afee92ae6bd04b24a9a9d84af8b66717c4de16f97d61"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementIndependent.Tests/KnownRegressions.json",
+          "sha256": "82517b9dda31542b58d5d91bddbaeb5598c08207897175b13ac4a2d880af6c7c"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementIndependent.Tests/LiveCorpus.json",
+          "sha256": "f91c8186d19691a90bc076b29f5a01f3441090d8786ba5be984ece474eb11118"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementIndependent.Tests/NuGet.offline.config",
+          "sha256": "2142cfb2dfa2c7feefbe40fabcc68b0dfecadafa99a1db9b70239d977cf2a7ef"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementIndependent.Tests/Program.cs",
+          "sha256": "06931e0793019814f974eb3be39e5e686a0bcc97f5d213a627c55866383943ce"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementIndependent.Tests/README.md",
+          "sha256": "381aee8ccfedce84083b712fde4d1498fc7732fb2de4077b963ca89602c9df70"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementIndependent.Tests/RegressionCases.cs",
+          "sha256": "9693289ce6b6d010c578873e6fe8d743bdf12b2fcbac0348bacfee444a2309b1"
+        },
+        {
+          "path": "tests/validation/Buddy.RefinementIndependent.Tests/ServiceCases.cs",
+          "sha256": "5d1ca4dea8421aaaf4536eb787d25aec9594e6eeaf87c1c48a2f7910407bd405"
+        }
+      ],
+      "finalEvidence": "validation/refinement60/FINAL-OUTCOME.json"
+    },
+    {
+      "id": "CONTEXTRESEARCH-60",
+      "attempt": 1,
+      "owner": "/root/context_research60",
+      "baseRevision": "cf38d5efc36792ae805fafd32e0a0ed2055b3a4a",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/ContextSourceReader.cs",
+        "apps/windows/Buddy.Windows/ContextSourceFileReader.cs",
+        "apps/windows/Buddy.Windows/ContextSourceImagePreview.cs",
+        "apps/windows/Buddy.Windows/SelectedImageOcr.cs",
+        "tests/Buddy.ContextSourceReader.Tests/Buddy.ContextSourceReader.Tests.csproj",
+        "tests/Buddy.ContextSourceReader.Tests/Program.cs",
+        "tests/Buddy.ContextSourceReader.Tests/OwnedNativeChecks.cs"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Source-backed supported ingestion/delivery capability and gap map"
+      ],
+      "status": "accepted",
+      "deliverable": "Hash-verified integrated source; focused root tests and independent output review. Live external history/binary/local-agent adapters remain incomplete.",
+      "worktree": "../Buddy-context60-ingest",
+      "roleAlias": "CONTEXT-RESEARCH60",
+      "acceptedSnapshot": "2ffccb1d5749a6819b202dd271a866a87973c0b6ee373ec8d7584d1686442b84",
+      "acceptedFiles": [
+        {
+          "path": "apps/windows/Buddy.Windows/ContextSourceFileReader.cs",
+          "sha256": "dba13f4f54f4dfbfb3f78b79c255d80e4e1351c566be02554fc50f7578811cc5"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/ContextSourceImagePreview.cs",
+          "sha256": "194765fd27ce8ed9c1d6c1fe85671d467caf47c0af34d4e454581121ceeeb8a2"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/ContextSourceReader.cs",
+          "sha256": "ae839eb7f1ea180e94c029f408a47571f493fed116c77285f768553f1cfa657d"
+        },
+        {
+          "path": "apps/windows/Buddy.Windows/SelectedImageOcr.cs",
+          "sha256": "4786f16eb14dce7ad223d2c63055dfa169a7042aff246963133698c6142643ab"
+        },
+        {
+          "path": "tests/Buddy.ContextSourceReader.Tests/Buddy.ContextSourceReader.Tests.csproj",
+          "sha256": "d4a83263e2d133ed908f33cb7f778d0abbd7e33974d494124ed0c9f01037b73a"
+        },
+        {
+          "path": "tests/Buddy.ContextSourceReader.Tests/OwnedNativeChecks.cs",
+          "sha256": "c0d27ee86fb4d89a7bf0be3f053b586a600d02f5e96118cd606424e566409516"
+        },
+        {
+          "path": "tests/Buddy.ContextSourceReader.Tests/Program.cs",
+          "sha256": "fd5e5134f120f3aec2619010c399fb804af1eb4325bb76cbc8a3a403a291b64b"
+        }
+      ],
+      "finalEvidence": "validation/refinement60/FINAL-OUTCOME.json"
+    },
+    {
+      "id": "CONTEXTPLAN-60",
+      "attempt": 1,
+      "owner": "/root/context_plan60",
+      "baseRevision": "cf38d5efc36792ae805fafd32e0a0ed2055b3a4a",
+      "writeScope": [
+        "services/Buddy.Server/RefinementWorkspace.cs",
+        "services/Buddy.Server/ContextDeliveryPlan.cs",
+        "tests/Buddy.ContextWorkspace.Tests/*",
+        "tests/Buddy.ContextIntegration.Tests/*",
+        "services/Buddy.Server/ContextOriginalAsset.cs",
+        "tests/Buddy.ContextAssets.Tests/*"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Implementable chat-isolated context, extraction/provenance and destination-aware reviewed delivery plan"
+      ],
+      "status": "accepted",
+      "deliverable": "Hash-verified integrated source; focused root tests and independent output review. Live external history/binary/local-agent adapters remain incomplete.",
+      "worktree": "../Buddy-context60-core",
+      "roleAlias": "CONTEXT-PLAN60",
+      "acceptedSnapshot": "7278bea1b3417bf3656624952a93dd2f0ba19764bf6484248066d62bc51ca979",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/ContextDeliveryPlan.cs",
+          "sha256": "52a6f29269078de888688ed5cdc749764dce1b15b240d02f6da5767c5b99bf69"
+        },
+        {
+          "path": "services/Buddy.Server/ContextOriginalAsset.cs",
+          "sha256": "b130c0e5c89968a7867f25c6b023ce0408b70c2995f5800c71807462ba7e4204"
+        },
+        {
+          "path": "services/Buddy.Server/RefinementWorkspace.cs",
+          "sha256": "391419e228e4d193d9fe52f813a3971c1a44e1976f520898fd7ebd7ead25206b"
+        },
+        {
+          "path": "tests/Buddy.ContextAssets.Tests/Buddy.ContextAssets.Tests.csproj",
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5"
+        },
+        {
+          "path": "tests/Buddy.ContextAssets.Tests/Program.cs",
+          "sha256": "3c1a2044a681c7e38aad3375ca70e6af73f66234f7a3d0ef8ce4d507a0b88d32"
+        },
+        {
+          "path": "tests/Buddy.ContextAssets.Tests/README.md",
+          "sha256": "586ca4be24279e936f497b14fee351794dc2620d0c3b2844506b5ca2bb86fbea"
+        },
+        {
+          "path": "tests/Buddy.ContextIntegration.Tests/Buddy.ContextIntegration.Tests.csproj",
+          "sha256": "1d7eee4a63856eb6d0b9bf9c938a76af8425ebc70f10e430b2a0fe681e2fd986"
+        },
+        {
+          "path": "tests/Buddy.ContextIntegration.Tests/GeneratePureHost.ps1",
+          "sha256": "d999d67518000a1bc5db361e90d5286f71b6b098026b9bfdaca2b3d2772f3e76"
+        },
+        {
+          "path": "tests/Buddy.ContextIntegration.Tests/NuGet.Config",
+          "sha256": "2142cfb2dfa2c7feefbe40fabcc68b0dfecadafa99a1db9b70239d977cf2a7ef"
+        },
+        {
+          "path": "tests/Buddy.ContextIntegration.Tests/Program.cs",
+          "sha256": "926b6248260aceaee90aadac625171068a44a27cc2c36813aab18419c616e50f"
+        },
+        {
+          "path": "tests/Buddy.ContextIntegration.Tests/PureHost.cs",
+          "sha256": "06109acc46820616de00419568f86341315c377f25d105eedad9a76213435169"
+        },
+        {
+          "path": "tests/Buddy.ContextIntegration.Tests/README.md",
+          "sha256": "b026a46be6edc97931072dd2555c5aef71734a24ad6471abbf7cc98e7b47e329"
+        },
+        {
+          "path": "tests/Buddy.ContextWorkspace.Tests/Buddy.ContextWorkspace.Tests.csproj",
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5"
+        },
+        {
+          "path": "tests/Buddy.ContextWorkspace.Tests/Program.cs",
+          "sha256": "70a4b9e98165f8db39c863147a1fe202cff537228182f1ea80cb0c5c745f094e"
+        }
+      ],
+      "finalEvidence": "validation/refinement60/FINAL-OUTCOME.json"
+    },
+    {
+      "id": "ROOT-60",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "cf38d5efc36792ae805fafd32e0a0ed2055b3a4a",
+      "writeScope": [
+        "apps/windows/Buddy.Windows/*",
+        "services/Buddy.Server/RefinementContext.cs",
+        "tests/Buddy.RefinementFollowup.Tests/Unshown/Program.cs",
+        "tests/Buddy.RefinementLifecycle.Tests/WatcherFakes.cs",
+        "docs/development/*",
+        "docs/Windows-refinement60.md"
+      ],
+      "dependencies": {
+        "REFINEBUILD-60": 1,
+        "REFINETEST-60": 1,
+        "CONTEXTRESEARCH-60": 1,
+        "CONTEXTPLAN-60": 1
+      },
+      "acceptance": [
+        "Scoped local context and reviewed original assets; faithful refinement, exact package and independent evidence. Named external adapter explicitly remains open."
+      ],
+      "status": "validated",
+      "deliverable": "Uncommitted isolated source and separate preview; local/fixture acceptance only; installation and live Calculator hold."
+    },
+    {
+      "id": "BROWSERBUILD-61",
+      "attempt": 1,
+      "owner": "/root/app47",
+      "worktree": "../Buddy-refinement60-builder",
+      "writeScope": [
+        "integrations/browser/*"
+      ],
+      "baseRevision": "cf38d5efc36792ae805fafd32e0a0ed2055b3a4a",
+      "dependencies": {},
+      "acceptance": [
+        "MV3 concrete ChatGPT DOM driver and native protocol; capability refusal; synthetic DOM acceptance"
+      ],
+      "status": "accepted",
+      "deliverable": "Local source and fixture evidence only; actual ChatGPT account/workspace contract and live setup remain pending.",
+      "acceptedSnapshot": "6a14741eb7ab889bbf27823c2da93747456d52bb89dac9b735d642c1dcbaa93e",
+      "acceptedFiles": [
+        {
+          "path": "integrations/browser/background.js",
+          "sha256": "67bf4af3f809eb0e61b58445742459afd1c72afbd8ce445f61ebc41be62f2e2c"
+        },
+        {
+          "path": "integrations/browser/bridge.js",
+          "sha256": "15595ee767647ea269b010adf49c099a07c9a166b451afad1b206eb02cc5a6c8"
+        },
+        {
+          "path": "integrations/browser/content-controller.js",
+          "sha256": "9d8b67b504a3ce66696992b4aca6f44d13bbe03aa1e672db51d095dd30c27634"
+        },
+        {
+          "path": "integrations/browser/content.js",
+          "sha256": "301c2a79ead8e4d2bd4339f5b31e1da70140aabd5b0659542c1b05fde5d68c0b"
+        },
+        {
+          "path": "integrations/browser/core.js",
+          "sha256": "d2d333bcb34a4e618c288c774061c70a1c041bee7f993e004a58306b36629389"
+        },
+        {
+          "path": "integrations/browser/dom-driver.js",
+          "sha256": "4048a65d9f5bf27664df753d381e070f5b7803f70ec13943b743fe4d6d023b6c"
+        },
+        {
+          "path": "integrations/browser/manifest.json",
+          "sha256": "f54058ee19d6635d58b7c6383c09090c5fbb503382dccc45b3da19fa0647f736"
+        },
+        {
+          "path": "integrations/browser/popup.css",
+          "sha256": "cee953e35a2fd2155f37fb4ef8b652c810ef0e8a4bc9688ea40f00eda85293ad"
+        },
+        {
+          "path": "integrations/browser/popup.html",
+          "sha256": "473d020986e9c4102cb367e27ed9daf7d36a6d2a572f7a3ea3236ba301a46710"
+        },
+        {
+          "path": "integrations/browser/popup.js",
+          "sha256": "460ea232d6f46a8b4bd647ce8cf76f3651580d51ec35f4daaf29d3179843afc7"
+        },
+        {
+          "path": "integrations/browser/providers/chatgpt.js",
+          "sha256": "35cf6f318441ff1c9515e5aad26a6115dbb3102978a4ec4cce735edcf82a3a67"
+        },
+        {
+          "path": "integrations/browser/providers/registry.js",
+          "sha256": "2b60fca1bd1fe844b5f6a7336a0f82b33402a43b5def305a13105b8bfd94260f"
+        },
+        {
+          "path": "integrations/browser/README.md",
+          "sha256": "ae77e45c311ed973d4be7313620443f8cec7f9c0181bd4afa7f14d77ccd69c28"
+        },
+        {
+          "path": "integrations/browser/tests/bridge.test.cjs",
+          "sha256": "ca02ec3a02657a522624e59187e96ce21eac7ff1e5cc907ac503911f45106887"
+        },
+        {
+          "path": "integrations/browser/tests/core.test.cjs",
+          "sha256": "3ad9b05ba3737e61f8c9c2e558da70c5bac4bf4d200ac4927ba6059a0be692f4"
+        },
+        {
+          "path": "integrations/browser/tests/dom-fixture.cjs",
+          "sha256": "04ab7f4ebae27743b74133b54c77167817767375b0084a3f9468e47e45975691"
+        }
+      ],
+      "finalEvidence": "validation/browser61/FINAL-OUTCOME.json"
+    },
+    {
+      "id": "BROWSERTEST-61",
+      "attempt": 1,
+      "owner": "/root/qa43",
+      "worktree": "../Buddy-refinement60-tester",
+      "writeScope": [
+        "tests/validation/Buddy.BrowserIndependent.Tests/*"
+      ],
+      "baseRevision": "cf38d5efc36792ae805fafd32e0a0ed2055b3a4a",
+      "dependencies": {},
+      "acceptance": [
+        "Frozen independent browser/protocol adversarial checks and honest production readiness boundary"
+      ],
+      "status": "accepted",
+      "deliverable": "Local source and fixture evidence only; actual ChatGPT account/workspace contract and live setup remain pending.",
+      "acceptedSnapshot": "be6fa9ae8222fc94100daa15cda56eba7259faef1e58beab042c0a80d70f863c",
+      "acceptedFiles": [
+        {
+          "path": "tests/validation/Buddy.BrowserIndependent.Tests/AcceptanceCases.json",
+          "sha256": "8b5be00481ff18fd22db14958458eceb653083b2d5635d66016721868d08e148"
+        },
+        {
+          "path": "tests/validation/Buddy.BrowserIndependent.Tests/bridge-boundary.test.cjs",
+          "sha256": "6ca30ec63c65c32ae42f13e2df378d40758e3517e5844c314726d119635827f5"
+        },
+        {
+          "path": "tests/validation/Buddy.BrowserIndependent.Tests/Buddy.BrowserIndependent.Tests.csproj",
+          "sha256": "caba4cb543e15eebca32f506a04ee4fbffcec4c2ec7aa482b267a65387e0bcea"
+        },
+        {
+          "path": "tests/validation/Buddy.BrowserIndependent.Tests/core-boundary.test.cjs",
+          "sha256": "fd82d7d7461e25fc214d1fd7b3669e586df0f000005bc4fce3055b81a9aa3e2f"
+        },
+        {
+          "path": "tests/validation/Buddy.BrowserIndependent.Tests/dom-boundary.test.cjs",
+          "sha256": "fa4f9104f99bcf6fb4e3cf99579bd305ac51970ba0a11b835a40e9d7de057ff6"
+        },
+        {
+          "path": "tests/validation/Buddy.BrowserIndependent.Tests/native-dom-fixture.html",
+          "sha256": "b920e28f136032ee4a760166414050e31a8cc018567e26c6e971a1139707a00e"
+        },
+        {
+          "path": "tests/validation/Buddy.BrowserIndependent.Tests/native-dom-fixture.js",
+          "sha256": "136059ebc0d383e4f89ec8e650ba2db861644ed5187748b37492cbea667db84c"
+        },
+        {
+          "path": "tests/validation/Buddy.BrowserIndependent.Tests/NuGet.offline.config",
+          "sha256": "2142cfb2dfa2c7feefbe40fabcc68b0dfecadafa99a1db9b70239d977cf2a7ef"
+        },
+        {
+          "path": "tests/validation/Buddy.BrowserIndependent.Tests/Program.cs",
+          "sha256": "e81244b608122925f0fef9ba5ac4ee6b27a2839f90ef6c880b455e9ead3f5260"
+        },
+        {
+          "path": "tests/validation/Buddy.BrowserIndependent.Tests/provider-boundary.test.cjs",
+          "sha256": "16bdbe974088f904161bf2d0b98025d9d46dfa2097ba1d46e7a746f5ed32b111"
+        },
+        {
+          "path": "tests/validation/Buddy.BrowserIndependent.Tests/README.md",
+          "sha256": "9b0d0f083e072702319cd41e27d09b22c2b64213f03396485c58f22fb5eb0fe9"
+        },
+        {
+          "path": "tests/validation/Buddy.BrowserIndependent.Tests/stage-native-dom.py",
+          "sha256": "b4f79f688eaacea87c7a89f6813471a40764baedb6b467141469ecfd0cad1532"
+        },
+        {
+          "path": "tests/validation/Buddy.BrowserIndependent.Tests/wire-interop.cjs",
+          "sha256": "ff79a482111a6bff7ad0e798d9704a971b21524b3aa5d356887496b2135ec975"
+        },
+        {
+          "path": "tests/validation/Buddy.BrowserIndependent.Tests/wire-synthetic-dom.cjs",
+          "sha256": "fb0bb0a32ada3a5e0aa24d6188210c2ecc339964b6ef91fa668b54355acf4384"
+        }
+      ],
+      "finalEvidence": "validation/browser61/FINAL-OUTCOME.json"
+    },
+    {
+      "id": "BROWSERPLAN-61",
+      "attempt": 1,
+      "owner": "/root/context_plan60",
+      "worktree": "../Buddy-context60-core",
+      "writeScope": [
+        "services/Buddy.Server/BrowserContext*.cs",
+        "tests/Buddy.BrowserContext.Tests/*"
+      ],
+      "baseRevision": "cf38d5efc36792ae805fafd32e0a0ed2055b3a4a",
+      "dependencies": {},
+      "acceptance": [
+        "Bounded identity/history/chunk/draft/asset/session lifecycle with one-use exact reviews"
+      ],
+      "status": "accepted",
+      "deliverable": "Local source and fixture evidence only; actual ChatGPT account/workspace contract and live setup remain pending.",
+      "acceptedSnapshot": "af9c1e08905d4bc75963a02d7d459074a5653c8188b5319529f65ef4d3ea6617",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/BrowserContextModels.cs",
+          "sha256": "3c65afe28d6a225ed5e1c39b25faebb9f33be82438329b7d34c8e3f643365776"
+        },
+        {
+          "path": "services/Buddy.Server/BrowserContextProtocol.cs",
+          "sha256": "1c3aeebf58d581ff2551e8d786fd5b3e74092c781cf4fe2857a53ccdba3cb126"
+        },
+        {
+          "path": "services/Buddy.Server/BrowserContextReview.cs",
+          "sha256": "be372a98e434603e53abd5ab7a3d074fd76d649e1208f01c1bb3a20c9bce85df"
+        },
+        {
+          "path": "services/Buddy.Server/BrowserContextSession.cs",
+          "sha256": "77ba2c5f5353bedd310873f58682f0ff030f70c6ce296525afb6e5690cb5365e"
+        },
+        {
+          "path": "services/Buddy.Server/BrowserContextTransfer.cs",
+          "sha256": "e1e22a844ce850e992860f2a3ef17b95416310821ea6a4c3b1af92326576540e"
+        },
+        {
+          "path": "tests/Buddy.BrowserContext.Tests/Buddy.BrowserContext.Tests.csproj",
+          "sha256": "2298e680fc354be6368b1f7ffddc5d3766e29cfd9b79ea3d9a09d0e464bd6ef5"
+        },
+        {
+          "path": "tests/Buddy.BrowserContext.Tests/NuGet.Config",
+          "sha256": "2142cfb2dfa2c7feefbe40fabcc68b0dfecadafa99a1db9b70239d977cf2a7ef"
+        },
+        {
+          "path": "tests/Buddy.BrowserContext.Tests/Program.cs",
+          "sha256": "cf9b91996b36d1bfaf8b4ad17a0b183d92bd4d272a3a6129f936c285883834c9"
+        },
+        {
+          "path": "tests/Buddy.BrowserContext.Tests/WireFixture.cs",
+          "sha256": "8e6bcf3d949fe8af8d4053f7f8c47affe4280316945c2814bfcb3651d868dc53"
+        }
+      ],
+      "finalEvidence": "validation/browser61/FINAL-OUTCOME.json"
+    },
+    {
+      "id": "BROWSERRESEARCH-61",
+      "attempt": 1,
+      "owner": "/root/context_research60",
+      "worktree": "../Buddy-context60-ingest",
+      "writeScope": [
+        "docs/Browser-integration61-research.md"
+      ],
+      "baseRevision": "cf38d5efc36792ae805fafd32e0a0ed2055b3a4a",
+      "dependencies": {},
+      "acceptance": [
+        "Official source-backed feasibility, permissions and live evidence limitations"
+      ],
+      "status": "accepted",
+      "deliverable": "Local source and fixture evidence only; actual ChatGPT account/workspace contract and live setup remain pending.",
+      "acceptedSnapshot": "42301990871c24a7844e6d29a7ab4bf214242eceea6c8e01ad42c3cf44814705",
+      "acceptedFiles": [
+        {
+          "path": "docs/Browser-integration61-research.md",
+          "sha256": "583bb5af0dadbb843f5c8ce5a547c06ee2640e34f57e86eca5a75ea2a5549ffe"
+        }
+      ],
+      "finalEvidence": "validation/browser61/FINAL-OUTCOME.json"
+    },
+    {
+      "id": "BROWSERROOT-61",
+      "attempt": 1,
+      "owner": "/root",
+      "worktree": "integration",
+      "writeScope": [
+        "apps/windows/Buddy.BrowserHost/*",
+        "apps/windows/Buddy.Windows/*",
+        "scripts/Prepare-BrowserSetup.ps1",
+        "tests/Buddy.BrowserHost.Tests/*",
+        "docs/development/*",
+        "docs/Windows-browser61.md",
+        "tests/Buddy.RefinementFollowup.Tests/Unshown/Program.cs"
+      ],
+      "baseRevision": "cf38d5efc36792ae805fafd32e0a0ed2055b3a4a",
+      "dependencies": {},
+      "acceptance": [
+        "Thin current-user native transport, explicit Buddy pairing/context/draft review, isolated package and synthetic/native owned tests"
+      ],
+      "status": "validated",
+      "deliverable": "Local source and fixture evidence only; actual ChatGPT account/workspace contract and live setup remain pending.",
+      "finalEvidence": "validation/browser61/FINAL-OUTCOME.json"
+    },
+    {
+      "id": "REFINETARGET-61",
+      "attempt": 1,
+      "owner": "/root/app47",
+      "worktree": "../Buddy-refinement60-builder",
+      "baseRevision": "cf38d5efc36792ae805fafd32e0a0ed2055b3a4a",
+      "writeScope": [
+        "services/Buddy.Server/RefinementContract.cs",
+        "tests/Buddy.RefinementBuilder.Tests/*"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Improve the two frozen numbers/units and Unicode-name utility cases using general finite source rules without weakening fidelity; independent output review and regressions."
+      ],
+      "status": "validated",
+      "deliverable": "Root-reviewed source and actual local-model evidence; no live field, installation or publication.",
+      "acceptedSnapshot": "61aca4b86d0ac25951e81cfa9cb35716ff532675ef14de113870ce26f2f54fe0",
+      "acceptedFiles": [
+        {
+          "path": "services/Buddy.Server/RefinementContract.cs",
+          "sha256": "7486f2d832c31eaf778249b7bb8c865368ef11b9faa5e01d2d14724702140fda"
+        },
+        {
+          "path": "tests/Buddy.RefinementBuilder.Tests/Program.cs",
+          "sha256": "22771e55fd97f1afa4c6191dfbc5f764d7a3c3333c50431d060499ead3064073"
+        },
+        {
+          "path": "tests/Buddy.RefinementBuilder.Tests/SemicolonChecks.cs",
+          "sha256": "502322033f0cd1fceb046b01dffac8bc08cca41c30f1c0138c2eef9d5fba9901"
+        }
+      ],
+      "finalEvidence": "validation/browser61/FINAL-OUTCOME.json"
     }
   ],
   "executionMode": "active",
-  "installation": "continuing_authorization_after_relevant_acceptance_and_fresh_recoverable_backup; no_installation_in_current_noninteractive_batch"
+  "installation": "HOLD: user explicitly paused installation and live Calculator testing on 2026-10-07"
 }

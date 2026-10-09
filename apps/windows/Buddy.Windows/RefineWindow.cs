@@ -28,6 +28,7 @@ internal sealed class RefineWindow : Window
     private readonly Action<CompanionMood>? mood;
     private readonly Action? starting;
     private readonly LocalTaskJournal? localTasks;
+    private readonly Func<bool> contextCurrent;
     private LocalTaskToken? displayedTask;
     internal RefinementOptionsPanel Options { get; }
     internal RefinementPreparationResult? CurrentPreparation { get; private set; }
@@ -35,22 +36,22 @@ internal sealed class RefineWindow : Window
     internal bool CanApply
     {
         get {
-            if (closed || applied || applying || operation is not null || refinement?.IsRunning == true || result is not { Accepted: true } || acceptedGeneration != generation || CurrentPreparation?.Ready != true || frozenRequestFingerprint is null) return false;
+            if (closed || !contextCurrent() || applied || applying || operation is not null || refinement?.IsRunning == true || result is not { Accepted: true } || acceptedGeneration != generation || CurrentPreparation?.Ready != true || frozenRequestFingerprint is null) return false;
             try { return frozenRequestFingerprint == RefinementDraftOptions.Fingerprint(Options.Snapshot().ToRequest(original, selectedMode)); }
             catch { return false; }
         }
     }
     internal RefineWindow(BuddyService service, string original, Func<string, CancellationToken, Task> applyEdit, Func<CancellationToken, Task> undoEdit,
-        string source, Action<CompanionMood>? mood = null, Action? starting = null, RefinementOptionsPanel? optionsPanel = null, LocalTaskJournal? localTasks = null)
+        string source, Action<CompanionMood>? mood = null, Action? starting = null, RefinementOptionsPanel? optionsPanel = null, LocalTaskJournal? localTasks = null, Func<bool>? contextCurrent = null)
     {
-        BuddyTheme.Ensure(); this.localTasks = localTasks; this.service = service; this.original = original; this.applyEdit = applyEdit; this.undoEdit = undoEdit; this.mood = mood; this.starting = starting;
+        BuddyTheme.Ensure(); this.contextCurrent = contextCurrent ?? (() => true); this.localTasks = localTasks; this.service = service; this.original = original; this.applyEdit = applyEdit; this.undoEdit = undoEdit; this.mood = mood; this.starting = starting;
         Title = "Buddy - Refine"; Width = 620; MinWidth = 380; Height = 780; MinHeight = 420; MaxHeight = SystemParameters.WorkArea.Height; FontFamily = BuddyTheme.Font; Foreground = BuddyTheme.Ink;
         Background = BuddyTheme.Surface; ResizeMode = ResizeMode.CanResize; WindowStartupLocation = WindowStartupLocation.CenterOwner;
         before = Editor(original); after = Editor("");
         var layout = new DockPanel(); var footer = new StackPanel { Margin = new(20, 8, 20, 12) }; DockPanel.SetDock(footer, Dock.Bottom); layout.Children.Add(footer);
         var actions = new WrapPanel();
         apply = BuddyTheme.Button("Apply", () => _ = Apply(), true); apply.IsEnabled = false; actions.Children.Add(apply);
-        copy = BuddyTheme.Button("Copy", () => { if (!closed && result is { Accepted: true } && !string.IsNullOrEmpty(after.Text)) System.Windows.Clipboard.SetText(after.Text); }); copy.IsEnabled = false; actions.Children.Add(copy);
+        copy = BuddyTheme.Button("Copy", () => { if (!closed && this.contextCurrent() && result is { Accepted: true } && !string.IsNullOrEmpty(after.Text)) System.Windows.Clipboard.SetText(after.Text); }); copy.IsEnabled = false; actions.Children.Add(copy);
         undo = BuddyTheme.Button("Undo", () => _ = Undo()); undo.IsEnabled = false; actions.Children.Add(undo);
         actions.Children.Add(BuddyTheme.Button("Stop", Cancel)); footer.Children.Add(actions);
         footer.Children.Add(Label("Undo for 30 seconds after Apply. Buddy never submits the form.", 12));
@@ -121,22 +122,22 @@ internal sealed class RefineWindow : Window
     }
     private void UpdateControls()
     {
-        bool canConfigure = !closed && !applied && !applying;
+        bool canConfigure = !closed && contextCurrent() && !applied && !applying;
         Options.IsEnabled = canConfigure; foreach (var button in modeButtons) button.IsEnabled = canConfigure;
-        apply.IsEnabled = CanApply; copy.IsEnabled = !closed && !applying && result is { Accepted: true } && acceptedGeneration == generation;
+        apply.IsEnabled = CanApply; copy.IsEnabled = !closed && contextCurrent() && !applying && result is { Accepted: true } && acceptedGeneration == generation;
     }
     internal async Task Refine(string mode)
     {
-        if (closed || applied || applying) return;
+        if (closed || !contextCurrent() || applied || applying) return;
         selectedMode = mode; Options.CancelResourceRead(); InvalidateResult(); UpdatePreparation();
         if (CurrentPreparation is not { Ready: true } prepared) { progress.Text = "Review the preparation messages before refining. Original unchanged."; return; }
-        starting?.Invoke(); if (closed || applied || applying) return;
+        starting?.Invoke(); if (closed || !contextCurrent() || applied || applying) return;
         // The preparation API owns the deep snapshot; editable controls never mutate these lists.
         int current = ++generation; var options = Options.Snapshot(); var request = new RefinementRequest(); refinement = request;
         var activity = localTasks?.Begin("refine", "Buddy-draft refinement", "Preparing a proposal; original unchanged."); displayedTask = activity;
         string fingerprint = RefinementDraftOptions.Fingerprint(prepared.Request); mood?.Invoke(CompanionMood.Thinking);
         try {
-            bool Current() => generation == current && !closed && ReferenceEquals(refinement, request);
+            bool Current() => generation == current && !closed && contextCurrent() && ReferenceEquals(refinement, request);
             var outcome = await request.Run(token => service.RefineStream(prepared.Request, token),
                 item => { if (Current() && item.Type == "delta") after.AppendText(item.Text); },
                 text => { if (Current()) progress.Text = text; });

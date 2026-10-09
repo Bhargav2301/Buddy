@@ -72,12 +72,12 @@ internal static partial class Program
     {
         foreach(var sample in GrammarCases.Take(4)){
             fixture.Model.Reset();var result=await fixture.Service.RefineDetailed(new(sample.Original),default);
-            Check(result.Accepted&&result.RefinedPrompt.Contains(sample.Expected)&&result.Structure?.GrammarRuleIds.Count==1,"production service returns source-derived grammar only after existing gates");
+            Check(result.Accepted&&result.RefinedPrompt.Contains(sample.Expected)&&result.Method=="source-grammar"&&result.Grammar is not null&&result.Structure is null,"production service prefers one minimal source-derived grammar correction only after existing gates");
             Check(result.ScoreBefore is null&&result.ScoreAfter is null&&fixture.Model.LastAssessedRewrite==result.RefinedPrompt&&fixture.Model.LastEmbeddingRewrite==result.RefinedPrompt,"fresh grammar candidate is assessed/embedded and never claims subjective scores as evidence");
             foreach(string failure in new[]{"preservation","embedding"}){
                 fixture.Model.Reset();fixture.Model.Preserved=failure!="preservation";fixture.Model.EmbeddingAvailable=failure!="embedding";
                 var refused=await fixture.Service.RefineDetailed(new(sample.Original),default);
-                Check(!refused.Accepted&&refused.RefinedPrompt==sample.Original&&refused.Structure is null,"grammar does not bypass a failed preservation/embedding gate");
+                Check(!refused.Accepted&&refused.RefinedPrompt==sample.Original&&refused.Structure is null&&refused.Grammar is null,"grammar does not bypass a failed preservation/embedding gate");
             }
         }
         foreach(float similarity in new[]{.799f,.801f}){

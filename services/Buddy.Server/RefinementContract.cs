@@ -53,6 +53,22 @@ public static class RefinementContract
         }
     });
 
+    // Presentation metadata only: these visible headings are not proof that a
+    // prompt is complete, optimal or safe, and never change refinement routing.
+    public static bool HasExplicitOrganization(string original)
+    {
+        if (string.IsNullOrWhiteSpace(original) || original.Length > 20000) return false;
+        try {
+            var protectedChars = ProtectedCharacters(original);
+            if (original.Select((c, i) => (c is '`' or '"' or '\u201c' or '\u201d') && !protectedChars[i]).Any(x => x)) return false;
+            string visible = new(original.Select((c, i) => protectedChars[i] ? ' ' : c).ToArray());
+            var headings = Regex.Matches(visible, @"(?m)^[ \t]*(?<kind>request|task|subject|purpose|constraints?|steps|context|output)[ \t]*:[ \t]*(?<body>[^\r\n]*)", Options, MatchTimeout)
+                .Where(m => m.Groups["body"].Value.Any(char.IsLetterOrDigit))
+                .Select(m => m.Groups["kind"].Value.ToLowerInvariant()).ToHashSet(StringComparer.Ordinal);
+            return headings.Any(h => h is "request" or "task") && headings.Any(h => h is not ("request" or "task"));
+        } catch (RegexMatchTimeoutException) { return false; }
+    }
+
     public static RefinementContractLedger Analyze(string original)
     {
         Security.Text(original, 20000, "Prompt");
@@ -68,6 +84,19 @@ public static class RefinementContract
             return Unsupported(original, "The prompt already has structure or contains a condition/ambiguous literal that must remain together.");
 
         var spans = new List<RefinementContractSpan>();
+        // A single explicit constraint after a semicolon can be separated without
+        // parsing (or promoting) any subject, count or coordinated task inside it.
+        // Keep both complete sides and the source punctuation; this is a finite
+        // presentation rule, not a general semicolon/English scope parser.
+        if (TrySemicolonConstraint(original, visible, protectedChars, out int separator)) {
+            int start = 0, end = original.Length, constraintStart = separator + 1;
+            while (char.IsWhiteSpace(original[start])) start++;
+            while (char.IsWhiteSpace(original[end - 1])) end--;
+            while (char.IsWhiteSpace(original[constraintStart])) constraintStart++;
+            Add("task", start, separator + 1 - start, start, separator + 1 - start);
+            Add("constraints", constraintStart, end - constraintStart, constraintStart, end - constraintStart);
+            return new(original, spans, Covers(original, spans), "Separated an explicit trailing constraint while keeping both complete source clauses intact.");
+        }
         bool comparisonScope = !Regex.IsMatch(visible, @"\b(?:first|then|next|finally|verbatim|unchanged)\b|\b(?:keep|preserve|retain)\s+(?:(?:the|this|original|exact)\s+)*(?:format|formatting|layout|wording)\b|\b(?:do not|don't|never)\s+(?:reformat|restructure)\b", Options, MatchTimeout);
         foreach (var (start, length) in Clauses(original, protectedChars))
         {
@@ -78,7 +107,7 @@ public static class RefinementContract
             if (kind != "task") { Add(kind, start, length, start, length); continue; }
             // A condition and its alternatives stay in one sentence, including its
             // semicolon branches. Only a separate explicit constraint may be lifted.
-            if (HasCondition(text)) { Add("task", start, length, start, length); continue; }
+            if (HasCondition(text) || HasCoordinatedTask(text)) { Add("task", start, length, start, length); continue; }
 
             // Lift an explicitly supplied output bound, never infer one from a goal.
             var limit = Regex.Match(text, @"\s+(?:in|within|using)\s+(?:exactly\s+|at most\s+|no more than\s+)?(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:sentences?|words?|paragraphs?|bullet points?)\s*[.!?]?$", Options, MatchTimeout);
@@ -181,7 +210,7 @@ public static class RefinementContract
                 if (RefinementGrammar.Propose(ledger.Original, span.Kind, content) is { } edit) {
                     content = edit.Result;
                     grammarRules.Add(edit.RuleId);
-                    operations.Add("Added a missing article in the requested task.");
+                    operations.Add(RefinementGrammar.Describe(edit.RuleId));
                 }
                 bool comparisonCommand = span.Kind == "task" && sectionIndex + 1 < normalized.Count && normalized[sectionIndex + 1].Kind == "comparison";
                 return comparisonCommand ? content : RenderContent(content, span.Kind);
@@ -210,6 +239,50 @@ public static class RefinementContract
     }
 
     private static RefinementContractReview Invalid(string reason) => new(false, false, "", reason);
+    private static bool TrySemicolonConstraint(string original, string visible, bool[] protectedChars, out int separator)
+    {
+        separator = -1;
+        for (int i = 0; i < original.Length; i++) {
+            if (original[i] != ';' || protectedChars[i]) continue;
+            if (separator >= 0) return false;
+            separator = i;
+        }
+        if (separator < 1 || separator + 1 >= original.Length || !char.IsWhiteSpace(original[separator + 1]) ||
+            original.Contains('\n') || original.Contains('\r') || original.Contains('`') ||
+            Clauses(original, protectedChars).Count() != 1) return false;
+        // Keep conditional, sequential, quoted-as-content, list/math and requested
+        // source-layout relationships opaque. Protected strings/URLs themselves
+        // remain exact source bytes, and never supply a constraint keyword.
+        if (Regex.IsMatch(visible, @"\b(?:if|unless|otherwise|else|provided|when|until|before|after|once|while|whenever|whether|except|first|then|next|finally|second|last|steps?|verbatim|literal|literally|unchanged|unmodified|unaltered|untouched|format|formatting|layout|wording|phrasing|punctuation|indentation|reformat|restructure|semicolon|saying|says|reads|containing|quote|quoted|strings?|code|math|equations?|formulas?|regex|sql|scripts?|commands?|examples?|rules?|instructions?)\b|[()\[\]{}=<>\\]|\$(?!\d)|\bas\s+is\b|\bno\s+(?:edits?|changes?|rewriting)\b|\b(?:do not|don't|never)\s+(?:change|alter|edit|modify|rewrite|rephrase)\s+(?:(?:the|this|my|original|supplied|source)\s+)*(?:prompt|text|request|input|it|anything|everything)\b", Options, MatchTimeout)) return false;
+        string task = visible[..separator].Trim(), constraint = visible[(separator + 1)..].Trim();
+        if (!Regex.IsMatch(task, @"^(?:please\s+)?(?:compare|contrast|explain|summarize|describe|write|draft|compose|prepare|list|analyze)\s+\S", Options, MatchTimeout)) return false;
+        // A trailing imperative can be text requested for a sign/message rather
+        // than a rule for its writer. Do not assign a global constraint role when
+        // content-introducing syntax or a literal display deliverable is present.
+        if (visible.Contains(':') || Regex.IsMatch(task,
+            @"\b(?:read|reading|say|state|states|stating|contains|include|including|print|printed|written|bearing|entitled|titled|signs?|labels?|warnings?|notices?|slogans?|mottos?|headlines?|captions?)\b|\bas\s+follows\b|\b(?:with|of|using)\s+(?:(?:the|this|these|following)\s+)*(?:words?|text|content|phrases?|sentences?)\b",
+            Options, MatchTimeout)) return false;
+        // 'Retain' also has unrelated action senses (e.g. retain a lawyer). Admit
+        // only a finite set of supplied content attributes, never arbitrary nouns.
+        return Regex.IsMatch(constraint, @"^(?:(?:do not|don't|never|must|keep|preserve|avoid|without|use|return|limit)\s+\S|retain\s+(?:(?:the|all|any|these|those|supplied|provided|original|exact)\s+)*(?:emojis?|names?|numbers?|units?|accents?|diacritics?|spelling|capitalization|dates?|prices?|symbols?)\b)", Options, MatchTimeout);
+    }
+
+    private static bool HasCoordinatedTask(string text)
+    {
+        // A second requested output is not part of the first output's subject.
+        // Keep the complete clause intact instead of lifting a prefix count into a
+        // global Request heading. Protected literal/code contents stay opaque.
+        string visible = Protected.Replace(text, match => new string(' ', match.Length));
+        // For a generated deliverable, even an unfamiliar second verb or adjective
+        // can introduce another obligation. This bounded parser cannot prove that a
+        // coordinated phrase belongs only to the first subject; preserve it whole.
+        if (Regex.IsMatch(visible, @"^(?:please\s+)?(?:write|draft|compose|create|prepare|generate|make|design)\b", Options, MatchTimeout) &&
+            Regex.IsMatch(visible, @"\b(?:and|or|plus|as\s+well\s+as)\b|[&+]", Options, MatchTimeout)) return true;
+        const string coordinator = @"\b(?:and|or|plus|as\s+well\s+as)\s+(?:(?:also|then|please)\s+)*";
+        const string action = @"(?:write|draft|compose|prepare|create|generate|make|design|explain|summarize|describe|list|compare|contrast|show|include|add|remove|return|give|calculate|analyze|find|build|evaluate|recommend|review|check|tell|state|report|outline|translate|rewrite|answer|provide)\b";
+        const string amount = @"(?:(?:exactly|at\s+most|at\s+least|no\s+more\s+than|no\s+fewer\s+than|(?:a\s+)?(?:minimum|maximum)\s+of)\s+)?(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|a|an|another|the)\s+";
+        return Regex.IsMatch(visible, coordinator + "(?:" + action + "|" + amount + ")", Options, MatchTimeout);
+    }
     private static RefinementContractLedger Unsupported(string original, string reason, bool requiresClarification = false) =>
         new(original, [new("s0", "task", 0, original.Length, original, 0, original.Length, 0)], false, reason, requiresClarification);
 

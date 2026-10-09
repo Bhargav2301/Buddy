@@ -200,6 +200,18 @@ internal static partial class Program
         foreach (var original in Golden)
         {
             f.Model.Reset(); var result = await f.Service.RefineDetailed(new(original), default);
+            var grammarCase = GrammarCases.FirstOrDefault(c => c.Original == original);
+            if (grammarCase.Original is not null) {
+                string expected = original.Replace(grammarCase.Content, grammarCase.Expected, StringComparison.Ordinal);
+                Check(result.Accepted && result.Method == "source-grammar" && result.Structure is null && result.Grammar?.Source == original && result.Grammar.Result == expected && result.RefinedPrompt == expected,
+                    "known finite correction preserves the rest of each source instead of adding headings");
+                Check(f.Model.Plans == 0 && f.Model.ChatCalls == 0 && f.Model.Assessments == 1 && f.Model.Embeddings == 1,
+                    "minimal source correction retains both independent verification gates");
+                Check(result.ScoreBefore is null && result.ScoreAfter is null && result.Changes.SequenceEqual(new[] { "Added a missing article in the requested task." }),
+                    "finite correction reports the actual source operation without model quality claims");
+                Check(result.Passes.Count == 1 && result.Passes[0].Name == "Source grammar", "only actual finite grammar pass exposed");
+                continue;
+            }
             Check(result.Accepted && result.Method == "source-structure" && result.Structure is not null, "supported source structure accepted after independent gates");
             Check(f.Model.Plans == 1 && f.Model.ChatCalls == 0 && f.Model.Assessments == 1 && f.Model.Embeddings == 1, "exactly one plan and verification, no simulated council");
             Check(result.ScoreBefore is null && result.ScoreAfter is null && result.Changes.SequenceEqual(result.Structure!.Operations), "structural utility uses certificate not subjective scores or model claims");

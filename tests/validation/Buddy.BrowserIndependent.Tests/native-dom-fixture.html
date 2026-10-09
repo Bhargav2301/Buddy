@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; media-src 'none'; font-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="buddy-driver-sha256" content="DRIVER_SHA256_TO_BE_STAGED">
+  <title>Owned Buddy browser61 DOM fixture</title>
+  <style>.fixture { display: block; margin: 8px; } .editor, .body { display: block; min-width: 200px; min-height: 25px; } #result { white-space: pre-wrap; }</style>
+</head>
+<body>
+  <h1>Owned synthetic DOM fixture</h1>
+  <p>No account, network resource, extension, profile history, upload, or message submission is used.</p>
+  <pre id="result">{"completed":false,"status":"not-started"}</pre>
+  <script src="dom-driver.js"></script>
+  <script src="native-dom-fixture.js"></script>
+</body>
+</html>

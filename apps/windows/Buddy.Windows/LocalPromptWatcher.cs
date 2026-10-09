@@ -22,7 +22,7 @@ internal sealed class LocalPromptWatcher:IDisposable
         try{return options.Consume(nowMilliseconds);}finally{ClearPreparedOptionsPause();}
     }
     internal bool Reply(string text)=>bubble?.Reply(text)==true;
-    internal async Task ShowReview(FocusedDraft draft,RefineRequest? request=null,Func<bool>? optionsCurrent=null,Func<bool>? captureCurrent=null){
+    internal async Task ShowReview(FocusedDraft draft,RefineRequest? request=null,Func<bool>? optionsCurrent=null,Func<bool>? captureCurrent=null,ExternalContextSelection? contextSelection=null){
         if(captureCurrent?.Invoke()==false)throw new OperationCanceledException("The source-field capture was replaced.");
         Suspend();ClearPreparedOptionsPause();if(service() is not {} host)throw new InvalidOperationException("Buddy is still starting.");
         if(request is not null&&request.Prompt!=draft.Edit.Original)throw new InvalidOperationException("Prepared options do not match this source field. Capture it again.");
@@ -36,10 +36,10 @@ internal sealed class LocalPromptWatcher:IDisposable
         subscription=observed;
         if(subscription is null){Suspend();throw new InvalidOperationException("The original field is no longer focused or does not expose safe change events. Refine source field again from that field.");}
         if(optionsCurrent?.Invoke()==false){Suspend();throw new InvalidOperationException("Prepared options changed during capture. Capture the original field again.");}
-        var card=Present(host,draft,request,optionsCurrent);timer.Start();_ = card.Refine();
+        var card=Present(host,draft,request,optionsCurrent,contextSelection);timer.Start();_ = card.Refine();
     }
-    private InlinePromptWindow Present(BuddyService host,FocusedDraft draft,RefineRequest? request=null,Func<bool>? optionsCurrent=null){
-        var card=new InlinePromptWindow(host,editor,draft,voice,voiceShortcut(),request:request,optionsCurrent:optionsCurrent,configureOptions:configureOptions);bubble=card;
+    private InlinePromptWindow Present(BuddyService host,FocusedDraft draft,RefineRequest? request=null,Func<bool>? optionsCurrent=null,ExternalContextSelection? contextSelection=null){
+        var card=new InlinePromptWindow(host,editor,draft,voice,voiceShortcut(),request:request,optionsCurrent:optionsCurrent,configureOptions:configureOptions,contextSelection:contextSelection);bubble=card;
         card.Closed+=(_,_)=>{if(!ReferenceEquals(bubble,card))return;bubble=null;review?.Cancel();review?.Dispose();review=null;cooldown=Environment.TickCount64+60000;Detach();if(enabled is null)timer.Stop();};card.Show();return card;
     }
     private async Task Check(){
