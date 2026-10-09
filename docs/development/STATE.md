@@ -1,3 +1,7 @@
+# Delivered: continuation63 installed and CI passed
+
+Implementation d268248 is installed; all 688 manifest entries match, and three saved-data files were unchanged before launch. Home and already-running Settings activation are observed, with one Buddy process. Both implementation CI runs pass Windows/browser/Android/version. OCR correction has 64 unshown WPF checks; visible correction remains unverified after a native tool geometry/input limitation. User-approved installation is complete; older holds below are historical. [Report](../Continuation63.md).
+
 # Current: authorized installed update and OCR correction63
 
 User authorization now covers installed updates and pushing source changes to the existing GitHub branch/PR. Continuation62 installed successfully over 0.4.5 with rollback retained; three saved data files were byte-identical before launch. Installed Home and Settings were observed working. OCR-63 adds original-image/text correction, zoom, exact provenance, fresh review and old-draft invalidation. 82 asset /64 unshown WPF /77 workspace /69 browser /169 reply checks and Windows package probes pass. Installing and visibly checking continuation63 is the next delivery step. No broader MVP acceptance is implied. [Report](../Continuation63.md).

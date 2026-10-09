@@ -1,3 +1,9 @@
+# Delivered continuation63
+
+- Complete: installed latest OCR correction implementation d268248, preserved rollback/data, verified Home and already-running Settings; both implementation CI runs pass.
+- Pending: visible OCR correction workflow, because the native input tool did not reliably activate Talk. Unshown WPF checks pass; do not label this visible acceptance or an identified Talk bug.
+- Next independent work: automatic OCR digit accuracy and factual/Guide usefulness; remaining browser and physical gates are unchanged. [Report](../Continuation63.md).
+
 # OCR correction63 and installed update
 
 - Implemented: explicit correction against retained original image, zoom/reset/cancel, first-extraction provenance, exact changed-text review and frozen-draft invalidation. Automated tests and package checks pass.

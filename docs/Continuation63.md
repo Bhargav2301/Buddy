@@ -22,4 +22,12 @@ This improves OCR review usefulness; it does **not** fix the previously observed
 - Release Windows publish and package/type/dependency/native OCR-load checks pass. New context and unshown WPF checks are included in Windows CI.
 - Root reviewed source and results. Local sanitized receipts are in `diagnostics/continuation63`; source contains no private profiles, logs or image captures.
 
-The separate continuation63 package is ready for installation. Its visible synthetic-image correction check and exact-head CI are recorded by the delivery follow-up; they are not claimed here in advance. Version remains 0.4.8 development, not completed 0.5.0 MVP acceptance.
+## Delivered installed checkpoint
+
+Continuation63 implementation `d26824861b8d7fc93744728adf47595acf2de339` is installed in the per-user Programs/Buddy directory. All 688 manifest entries matched the installed files. Three saved-data files again remained byte-identical before launch, and the previous binaries are retained for rollback; the older 0.4.5 backup also remains. Home opened, and a second `--settings --quiet` invocation exited successfully with one installed Buddy process. A fresh accessibility observation confirmed the Settings/General surface. No settings or messages were changed.
+
+The visible synthetic-image correction walkthrough could not be completed: the supported Windows tool first returned `coordinate input geometry is unavailable`; refreshing the window permitted a retry, but no Talk surface was observed. Keyboard focus also did not visibly change. No synthetic image was selected, attached or sent. This is a recorded native-input limitation, not visible correction acceptance or proof of an app-level Talk defect. The 64 unshown WPF checks remain separate evidence.
+
+Both exact-implementation [PR CI](https://github.com/Bhargav2301/Buddy/actions/runs/37950567912) and [push CI](https://github.com/Bhargav2301/Buddy/actions/runs/37950561319) pass version, browser, Windows and Android; draft prerelease was skipped. The Windows job includes the new asset/workspace and unshown WPF suites. Documentation-only delivery follow-up has separate CI.
+
+Verified archive: `Buddy-Windows-0.4.8-continuation63.zip`, SHA-256 `dafbd3934b2c9e586e4baedb419aa390f441d09567290033d1ac1c6ad56a8246`. Exact source backup: `Buddy-Source-d268248.zip`, SHA-256 `39b728a470cad9640c4721569deb8603aeac3ba3359fbca7b410121e7a8622ec`. The package is immutable and identifies the implementation commit; this later report records installed acceptance. No merge/tag/release was made. Version remains 0.4.8 development, not completed 0.5.0 MVP acceptance.

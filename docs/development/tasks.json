@@ -2,7 +2,7 @@
   "schema": 1,
   "integrationOwner": "/root",
   "publication": "source_changes_and_existing_feature_branch_PR_push_authorized; merge_and_release_not_requested",
-  "installedBaseline": "0.4.8 / a80b1437f335e4a7367db883f98608ee62e93993; upgraded from 0.4.5 with rollback retained",
+  "installedBaseline": "0.4.8 / d26824861b8d7fc93744728adf47595acf2de339; continuation63 installed, rollback retained",
   "tasks": [
     {
       "id": "DEV-01",
@@ -4052,7 +4052,7 @@
         "Cancellation, stale edits, exact text, unchanged originals, budgets and WPF review behavior tested",
         "Build and package checks pass; tested checkpoint pushed through existing feature branch/PR"
       ],
-      "status": "running",
+      "status": "validated",
       "deliverable": "Integrated OCR correction UI, service contract, regression tests, updated installed build and handoff",
       "worktree": "integration",
       "finalEvidence": "docs/Continuation63.md"

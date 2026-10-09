@@ -1,3 +1,9 @@
+# Continuation63 delivery evidence
+
+Installed d268248: 688 manifest file hashes match; installer exit0; settings/conversation/TLS files byte-identical before startup; rollback retained. Home is observed and already-running --settings returns0 with a single installed process, followed by Settings/General in accessibility. PR37950567912 and push37950561319 pass all version/browser/Windows/Android jobs.
+
+Visible OCR correction remains not-run-to-completion: first input geometry error, then no observed Talk surface after refreshed input; no image selected/uploaded and no message sent. Two owned PNG fixtures were generated, not screenshots. Exact local receipts are in diagnostics/continuation63. [Report](../Continuation63.md).
+
 # Continuation63 implementation and initial installed acceptance
 
 Verified local upgrade 0.4.5 to continuation62 0.4.8/a80b143: installer exit0, previous binaries retained for rollback, three data files byte-identical before startup. The running executable is in the installed Programs/Buddy folder; Home and Settings navigation observed through supported Windows accessibility. No settings, private drafts or messages were changed.
