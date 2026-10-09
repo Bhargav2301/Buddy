@@ -1,4 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup><OutputType>WinExe</OutputType><TargetFramework>net8.0-windows</TargetFramework><UseWPF>true</UseWPF><UseWindowsForms>true</UseWindowsForms><ImplicitUsings>disable</ImplicitUsings><AssemblyName>Buddy</AssemblyName><RootNamespace>Buddy.Windows</RootNamespace><ApplicationManifest>app.manifest</ApplicationManifest><RuntimeIdentifier>win-x64</RuntimeIdentifier><SelfContained>true</SelfContained></PropertyGroup>
-  <ItemGroup><ProjectReference Include="../../../services/Buddy.Server/Buddy.Server.csproj" /><PackageReference Include="System.Speech" Version="8.0.0" /><PackageReference Include="QRCoder" Version="1.6.0" /></ItemGroup>
+  <PropertyGroup><OutputType>WinExe</OutputType><TargetFramework>net8.0-windows10.0.19041.0</TargetFramework><UseWPF>true</UseWPF><UseWindowsForms>true</UseWindowsForms><ImplicitUsings>disable</ImplicitUsings><AssemblyName>Buddy</AssemblyName><RootNamespace>Buddy.Windows</RootNamespace><ApplicationManifest>app.manifest</ApplicationManifest><RuntimeIdentifier>win-x64</RuntimeIdentifier><SelfContained>true</SelfContained></PropertyGroup>
+  <ItemGroup><ProjectReference Include="../../../services/Buddy.Server/Buddy.Server.csproj" /><PackageReference Include="System.Speech" Version="8.0.0" /><PackageReference Include="QRCoder" Version="1.6.0" /><PackageReference Include="Tesseract" Version="5.2.0" /></ItemGroup>
+  <ItemGroup><PackageReference Include="SharpVectors.Wpf" Version="1.8.6" /><PackageReference Include="NAudio" Version="2.2.1" /></ItemGroup>
+  <ItemGroup><Content Include="Assets/Figma/*.svg" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="refine-apps.json" /></ItemGroup>
+  <ItemGroup><Content Include="piper_worker.py" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" /></ItemGroup>
+  <PropertyGroup><ApplicationIcon>Assets/Branding/Buddy.ico</ApplicationIcon></PropertyGroup>
+  <ItemGroup><Content Include="Assets/Branding/Buddy.png;Assets/Branding/Buddy.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" /></ItemGroup>
+  <ItemGroup><Content Include="Assets/Branding/Expressions/*.png" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" /></ItemGroup>
+  <ItemGroup><Content Include="tessdata/eng.traineddata" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" /></ItemGroup>
+  <ItemGroup><PackageReference Include="Whisper.net" Version="1.9.1" /><PackageReference Include="Whisper.net.Runtime" Version="1.9.1" /></ItemGroup>
 </Project>

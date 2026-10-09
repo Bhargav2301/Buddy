@@ -1,0 +1,44 @@
+# Refinement and reviewed context preview 60
+
+October 7, 2026. Isolated source: `Buddy-refinement60`, based on `cf38d5efc36792ae805fafd32e0a0ed2055b3a4a` (0.4.8). Changes are uncommitted and unpublished. The separate preview is `release/Buddy-0.4.8-refinement60-review`, with `.buddy-preview` isolation enabled. No installed files were replaced. Installation and live Calculator testing remain on hold; the separate hotfix59 source and unfinished, disabled activation diagnostic are preserved.
+
+## Observed refinement quality
+
+The frozen 12-prompt corpus was exercised against installed 0.4.5, the previous candidate, a repaired DLL, and the integrated service. The integrated run produced eight independently reviewed, faithful improvements and four unchanged originals; it accepted no unsafe rewrite. Earlier installed/candidate runs exposed an unsafe compound-request sentence-count rewrite, now preserved as regression evidence and fixed.
+
+The improvements comprise five bounded grammar repairs and three useful structural changes. This is finite English repair, not a general guarantee of good rewriting. Numbers/units and Unicode-name cases still failed their improvement targets, although the original details remained intact. The already-structured case was expected to stay unchanged. The distinct-count case retains the original instead of changing the scope of its separate requests.
+
+The final follow-up changes only no-change metadata/messages: existing explicit sections are described as already organized; other unchanged results report no verified improvement; a retry-context limit is explained separately. None of these messages claims an optimal prompt or invents a quality score. Model prompts, retries, fidelity, approval and budget gates remain unchanged. The full 12-case measurement belongs to service `de8634750b1d79c108ccdf06bba4cd041cbd030d12fc77f0b2975ac76bdfe8a9`; it is not mislabeled as a rerun of the later package.
+
+The final packaged service `9538649bdda8bffc49df5c101ba53b6adbc6962794b87905a39429de1e5eda72` and desktop assembly `9fd07657ed9658ddcd7ad162f05744f5e4319a301c15fb074b4de7af8bd7fcaf` completed four additional actual local-model cases through the packaged source reader and current context model. They preserved the selected user/assistant pair, a complete TXT checklist with a minimal grammar fix, an embedded malicious instruction as inert source data, and an unfetched URL including query/fragment/CRLF. Original file bytes were retained and checked independently from extracted text. Exact resulting payloads passed an in-memory destination check; no external field was written.
+
+## Implemented flow
+
+- The notch opens a context review workspace for its current local chat. Completed user prompts and Buddy responses enter together, with scope, role, order, origin and digest. Drafts, partial answers and failed requests do not become completed history. Imported external pairs require explicit user selection; a new external-context action starts a fresh scope.
+- TXT/Markdown, PNG/JPEG, explicitly offered browser text and public HTTPS reference drops can be staged. Links are not fetched. Virtual browser files, HTML, PDF and DOCX remain unsupported. File reads pin local handles and refuse linked paths, active writers, ambiguous formats and oversized data.
+- Original supported files remain bounded, immutable memory snapshots with exact bytes, MIME, size and SHA-256. Extracted text has its own digest and extraction method. Workspace ownership survives disposal of the reader result and changes to the original path. Remove, Clear and session closure release owned leases; a caller's existing copy cannot be retroactively erased.
+- English OCR is explicit and local. The original preview remains beside the extracted text until review or discard. It warns that letters and numbers can be wrong. An actual synthetic `ALPHA 123` image was recognized as `ALPHA 125`; this remains a failed accuracy result. Confidence filtering is not an accuracy guarantee. Closing discards unreviewed image extraction.
+- Users review sources, select complete exchanges, optionally pin a prior response, and see exact projected text plus named excerpts/omissions. No selected context fitting the budget blocks preparation. The current model envelope remains bounded; a source or destination budget is not a claim about an external provider's token capacity.
+- Reviewed source text and URLs stay in escaped untrusted-data records. User-selected URLs never acquire retrieval/citation authority. The legacy verified-web path remains separate. Requiring an original attachment blocks text-only delivery instead of substituting OCR, a path, a URL or base64.
+- Local draft refinement and the next explicit local message use the selected snapshot once. External preparation carries it to the existing guarded text editor, with a fresh field capture, exact payload review, recipient confirmation, no Send, and existing Undo. The UI warns that an external app may sync draft text before Send; it does not claim to verify the account or conversation.
+- Clear, new chat, changed selections, stale destination/original text, expiry and cancellation invalidate pending work. Opening context cancels the old review. History-capacity recovery and presentation notices cannot silently add unseen or previously cleared pairs. A failed source import keeps its refusal visible and releases its newly read original.
+
+## Verification and practical limits
+
+All 12 affected suite builds passed without warnings/errors. Final focused checks: builder 249; repair 109; meaning 464; lifecycle 40; core 235; follow-up 42; workspace 77; original assets 58; readers 159; synthetic integration 72; independent safety 95 plus 56 regression assertions. The final unshown WPF suite passed 49 checks, including retained-image review, recipient confirmation, original-required refusal and source-capacity error visibility. These counts measure tested contracts, not user-visible output quality.
+
+The changed byte reader passed 27 actual checks using newly generated owned TXT/MD/PNG/JPEG fixtures: genuine decoding, held handles, BOM/original separation, retained snapshots, writer refusal and cancellation. This mode did not run OCR. Earlier OCR accuracy failure remains preserved. The exact preview passed package/dependency/native-OCR-load and branding checks; dependency loading is not recognition accuracy.
+
+No visible app workflow, third-party field Apply/Undo, actual attachment upload, microphone, headphones or audio playback acceptance was performed in this batch. Stop/reopen and physical voice/output checks remain separate acceptance work; the current hold prohibits treating the old Calculator attempt as a new pass. No cloud audio, private-history harvesting, credentials, hooks, account operations or submission occurred.
+
+## Material remaining work
+
+Automatic external same-chat history and original-file attachment delivery are not implemented. UIA ValuePattern gives reviewed text replacement, not attachment or chat identity. The existing local-agent pipe exchanges status/questions/denials in bounded frames; no actual coding-agent client consumes a draft/asset protocol. Adding a generic queue would not establish support for a named product.
+
+The parent has asked the user to choose the first complete destination. A browser adapter needs a verified per-tab/document/chat binding, complete role-aware turn extraction, exact draft updates and observable attachment completion. Extension/native-host installation and current-chat read/upload scopes require separate concrete authorization after implementation; none is assumed now. A local-agent adapter needs the exact client/version and a supported participant API that can stage a draft and originals without execution. Until that choice and implementation, only the documented text flow is available.
+
+## Source and evidence
+
+Primary implementation: `services/Buddy.Server/Refinement*.cs`, `ContextDeliveryPlan.cs`, `ContextOriginalAsset.cs`; Windows `ContextWorkspaceWindow.cs`, `ContextSource*.cs`, `SelectedImageOcr.cs`, `MainWindow.RefinementContext.cs`, notch/session integration, options/refinement/inline review lifecycle. Tests include independent refinement corpora, context workspace/assets/integration/readers and the expanded unshown review fixture. The exact changed-file manifest and source archive are recorded outside Git with the preview.
+
+Private evidence under `validation/refinement60`: `final-checks-v2/receipts.json`, `package-checks.json`, `context-final-pins.json`, `context-final-model-results.json`, `evidence/integrated`, `evidence/context-final`, `ingestion-owned-assets-v3/receipt.json`, preserved `ingestion-owned-fixtures-v2/ocr-result.json`, tester reviews, specialist manifests, and final source/package seal. Synthetic contents only; no user profile or microphone data belongs in Git.

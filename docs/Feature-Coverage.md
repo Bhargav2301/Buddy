@@ -1,4 +1,6 @@
-# Supplied specification → Buddy 0.1 coverage
+# Supplied specification → Buddy coverage
+
+**Current Windows 0.3.0:** see [Windows assistant preview](Windows-Assistant-Preview.md) for the updated TRD/UI/UX v1.2 mapping, implemented voice/Guide/Agent/research capabilities, and remaining acceptance work. The table below is the historical 0.1 baseline and is not the current Windows feature list.
 
 Status labels describe implemented code, not device-level certification. See `Validation.md` for executed tests and limitations.
 

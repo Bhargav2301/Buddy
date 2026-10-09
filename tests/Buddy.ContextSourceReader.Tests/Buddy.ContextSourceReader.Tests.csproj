@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0-windows10.0.19041.0</TargetFramework><UseWPF>true</UseWPF></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../services/Buddy.Server/Buddy.Server.csproj" Condition="'$(ContextAssetServerDll)' == ''" />
+    <Reference Include="Buddy.Server" Condition="'$(ContextAssetServerDll)' != ''"><HintPath>$(ContextAssetServerDll)</HintPath></Reference>
+    <PackageReference Include="Tesseract" Version="5.2.0" />
+    <Compile Include="../../apps/windows/Buddy.Windows/RefinementResourceReader.cs" Link="RefinementResourceReader.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/ContextSourceReader.cs" Link="ContextSourceReader.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/ContextSourceFileReader.cs" Link="ContextSourceFileReader.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/ContextSourceImagePreview.cs" Link="ContextSourceImagePreview.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/SelectedImageOcr.cs" Link="SelectedImageOcr.cs" />
+  </ItemGroup>
+</Project>

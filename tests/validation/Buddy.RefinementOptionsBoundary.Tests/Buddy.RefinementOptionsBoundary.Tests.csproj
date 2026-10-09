@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <BuddySourceRoot Condition="'$(BuddySourceRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..\</BuddySourceRoot>
+    <BuddyResourceRoot Condition="'$(BuddyResourceRoot)' == ''">$(BuddySourceRoot)</BuddyResourceRoot>
+  </PropertyGroup>
+  <!-- Reviewed production sources compile into this fixture's own bin/obj. -->
+  <ItemGroup>
+    <Compile Include="$(BuddySourceRoot)services\Buddy.Server\*.cs" Link="Production\%(Filename)%(Extension)" />
+    <Compile Include="$(BuddyResourceRoot)apps\windows\Buddy.Windows\RefinementResourceReader.cs" Link="Production\RefinementResourceReader.cs" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="AngleSharp" Version="1.8.2" />
+    <AssemblyMetadata Include="BuddySourceRoot" Value="$([System.IO.Path]::GetFullPath('$(BuddySourceRoot)'))" />
+  </ItemGroup>
+  <Import Project="ReviewedSource.targets" />
+</Project>

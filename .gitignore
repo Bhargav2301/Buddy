@@ -25,3 +25,16 @@ dist/
 **/key.properties
 **/desktop.json
 **/keys/
+**/preview-data/
+**/local-voice/
+**/Logs/
+*.onnx
+*.onnx.json
+*.gguf
+*.safetensors
+*.dmp
+.buddy-rollback.json
+
+**/SpeechModels/
+ggml-*.bin
+*.download

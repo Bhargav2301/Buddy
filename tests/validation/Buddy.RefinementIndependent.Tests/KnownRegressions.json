@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "scope": "Known builder-identified single-span gaps, kept separate from independent heldouts.",
+  "cases": [
+    {"id":"known-standalone-poem","category":"known-regression","prompt":"Write poem.","utility":"Add the missing indefinite article, preserving the sole requested artifact and adding no subject or constraints.","preserve":["poem"],"literals":[],"forbid":["about","stanzas","rhyme"],"repeat":true},
+    {"id":"known-standalone-difference","category":"known-regression","prompt":"Explain difference between RAM and storage.","utility":"Add the missing definite article while preserving both operands and the comparison relation; do not answer the question.","preserve":["difference","RAM","storage"],"literals":[],"forbid":["for beginners","gigabytes"],"repeat":true}
+  ]
+}

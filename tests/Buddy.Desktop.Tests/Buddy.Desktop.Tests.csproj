@@ -1,7 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework></PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../apps/windows/Buddy.Windows/SpeechSignal.cs" Link="SpeechSignal.cs" />
+    <Compile Include="../../services/Buddy.Server/WorkflowIntent.cs" Link="WorkflowIntent.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/PreviewEnvironment.cs" Link="PreviewEnvironment.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/OverlayPlacement.cs" Link="OverlayPlacement.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/RegionShape.cs" Link="RegionShape.cs" />
     <Compile Include="../../apps/windows/Buddy.Windows/DesktopPreferences.cs" Link="DesktopPreferences.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/AssistantInteraction.cs" Link="AssistantInteraction.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/DesktopLaunch.cs" Link="DesktopLaunch.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/DesktopActivation.cs" Link="DesktopActivation.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/GuardedEdit.cs" Link="GuardedEdit.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/InstallationTransaction.cs" Link="InstallationTransaction.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/CompanionState.cs" Link="CompanionState.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/LocalDataTree.cs" Link="LocalDataTree.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/DictationInsertion.cs" Link="DictationInsertion.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/DispatchInterruption.cs" Link="DispatchInterruption.cs" />
   </ItemGroup>
 </Project>

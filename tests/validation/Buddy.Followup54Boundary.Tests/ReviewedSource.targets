@@ -1,0 +1,10 @@
+<Project>
+  <Target Name="CaptureIndependentReviewedInputs" BeforeTargets="AssignTargetPaths">
+    <MakeDir Directories="$(IntermediateOutputPath)" />
+    <GetFileHash Files="@(Compile);$(MSBuildProjectFullPath);$(MSBuildThisFileFullPath);$(MSBuildThisFileDirectory)teaching-heldouts.json;$(BuddySourceRoot)Directory.Build.props;$(BuddySourceRoot)VERSION" Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="IndependentReviewedInputs" />
+    </GetFileHash>
+    <WriteLinesToFile File="$(IntermediateOutputPath)qa54-reviewed-inputs.txt" Lines="@(IndependentReviewedInputs->'%(FullPath)|%(FileHash)')" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <ItemGroup><EmbeddedResource Include="$(IntermediateOutputPath)qa54-reviewed-inputs.txt" LogicalName="Qa54ReviewedInputs" /></ItemGroup>
+  </Target>
+</Project>

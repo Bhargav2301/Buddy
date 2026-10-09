@@ -1,0 +1,239 @@
+# Delivered: continuation63 installed and CI passed
+
+Implementation d268248 is installed; all 688 manifest entries match, and three saved-data files were unchanged before launch. Home and already-running Settings activation are observed, with one Buddy process. Both implementation CI runs pass Windows/browser/Android/version. OCR correction has 64 unshown WPF checks; visible correction remains unverified after a native tool geometry/input limitation. User-approved installation is complete; older holds below are historical. [Report](../Continuation63.md).
+
+# Current: authorized installed update and OCR correction63
+
+User authorization now covers installed updates and pushing source changes to the existing GitHub branch/PR. Continuation62 installed successfully over 0.4.5 with rollback retained; three saved data files were byte-identical before launch. Installed Home and Settings were observed working. OCR-63 adds original-image/text correction, zoom, exact provenance, fresh review and old-draft invalidation. 82 asset /64 unshown WPF /77 workspace /69 browser /169 reply checks and Windows package probes pass. Installing and visibly checking continuation63 is the next delivery step. No broader MVP acceptance is implied. [Report](../Continuation63.md).
+
+# Current: continuation62 requested-detail replies and browser contract audit
+
+The comprehensive October9 handoff matched clean canonical415fe28 and origin; its CI passed. REPLY-62 /root adds explicit detailed local replies (up to12 sentences /6,000 UTF-16 units), while ordinary/tighter/specialist limits remain. Token-budget termination is refused for every Ollama model path; incomplete/late replies are not saved. No stream contract or settings migration changed.
+
+169 planning/reply assertions, affected preview/staged/speech/teaching/research/core suites,231 Node browser cases and broker/framing/independent checks pass. Windows builds cleanly; a fresh0.4.8-continuation62-review package passes dependency/OCR-load checks. Four local Gemma responses meet length bounds, but one includes unsupported benchmark figures: no general factual-quality acceptance. [Report](../Continuation62.md).
+
+The production browser identity/history/attachment contract is still unavailable; source-owned admission remains closed. Probe0.1.6 and its accepted observation are preserved. Installed Buddy was not replaced; last installed0.4.5 is historical, not freshly rechecked. Installation/live Calculator remain held. Windows0.5.0 and broader native gates remain incomplete.
+
+# Current: probe 0.1.6 structural detection confirmed on the live page
+
+The approved inspection of the selected conversation succeeded through Chrome's Elements panel. The user and assistant wrappers use paired search-unit keys inside a marked conversation root; legacy role attributes were absent on those wrappers. Virtualized turns explain why loaded counts cannot represent complete history. No private page content or IDs are retained in project records.
+
+PROBE-016 /root implements the observed structure, bounded alias/key deduplication and conflict abstention. 231 Node and 60 owned offline Chrome cases pass; preserved0.1.5 reproduces the zero-role failure. Implementation and package were synchronized at `50c6226`. The user subsequently reported live0.1.6 editor1 / roles2 / user1 / assistant1 / fileinputs2+ / streamingfalse / routetrue. This closes the observed detection miss for this page. Both implementation PR/push CI runs passed version/browser/Windows/Android. No further unchanged probe run is needed; full identity/history/draft/attachment contracts and other native acceptance remain open. No Windows install/native registration was performed. Windows remains0.4.8, not completed0.5.0. See [report and acceptance limits](../Browser-readiness-0.1.6.md). Older entries below describe their original checkpoints.
+
+# Current: live 0.1.4 detects an editor; scoped-route repair 0.1.5
+
+The user supplied a 0.1.4 observation with editor candidates1 on a visible existing project conversation. R02 did not recur. Roles/users/assistants remain0 despite visible messages. The screenshot's generic `/g/g-p-.../c/UUID` route explains the false URL flag; no private IDs/text are retained.
+
+PROBE-015 /root adds scoped route recognition and missing-role interpretation only. 230 Node and32 owned offline Chrome cases pass; preserved0.1.4 reproduces the route bug. A fresh0.1.5 package preserves older builds. Candidate detection has user-reported live evidence; exact field binding and role/history recognition remain unverified. Another seven-count run cannot establish the missing message markup. Next work needs structural evidence for message containers, not guessed selectors. See [current report](../Browser-readiness-0.1.5.md). Windows stays0.4.8 and installed state is unchanged. Older live-pending statements retain their original checkpoints.
+
+# Current: 0.1.3 live check completed; 0.1.4 composer detection candidate
+
+The user reported a successful 0.1.3 structural observation and confirmed that its zero composer count occurred with the new-chat message box visible. R02 did not recur in this attempt; composer detection failed. No live DOM was inspected by the assistant. File inputs 2+ count controls, not attachments.
+
+PROBE-014 /root broadens provisional composer detection using actual HTML editability, form ancestry and accessible textbox roles, with hidden/disabled/nested exclusions and clearer result interpretation. 210 Node cases and 28 owned offline Chrome DOM cases pass. A fresh 0.1.4 package preserves the 0.1.2/0.1.3 artifacts. Live recognition of the user's editor remains unverified. No installed Windows, native host or full adapter activation changed; Windows remains 0.4.8. See [the current report](../Browser-readiness-0.1.4.md). Older pending-live statements below describe their original checkpoints.
+
+# Current: readiness probe 0.1.3 implemented; live popup acceptance pending
+
+PROBE-013 is owned and integrated by `/root` in the canonical checkout. The user reported R02 from probe0.1.2. The standalone replacement at `integrations/readiness-probe` implements direct popup ownership, exact window/tab/document binding and immediate cancellation without a background worker. The old focus predicate and early Disconnect/session-resurrection race were reproduced against preserved0.1.2 using synthetic APIs.
+
+100 new probe cases plus107 existing browser cases pass. A separate whitelist-only0.1.3 package and checksum builder is provided; the old probe/source folders are preserved. Source and test work follow the ongoing repository workflow. No extension loading, live readiness invocation, account/content access, native registration or installed Windows update was performed. Real Chrome popup acceptance remains pending a deliberate user check of the version-labelled new package.
+
+See [R02 repair, evidence and delivery](../Browser-readiness-0.1.3.md). The0.1.3 probe is now implemented rather than design-only; this does not complete the separate full browser adapter, Calculator59 or other MVP acceptance gaps below.
+
+# Current: October 9 source synchronization
+
+The user directly requested reconciliation of local source and GitHub. The canonical working checkout is now `C:/Projects/Buddy/repository`, branch `feature/interactive-assistant`. The integrated browser61 source is committed as `9df490c`; the adjacent synchronization commit repairs one stale test extraction marker and updates these records. This source-sync authorization supersedes the historical publication hold below for this reviewed source and the existing draft PR only.
+
+GitHub's starting head was `63ca5e9` (0.4.5). Its three descendant local hotfix commits through `cf38d5e`, plus the complete 680-file browser61 snapshot, are included. The source snapshot matched every live file and the handoff ZIP; Git normalized CRLF to LF in 88 text files with no other import changes. The old canonical checkout is preserved by `backup/pre-sync-20261009`. Original browser61/refinement60 folders, archives, private evidence and separate hotfix59 work are preserved.
+
+Fresh Windows and browser-host builds pass with zero warnings/errors. All 26 selected .NET suite invocations and 107 JavaScript cases pass; the full acceptance suite was not rerun. Tests use cached dependencies and self-contained .NET 8 as needed. See [source synchronization and exact remaining work](../Source-sync-2026-10-09.md). This is version 0.4.8 source, not completed 0.5.0 MVP acceptance or a newly installed/released package.
+
+Next work remains the verified live browser adapter and the handoff's readiness/disconnect issue, separate Calculator59 integration, actual local-agent consumer, OCR usefulness and coordinated physical/foreground acceptance. Browser probe 0.1.3 is design-only. Installed Buddy, settings, models, browser profiles and registrations were not changed. Older entries below are historical and do not replace this source location or current source-sync authorization.
+
+# Current: browser61 preview verified; live adapter and setup held
+
+October 7: Buddy-browser61 is the uncommitted integration at base cf38d5efc36792ae805fafd32e0a0ed2055b3a4a. Separate release/Buddy-0.4.8-browser61-review passes package/branding and local fixture checks. Installed0.4.5, sealed refinement60 and Calculator59/disabled diagnostic remain preserved. No install, extension loading, native registration, account/history read, upload, Send or publication.
+
+Exact packaged local-model corpus: original12 now10 useful faithful changes/2 truthful unchanged/0 unsafe accepted observed; earlier8 useful outputs identical. Both numbers/units and Unicode targets improved with exact source-span constraint separation. Six additional builder-authored cases pass separately; finite evidence is not a broad language guarantee. Independent source/output review complete.
+
+Browser protocol, local review UI, complete role-aware pairs and original-byte DOM staging are implemented and validated with synthetic identities/receipts, actual owned native host/pipe and JS-to-C# wire plus isolated Chromium DOM. Production ChatGPT remains readiness-only: live verified account/workspace/history/attachment contract is missing. Real local-agent consumer and OCR usefulness remain open. Do not call this adapter complete.
+
+Concrete next approval is the separately sealed readiness probe0.1.0, only activeTab+scripting on one selected ChatGPT tab in one user-selected profile. Native registration and content/upload approval are separate later gates. Exact private request: validation/browser61/MINIMUM-SETUP-REQUEST.md. No setup authorized/applied in this phase. See [full report](../Windows-browser61.md) and validation/browser61/FINAL-OUTCOME.json. Older entries below are historical.
+
+# Historical: browser61 integration start; installation held
+
+User choice received October7 09:45:58UTC: ChatGPT in browser, plus capability-checked other browser interfaces including sites used in Comet. Root Buddy-browser61 is seeded from sealed refinement60 source snapshot4a41fa2363e94b8e01df55530eb00007613e14ea48447d60c7cde14df714870a. Buddy-refinement60, its archive/evidence/preview, and Calculator59 remain preserved separately.
+
+Four dedicated roles continue. Implement MV3 activeTab/scripting/nativeMessaging, bounded current-user native transport, exact current document/account/workspace/chat binding, full selected pairs and original byte staging, reviewed draft replacement and confirmed attachment state, no Send. Synthetic DOM/local pages only; no extension/native-host registration, persistent permission grant, real account/chat read or upload. No paid/cloud speech, unrelated PC operations, installed replacement or publication.
+
+Public sources do not establish a current verified ChatGPT account/workspace DOM contract. Production identity admission must remain unavailable until concrete narrowly scoped characterization is approved and passes. A label, route, file input or synthetic fixture is not a verified production capability. Implement useful DOM/protocol primitives now and report this material limitation with minimum concrete setup needs.
+
+# Current: refinement60 preview validated; destination adapter pending
+
+October 7: isolated Buddy-refinement60 remains uncommitted at base cf38d5efc36792ae805fafd32e0a0ed2055b3a4a. Separate release/Buddy-0.4.8-refinement60-review is built, not installed. Installation and live Calculator testing remain HOLD. Preserved hotfix59 and its incomplete disabled activation diagnostic were not resumed. No push, merge, publication, external upload, account access or message submission.
+
+Four dedicated roles completed source handoffs and independent review. The frozen 12-case integrated local-model lane yielded eight faithful improvements and four unchanged originals; two utility targets remain unmet. The exact later package passed four additional context/model cases. Focused builds/tests, 27 owned-file native checks, package/dependency load and branding pass. OCR accuracy remains a recorded failure: ALPHA 123 became ALPHA 125. Neither assertion counts nor dependency loading establish recognition or real-app acceptance.
+
+Local same-chat full pairs, explicit manual external pairs, retained original TXT/MD/PNG/JPEG assets, reviewed text/link/image staging and scoped one-use text preparation are implemented. Automatic external history, binary attachment delivery and a real local-agent consumer are material implementation gaps. Await the user's first destination choice (ChatGPT browser, Grok in Comet, or exact local-agent client/version); do not infer permission for installation/history reads/uploads. See [full outcome](../Windows-refinement60.md) and private validation/refinement60/FINAL-OUTCOME.json. Older entries below are historical.
+
+# Current: refinement repair and source/context work; installation and live Calculator tests on hold
+
+October 7: the user requested four dedicated roles: refinement builder, independent refinement tester, source/context researcher and source/context planner. Their exact ownership is in tasks.json. Root integration is isolated at Buddy-refinement60 from clean cf38d5e; Calculator59 repairs and the incomplete activation diagnostic remain preserved separately. No installation, live Calculator testing or publication in this batch.
+
+First reproduce installed0.4.5 and candidate refinement behavior with synthetic/canned prompts and isolated state, then repair and independently validate varied prompts, no-op/empty/error/cancellation/limits/repeated turns. Previous single-prompt acceptance is insufficient. Latest user report has no specific failing input/error yet; do not invent one.
+
+Implement supported chat-scoped previous prompts AND AI responses, notch source staging and context delivery. Preserve privacy, exact app/chat identity, destination budgets, review, Apply/Undo and original text. No unrelated chat history, silent external source transmission or message submission. External adapters use synthetic fixtures; live field tests require fresh coordination. Research/planning must lead to concrete implementation, with unsupported binary attachments/destinations honestly labelled.
+
+# Current: version 0.4.8 packaged source validated; coordinated update pending
+
+The focused candidate includes reviewed Calculator restoration plus the unchanged approved refinement fix. All59 nonforeground aggregate commands, static package checks and exact packaged native dependency probe pass. Exact final service/local-model comparison refinement passes in18.505seconds with similarity0.9005715024022094, no profile/field write or cloud route. Source/build hashes, local source commit and archive are sealed with the new package. No unfinished55 or wider feature work was included.
+
+Fresh private hotfix58 acceptance/update helpers are prepared independently; their measured readiness lives in validation/hotfix58, not older57 receipts. Installed0.4.5 and current settings remain preserved. No live activation/focus/install or publication now. The consumed57 launcher/deadline cannot be reused. See [candidate report](../Windows-hotfix58.md); await fresh desktop availability before the new one-use local START workflow.
+
+# Historical source-only activation58 checkpoint
+
+# Current: minimized Calculator source repair validated; native acceptance pending
+
+October 6: user confirmed the failed hotfix57 launch left Calculator minimized. Isolated Buddy-hotfix58 now activates the exact signed Calculator registration once through the supported Windows activation manager, pins its returned process/window identity, restores only that minimized root once, and requests ordinary foreground activation at most once. Existing strict success checks remain mandatory and bound to the same target. No focus workaround, input/deadline reset, automatic relaunch or stale receipt reuse.
+
+Root integrated app47's isolated pure lifecycle policy and added the guarded native adapter, restoration-only binding and failure reporting. Independent qa43 review caught and closed a sample race. AppBinding432, ComputerUse132, report82 and UserFailureBoundary56 checks/cases pass; all four builds and Windows Release compile have zero warnings/errors. No native desktop/activation test, package, version bump, installed replacement or publication. Installed0.4.5 and sealed hotfix57 evidence/attempt remain preserved. No active command remains at final handoff. See [repair and exact remaining native acceptance](../Windows-calculator-activation58.md).
+
+# Historical: failed local update diagnosed; focused reporting repair verified
+
+October 6: hotfix57 local START run 8292aba49a0240dd9ec15ac365b77a87 dispatched Calculator once but failed its foreground postcondition after 30 checks. No frame/package verification branch was reached, input stayed unchanged, and all update work settled. No installation or rollback ran; installed0.4.5 remains the same process and all4,416 application files match the prepared baseline. The old deadline/attempt is consumed and cannot be reused. No current foreground authorization.
+
+Isolated Buddy-hotfix58 / hotfix/launch-verification58 is based on f8c56b90f6d80479717d0988182ba37492d998f1. Root repaired discarded final verification reasons, with188 focused checks passing, Windows compile0warnings/errors and independent read-only review. Native activation cause remains unproven; no guard or activation-policy change. No new package, installation, publication or version bump. Current preferences and all historical evidence/previews remain preserved. See [investigation](../Windows-launch-investigation58.md).
+
+# Historical: hotfix57 verified source, version0.4.7 candidate
+
+Based on local-only cebb465; installed0.4.5 and sealed0.4.6 remain preserved. All59 aggregate commands, combined Windows publication/package checks, exact-DLL existing Calculator frame/consumer revalidation, and exact local-model refinement pass. APP57 and root consumer passed independent review. The actual0.4.6 launch exposed a Windows frame wrapper; this candidate fixes the bounded postcondition without granting later input authority. No unfinished55. Private acceptance helpers are being bound to the sealed candidate before a new coordinated window; no new activation or installation occurred. Installed update remains authorized after acceptance. Publication is blocked; the new source identity is not covered by approval naming only cebb465. No merge/release. See [current report](../Windows-hotfix57.md).
+
+# Current: focused hotfix56, version 0.4.6 candidate
+
+Published base:63ca5e9b6b8d2785b6941ce4ad216b627b960d8c. Installed baseline:0.4.5/followup54. REFINE-56 and APP-56 passed hash-verified intake and root review; independent QA found no blocking trust/no-replay issue. All 58 combined aggregate commands, final Windows publish/package checks, exact local-model refinement and exact-desktop-DLL read-only Calculator resolution pass. A fresh recoverable backup is verified. No followup55 source is included. Publication of the tested focused fix is authorized; foreground launch and installed replacement remain pending coordination. No merge/release. See [current report](../Windows-hotfix56.md). Older entries below are historical.
+
+# Followup54: integrated gates and separate packaged checks passed
+
+All CORE54, PROVIDER54, TEACH54, REFINE54, NOTCH54 and QA54 handoffs are accepted. Root fixed context replay/provenance, optional-session ownership, placement persistence/cancellation and verified procedural Guide routing. Final57-command aggregate is reconciled in validation/followup54/final-validation.json; source build snapshot db79b29ce736d80671f85a1c4b858e407675594361969792bb604d99f7c770cf. Windows/native-harness build0warnings/errors,12ledger tests and571-file source scan pass. Actual local refinement14case round:13useful structural candidates plus1expected clarification; four finite grammar improvements. Actual general model teaching remains unaccepted; bounded static local-reference concepts are separate limited coverage.
+
+Installed0.4.4, speaker85/F3/small.en and sealed47 remain unchanged. No foreground/capture/microphone/audio playback/cloud/accounts/hooks/installation/publication. Current report docs/Windows-followup54.md and original17 mapping supersede historical summaries below. Fresh candidate release/Buddy-0.4.5-followup54-review passes package/native OCR, branding, silent Piper synthesis and synthetic Whisper checks with a separate empty local state. Source/manifests and final preservation checks are recorded in validation/followup54/FINAL-REVIEW.json and CHECKPOINT.md. Normal visible acceptance remains pending a fresh parent-coordinated window. No root model job remains after receipt. Publication remains independently blocked.
+
+# Historical checkpoints
+
+# Followup53: parallel functional implementation, foreground paused
+
+User explicitly requested multiple agents at17:10UTC Oct5 to continue remaining fixes and all discussed local/features work. CORE53 owns transactional preferences/hotkeys, TEACH53 grounded useful teaching/region research, REFINE53 advanced external options/fresh capture, NOTCH53 local interaction/notes/chat/text inbox, PROVIDER53 opt-in production routing/setup and bounded local-agent contracts, QA53 independent fixture/review criteria. Root owns shared host/UI wiring and integrated tests/models. Workers are isolated dirty-source worktrees with a recorded seed, not copies of sealed preview47. Existing source50 tests are reused; unaccepted general teaching remains unaccepted until useful actual-model output passes.
+
+Local-start diagnostic at16:47:46 ran17.609seconds: first Quick/Comet routine verification/settling passed; second Home Talk Invoke bracketed an unknown-source input-tick change in22.906ms, before Calculator draft; owned cleanup succeeded. No product/guard defect is established and no event is exempted. Keep this diagnosis separate from implementation. User previously denied touching input. No new foreground, capture, audio, account/grant/hook installation, install or publication. Preserve official Buddy art/licenses, selected speaker85/F3, installed0.4.4 and exact preview47/sourcearchive. Current private work ledger/evidence: validation/followup53 and acceptance47/CHECKPOINT.json.
+
+# No foreground retry; local-start timing alternative prepared
+
+Oct5: the latest remote two-minute window arrived with only 80 seconds remaining and correctly failed the unchanged >90 second admission guard before desktop work. Dispatch/approval latency has no established upper bound. A private single-use local diagnostic launcher now performs setup before user START, freezes a 180 second deadline, counts down 10 seconds and refuses launch admission after 30 seconds or at <=120 seconds remaining. Native startup/cleanup remain cooperative; no hard real-time promise or deadline extension. 19 fake-child tests pass plus exact CLI expired-deadline refusal; the unchanged runner retains 136 headless checks. Candidate 4418 static files/source archive and four installed 0.4.4 hashes match. Launcher and exact diagnostic remain NOT RUN. No installation/publication. See private validation/acceptance47/local-start/TIMING-AND-READINESS.md and CHECKPOINT.json; no active root sessions.
+
+# Latest foreground ended14:59:42UTC: packaged Stop and Comet pass
+
+Announced deadline15:01:27UTC. Actual sealed preview passed pending Quick Stop with exact draft restoration, then verified Comet with production banner and foreground process identity. Input tick changed during Calculator phase; source unknown, guard honored, no baseline reset/retry/browser work. Calculator incomplete, Spotify and Home reopen unrun. Owned preview/context exited; UI settled; residual verified handles empty; only installedBuddyPID33820 remains. Clipboard/settings/installed files untouched; no installation. A demonstrated separator-only installed-path comparison bug in the harness was corrected before startup, with0warning/error build; candidate unchanged. Current runner path-diagnosis/output. Private validation/acceptance47/foreground1459-packaged/receipt.json, ROOT-OUTCOME.json and CHECKPOINT.json record evidence. Further foreground requires parent coordination.
+
+# Headless input/review diagnosis complete; no new foreground
+
+Oct5: the 14:24 receipt cannot identify whether input activity came from automation, another application or a person. The approval arrived39.788seconds after proposal publication and27.226seconds after cleanup; the60second review timeout was not the stop cause. Acceptance harness now reports neutral input metadata with an immutable latched baseline, immediately streams full proposalReady, and supports atomic explicit one-use run/window/field/deadline-bound review. Cleanup survives status-file I/O errors; expiry is checked again after current-state validation. Final105headless checks, build0warnings/errors and scoped qa43 review pass. Use private validation/acceptance47/input-diagnosis/output, not the historical geometry binary. Packaged stop-reopen/launches remain independent and NOT RUN. Foreground remains paused until a newly announced parent-coordinated window. No candidate or installed app/settings changes, installation or publication. See private input-diagnosis/DIAGNOSIS.md and current CHECKPOINT.json. Earlier entries below are historical.
+
+# Latest foreground: capture/proposal pass; input activity stops before Apply
+
+Fresh Ready window ending14:27:35UTC stopped14:24:36UTC on changed input tick. Exact candidate captured the owned Comet textarea with stable physical window0,0,2560,1600 and field681,640,1200,301 at144DPI; focused/expected identity matched. Local refinement completed with faithful Request/Subject structure and original unchanged. An input timestamp change of unknown source canceled the review wait; no Apply/Undo, packagedStop/launch/reopen or installation ran. Root's proposal-bound approval was written after cancellation and was not consumed. Owned browser closed; UI settled; input free. Do not reset baseline and continue another scope after input-ownership loss. Private validation/acceptance47/foreground1423-component/receipt.json and ROOT-OUTCOME.json are authoritative; CHECKPOINT current. All foreground activity ended before deadline.
+
+# Documentation reconciled; wait for parent-relayed fresh Ready
+
+Original17-user-report.md now provides the concise exact1–17 mapping, explicit preview47/source50 split, Coucou feature gaps and disabled connector/provider state. Independent docs43 review found no blocking factual errors; wording clarifications applied. No new code/model/native work. Foreground remains paused until parent relays user Ready with a newly announced hard deadline. Independent packaged modes are prepared in geometry-diagnosis/output, with no browser gate; immediate desktop/process/hash guards still apply. No installation in the next five-minute window. All independent work is complete and root commands settled. Private validation/acceptance47/CHECKPOINT.json is current.
+
+# Geometry headless diagnosis complete; independent packaged scopes prepared
+
+Oct5: exact historical Anchor cause remains unproved because bounds/runtime IDs were not recorded. No candidate defect established and no candidate edits. Acceptance harness now has candidate-equivalent DPI, stable full-containment samples, exact field binding and post-capture validation, with numerical owned-only diagnostics. Final77headless checks and zero-warning/error build pass; scoped qa43 review passed. Packaged stop-reopen/launches/all modes use a neutral noneditable owned context and do not depend on browser refinement. Delayed-start cancellation regression proves no late Window creation. Two headless renderer attempts timed out without layout measurements; scoped cleanup found0residual owned-profile processes. No native acceptance/installation in this diagnosis. Preserved47 still matches4418static hashes/sourcearchive; installed app/settings untouched. See private validation/acceptance47/geometry-diagnosis/DIAGNOSIS.md and CHECKPOINT.json. All root commands settled. Further foreground work requires a fresh parent-announced window.
+
+# Foreground acceptance stopped safely at field-bounds guard
+
+Oct5 announced13:41–13:46window ended13:41:57UTC. Candidate FocusedFieldEditor.Capture refused the owned Comet textarea: "The field is not visibly inside the selected app." No proposal/Apply/Undo or packaged tests ran; no text edits. Owned browser closed, UI operations settled, input free, installed Buddy not paused, clipboard untouched. Stop boundary honored; do not start another foreground test without parent coordination. Investigate harness/window geometry headlessly; no production failure cause established yet and no guard bypass. Private validation/acceptance47/foreground1341-component/receipt.json and CHECKPOINT.json contain exact evidence. No installation.
+
+# Preserved47 actual executable preflight passed through approved retry
+
+Oct5 13:39UTC: the same normal approval route cleared the transient capacity failure. Actual preserved Buddy.exe package/dependency/native-OCR check and branding check each exited0 with captured stdout/empty stderr; owned check processes ended. Headless gates now pass. No foreground work occurred. Ready for a freshly announced five-minute browser/packaged-app acceptance window after immediate desktop and ownership guards; no installation yet. Private validation/acceptance47/package-headless-verified.json and CHECKPOINT.json are current. All root commands are settled after final preservation verification.
+
+# Preserved47 acceptance harness repaired headlessly; foreground still pending
+
+Oct5 13:36UTC: isolated harness final build0warnings/errors and40headless checks pass, including exact sealed candidate unshown review callbacks and in-memory Apply/Undo. All13assets+2assemblies stage exactly;4418candidate static files and sourcearchive remain unchanged. Scoped qa43 review blockers addressed. No foreground/model/audio/installed writes; originalinstalledPID33820 remains observed. Native desktop enumeration is unavailable in the current sandbox; earlier staged callback evidence stays separate.
+
+Actual sealed executable headless checks were not executed: automatic approval review failed because its selected model was at capacity, not a safety determination. Do not bypass. Resolve that infrastructure gate before a freshly announced five-minute browser/packaged-app acceptance window. Private validation/acceptance47/CHECKPOINT.json and HEADLESS-READINESS.md record exact modes, hashes, bounds and pending checks. Browser Apply/Undo, actual QuickStop/launch/reopen and installation remain unperformed. All root commands settled.
+
+# Followup51 completed noninteractive verification; preserved47 acceptance can proceed
+
+Exact original17 mapping and the bounded real-app plan are current in Feedback-status-50.md and Feedback47-acceptance-plan.md. Final source passes959 checks across15 pure/injected suites; Windows/native-fixture build has0warnings/errors. New native50 fixtures remain unexecuted. Task retry/initial-send/shared-conversation ownership repairs passed independent source review. All scoped workers and root commands have settled; no stalled worker or active model job.
+
+Final synthetic-image service explicitly answers A2/B6/Btaller in three sentences; prior actual reviewed-text research pass remains. General model teaching is NOT ACCEPTED: both latest nine-case rounds have five independent utility failures and four correct host clarifications. Do not fold this experimental source into preserved47. No new preview or installed writes. Preserved47 still matches4418 static hashes and its source archive; installed0.4.4's four binaries/build-info match baseline.
+
+Parent may progress preserved47 acceptance independently of teaching after announcing a fresh bounded window and checking desktop/ownership. Use owned local Comet draft Apply/Undo without sending and exact Comet/Calculator/Spotify launches only; NO Camera/accounts/microphone/audio. Installation already has continuing user authorization after actual acceptance and a fresh recoverable backup; publication remains independently denied. Do not ask duplicate installation permission. Older checkpoints below are historical; private validation/followup50/CHECKPOINT.json is the current process/evidence handoff.
+
+# Followup50 resumed: exact feedback and installation boundary
+
+Parent relayed the exact original17 feedback items; private validation/followup50/original-feedback.json is authoritative. STATUS51 corrects the mapping and prepares a bounded acceptance plan. Installing working updates is already in the continuing user request, subject to actual acceptance and a fresh recoverable backup; publication remains independently blocked. Do not request redundant installation authorization or conflate it with publication. No foreground work yet, no Camera activation without camera-related scope. Preserve feedback47 exactly; independent followup50 remains separate and unverified teaching must not enter that candidate.
+
+# Followup50 checkpoint: preserved preview, teaching still pending
+
+Parent requests immediate checkpoint. No foreground work occurred in followup50. Preserve sealed feedback47 preview and installed0.4.4; do not fold unverified teaching into that preview. ACTIVITY, NOTCH, QA, REGION and STATUS50 accepted; TEACH50 remains in worker pending coordinated-gerund guard repair and formal handoff. Root94journal checks pass and notch wiring compiles; latest QA lifecycle fixture and final model changes still need integrated checks. Actual baseline and first teaching revision each fail all6 independent usefulness reviews. Actual reviewed-query research completes with public text only and local answer; chart service returns correctA2/B6 but misses explicitcomparison. Original numbered17message not recovered, so mapping is provisional. See private validation/followup50/CHECKPOINT.json for precise next steps. This is a parent coordination checkpoint, not a user pause or approval request; continue authorized noninteractive work when resumed. No install/publication/accounts/audio/foreground.
+
+# Followup50: noninteractive local features and acceptance mapping
+
+Foreground window completed Oct5 at11:40:53UTC within five minutes:130owned native checks passed plus visible/responding isolated preview startup. Installed0.4.4 binaries/settings unchanged; only originalinstalledPID33820 remained. User is free to use PC. Do not open foreground windows, capture the live desktop/microphone, play audio, activate Camera/Spotify or run external-app launches without a new parent-coordinated window. No installation/publication/accounts/credentials/security changes. Preserve all existing previews, including sealed feedback47; new source work is uncommitted in quality46 with snapshot under validation/followup50.
+
+Parent directs appropriate missing local Coucou notch features, general model-generated teaching investigation against nonprivate recorded observations, and exact17feedback implementation/test/pending mapping. ACTIVITY50 owns pure task journal, NOTCH50 surface, TEACH50 model guidance/harness, REGION50 noninteractive completion harness, STATUS50 evidence mapping, QA50 independent criteria. Root owns integration and all actual models/network/native work. All prior artifacts remain historical immutable evidence; no wholeassistant/fullCoucou parity claim.
+
+# Feedback47 preview: noninteractive gates complete; foreground acceptance next
+
+Current report: [October 5 feedback preview](../Windows-feedback47.md). A fresh separate preview is prepared at `release/Buddy-0.4.5-feedback47-review`, based on uncommitted `local/quality46` / `ced111d78a4e4230e53d8d359ca167b231e29e56`; installed0.4.4 and the prior0.4.5 preview remain untouched. Current Piper speaker85/F3 and selected Whisper small.en are copied with verified existing assets, with current preferences and Black only in the preview. New empty preview state uses existing local Gemma3:4b/all-minilm; no installed history/keys/accounts copied.
+
+All accepted feedback fixes, exact task dispatch and package identity repairs are integrated. Final headless regression receipts, Windows compile, package/OCR and silent local speech results are under private validation/feedback47. Actual14case refinement matrix repeated twice now has13useful unique/26accepted outputs and two expected contradiction clarifications; the previously failed conditional passes0.813859 against unchanged0.80 after globally replacing display heading Task with Request. Source roles/coverage/order/literals/exact rerender, preservation assessment and independent oracle stay unchanged. Root-reviewed utility is modest structure; rough grammar persists.
+
+Actual readonlyComet traversal depth16 iscomplete123visited/maxdepth15/108elements. Authored browser Reload lesson passes independent chrome ancestry/usefulness/freshgrounding. This is not model-generated teaching or action execution. Actual readonlyComet/Camera/Spotify resolution nowpasses; Store activation and foreground postconditions still need acceptance. No general shell/ACL/security change. QA postcommit-settings warning and final preactivation Stop checkpoints are fixed.
+
+User Ready was already given and the secure-desktop guard passed readonlyOct5 checks. The user has since been told controls are free: notify via the parent before opening foreground fixtures/preview, then recheck the guard. Proposed five-minute window covers owned layout/region/settings/capture/shortcuts/Stop/tray and isolated preview startup; no microphone capture, audio playback, external field edits or Camera/Spotify activation in that window. Physical audio and competing third-party hooks remain manual. General model-generated Guide remains unproven. Exact screenshot SSL failure remains unreproduced; normal TLS validation remains enabled.
+
+Full Coucou parity is not implemented: see the report's remaining local cards/ticker/session/embedded-chat/file/hook/provider/service/platform inventory and pinned33-row audit. No install, publication, account grants, credentials, cloud audio or new model downloads. Publication remains independently blocked; do not retry a denied action.
+
+---
+
+# October 5 feedback work active
+
+User Ready is now confirmed. The read-only Comet probe passes the desktop guard (95controls,2depth omissions). Thirty owned observation checks pass after an owned-fixture dispatcher correction. Actual local-model Comet Guide grounded Reload but failed explanation-usefulness due duplicate click prose. No actions were executed. Public canned web probes did not reproduce the screenshot TLS failure; certificate validation unchanged. Installed build freshlyconfirmed0.4.4/950095dc; currentPiperspeaker85 and newerpreferencesmustbepreserved. Root settings fixcheckpoint compiles0warnings/errors, but validation/integration remains in progress. Six scopedworkers continue. See private validation/feedback47/CHECKPOINT.md for precise earlyfindings/handoffs. Prior instruction to awaitReady below has been satisfied; recheckguard forsubsequentnativework.
+
+User reports installed0.4.4 region Enter/no result, refinement busy hangs, preferences resets/shortcuts, clipped chat/face, vanishing notch, robotic URL speech and inactive connectors. New preference: black surfaces with existing readable text. Root prioritizes actual lifecycle/settings causes. See LIFE-47/UI-47/VOICE-47/QA-49/DOC-47/INT-48 ownership. Workers are isolated copies of the uncommitted quality46 seed, not just HEAD; original snapshot is in private validation/feedback47/seed-quality46.json. No worker uses native desktop or actual models.
+
+Connected PC does not mean interactive readiness. Prior secure-desktop guard remains binding: wait for explicit Ready before native/Comet work. Preserve installed0.4.4, clean0.4.5 preview and all backups. No installation/publication/credential setup or grants; never retry denied publication. Region research must offer review of minimized text before any external query; no arbitrary screenshot upload. Companion uses Buddy artwork; Coucou parity must distinguish source platforms and unavailable integrations. Screenshot pixel review is supplied separately; no screenshot acceptance claimed yet.
+
+# Quality46: independent results ready, native acceptance blocked
+
+The checkpoint was not a user pause. All authorized independent work is complete for this iteration: REFINE-47, WINDOW-46, QA-48 and REG-46 final handoffs are integrated; root reviewed actual outputs, ran affected regressions and compiled the final Windows sources. The latest 22 headless suites total 1,793 passing checks; 13 pure observation diagnostics pass separately; Windows Release compile has zero warnings/errors. All refinement suites were rerun after the grouping normalization.
+
+Actual local-model evidence is 14 cases in two rounds: 12 useful unique cases, including all original eight; one expected contradictory-count clarification; one conditional request with unmet utility because similarity 0.7505545693567622 is below the unchanged 0.80 gate. The exact poem now separates Task and Subject with the whole supplied scene retained. Root review labels the improvements modest source-grounded structure; rough grammar remains in some cases. This is not an all-pass 14-case matrix or broad semantic proof.
+
+See [current report](../Windows-quality46.md) and private validation/quality46 final receipts. Source is uncommitted on local/quality46, based on ced111d78a4e4230e53d8d359ca167b231e29e56. VERSION stays 0.4.5; no new package or installation. Installed0.4.4 binaries/build-info/preferences and the preserved0.4.5 source archive match baseline checksums. Clean Buddy-core45 and release/Buddy-0.4.5-local remain preserved.
+
+INT-47 is blocked only for remaining dependent acceptance work: the latest actual desktop probe hit the secure-desktop guard before UIA reads. Do not bypass, unlock, or use another route to read controls. Wait for the user to unlock Satonara, leave an ordinary Comet tab visible and confirm Ready. Then root may serialize owned-window cache/privacy/lifetime and native regression checks, bounded actual Comet cached-versus-live measurements and the public-chrome-only Guide probe. No current cached-performance, actual Guide or final-native pass is claimed. Production depth12/400node/600ms/2s bounds and incomplete-image refusal remain unchanged. Physical/third-party checks remain distinct.
+
+No root commands are intentionally left running at handoff; source/receipts are complete. No further model matrix repetition is needed without a changed input or unresolved concern. Keep the failed rounds and obsolete-fixture logs as history. Parent may continue independently authorized work on new instructions; this is not a user pause or new permission request. Installation/publication remain separately restricted.
+
+# Prior 0.4.5 checkpoint
+
+Updated 2026-10-04. Root owns integration and all installed, native and model operations.
+
+Installed baseline: **0.4.4 / 950095dc1f8d1ce86b0f17bf8919a3465344e369**, verified with Night Mint and preserved Voice C (speaker 60). Installation receipts and the 4,443-file recovery inventory remain under private `validation/reliability44`. Keep this build stable while the user tests it.
+
+New work: **0.4.5 local preview**, in `Buddy-core45` (`local/core45`) and isolated `core-*45` / `fix-*45` worker checkouts. Actual user failures take priority: Guide's process-query failure and stale selected-window risk; unchanged/cosmetic refinement wrongly offered for acceptance; clipped inline review. The batch also exposes local Buddy-draft refinement inputs, explicit budgets and reviewed text resources. Advanced external-field options remain incomplete; focus and Undo safeguards stay intact.
+
+REFINE-45 owns deterministic preflight; RESOURCE-45 owns the explicit text-file reader; UI-45 owns Buddy-draft controls; QA-46 owns independent boundary/native tests; DOC-45 reconciles the pinned union. Exact ownership and dependencies are in tasks.json. Root alone integrates and runs aggregate native/live tests. No worker installs, commits, publishes or drives user applications.
+
+Repair ownership: REFINE-46 rejects echoes/cosmetic changes with one bounded faithful retry; WINDOW-45 validates selected HWND/thread/PID/process lifetime and fresh-focus retries; CONTROL-45 adds a Buddy-owned observe/checkpoint/single-launch/verify adapter for exact supported app-open requests; QA-47 independently checks the failures. Root wires foreground selection, cancellation and the explicit action route. This is UFO-inspired architecture, not an installed upstream framework, general computer-use engine or new provider connection. Exact launches honor Agent/privacy settings; broader or consequential tasks retain review.
+
+Root rejected two actual-model attempts as useful refinement: attempt 1 only added a period and used an older fixture prompt; exact-prompt attempt 2 only changed Write to Draft with 85-to-85 estimated quality. Attempt 3 requires assessed improvement for wording-only proposals or returns explicit NoChange; reviewed context additions retain their separate intent. A truthful original-kept result is outcome-integrity evidence, not successful rewriting. Final root validation: 2,006 application checks and 24 real-model outcome-integrity cases pass. Only two of eight canned prompts showed useful grammar improvement; the exact user poem remains unchanged. Current Comet UIA observation succeeded but was incomplete; actual browser editing/Guide and production launch acceptance remain open. Source/package sealing is next.
+
+No next installation before communicating the scoped changes and receiving separate applicable authorization. Publication remains blocked; no retry. No accounts, external hooks, permission grants, cloud audio, user-data transmission, credentials/security changes or unrelated PC operations. Night Mint 1.1 is authoritative; preserve original artwork and all installed preferences.
+
+This is not full assistant completion. External agent sessions/hooks/status integrations and usable cloud providers remain missing; partial implementations stay labelled. Clicky's local Whisper is also batch-based, so local partial transcripts are an enhancement. Reliable early speech, requested longer answers, Guide's imported-note consistency and resource convenience remain open. Existing 0.4.4 counts do not validate the new batch or establish physical/universal app acceptance.

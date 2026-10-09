@@ -1,0 +1,12 @@
+<Project>
+  <Target Name="CaptureQaReviewedInputs" BeforeTargets="AssignTargetPaths">
+    <MakeDir Directories="$(IntermediateOutputPath)" />
+    <GetFileHash Files="@(Compile)" Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="QaReviewedInputs" />
+    </GetFileHash>
+    <WriteLinesToFile File="$(IntermediateOutputPath)qa-reviewed-inputs.txt" Lines="@(QaReviewedInputs->'%(FullPath)|%(FileHash)')" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <ItemGroup>
+      <EmbeddedResource Include="$(IntermediateOutputPath)qa-reviewed-inputs.txt" LogicalName="QaReviewedInputs" />
+    </ItemGroup>
+  </Target>
+</Project>

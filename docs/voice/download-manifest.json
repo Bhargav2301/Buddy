@@ -1,0 +1,102 @@
+{
+  "packages": [
+    {
+      "name": "piper-tts",
+      "version": "1.8.0",
+      "license": "GPL-3.0-or-later",
+      "license_expression": null,
+      "filename": "piper_tts-1.8.0-cp39-abi3-win_amd64.whl",
+      "bytes": 34119688,
+      "sha256": "5da9bfdb05dfe15da3536859d422e605483ffa6d2b3ec2c5b9593bae6b5aa6a4",
+      "url": "https://files.pythonhosted.org/packages/12/9c/c736d1961cf9ce0655278731b9430df41892ca2ded7b09dabcb340612158/piper_tts-1.8.0-cp39-abi3-win_amd64.whl"
+    },
+    {
+      "name": "onnxruntime",
+      "version": "1.30.0",
+      "license": "MIT License",
+      "license_expression": null,
+      "filename": "onnxruntime-1.30.0-cp312-cp312-win_amd64.whl",
+      "bytes": 14311470,
+      "sha256": "f3501472571f1b1eee50e017851e7929f5ea37312d2d8c2494a19e8fc58b4a38",
+      "url": "https://files.pythonhosted.org/packages/a6/13/0f1699f6de549c9324bc9112a2a85b14c517904cd11b562a654643b755a1/onnxruntime-1.30.0-cp312-cp312-win_amd64.whl"
+    },
+    {
+      "name": "pathvalidate",
+      "version": "3.3.1",
+      "license": "MIT License",
+      "license_expression": null,
+      "filename": "pathvalidate-3.3.1-py3-none-any.whl",
+      "bytes": 24305,
+      "sha256": "5263baab691f8e1af96092fa5137ee17df5bdfbd6cff1fcac4d6ef4bc2e1735f",
+      "url": "https://files.pythonhosted.org/packages/9a/70/875f4a23bfc4731703a5835487d0d2fb999031bd415e7d17c0ae615c18b7/pathvalidate-3.3.1-py3-none-any.whl"
+    },
+    {
+      "name": "numpy",
+      "version": "2.5.3",
+      "license": null,
+      "license_expression": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+      "filename": "numpy-2.5.3-cp312-cp312-win_amd64.whl",
+      "bytes": 12567828,
+      "sha256": "0a59a421a32580a009e8a1751345bf829631b990dc1794b80514ab722b435def",
+      "url": "https://files.pythonhosted.org/packages/3c/a1/accf6d4f0c80c5d9ba9735d6b1550e444180599f34dec69ca01360f717ad/numpy-2.5.3-cp312-cp312-win_amd64.whl"
+    },
+    {
+      "name": "protobuf",
+      "version": "7.36.2",
+      "license": "3-Clause BSD License",
+      "license_expression": null,
+      "filename": "protobuf-7.36.2-cp310-abi3-win_amd64.whl",
+      "bytes": 456514,
+      "sha256": "a300819d441e078a5608c0d3c709796bb548136058fda017ae51d425b44fd353",
+      "url": "https://files.pythonhosted.org/packages/8a/55/b77bda4e5e5f5971fb51b07663694690e9afdb9402136c16a522bd621cad/protobuf-7.36.2-cp310-abi3-win_amd64.whl"
+    },
+    {
+      "name": "flatbuffers",
+      "version": "25.12.19",
+      "license": "Apache 2.0",
+      "license_expression": null,
+      "filename": "flatbuffers-25.12.19-py2.py3-none-any.whl",
+      "bytes": 26661,
+      "sha256": "7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4",
+      "url": "https://files.pythonhosted.org/packages/e8/2d/d2a548598be01649e2d46231d151a6c56d10b964d94043a335ae56ea2d92/flatbuffers-25.12.19-py2.py3-none-any.whl"
+    },
+    {
+      "name": "packaging",
+      "version": "26.3",
+      "license": null,
+      "license_expression": "Apache-2.0 OR BSD-2-Clause",
+      "filename": "packaging-26.3-py3-none-any.whl",
+      "bytes": 129956,
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+      "url": "https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl"
+    }
+  ],
+  "modelRevision": "c10ece1aade47bb51c153c893d14e5bf8e5b7117",
+  "modelFiles": [
+    {
+      "type": "file",
+      "oid": "ead7f850edbce2c5e0a2af5749e5c8afcf99f454",
+      "size": 326,
+      "path": "en/en_GB/vctk/medium/MODEL_CARD"
+    },
+    {
+      "type": "file",
+      "oid": "3c01d9375aa487856511647e24c15b2db8462e69",
+      "size": 76952753,
+      "lfs": {
+        "oid": "4e9fc85ab9009385319fc6bae7f55577f8a2d7ee77fd9159a5500eb6531f41e6",
+        "size": 76952753,
+        "pointerSize": 133
+      },
+      "xetHash": "48941c27359035524f69ef0470139c0205d9b07c1d76baf1fe36c2eac9b4ed86",
+      "path": "en/en_GB/vctk/medium/en_GB-vctk-medium.onnx"
+    },
+    {
+      "type": "file",
+      "oid": "8b9509fc9e58d214f0092a662441b57de1427225",
+      "size": 6637,
+      "path": "en/en_GB/vctk/medium/en_GB-vctk-medium.onnx.json"
+    }
+  ],
+  "downloadBytes": 61636422.0
+}

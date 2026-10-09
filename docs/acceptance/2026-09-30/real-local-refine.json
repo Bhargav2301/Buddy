@@ -1,0 +1,130 @@
+{
+  "at": "2026-09-29T20:53:00.1073685+00:00",
+  "fixture": "synthetic prompts only",
+  "results": [
+    {
+      "mode": "quick",
+      "durationSeconds": 15.1563122,
+      "original": "Write a concise 3-item checklist for reviewing a draft. Keep the original dates unchanged and do not invent facts.",
+      "result": {
+        "RefinedPrompt": "Write a concise 3-item checklist for reviewing a draft. Keep the original dates unchanged and do not invent facts.",
+        "Engine": "buddy_local",
+        "Mode": "quick",
+        "Technique": "zero-shot",
+        "Accepted": false,
+        "Similarity": 0.7721308317001041,
+        "ScoreBefore": 65,
+        "ScoreAfter": 65,
+        "Changes": [
+          "Added criteria for review (clarity, accuracy, completeness).",
+          "Introduced a question prompting for specific aspects within each checklist item.",
+          "Expanded the prompt\u0027s length and complexity, moving beyond a simple checklist instruction.",
+          "Removed the constraint about not inventing facts, acknowledging the need for clarification.",
+          "Improved clarity and context by explicitly stating the purpose of the checklist and the desired focus."
+        ],
+        "Passes": [
+          {
+            "Name": "Specifier",
+            "Text": "Improve the prompt to clarify the purpose of the checklist and the criteria for review.\n\n\u201CCreate a concise 3-item checklist for reviewing a draft, preserving the original dates. The checklist should focus on [Specify criteria for review, e.g., clarity, accuracy, completeness].  What specific aspects should be assessed within each item?\u201D",
+            "Explanation": "Clarify the goal, context, constraints and missing details."
+          }
+        ],
+        "Message": "Original kept: intent preservation could not be verified. Review the suggestions and add any missing context."
+      }
+    },
+    {
+      "mode": "guided",
+      "durationSeconds": 3.4682416,
+      "original": "Write a concise 3-item checklist for reviewing a draft. Keep the original dates unchanged and do not invent facts.",
+      "result": {
+        "RefinedPrompt": "Write a concise 3-item checklist for reviewing a draft, preserving original dates and without inventing any facts.",
+        "Engine": "buddy_local",
+        "Mode": "guided",
+        "Technique": "zero-shot",
+        "Accepted": true,
+        "Similarity": 0.9697980921971686,
+        "ScoreBefore": 85,
+        "ScoreAfter": 95,
+        "Changes": [
+          "Added \u0027without inventing any facts\u0027 to explicitly reinforce the constraint about not adding new information.",
+          "Minor wording adjustment for improved clarity and emphasis on the constraint.",
+          "Increased clarity score due to stronger phrasing regarding factual accuracy.",
+          "Context score increased due to clearer instruction on data handling.",
+          "Output format score increased due to the direct and concise checklist format."
+        ],
+        "Passes": [
+          {
+            "Name": "Specifier",
+            "Text": "Revise the following draft checklist to ensure it effectively reviews a draft while maintaining original dates and without inventing any facts. Clarify the goal, context, constraints, and any missing details regarding the draft and the review process.",
+            "Explanation": "Clarify the goal, context, constraints and missing details."
+          },
+          {
+            "Name": "Simplifier",
+            "Text": "Write a concise 3-item checklist for reviewing a draft, preserving original dates and without inventing facts.",
+            "Explanation": "Break complex tasks into concise ordered steps."
+          },
+          {
+            "Name": "Critic",
+            "Text": "Write a concise 3-item checklist for reviewing a draft, preserving the original dates and without inventing any facts.",
+            "Explanation": "Remove ambiguity and unsupported assumptions; preserve prohibitions."
+          }
+        ],
+        "Message": "Review the changes before applying. Buddy will not send your prompt."
+      }
+    },
+    {
+      "mode": "council",
+      "durationSeconds": 4.3882201,
+      "original": "Write a concise 3-item checklist for reviewing a draft. Keep the original dates unchanged and do not invent facts.",
+      "result": {
+        "RefinedPrompt": "Write a concise 3-item checklist for reviewing a draft, preserving the original dates and without inventing any facts.",
+        "Engine": "buddy_local",
+        "Mode": "council",
+        "Technique": "zero-shot",
+        "Accepted": true,
+        "Similarity": 0.9775802182314953,
+        "ScoreBefore": 85,
+        "ScoreAfter": 95,
+        "Changes": [
+          "Added \u0027without inventing any facts\u0027 to explicitly reinforce the constraint about not adding new information.",
+          "Minor wording adjustment for smoother flow (\u0027preserving the original dates\u0027 was slightly clunky).",
+          "Increased clarity by directly stating the intent to avoid inventing facts.",
+          "The rewrite is more emphatic in its constraints, which is generally desirable when dealing with untrusted data.",
+          "The addition of \u0027without inventing any facts\u0027 strengthens the prompt\u0027s safety measures."
+        ],
+        "Passes": [
+          {
+            "Name": "Specifier",
+            "Text": "Revise the following draft checklist to clearly define the review criteria and ensure a concise, actionable 3-item list, maintaining the original dates and without inventing any facts.",
+            "Explanation": "Clarify the goal, context, constraints and missing details."
+          },
+          {
+            "Name": "Simplifier",
+            "Text": "Write a concise 3-item checklist for reviewing a draft, preserving the original dates and without inventing facts.",
+            "Explanation": "Break complex tasks into concise ordered steps."
+          },
+          {
+            "Name": "Stylist",
+            "Text": "\u201CWrite a concise 3-item checklist for reviewing a draft, preserving the original dates and without inventing any facts.\u201D",
+            "Explanation": "Improve tone and audience fit without inventing an audience."
+          },
+          {
+            "Name": "Critic",
+            "Text": "Write a concise 3-item checklist for reviewing a draft, preserving the original dates and without inventing facts.",
+            "Explanation": "Remove ambiguity and unsupported assumptions; preserve prohibitions."
+          },
+          {
+            "Name": "Formatter",
+            "Text": "Create a 3-item checklist for reviewing a draft, preserving the original dates and without inventing any facts.",
+            "Explanation": "Make the existing requirements easy to read and reuse."
+          }
+        ],
+        "Message": "Review the changes before applying. Buddy will not send your prompt."
+      }
+    },
+    {
+      "cancelledBeforeDispatch": true,
+      "persistedConversations": 0
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+# Local notch scope after feedback47
+
+STATUS-51 attempt 1, 2026-10-05. This updates the [33-row Coucou inventory](Coucou-notch-feedback47.md) and [original 17-item mapping](Feedback-status-50.md), not a full-parity claim. Installed 0.4.4 and sealed feedback47 stay unchanged. Local journal/cards are now **implemented in current source, compiled and pure-tested; native50 has not run**. General model teaching remains unaccepted. Current-source additions are separate from the preserved candidate.
+
+## Present capability and selected next work
+
+| Capability | Present evidence | Followup50 boundary |
+|---|---|---|
+| Durable top-edge surface | [CompanionIsland](../apps/windows/Buddy.Windows/CompanionIsland.cs) has explicit persisted Hidden/Compact/Expanded, optional fullscreen suppression, automatic recovery after other-instance suppression and no idle-hide timer. The 55-check owned visual receipt verifies the relevant mode/recovery cases. | Preserve explicit user choice; do not introduce Coucou's timed idle hide into a reported disappearing-bar problem. |
+| Original reactive Buddy | The island uses [CompanionFace](../apps/windows/Buddy.Windows/CompanionFace.cs) and actual local mood. Black/readable roles, full face bounds and reduced-motion presentation exist. | Keep Buddy art and truthful state. Additional greeting, poke/completion sequences or wardrobe require separately authored implementation and checks; do not imply all Coucou reactions are present. |
+| Local routes and Stop | Type, Voice, Guide, Refine, Select area, Home and Settings use existing owners. The passive bar is nonactivating; Stop is reachable in its header. | A source jump may reopen a guarded existing view. It must not replay an operation, accept a refinement, approve an action or silently start a microphone. |
+| Current task/status/readiness | Sealed47 [IslandActivity](../apps/windows/Buddy.Windows/CompanionIsland.cs) has one current summary. Availability derives from existing local checks; a 350 ms presentation refresh is not continuous model/provider health monitoring. | Current50 source adds recent-task records. Freshness and terminal state must come from actual events, never mood or timer-based completion. |
+| Recent Buddy task journal | **Implemented, ACTIVITY-50:** `LocalTaskJournal.cs` keeps exact identity/source/generation, bounded memory-only records/stages, explicit review/terminal state and late-event isolation. Root `root-journal.txt`: 94 pure checks passed. | Root wiring covers Home typed chat, QuickChat, Buddy-draft refinement/Undo and bounded app opening with generic labels. No voice, Guide, external-field refinement or external-agent feed. Root lifecycle/native acceptance remains pending; a terminal event describes only the observed operation. |
+| Recent-task pills and focused card | **Implemented, NOTCH-50:** `Recent local tasks`, local-session scope, source, exact Updated time, `Observed stages`, stable selected card, terminal-only Dismiss and guarded Open source/Open source to review. Accepted handoff records 20 pure presentation checks and clean worker compile. | Eight recent tasks/eight stages; root current-source wiring compiled clean at its checkpoint. `LocalNotchChecks.Run` compiled but **not run**. Final integrated source checks now pass959 assertions across15 suites with zero build warnings/errors. No native50 or actual task-workflow acceptance. |
+
+UI-47 evidence is private `validation/feedback47/foreground-feedback-visual47.txt`, with startup/cleanup in `foreground-five-minute.json` and `foreground-preservation.json`. Current50 receipts are `validation/followup50/ACTIVITY-50-handoff.json`, `NOTCH-50-handoff.json`, their accepted receipts, `root-journal.txt`, `root-notchwiring-build.txt` and `CHECKPOINT.json`. Read-only current integration source `apps/windows/Buddy.Windows/MainWindow.LocalTasks.cs` confirms guarded existing-view navigation; root lifecycle changes also touch Home, QuickChat, Buddy-draft and routine-launch owners. These files were not copied into this documentation worker or into sealed47.
+
+Opening a task source is not permission to replay, accept or approve it. Routine launch history may have no reopenable source. The journal uses caller-supplied generic labels rather than collecting prompts or automatically detecting secrets. Any new native/source-window acceptance needs a separately announced window; the [preserved47 plan](Feedback47-acceptance-plan.md) tests only that candidate, not native50. No foreground work runs now.
+
+## Remaining Coucou groups
+
+These rows condense the prior 33-feature audit; they do not discard its platform distinctions. Coucou pin: **`59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d`**. The source/license receipts remain under `validation/upstream44/coucou` and `validation/feedback47/coucou-audit`; `validation/feedback47/docs47/source-receipts.json` records the prior 31-file audit. Neither STATUS-50 nor STATUS-51 ran upstream code or new network inspection.
+
+| Group | Source-grounded upstream distinction | Buddy status and dependency |
+|---|---|---|
+| Hover wake, greeting, return, pinning and optional collapse | [Windows FSM][fsm] and [island][up-island] implement hover/timers/greeting/alert pinning; macOS adds notch-specific geometry. | **Partial:** durable explicit modes are present. Full hover/greeting/pinning state machine remains separate local work; do not copy automatic hiding as a requirement. |
+| Mini companions, focused pills, ticker, completion/error/note cards | [Windows views][views] and [ticker][ticker] show task cards and queued steps; richer macOS views include session/source details. Windows Retry changes view; n8n error link has an empty URL. | **Partial:** local Buddy task pills/focused card and recorded stages are now implemented/pure-tested, not native-tested. External sessions, mini companions, animation ticker and note card/editor remain gaps. Do not copy placeholder Retry. |
+| Embedded chat, model picker, history and context chips | [Windows chat][up-chat] uses its backend; [macOS chat service][mac-chat] has broader providers. | **Partial:** separate Buddy QuickChat/local history and local Ollama are usable. Embedded notch composition and active multi-provider selection are missing; passive source focus must stay protected. |
+| General drop inbox, file/image/PDF context and progress | [Windows upload][upload] and [file backend][files] provide a drop/context path; macOS also exposes email operations. | **Partial:** reviewed bounded TXT/MD in Buddy-draft refinement is not general chat attachment support. General files need explicit review, removal, type/size limits and actual progress; no timer-based transmission claims. |
+| Selected-window attachment and detached dragging | [macOS controller][controller] implements window/desktop attach/detach; Windows [view registry][views] explicitly lacks window attach. | **Missing gesture:** Buddy's explicit region/window capture and cursor companion are different capabilities. A future drag gesture must not silently grant capture or retain stale window identity. |
+| Sound/effects, wardrobe, seasonal extras and display policy | [Windows views][views] exposes effect settings; [macOS views][mac-views] contains wardrobe/seasonal selection. Full native Windows screen-policy implementation was not covered by the prior audit. | **Partial/missing:** existing local speech and reduced motion are not decorative effect controls or wardrobe. Multi-monitor behavior needs its own acceptance; use original Buddy accessories/sounds only. |
+| Coding-agent monitoring and hook lifecycle | [Windows hooks][hooks] consumes lifecycle events; [macOS HookServer][mac-hooks] covers more agents. | **Missing external integration:** a local Buddy journal does not monitor Claude/Codex/Cursor, install hooks or dispatch their work. Setup must be explicit and session identities robust; do not read/modify external profiles now. |
+| Permission/question relay, diffs and usage | Windows [views][views]/[pipe][pipe] support Claude Allow/Deny; question view says answer in terminal. macOS has broader agent/question/diff/usage surfaces; separate usage acquisition was not fully inspected. | **Missing:** Buddy action review/refinement diffs are not coding-agent relay/diffs. Future relay needs exact session/request identity, timeout/cancellation, duplicate/out-of-order handling and bounded outcomes, without global/permanent Always permission. |
+| Cloud assistant providers | [macOS service][mac-chat] and [Windows backend][up-api] implement differing provider paths. | **Disconnected components only:** [Buddy provider factory][providers] cannot activate live transport; production [host][host] uses Ollama. Keys alone cannot supply production routing, secure entry, content/cost consent or live acceptance. |
+| GitHub, Vercel, n8n, Resend, Stripe, Cal.com and Notion cards | [Windows service cards][integrations]/[pollers][pollers] show status; macOS has richer drill-downs. Service status generally observes rather than executes; n8n Retry is a placeholder. | **Missing usable integrations:** each needs its own scoped adapter/setup/lifecycle and real acceptance. No grants or accounts are activated. Preserve separate currency buckets; avoid stale pollers and false successful-send/retry claims. |
+| Mail sending and web/result views | macOS [views][mac-views] implements Resend/Apple Mail paths; Windows registry has mail/search/result placeholders despite some backend search capability. | **Missing mail; partial research:** a reviewed-text search/fetch/local-answer service case now passes; full gesture and image-based web search remain unaccepted/missing respectively. A compose window/status card is not mail sent; sending needs exact reviewed content and authorization. |
+| Music and macOS system behavior | [MusicController][music] uses Apple Music/Automation outside the App Store; macOS controller handles Spaces/native notch geometry. | **Missing/platform-specific:** a Windows media-session adapter would be new implementation and permission/acceptance work. Apple Music/Spaces source is not evidence of Windows functionality. |
+
+The useful immediate slice is **truthful local task history and recoverable source views**, with no new external access. It leaves general model teaching, full region completion, advanced refinement in the original external field and physical speech acceptance visible as separate Buddy workflow gaps. Local cards cannot establish those outcomes.
+
+## Asset and activation boundaries
+
+Coucou's [code license][license] is MIT, while [LICENSE-ASSETS][assets] separately reserves Coucou/Mochi names, character artwork, icons, sounds and media. Buddy keeps independently authored Buddy art; no reserved assets or upstream code were imported or executed by this audit. The user's all-features request is not a live account grant, provider connection, hook installation or permission to transmit user content.
+
+Existing [Gmail/Notion plumbing][connectors] has account grants disabled and smaller proposed scopes; it is not a connected Coucou dashboard. Cloud brain setup and service connectors are also different implementation tracks. Future activation requires a concrete implemented path plus the relevant explicit setup/content/scope permissions, rather than merely entering an API key.
+
+[fsm]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/windows/src/island/fsm.ts
+[up-island]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/windows/src/island/island.ts
+[views]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/windows/src/views/views.ts
+[ticker]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/windows/src/views/ticker.ts
+[up-chat]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/windows/src/views/chat.ts
+[mac-chat]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/NotchBuddy/Sources/App/ClaudeService.swift
+[upload]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/windows/src/views/upload.ts
+[files]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/windows/src-tauri/src/files.rs
+[controller]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/NotchBuddy/Sources/App/IslandWindowController.swift
+[mac-views]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/NotchBuddy/Sources/App/IslandViewContent.swift
+[hooks]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/windows/src/island/hooks.ts
+[mac-hooks]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/NotchBuddy/Sources/App/HookServer.swift
+[pipe]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/windows/src-tauri/src/pipe.rs
+[up-api]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/windows/src-tauri/src/claude.rs
+[integrations]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/windows/src/views/integrations.ts
+[pollers]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/windows/src-tauri/src/integrations.rs
+[music]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/NotchBuddy/Sources/App/MusicController.swift
+[license]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/LICENSE
+[assets]: https://github.com/Louis-CFM/coucou/blob/59f63dfc9572ab7bdc4a4f7a0ca2ecbe1057176d/LICENSE-ASSETS.md
+[providers]: ../services/Buddy.Server/ProviderTransports.cs
+[host]: ../services/Buddy.Server/BuddyHost.cs
+[connectors]: ../services/Buddy.Server/ConnectorPlumbing.cs
+
+## Final root verification
+
+The integrated followup source passes 959 checks across 15 pure/injected suites, including94 journal,20 presentation and47 task-boundary checks. Independent source review identified and confirmed repairs for failed-Apply retry tokens, initial Home send ownership and shared Quick/Voice conversation creation. Native50 fixtures include late Apply/Undo cancellation and failed-then-successful Apply, but remain unexecuted. Evidence: private `validation/followup50/final51-headless-summary.json` and `final51-root-review.json`. These results do not change or certify the sealed feedback47 candidate.

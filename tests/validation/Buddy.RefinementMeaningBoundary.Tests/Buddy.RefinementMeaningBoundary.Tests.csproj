@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><BuddySourceRoot Condition="'$(BuddySourceRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..\</BuddySourceRoot></PropertyGroup>
+  <PropertyGroup Condition="Exists('$(BuddySourceRoot)services\Buddy.Server\RefinementContract.cs')"><DefineConstants>$(DefineConstants);HAS_CONTRACT</DefineConstants></PropertyGroup>
+  <ItemGroup Condition="Exists('$(BuddySourceRoot)services\Buddy.Server\RefinementContract.cs')">
+    <Compile Include="$(BuddySourceRoot)services\Buddy.Server\*.cs" Link="Production\%(Filename)%(Extension)" />
+    <Compile Include="..\Buddy.UserFailureBoundary.Tests\SourceReceipt.cs" Link="SourceReceipt.cs" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" /><PackageReference Include="AngleSharp" Version="1.8.2" />
+    <AssemblyMetadata Include="BuddySourceRoot" Value="$([System.IO.Path]::GetFullPath('$(BuddySourceRoot)'))" />
+  </ItemGroup>
+  <Import Project="..\Buddy.UserFailureBoundary.Tests\ReviewedSource.targets" Condition="Exists('$(BuddySourceRoot)services\Buddy.Server\RefinementContract.cs')" />
+</Project>

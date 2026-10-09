@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <BuddySourceRoot Condition="'$(BuddySourceRoot)' == ''">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/../..'))</BuddySourceRoot>
+    <BuddyServerAssembly Condition="'$(BuddyServerAssembly)' == ''">$(BuddySourceRoot)/services/Buddy.Server/bin/Release/net8.0/Buddy.Server.dll</BuddyServerAssembly>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <Reference Include="Buddy.Server"><HintPath>$(BuddyServerAssembly)</HintPath><Private>true</Private></Reference>
+    <Compile Include="$(BuddySourceRoot)/apps/windows/Buddy.Windows/NotchChatSession.cs" Link="Production/NotchChatSession.cs" />
+    <Compile Include="$(BuddySourceRoot)/apps/windows/Buddy.Windows/NotchTextInbox.cs" Link="Production/NotchTextInbox.cs" />
+    <Compile Include="$(BuddySourceRoot)/apps/windows/Buddy.Windows/NotchNoteStore.cs" Link="Production/NotchNoteStore.cs" />
+    <Compile Include="$(BuddySourceRoot)/apps/windows/Buddy.Windows/RefinementResourceReader.cs" Link="Production/RefinementResourceReader.cs" />
+    <Compile Include="$(BuddySourceRoot)/apps/windows/Buddy.Windows/RefinementRequest.cs" Link="Production/RefinementRequest.cs" />
+    <Compile Include="$(BuddySourceRoot)/apps/windows/Buddy.Windows/ExternalRefinementOptions.cs" Link="Production/ExternalRefinementOptions.cs" />
+    <Compile Include="$(BuddySourceRoot)/apps/windows/Buddy.Windows/RefinementDraftOptions.cs" Link="Production/RefinementDraftOptions.cs" />
+    <Compile Include="$(BuddySourceRoot)/apps/windows/Buddy.Windows/GuardedEdit.cs" Link="Production/GuardedEdit.cs" />
+  </ItemGroup>
+  <Target Name="ExtractPureContextHost" BeforeTargets="CoreCompile">
+    <Error Condition="!Exists('$(BuddyServerAssembly)')" Text="Build the selected Buddy.Server first, or set BuddyServerAssembly explicitly. This project never builds into BuddySourceRoot." />
+    <Exec Command="powershell -NoProfile -File &quot;$(MSBuildProjectDirectory)/GeneratePureHost.ps1&quot; -BuddySourceRoot &quot;$(BuddySourceRoot)&quot; -BuddyServerAssembly &quot;$(BuddyServerAssembly)&quot; -OutputDirectory &quot;$(MSBuildProjectDirectory)/$(IntermediateOutputPath)context-host&quot;" />
+    <ItemGroup><Compile Include="$(IntermediateOutputPath)context-host/ProductionFragments.g.cs" /></ItemGroup>
+  </Target>
+</Project>

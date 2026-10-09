@@ -19,175 +19,293 @@ using Orientation = System.Windows.Controls.Orientation;
 
 namespace Buddy.Windows;
 
-public sealed class MainWindow : Window
+public sealed partial class MainWindow : Window
 {
-    private static readonly SolidColorBrush Bg = Brush("#111820"), Panel = Brush("#1A242E"), Ink = Brush("#EBF3F7"), Muted = Brush("#9DB0BF"), Accent = Brush("#8EE4C5");
+    private static readonly SolidColorBrush Bg = BuddyTheme.Canvas, Panel = BuddyTheme.Surface, Ink = BuddyTheme.Ink, Muted = BuddyTheme.Muted, Accent = BuddyTheme.Deep;
     private BuddyHost? host;
     private readonly TextBlock status = Text("Starting Buddy…", 13, Muted), contextLabel = Text("", 12, Accent);
+    private readonly TextBlock companionBrand = Text("Buddy", 18, Accent), talkHeading = Text("Talk with Buddy", 28);
     private readonly TextBox input = new() { AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 76, MaxHeight = 180, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
     private readonly StackPanel messages = new(), rail = new();
     private readonly ScrollViewer scroller;
     private readonly ListBox conversations = new() { BorderThickness = new(0), Background = System.Windows.Media.Brushes.Transparent, Foreground = Ink, DisplayMemberPath = "Title", Margin = new(0, 16, 0, 8) };
-    private readonly ComboBox mode = new() { ItemsSource = new[] { "Type", "Hybrid", "Voice" }, SelectedIndex = 0, Width = 105 };
     private readonly CheckBox speak = new() { Content = "Read aloud", Foreground = Muted, VerticalAlignment = VerticalAlignment.Center };
     private readonly Button send, stop;
     private readonly System.Windows.Forms.NotifyIcon tray = new();
+    private System.Drawing.Icon? trayArtwork;
     private readonly DispatcherTimer refresh = new() { Interval = TimeSpan.FromSeconds(6) }, foreground = new() { Interval = TimeSpan.FromMilliseconds(800) };
-    private SpeechSynthesizer? tts;
-    private SpeechRecognitionEngine? recognizer;
+    private LocalVoiceOutput? tts;
+    private bool homeSpeaking;
+    private int homeSpeechGeneration;
+    private LocalRecognizer? recognizer;
+    private CancellationTokenSource? mainMicrophone;
+    private GuardedEdit? mainDictationEdit;
+    private readonly Button undoDictation = new() { Content = "Undo dictation", Visibility = Visibility.Collapsed };
+    private readonly Button copyDictation = new() { Content = "Copy dictation", Visibility = Visibility.Collapsed };
+    private string lastDictation = "";
     private CancellationTokenSource? request;
     private string? currentId, context;
     private byte[]? image;
     private IntPtr hwnd, previousWindow;
+    private readonly WindowSelectionTracker windowSelection;
+    private WindowSelectionMonitor? windowSelectionMonitor;
     private bool busy, shuttingDown, refreshing;
-    private DesktopPreferences desktop = DesktopPreferences.Load();
+    private DesktopPreferences desktop;
+    private readonly Func<DesktopPreferences, DesktopPreferences> persistPreferences;
     private CursorCompanionWindow? companion;
+    private CompanionIsland? island;
+    private string desktopActivity = "";
+    private string islandBrainStatus = "Local service unavailable";
+    private bool companionPresenceAvailable = true;
+    internal void SetCompanionPresence(bool available)
+    {
+        companionPresenceAvailable = available;
+        companion?.SetEnabled(available && desktop.ShowCompanion);
+        island?.Refresh();
+        Diagnostics.Write("Companion ownership: " + (available ? "this preview" : "another Buddy instance; preview companion hidden"));
+    }
+    private readonly CompanionState companionState = new();
     private QuickChatWindow? quick;
+    private VoiceOverlayWindow? voiceOverlay;
+    private DesktopAssistant? assistant;
+    private OnboardingWindow? onboarding;
+    private PushToTalkHook? ptt;
     private ShortcutRegistration? shortcut;
-    private bool voiceShortcutReady;
+    private ShortcutRegistration? voiceShortcut;
+    private bool stopShortcutReady;
     private readonly TextBlock shortcutHint = Text("Starting shortcuts…", 11, Muted);
     private static SolidColorBrush Brush(string hex) => new((System.Windows.Media.Color)ColorConverter.ConvertFromString(hex));
     private static TextBlock Text(string value, double size = 15, System.Windows.Media.Brush? color = null) => new() { Text = value, FontSize = size, Foreground = color ?? Ink, TextWrapping = TextWrapping.Wrap, Margin = new(0, 0, 0, 8) };
     private static Button Btn(string label, Action action, bool primary = false)
     {
-        var b = new Button { Content = label, Padding = new(14, 9, 14, 9), Margin = new(0, 0, 8, 8), Background = primary ? Accent : Panel, Foreground = primary ? Bg : Ink, BorderThickness = new(0), Cursor = System.Windows.Input.Cursors.Hand };
-        b.Click += (_, _) => action(); return b;
+        return BuddyTheme.Button(label, action, primary);
     }
+    private static WrapPanel Wrap(params UIElement[] children) { var row = new WrapPanel(); foreach (var c in children) row.Children.Add(c); return row; }
     private static StackPanel Row(params UIElement[] children) { var row = new StackPanel { Orientation = Orientation.Horizontal }; foreach (var c in children) row.Children.Add(c); return row; }
-    private static void StyleBox(TextBox box) { box.Background = Panel; box.Foreground = Ink; box.CaretBrush = Accent; box.BorderBrush = Brush("#344553"); box.Padding = new(12); box.FontSize = 15; }
+    private static void StyleBox(TextBox box) { box.Padding = new(12); box.FontSize = 14; } // Theme states own colors, including disabled and validation.
 
-    public MainWindow()
+    public MainWindow() : this(true) { }
+    internal MainWindow(bool startService, DesktopPreferences? initialPreferences = null, Action<DesktopPreferences>? persistPreferences = null,
+        Func<string, CancellationToken, Task<ComputerUseResult>>? routineRunner = null,
+        Func<DesktopPreferences, DesktopPreferences>? mergePreferences = null)
     {
-        Title = "Buddy — your local AI companion"; Width = 1160; Height = 820; MinWidth = 850; MinHeight = 620; Background = Bg; Foreground = Ink; FontFamily = new("Segoe UI"); WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        var layout = new Grid(); layout.ColumnDefinitions.Add(new() { Width = new(250) }); layout.ColumnDefinitions.Add(new());
+        desktop = initialPreferences ?? DesktopPreferences.Load();
+        windowSelection = new WindowSelectionTracker(isOwnWindow: window => Native.IsOwnWindow(window) && window != ScreenPerception.PracticeHandle,
+            checkWindow: window => (assistant?.Perception ?? new ScreenPerception(() => desktop)).Check(window));
+        runRoutine = routineRunner ?? (startService ? ((query, ct) => RoutineAppOpen.RunAsync(query, () => desktop.AgentEnabled, () => desktop.BlockedApps, ct)) : null);
+        this.persistPreferences = mergePreferences ?? (persistPreferences is null ? value => value.Save(previous: desktop)
+            : value => { persistPreferences(value); return value; });
+        BuddyTheme.Apply(desktop.Appearance, desktop.ReduceMotion);
+        AppBranding.Apply(this);
+        Title = "Buddy — your local AI companion"; Width = 1160; Height = 820; MinWidth = 760; MinHeight = 560; Background = Bg; Foreground = Ink; FontFamily = BuddyTheme.Font; WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        var layout = new Grid { Background = Bg }; layout.ColumnDefinitions.Add(new() { Width = new(240) }); layout.ColumnDefinitions.Add(new());
         var side = new DockPanel { Background = Panel, Margin = new(0) }; Grid.SetColumn(side, 0); layout.Children.Add(side);
-        var brand = new StackPanel { Margin = new(24, 28, 16, 8) }; brand.Children.Add(Text("◉  Buddy", 28)); brand.Children.Add(Text("A little clarity. Any time.", 12, Muted)); brand.Children.Add(Btn("＋ New conversation", () => _ = NewChat(), true)); DockPanel.SetDock(brand, Dock.Top); side.Children.Add(brand);
-        var nav = new StackPanel { Margin = new(18, 12, 12, 16) };
-        nav.Children.Add(Btn("Saved prompts", () => _ = Notes(false))); nav.Children.Add(Btn("What Buddy remembers", () => _ = Notes(true))); nav.Children.Add(Btn("Pair Android phone", Pair)); nav.Children.Add(Btn("PC setup & models", () => _ = Setup())); nav.Children.Add(Btn("Export conversation", () => _ = Export())); nav.Children.Add(Btn("Delete conversation", () => _ = Delete())); nav.Children.Add(Btn("Quit Buddy", () => _ = Quit()));
-        nav.Children.Insert(0, Btn("Open quick chat", () => OpenQuick(false), true));
-        nav.Children.Insert(1, Btn("Cursor & shortcuts", CursorSettings));
-        DockPanel.SetDock(nav, Dock.Bottom); side.Children.Add(nav); side.Children.Add(conversations);
-        var main = new Grid { Margin = new(36, 28, 36, 24) }; Grid.SetColumn(main, 1); layout.Children.Add(main);
+        var brand = new StackPanel { Margin = new(24, 24, 16, 24), Orientation = Orientation.Horizontal }; companionBrand.FontWeight = FontWeights.Bold; var logo = AppBranding.Image(40); logo.Margin = new(0, 0, 10, 0); brand.Children.Add(logo); brand.Children.Add(companionBrand); DockPanel.SetDock(brand, Dock.Top); side.Children.Add(brand);
+        var footer = new StackPanel { Margin = new(24, 12, 16, 16) };
+        footer.Children.Add(Btn("Talk", () => OpenQuick(false))); footer.Children.Add(Btn("Voice", () => OpenQuick(true))); footer.Children.Add(Btn("Hide Home - keep Buddy running", HideHome)); footer.Children.Add(Btn("Exit Buddy (stops companion)", () => _ = Quit()));
+        var footerText = new FrameworkElementFactory(typeof(TextBlock));
+        footerText.SetBinding(TextBlock.TextProperty, new System.Windows.Data.Binding());
+        footerText.SetValue(TextBlock.TextWrappingProperty, TextWrapping.Wrap);
+        footerText.SetValue(TextBlock.TextAlignmentProperty, TextAlignment.Center);
+        var footerTemplate = new DataTemplate { VisualTree = footerText };
+        foreach (Button button in footer.Children) button.ContentTemplate = footerTemplate;
+        DockPanel.SetDock(footer, Dock.Bottom); side.Children.Add(footer);
+        var nav = new StackPanel { Margin = new(12, 0, 12, 0) };
+        foreach (var section in HomeSections) {
+            var button = Btn(section, () => NavigateHome(section)); button.HorizontalContentAlignment = HorizontalAlignment.Left;
+            button.Background = Brushes.Transparent; button.BorderThickness = new(0); button.Margin = new(0, 0, 0, 4);
+            navigationButtons[section] = button; nav.Children.Add(button);
+        }
+        ApplyCoreNavigation();
+        side.Children.Add(new ScrollViewer { Content = nav, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
+        homeBody.Margin = new(40, 40, 40, 24); Grid.SetColumn(homeBody, 1); layout.Children.Add(homeBody);
+        var main = new Grid(); chatView = main;
         main.RowDefinitions.Add(new() { Height = GridLength.Auto }); main.RowDefinitions.Add(new()); main.RowDefinitions.Add(new() { Height = GridLength.Auto });
-        var header = new StackPanel(); header.Children.Add(Text("YOUR EVERYDAY THINKING PARTNER", 11, Accent)); header.Children.Add(Text("What’s on your mind?", 30)); header.Children.Add(status); main.Children.Add(header);
+        var header = new StackPanel(); header.Children.Add(Btn("Back to conversations", () => NavigateHome("Conversations"))); header.Children.Add(talkHeading); header.Children.Add(status); main.Children.Add(header);
         scroller = new ScrollViewer { Content = messages, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Margin = new(0, 18, 0, 20) }; Grid.SetRow(scroller, 1); main.Children.Add(scroller);
         var composer = new StackPanel(); Grid.SetRow(composer, 2); main.Children.Add(composer); composer.Children.Add(contextLabel);
-        StyleBox(input); composer.Children.Add(input);
+        StyleBox(input); input.MinHeight = 96; input.VerticalContentAlignment = VerticalAlignment.Top; input.Padding = new(10,8,10,8); composer.Children.Add(input);
         send = Btn("Send  ↗", () => _ = Send(), true); stop = Btn("Stop", Cancel); stop.IsEnabled = false;
-        composer.Children.Add(Row(mode, Btn("Dictate", Dictate), Btn("Refine", () => _ = Refine()), speak, stop, send));
-        composer.Children.Add(Row(Btn("Read screen text", () => _ = ReadContext()), Btn("Capture window", () => _ = Capture()), Btn("Clear context", ClearContext)));
+        composer.Children.Add(Wrap(Btn("Dictate", Dictate), Btn("Refine Buddy draft", () => _ = Refine()), Btn("Refine source field", () => _ = RefineFocusedField(useSummonedField:true)), speak, stop, send, undoDictation, copyDictation));
+        undoDictation.Click += (_, _) => { try { mainDictationEdit?.Undo(DateTimeOffset.UtcNow, default); status.Text = "Exact draft restored."; } catch (Exception e) { status.Text = e.Message; } undoDictation.Visibility = Visibility.Collapsed; };
+        copyDictation.Click += (_, _) => { if (lastDictation.Length > 0) System.Windows.Clipboard.SetText(lastDictation); };
+        composer.Children.Add(Wrap(Btn("Read screen text", () => _ = ReadContext()), Btn("Capture window", () => _ = Capture()), Btn("Clear context", ClearContext), Btn("Prepare source-field options", PrepareExternalRefinementOptions), Btn("Browser context preview", OpenBrowserContext)));
         composer.Children.Add(shortcutHint);
-        Content = layout;
+        Content = layout; NavigateHome("Conversations");
+        SizeChanged += (_, _) => homeBody.Margin = new(ActualWidth < 1000 ? 24 : 40, 32, ActualWidth < 1000 ? 24 : 40, 24);
         input.PreviewKeyDown += (_, e) => { if (e.Key == System.Windows.Input.Key.Enter && System.Windows.Input.Keyboard.Modifiers.HasFlag(System.Windows.Input.ModifierKeys.Control)) { e.Handled = true; _ = Send(); } };
-        mode.SelectionChanged += (_, _) => { StopMainDictation(); tts?.SpeakAsyncCancelAll(); };
         conversations.SelectionChanged += (_, _) => { if (!refreshing && !busy && conversations.SelectedItem is Conversation c) _ = Select(c.Id); };
         SourceInitialized += (_, _) => {
-            hwnd = new WindowInteropHelper(this).Handle; HwndSource.FromHwnd(hwnd).AddHook(Hook); Native.SetWindowDisplayAffinity(hwnd, 0x11);
+            CaptureProtection.Enabled = desktop.ProtectScreenshots;
+            LocalSpeechInput.Preferences = () => desktop;
+            hwnd = new WindowInteropHelper(this).Handle; HwndSource.FromHwnd(hwnd).AddHook(Hook); CaptureProtection.Apply(hwnd);
+            if (!startService) return; // Isolated window tests must not register user hotkeys or start the shared store.
             shortcut = new ShortcutRegistration((id, modifiers) => Native.RegisterHotKey(hwnd, id, modifiers, 0x20), id => Native.UnregisterHotKey(hwnd, id));
-            var preferred = ShortcutChoice.Choices.FirstOrDefault(c => c.Label == desktop.Shortcut) ?? ShortcutChoice.Choices[0];
-            if (!shortcut.TrySet(preferred))
-                foreach (var choice in ShortcutChoice.Choices.Where(c => c.Modifiers != 8)) if (shortcut.TrySet(choice)) break;
-            voiceShortcutReady = Native.RegisterHotKey(hwnd, 3, 0x4006, 0x20);
-            Native.RegisterHotKey(hwnd, 2, 0x4003, 0x1B);
+            var preferred = ShortcutChoice.Find(desktop.Shortcut);
+            shortcut.TrySet(preferred); // Never silently claim a different chord on startup.
+            voiceShortcut = new ShortcutRegistration((id, modifiers) => Native.RegisterHotKey(hwnd, id, modifiers, 0x20), id => Native.UnregisterHotKey(hwnd, id), 3, 7);
+            voiceShortcut.TrySet(ShortcutChoice.Find(desktop.VoiceShortcut));
+            refineShortcutReady = Native.RegisterHotKey(hwnd, 5, 0x4003, 0x52);
+            dictationShortcutReady = Native.RegisterHotKey(hwnd, 6, 0x4003, 0x44);
+            stopShortcutReady = Native.RegisterHotKey(hwnd, 2, 0x4003, 0x1B);
+            regionShortcut = new ShortcutRegistration((id,mods) => Native.RegisterHotKey(hwnd,id,mods,0x52), id => Native.UnregisterHotKey(hwnd,id),8,9);
+            if(desktop.RegionSelectionEnabled && !regionShortcut.TrySet(ShortcutChoice.FindRegion(desktop.RegionShortcut))) status.Text="The area-selection shortcut is already in use.";
             UpdateShortcutHint();
         };
-        Loaded += async (_, _) => await Start();
-        Closing += (_, e) => { if (!shuttingDown) { e.Cancel = true; StopMainDictation(); tts?.SpeakAsyncCancelAll(); Hide(); tray.ShowBalloonTip(2500, "Buddy is beside your cursor", "Use your shortcut for quick chat, or the tray icon for Home. Choose Quit Buddy to stop phone access.", System.Windows.Forms.ToolTipIcon.Info); } };
-        foreground.Tick += (_, _) => { var current = Native.GetForegroundWindow(); if (current != IntPtr.Zero && !Native.IsOwnWindow(current)) previousWindow = current; };
+        if (startService) Loaded += async (_, _) => await Start();
+        Closing += (_, e) => { if (!shuttingDown) { e.Cancel = true; HideHome(); } };
+        Deactivated += (_, _) => { if (mainMicrophone is not null) { StopMainDictation(); status.Text = "Microphone off · focus changed."; } };
+        foreground.Tick += (_, _) => ObserveForegroundTarget();
         refresh.Tick += async (_, _) => { if (!busy && host is not null && IsVisible) { await RefreshList(); if (currentId is not null) await ShowHistory(); } };
     }
     private async Task Start()
     {
         try
         {
-            var data = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Buddy"); host = await BuddyHost.Start(data);
-            tray.Icon = System.Drawing.SystemIcons.Application; tray.Text = "Buddy — local AI"; tray.Visible = true; tray.DoubleClick += (_, _) => Dispatcher.Invoke(Summon);
+            var data = PreviewEnvironment.DataDirectory; host = await BuddyHost.Start(data, PreviewEnvironment.Enabled ? 47839 : BuddyHost.DefaultPort, loopbackOnly: PreviewEnvironment.Enabled);
+            trayArtwork = AppBranding.TrayIcon(); tray.Icon = trayArtwork; tray.Text = "Buddy - local AI"; tray.Visible = true; tray.DoubleClick += (_, _) => Dispatcher.Invoke(Summon);
             var menu = new System.Windows.Forms.ContextMenuStrip();
             menu.Items.Add("Quick chat", null, (_, _) => Dispatcher.Invoke(() => OpenQuick(false)));
             menu.Items.Add("Voice", null, (_, _) => Dispatcher.Invoke(() => OpenQuick(true)));
             menu.Items.Add("Open Buddy Home", null, (_, _) => Dispatcher.Invoke(Summon));
+            menu.Items.Add("Settings", null, (_, _) => Dispatcher.Invoke(OpenSettings));
+            menu.Items.Add("Reviewed cloud text", null, (_, _) => Dispatcher.Invoke(OpenCloudText));
+            menu.Items.Add("Local agent sessions", null, (_, _) => Dispatcher.Invoke(OpenLocalAgentSessions));
+            menu.Items.Add("Refine focused prompt", null, (_, _) => Dispatcher.Invoke(() => _ = RefineFocusedField()));
+            menu.Items.Add("Prepare source-field options", null, (_, _) => Dispatcher.Invoke(PrepareExternalRefinementOptions));
+            menu.Items.Add("Dictate into focused field", null, (_, _) => Dispatcher.Invoke(() => _ = RefineFocusedField(dictation: true)));
+            var companionMenu = new System.Windows.Forms.ToolStripMenuItem("Companion");
+            companionMenu.DropDownItems.Add("Settings", null, (_, _) => Dispatcher.Invoke(OpenSettings));
+            companionMenu.DropDownItems.Add("Dock", null, (_, _) => Dispatcher.Invoke(() => companion?.SetDocked(true)));
+            companionMenu.DropDownItems.Add("Follow pointer", null, (_, _) => Dispatcher.Invoke(() => companion?.SetDocked(false)));
+            companionMenu.DropDownItems.Add("Snooze 15 minutes", null, (_, _) => Dispatcher.Invoke(() => companion?.Snooze()));
+            menu.Items.Add(companionMenu);
             menu.Items.Add("Cursor & shortcuts", null, (_, _) => Dispatcher.Invoke(() => { Summon(); CursorSettings(); }));
-            menu.Items.Add("Quit", null, (_, _) => Dispatcher.Invoke(() => _ = Quit())); tray.ContextMenuStrip = menu;
+            menu.Items.Add("Exit Buddy (stops companion)", null, (_, _) => Dispatcher.Invoke(() => _ = Quit())); tray.ContextMenuStrip = menu;
+            host.Service.WebEnabled = desktop.AllowWebResearch; host.Service.AgentEnabled = desktop.AgentEnabled;
+            companionState.Changed += mood => companion?.SetMood(mood);
+            tasks = new TaskCenter(host.Service, () => assistant?.Cancel(), text => StartWorkflow("agent",text)); await tasks.Initialize();
+            assistant = new DesktopAssistant(() => host?.Service, () => desktop, () => previousWindow, mood => companionState.Set("assistant", mood), target => companion?.PointTo(target), () => PrepareDesktopActivity("assistant"), tasks.Ledger, () => windowSelection.RequireCurrent());
+            assistant.DrawRegionRequested=()=>BeginRegionSelection(true);
+            fieldEditor = new FocusedFieldEditor(assistant.Perception);
+            fieldBadge = new FocusedFieldBadge(fieldEditor, identity => _ = RefineFocusedField(identity)); fieldBadge.SetEnabled(desktop.ShowFieldBadge);
+            promptWatcher=new(fieldEditor,()=>host?.Service,()=>OpenQuick(true),()=>desktop.VoiceShortcut,PrepareExternalRefinementOptions);promptWatcher.SetEnabled(desktop.LocalPromptSuggestions);
+            voiceOverlay = new VoiceOverlayWindow(() => host?.Service, EnsureConversation, () => desktop, mood => companionState.Set("voice", mood), () => previousWindow,
+                assistant.Perception, StartWorkflow, () => OpenQuick(false), text => _ = RefineFocusedField(useSummonedField:true), Summon, () => PrepareDesktopActivity("voice"), target => companion?.PointTo(target));
+            voiceOverlay.RefinementReply=text=>promptWatcher?.Reply(text)==true;
             quick = new QuickChatWindow(() => host?.Service, EnsureConversation, () => desktop,
-                mood => companion?.SetMood(mood), Summon, () => { Summon(); CursorSettings(); });
-            companion = new CursorCompanionWindow(() => quick?.IsVisible == true && quick.IsMouseOver);
-            companion.SetEnabled(desktop.ShowCompanion);
+                mood => companionState.Set("talk", mood), Summon, OpenSettings, () => OpenQuick(true), StartWorkflow,
+                async ct => { var snapshot = await assistant.Perception.Capture(previousWindow, ct); await host.Service.Audit("capture", snapshot.Context.App, "UIA text; no screenshot stored"); return snapshot; }, field => { _ = RefineFocusedField(useSummonedField:true); }, () => PrepareDesktopActivity("talk"), localTasks);
+            companion = new CursorCompanionWindow(() => quick?.IsVisible == true && quick.IsMouseOver, RouteCompanionAction);
+            islandBrainStatus = "Checking local brain";
+            island = new CompanionIsland(ReadIslandActivity, RouteCompanionAction, () => !companionPresenceAvailable, StoreIslandMode, () => desktop.IslandHideInFullscreen, () => localTasks.Snapshot, OpenLocalTaskSource, localTasks.Dismiss,
+                "Buddy tasks and explicitly paired client reports in this session", CreateNotchWorkspace(), ReadIslandPlacement(), StoreIslandPlacement);
+            island.SetMode(desktop.IslandMode);
+            companion.SetEnabled(companionPresenceAvailable && desktop.ShowCompanion);
+            ApplyDisplayName();
+            ConfigurePtt(); ConfigureRegionHook(); companion.SetTriangleEnabled(desktop.TrianglePointerEnabled); companion.SetCompactPointerMode(desktop.CompactPointerMode);
+            try { windowSelectionMonitor = new WindowSelectionMonitor(ObserveTargetWindow, () => { windowSelection.Clear(); previousWindow = IntPtr.Zero; }); }
+            catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception) { Diagnostics.Write("Foreground selection listener unavailable; periodic selection checks remain active", ex); }
             foreground.Start(); refresh.Start(); await RefreshList();
-            if (conversations.Items.Count > 0) await Select(((Conversation)conversations.Items[0]).Id); else await NewChat();
-            var s = await host.Service.Store.Read(s => s); var modelStatus = await host.Service.Engine.Status(s.Model, s.VisionModel); status.Text = modelStatus.Message;
-            if (modelStatus.Ready && desktop.StartInCompanionMode) Hide();
+            if (conversations.Items.Count > 0) { currentId = ((Conversation)conversations.Items[0]).Id; await ShowHistory(); }
+            NavigateHome(homeSection);
+            var s = await host.Service.Store.Read(s => s); var modelStatus = await host.Service.Engine.Status(s.Model, s.VisionModel);
+            var availableDefault = OllamaEngine.AvailableDefault(s.Model, modelStatus.Installed);
+            if (availableDefault != s.Model) {
+                await host.Service.Store.Update(settings => { settings.Model = availableDefault; return true; });
+                modelStatus = await host.Service.Engine.Status(availableDefault, s.VisionModel);
+            }
+            status.Text = modelStatus.Message;
+            SetNotchModels(modelStatus, availableDefault, s.EmbeddingModel);
+            islandBrainStatus = (modelStatus.Ready ? "Local brain ready · " : "Local brain unavailable · ") + availableDefault;
+            if (!desktop.OnboardingCompleted) ShowOnboarding();
+            if (modelStatus.Ready && desktop.StartInCompanionMode && !keepHomeOpen) Hide();
         }
-        catch (Exception ex) { Diagnostics.Write("Service startup failed", ex); status.Text = "Could not start Buddy: " + ex.Message; MessageBox.Show(status.Text + "\n\nError log: " + Diagnostics.LogPath, "Buddy startup"); }
+        catch (Exception ex) { islandBrainStatus = "Local service unavailable"; Diagnostics.Write("Service startup failed", ex); status.Text = "Could not start Buddy: " + ex.Message; MessageBox.Show(status.Text + "\n\nError log: " + Diagnostics.LogPath, "Buddy startup"); }
     }
     private IntPtr Hook(IntPtr h, int msg, IntPtr w, IntPtr l, ref bool handled)
     {
         if (msg == 0x0312)
         {
             int id = w.ToInt32();
-            if (id == shortcut?.ActiveId) { OpenQuick(desktop.ShortcutStartsVoice); handled = true; }
-            else if (id == 3) { OpenQuick(true); handled = true; }
-            else if (id == 2) { Cancel(); quick?.Cancel(); handled = true; }
+            if (id == shortcut?.ActiveId) { OpenQuick(false); handled = true; }
+            else if (id == voiceShortcut?.ActiveId) { OpenQuick(true); handled = true; }
+            else if (id == regionShortcut?.ActiveId) { BeginRegionSelection(); handled = true; }
+            else if (id == 5) { _ = RefineFocusedField(); handled = true; }
+            else if (id == 6) { _ = RefineFocusedField(dictation: true); handled = true; }
+            else if (id == 2) { Cancel(); handled = true; }
         }
         return IntPtr.Zero;
     }
-    private void Summon() { quick?.Dismiss(); Show(); WindowState = WindowState.Normal; Activate(); input.Focus(); if (host is not null) { _ = RefreshList(); _ = ShowHistory(); } }
-    private async Task<string?> EnsureConversation() { if (currentId is null) await NewChat(); return currentId; }
-    private void OpenQuick(bool voice)
+    internal void HideHome()
     {
-        var active = Native.GetForegroundWindow(); if (active != IntPtr.Zero && !Native.IsOwnWindow(active)) previousWindow = active;
+        if (!FlushPendingPreferences()) return;
+        keepHomeOpen=false;StopMainDictation();tts?.Cancel();Hide();
+        companion?.SetEnabled(companionPresenceAvailable&&desktop.ShowCompanion);
+        if(tray.Visible)tray.ShowBalloonTip(1800,"Buddy is still running","Use your voice/chat shortcut or the tray icon. Exit Buddy stops the companion and service.",System.Windows.Forms.ToolTipIcon.Info);
+    }
+    private void Summon() { keepHomeOpen = true; quick?.Dismiss(); voiceOverlay?.Dismiss(); Show(); WindowState = WindowState.Normal; Activate(); if (homeBody.Content == chatView) input.Focus(); if (host is not null) { _ = RefreshList(); _ = ShowHistory(); } }
+    private Task<Conversation>? creatingSharedConversation;
+    private async Task<string?> EnsureConversation()
+    {
+        if (host is null || shuttingDown) return null;
+        if (currentId is not null) return currentId;
+        // Quick Chat and Voice own their activity and cancellation. Creating their
+        // first conversation must not navigate Home or cancel the calling surface.
+        var creating = creatingSharedConversation ??= host.Service.CreateConversation(null);
+        try {
+            var created = await creating;
+            if (shuttingDown) return null;
+            currentId ??= created.Id;
+            return currentId;
+        }
+        finally { if (ReferenceEquals(creatingSharedConversation, creating)) creatingSharedConversation = null; }
+    }
+    private async void OpenQuick(bool voice, bool held=false)
+    {
+        if(!await RememberSourceField()||shuttingDown||(held&&!voiceHeld))return;
         if (quick is null) { status.Text = "Buddy is still starting. Please wait."; Summon(); return; }
-        StopMainDictation(); tts?.SpeakAsyncCancelAll();
-        if (voice && quick.IsVisible && quick.IsListening) { quick.Cancel(); return; }
+        PrepareDesktopActivity(voice ? "voice" : "talk");
+        if (voice) { quick.Dismiss(); if (voiceOverlay?.IsListening == true) voiceOverlay.Dismiss(); else voiceOverlay?.Open(held); return; }
+        voiceOverlay?.Dismiss();
         if (!voice && quick.IsVisible && quick.IsActive) { quick.Dismiss(); return; }
-        quick.Open(voice, currentId);
+        quick.Open(currentId);
     }
     private void UpdateShortcutHint()
     {
-        shortcutHint.Text = (shortcut?.Active?.Label ?? "Main shortcut unavailable — use tray") +
-            (desktop.ShortcutStartsVoice ? " for voice" : " for quick chat") +
-            (voiceShortcutReady ? " · Ctrl+Shift+Space for voice" : " · Voice shortcut unavailable — use tray") + " · Ctrl+Alt+Esc stops";
+        shortcutHint.Text = (shortcut?.Active?.Label ?? "Chat shortcut unavailable — use tray") + " for chat · " +
+            (voiceShortcut?.Active?.Label ?? "Voice shortcut unavailable — use tray") + (desktop.HoldToTalk ? " tap / hold for voice" : " for voice") +
+            (stopShortcutReady ? " · Ctrl+Alt+Esc stops" : " · Global Stop shortcut is in use: use the Stop buttons") + " · Windows+Space belongs to Windows";
     }
-    private void CursorSettings()
-    {
-        var p = new StackPanel(); p.Children.Add(Text("Buddy, beside your cursor", 25));
-        p.Children.Add(Text("A small companion follows your pointer. Use a shortcut to open chat or speak.", 14, Muted));
-        var enabled = new CheckBox { Content = "Show the cursor companion", IsChecked = desktop.ShowCompanion, Foreground = Ink, Margin = new(0, 12, 0, 12) };
-        var start = new CheckBox { Content = "Start with the companion when the AI model is ready", IsChecked = desktop.StartInCompanionMode, Foreground = Ink, Margin = new(0, 0, 0, 14) };
-        p.Children.Add(enabled); p.Children.Add(start); p.Children.Add(Text("Main shortcut", 14));
-        var keys = new ComboBox { ItemsSource = ShortcutChoice.Choices, SelectedItem = shortcut?.Active ?? ShortcutChoice.Choices[0], Margin = new(0, 0, 0, 14) }; p.Children.Add(keys);
-        p.Children.Add(Text("Windows + Space normally switches keyboard layouts. Buddy can use it only if Windows makes it available. A conflicting selection leaves your working shortcut active.", 12, Muted));
-        p.Children.Add(Text("When I press the main shortcut", 14));
-        var action = new ComboBox { ItemsSource = new[] { "Open chat bar", "Start voice" }, SelectedIndex = desktop.ShortcutStartsVoice ? 1 : 0, Margin = new(0, 0, 0, 14) }; p.Children.Add(action);
-        var read = new CheckBox { Content = "Read voice answers aloud", IsChecked = desktop.ReadVoiceAnswers, Foreground = Ink, Margin = new(0, 0, 0, 14) }; p.Children.Add(read);
-        p.Children.Add(Text("Voice listens to one utterance, sends after a pause, and switches the microphone off. Esc, Stop, or leaving the bar stops listening. Ctrl+Shift+Space is the dedicated voice shortcut.", 12, Muted));
-        var notice = Text("", 12, Accent); p.Children.Add(notice);
-        p.Children.Add(Btn("Save preferences", () =>
-        {
-            if (keys.SelectedItem is not ShortcutChoice choice || shortcut is null) return;
-            var old = shortcut.Active;
-            if (!shortcut.TrySet(choice)) { notice.Text = "That shortcut is already in use or reserved by Windows. Your current shortcut is unchanged."; return; }
-            try
-            {
-                var next = new DesktopPreferences { ShowCompanion = enabled.IsChecked == true, StartInCompanionMode = start.IsChecked == true, Shortcut = choice.Label, ShortcutStartsVoice = action.SelectedIndex == 1, ReadVoiceAnswers = read.IsChecked == true };
-                next.Save(); desktop = next; companion?.SetEnabled(desktop.ShowCompanion); UpdateShortcutHint(); notice.Text = "Saved. " + shortcutHint.Text;
-            }
-            catch (Exception ex) { if (old is not null) shortcut.TrySet(old); UpdateShortcutHint(); notice.Text = "Could not save: " + ex.Message; }
-        }, true));
-        Dialog("Buddy · Cursor & shortcuts", p, 590, 640);
-    }
+    private void CursorSettings() => OpenSettingsSection("Shortcuts");
     private async Task RefreshList()
     {
         if (host is null) return; refreshing = true;
         try { conversations.ItemsSource = await host.Service.Store.Read(s => s.Conversations.OrderByDescending(c => c.UpdatedAt).Select(c => c with { Messages = [] }).ToList()); conversations.SelectedItem = conversations.Items.Cast<Conversation>().FirstOrDefault(c => c.Id == currentId); }
         finally { refreshing = false; }
     }
-    private async Task NewChat() { if (host is null || busy) return; currentId = (await host.Service.CreateConversation(null)).Id; ClearContext(); await RefreshList(); await ShowHistory(); input.Focus(); }
-    private async Task Select(string id) { if (busy) return; currentId = id; ClearContext(); await ShowHistory(); }
+    private async Task NewChat()
+    {
+        if (host is null || busy) return;
+        PrepareDesktopActivity("home");
+        using var source = new CancellationTokenSource(TimeSpan.FromSeconds(30)); request = source; SetBusy(true);
+        try {
+            var created = await host.Service.CreateConversation(null).WaitAsync(source.Token);
+            source.Token.ThrowIfCancellationRequested();
+            currentId = created.Id; homeTask = null; homeTaskConversation = null; ClearContext();
+            messages.Children.Clear(); ShowChat();
+            await RefreshList(); source.Token.ThrowIfCancellationRequested();
+        }
+        catch (OperationCanceledException) { if (desktopActivity == "home") status.Text = "Conversation creation stopped."; }
+        catch (Exception ex) { if (desktopActivity == "home") status.Text = ex.Message; }
+        finally { if (ReferenceEquals(request, source)) { request = null; SetBusy(false); } }
+    }
+    private async Task Select(string id) { if (busy) return; currentId = id; ClearContext(); await ShowHistory(); ShowChat(); }
     private async Task ShowHistory()
     {
         if (host is null) return; var c = await host.Service.Store.Read(s => s.Conversations.FirstOrDefault(c => c.Id == currentId)); messages.Children.Clear();
         if (c is null) { currentId = null; messages.Children.Add(Text("Choose or create a conversation.", 20, Muted)); return; }
-        foreach (var m in c.Messages) Bubble(m.Role, m.Text);
+        foreach (var m in c.Messages) Bubble(m.Role, m.Text, m.Evidence);
         if (c.Messages.Count == 0)
         {
             messages.Children.Add(Text("Less friction. More room to think.", 24)); messages.Children.Add(Text("Ask a question, untangle an idea, or bring the app you’re using into the conversation.", 15, Muted));
@@ -196,112 +314,183 @@ public sealed class MainWindow : Window
         }
         scroller.ScrollToEnd();
     }
-    private TextBox Bubble(string role, string value)
+    private TextBox Bubble(string role, string value, MessageEvidence? evidence = null)
     {
         var content = new StackPanel(); content.Children.Add(Text(role == "user" ? "YOU" : "BUDDY", 11, role == "user" ? Muted : Accent));
         var text = new TextBox { Text = value, IsReadOnly = true, TextWrapping = TextWrapping.Wrap, BorderThickness = new(0), Background = System.Windows.Media.Brushes.Transparent, Foreground = Ink, FontSize = 16, Padding = new(0) }; content.Children.Add(text);
+        var sources = new StackPanel(); SourceLinks.Fill(sources, evidence); content.Children.Add(sources); text.Tag = sources;
         messages.Children.Add(new Border { Child = content, Padding = new(18), Margin = new(0, 0, 8, 12), Background = role == "user" ? Panel : Bg, CornerRadius = new(12) }); return text;
     }
-    private void SetBusy(bool value) { busy = value; input.IsReadOnly = value; send.IsEnabled = !value; stop.IsEnabled = value; conversations.IsEnabled = !value; mode.IsEnabled = !value; }
+    private void SetBusy(bool value) { busy = value; input.IsReadOnly = value; send.IsEnabled = !value; stop.IsEnabled = value || homeSpeaking; conversations.IsEnabled = !value; companionState.Set("home", value ? CompanionMood.Thinking : CompanionMood.Idle); }
     private async Task Send()
     {
-        if (host is null || busy || string.IsNullOrWhiteSpace(input.Text)) return; if (currentId is null) await NewChat();
-        var draft = input.Text.Trim(); var selectedMode = mode.SelectedItem?.ToString()?.ToLowerInvariant() ?? "type";
-        var payload = new ChatRequest(currentId!, draft, Guid.NewGuid().ToString(), selectedMode, context, image is null ? null : Convert.ToBase64String(image));
-        request = new(); SetBusy(true); tts?.SpeakAsyncCancelAll(); input.Clear(); messages.Children.Clear();
-        var old = await host.Service.Store.Read(s => s.Conversations.First(c => c.Id == currentId)); foreach (var m in old.Messages) Bubble(m.Role, m.Text);
-        Bubble("user", draft); var answer = Bubble("assistant", "");
+        if (host is null || busy || string.IsNullOrWhiteSpace(input.Text)) return;
+        var draft = input.Text.Trim(); const string selectedMode = "type";
+        var route = AssistantIntent.Mode(draft); if (route is "agent" or "guide" or "knowledge") { StartWorkflow(route, draft); return; }
+        PrepareDesktopActivity("home");
+        var source = new CancellationTokenSource(TimeSpan.FromMinutes(4)); request = source;
+        var activity = localTasks.Begin("home", "Home chat", "Preparing an answer on this PC."); homeTask = activity; homeTaskConversation = currentId;
+        // Claim this request and freeze its input before the first asynchronous
+        // conversation creation. A second Send cannot enter while it is pending.
+        var selectedConversation = currentId;
+        var selectedContext = context; var selectedImage = image is null ? null : Convert.ToBase64String(image); var selectedApp = screenApp;
+        SetBusy(true); tts?.Cancel(); input.Clear(); messages.Children.Clear();
+        TextBox? answer = null; bool sourcesAttached = false, completedStream = false;
         try
         {
-            await foreach (var item in host.Service.Chat(payload, request.Token)) { if (item.Type == "delta") { answer.Text += item.Text; scroller.ScrollToEnd(); } if (item.Type == "status") status.Text = item.Text; }
+            if (selectedConversation is null) {
+                var created = await host.Service.CreateConversation(null).WaitAsync(source.Token);
+                source.Token.ThrowIfCancellationRequested();
+                selectedConversation = created.Id; currentId = created.Id; homeTaskConversation = created.Id;
+            }
+            var payload = new ChatRequest(selectedConversation, draft, Guid.NewGuid().ToString(), selectedMode, selectedContext, selectedImage, desktop.AllowWebResearch, selectedApp);
+            var old = await host.Service.Store.Read(s => s.Conversations.First(c => c.Id == payload.ConversationId)).WaitAsync(source.Token);
+            source.Token.ThrowIfCancellationRequested();
+            foreach (var m in old.Messages) Bubble(m.Role, m.Text, m.Evidence);
+            Bubble("user", draft); answer = Bubble("assistant", "");
+            await foreach (var item in host.Service.Chat(payload, source.Token)) { source.Token.ThrowIfCancellationRequested(); if (item.Type == "delta") { answer.Text += item.Text; scroller.ScrollToEnd(); } if (item.Type == "status") status.Text = item.Text; if (item.Type == "evidence") sourcesAttached = SourceLinks.Fill((StackPanel)answer.Tag, item.Evidence); if (item.Type == "done") completedStream = true; }
+            source.Token.ThrowIfCancellationRequested();
+            if (!completedStream) throw new InvalidOperationException("The answer did not finish. Your draft is kept.");
             status.Text = "Answered on your PC · " + DateTime.Now.ToShortTimeString(); ClearContext();
-            if (speak.IsChecked == true || selectedMode == "voice") ReadAloud(answer.Text);
+            localTasks.Finish(activity, LocalTaskPhase.Completed, "Answer displayed in the conversation.", observedStep: true);
+            if (speak.IsChecked == true) ReadAloud(answer.Text, sourcesAttached);
         }
-        catch (OperationCanceledException) { status.Text = "Stopped. Your draft has been restored."; input.Text = draft; answer.Text += "\n[Stopped — partial answer not saved]"; }
-        catch (Exception ex) { status.Text = ex.Message; input.Text = draft; answer.Text += "\n[Answer failed — not saved]"; }
-        finally { request.Dispose(); request = null; SetBusy(false); await RefreshList(); }
+        catch (OperationCanceledException) { localTasks.Finish(activity, LocalTaskPhase.Cancelled, "Answer stopped or timed out; draft restored."); if (desktopActivity == "home") status.Text = "Stopped. Your draft has been restored."; input.Text = draft; if (answer is not null) answer.Text += "\n[Stopped — partial answer not saved]"; }
+        catch (Exception ex) { localTasks.Finish(activity, LocalTaskPhase.Failed, "Answer unavailable; review Home for details."); if (desktopActivity == "home") status.Text = ex.Message; input.Text = draft; if (answer is not null) answer.Text += "\n[Answer failed — not saved]"; }
+        finally { if (ReferenceEquals(request, source)) { request = null; SetBusy(false); } source.Dispose(); try { await RefreshList().WaitAsync(TimeSpan.FromSeconds(3)); } catch (Exception ex) { if (desktopActivity == "home" && homeTask == activity) status.Text += " Conversation list: " + ex.Message; } }
     }
-    private void Cancel() { request?.Cancel(); host?.Service.StopAll(); StopMainDictation(); tts?.SpeakAsyncCancelAll(); }
+    private void Cancel() { StopBrowserContext(); island?.CancelPlacement(); contextWindow?.CancelReading(); nextNotchContext=null; notchChat?.SetContextNotice(""); notchChat?.Stop(); CancelCloudRequest(); CancelExternalRefinementOptions(); if (routineRequest is not null && desktopActivity == "routine") { routineStatus = "Stopped. An already dispatched app launch cannot be undone; no further action will run."; status.Text = routineStatus; } routineRequest?.Cancel(); desktopActivity = ""; summonCapture?.Cancel();summonedField=null;voiceHeld=false; promptWatcher?.Suspend(); tasks?.Cancel(); regionPicker?.Cancel(); request?.Cancel(); captureRequest?.Cancel(); fieldCapture?.Cancel(); refineWindow?.Cancel(); dictationWindow?.Cancel(); onboarding?.Cancel(); host?.Service.StopAll(); StopMainDictation(); tts?.Cancel(); quick?.Cancel(); voiceOverlay?.Cancel(); assistant?.Cancel(); }
+    private void PrepareDesktopActivity(string source)
+    {
+        island?.CancelPlacement();
+        if (source != "notch") notchChat?.Stop();
+        if (source != "cloud-text") CancelCloudRequest();
+        if (source != "routine") routineRequest?.Cancel();
+        desktopActivity = source;
+        if(source!="voice")promptWatcher?.Suspend();
+        // Surface-local entry points (including restarting an open panel) share this handoff.
+        // Cancel desktop operations without interrupting an unrelated Android request.
+        if (source != "jobs") tasks?.Cancel();
+        if (source != "region") regionPicker?.Cancel();
+        if (source != "home") request?.Cancel();
+        if (source != "talk") quick?.Cancel();
+        if (source != "voice") voiceOverlay?.Cancel();
+        if (source != "assistant") assistant?.Cancel();
+        if (source != "refine") refineWindow?.Cancel();
+        if (source != "dictation") dictationWindow?.Cancel();
+        if (source is not "field" and not "refine" and not "dictation") fieldCapture?.Cancel();
+        captureRequest?.Cancel(); onboarding?.Cancel(); StopMainDictation(); tts?.Cancel();
+    }
     private void StopMainDictation()
     {
+        mainMicrophone?.Cancel(); mainMicrophone?.Dispose(); mainMicrophone = null;
         var engine = recognizer; recognizer = null;
-        if (engine is not null) { try { engine.RecognizeAsyncCancel(); } catch (InvalidOperationException) { } engine.Dispose(); }
+        LocalSpeechInput.Stop(engine); companionState.Set("home-dictation", CompanionMood.Idle);
         stop.IsEnabled = busy;
     }
-    private void ReadAloud(string text)
+    private async Task ReadLocalVoice(string text, bool sourcesAttached)
     {
-        if (quick?.IsListening == true) return;
-        try { tts ??= new SpeechSynthesizer(); tts.SpeakAsync(text); }
+        int token = ++homeSpeechGeneration; homeSpeaking = true; stop.IsEnabled = true;
+        try { await tts!.SpeakAsync(text, desktop, sourcesAttached); }
+        catch (OperationCanceledException) { }
+        catch (Exception ex) { status.Text = "Answer shown — " + ex.Message; }
+        finally { if (token == homeSpeechGeneration) { homeSpeaking = false; stop.IsEnabled = busy || mainMicrophone is not null; } }
+    }
+    private void ReadAloud(string text, bool sourcesAttached = false)
+    {
+        if (voiceOverlay?.IsListening == true) return;
+        try { tts ??= new LocalVoiceOutput(); _ = ReadLocalVoice(text, sourcesAttached); }
         catch (Exception ex)
         {
             Diagnostics.Write("Optional read-aloud unavailable", ex);
             status.Text = "Answer saved. Read-aloud is unavailable: " + ex.Message;
         }
     }
-    private void Dictate()
+    private void Dictate() => _ = DictateDraft();
+    private async Task DictateDraft()
     {
-        if (busy) return; quick?.Cancel(); tts?.SpeakAsyncCancelAll();
+        if (busy) return; Cancel();
+        var cts = new CancellationTokenSource(); mainMicrophone = cts;
+        var original = input.Text; var edit = new GuardedEdit(new HomeDraftField(input), original);
+        var insertion = new DictationInsertion(input.SelectionStart, input.SelectionLength);
+        status.Text = "Preparing microphone…"; stop.IsEnabled = true; companionState.Set("home-dictation", CompanionMood.Listening);
         try
         {
-            recognizer?.Dispose(); var installed = SpeechRecognitionEngine.InstalledRecognizers();
-            if (installed.Count == 0) throw new InvalidOperationException("No Windows speech language is installed. Install one in Windows Settings, or press Win+H in the message box.");
-            recognizer = new SpeechRecognitionEngine(installed.First()); var engine = recognizer; recognizer.LoadGrammar(new DictationGrammar()); recognizer.SetInputToDefaultAudioDevice();
-            recognizer.SpeechRecognized += (_, e) => Dispatcher.BeginInvoke(new Action(() => { if (!ReferenceEquals(recognizer, engine)) return; input.Text = e.Result.Text; status.Text = "Dictation ready"; if (mode.SelectedItem?.ToString() == "Voice") _ = Send(); }));
-            recognizer.RecognizeCompleted += (_, e) => Dispatcher.BeginInvoke(new Action(() => { if (!ReferenceEquals(recognizer, engine)) return; if (!busy) { if (e.Error is not null) status.Text = "Microphone: " + e.Error.Message; else if (e.Result is null) status.Text = "No speech recognized. Try again or type."; } stop.IsEnabled = busy; }));
-            recognizer.RecognizeAsync(RecognizeMode.Single); status.Text = "Listening… Speak now. Stop ends listening."; stop.IsEnabled = true;
+            var engine = await LocalSpeechInput.Create(cts.Token, desktop);
+            if (!ReferenceEquals(mainMicrophone, cts)) { LocalSpeechInput.Stop(engine); return; }
+            recognizer = engine;
+            engine.SpeechHypothesized += (_, e) => Dispatcher.BeginInvoke(new Action(() => { if (ReferenceEquals(recognizer, engine)) status.Text = "Listening · " + e.Result.Text; }));
+            engine.RecognizeCompleted += (_, e) => Dispatcher.BeginInvoke(new Action(() => {
+                if (!ReferenceEquals(recognizer, engine)) return;
+                StopMainDictation();
+                if (e.Result is null || e.Cancelled) { status.Text = e.Error?.Message ?? "No speech recognized."; return; }
+                lastDictation = e.Result.Text; copyDictation.Visibility = Visibility.Visible;
+                if (e.Error is not null || e.Result.RequiresReview || SpeechReview.Required(e.Result.Confidence, e.Result.Alternates.Select(a => (a.Text, a.Confidence)))) { status.Text = "Uncertain transcript: " + lastDictation + ". Use Copy dictation and review before sending."; return; }
+                try {
+                    if (input.SelectionStart != insertion.Start || input.SelectionLength != insertion.Length) throw new InvalidOperationException("The caret changed. Use Copy dictation.");
+                    edit.Apply(insertion.Replace(original, lastDictation), DateTimeOffset.UtcNow, default);
+                    mainDictationEdit = edit; undoDictation.Visibility = Visibility.Visible; status.Text = "Dictation inserted into your draft. Review before Send. Undo for 30 seconds.";
+                } catch (Exception error) { status.Text = error.Message; }
+            }));
+            engine.RecognizeAsync(RecognizeMode.Single); status.Text = "Listening… Speak, then pause. Stop ends listening.";
         }
-        catch (Exception ex) { status.Text = ex.Message; input.Focus(); }
+        catch (Exception ex) { if (ReferenceEquals(mainMicrophone, cts)) { StopMainDictation(); status.Text = ex is OperationCanceledException ? "Microphone unavailable or stopped." : ex.Message; input.Focus(); } }
     }
     private Window Dialog(string title, UIElement content, int width = 580, int height = 650)
     {
-        var w = new Window { Title = title, Content = new ScrollViewer { Content = content, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Margin = new(24) }, Width = width, Height = height, Background = Bg, Foreground = Ink, Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner };
+        var w = new Window { Title = title, Content = new ScrollViewer { Content = content, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Margin = new(24) }, Width = Math.Min(width, SystemParameters.WorkArea.Width), Height = Math.Min(height, SystemParameters.WorkArea.Height), Background = Bg, Foreground = Ink, Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner };
+        w.SourceInitialized += (_, _) => CaptureProtection.Apply(new WindowInteropHelper(w).Handle);
         w.Show(); return w;
     }
-    private async Task Refine()
-    {
-        if (host is null || busy || string.IsNullOrWhiteSpace(input.Text)) return; var original = input.Text; request = new(); SetBusy(true); status.Text = "Refining with local AI…";
-        try
-        {
-            var improved = await host.Service.Refine(original, request.Token); var p = new StackPanel(); p.Children.Add(Text("Review your refined prompt", 23)); p.Children.Add(Text("Apply replaces your draft. You decide when to send it.", 13, Muted));
-            var editor = new TextBox { Text = improved, AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 260 }; StyleBox(editor); p.Children.Add(editor); Window? w = null;
-            p.Children.Add(Btn("Apply to draft", () => { input.Text = editor.Text; w?.Close(); status.Text = "Refined prompt applied — not sent."; }, true)); p.Children.Add(Btn("Keep original", () => w?.Close())); w = Dialog("Buddy · Refine", p);
-        }
-        catch (Exception ex) { status.Text = ex is OperationCanceledException ? "Refinement stopped." : ex.Message; }
-        finally { request?.Dispose(); request = null; SetBusy(false); }
-    }
-    private void ClearContext() { context = null; if (image is not null) Array.Clear(image); image = null; contextLabel.Text = ""; }
+    private string? screenApp;
+    private CancellationTokenSource? captureRequest;
+    private void ClearContext() { context = null; screenApp = null; if (image is not null) Array.Clear(image); image = null; contextLabel.Text = ""; }
     private async Task ReadContext()
     {
-        if (busy) return;
+        if (busy || captureRequest is not null) return;
+        ClearContext();using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(8)); captureRequest = timeout;
         try
         {
-            Native.CheckWindow(previousWindow); status.Text = "Reading visible screen text…"; var target = previousWindow;
-            var task = Task.Run(() => Native.ReadWindow(target)); var text = await task.WaitAsync(TimeSpan.FromSeconds(3));
+            status.Text = "Reading visible screen text…"; var target = previousWindow;
+            var perception = assistant?.Perception ?? new ScreenPerception(() => desktop);
+            var snapshot = await perception.Capture(target, timeout.Token); timeout.Token.ThrowIfCancellationRequested();
+            var text = snapshot.PromptText;
+            if (host is not null) await host.Service.Audit("capture", snapshot.Context.App, "Explicit reviewed UIA text; no image stored");
             var p = new StackPanel(); p.Children.Add(Text("Review screen text before sharing", 23)); p.Children.Add(Text("Password fields and common sensitive tokens are omitted. Review the remaining text.", 13, Muted));
             var box = new TextBox { Text = text, AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, Height = 360, VerticalScrollBarVisibility = ScrollBarVisibility.Auto }; StyleBox(box); p.Children.Add(box); Window? w = null;
-            p.Children.Add(Btn("Use this context", () => { context = box.Text; contextLabel.Text = "Screen text attached · sent with your next message"; w?.Close(); }, true)); w = Dialog("Buddy · Screen text", p); status.Text = "Review the context, then ask your question.";
+            p.Children.Add(Btn("Use this context", () => { ClearContext(); context = box.Text; screenApp = snapshot.Context.App; contextLabel.Text = "Screen text attached · sent with your next message"; w?.Close(); }, true)); w = Dialog("Buddy · Screen text", p); status.Text = "Review the context, then ask your question.";
         }
-        catch (Exception ex) { status.Text = ex is TimeoutException ? "This app did not expose its screen text in time." : ex.Message; }
+        catch (Exception ex) { status.Text = ex is OperationCanceledException ? "Screen reading stopped." : ex.Message; }
+        finally { if (ReferenceEquals(captureRequest, timeout)) captureRequest = null; }
     }
     private async Task Capture()
     {
-        if (busy || host is null) return;
+        if (busy || host is null || captureRequest is not null) return;
+        ClearContext();using var captureTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(8)); captureRequest = captureTimeout;
         try
         {
-            var s = await host.Service.Store.Read(s => s); var available = await host.Service.Engine.Status(s.Model, s.VisionModel);
+            var s = await host.Service.Store.Read(s => s); var available = await host.Service.Engine.Status(s.Model, s.VisionModel, captureTimeout.Token);
             if (!available.Installed.Contains(s.VisionModel)) { status.Text = "Download the optional vision model in PC setup first."; return; }
-            Native.CheckWindow(previousWindow); Hide(); await Task.Delay(250); byte[] bytes; try { bytes = Native.Capture(previousWindow); } finally { Summon(); }
-            var p = new StackPanel(); p.Children.Add(Text("Check this image before sharing", 23)); p.Children.Add(Text("Only this capture is shared with the local vision model. It is not saved in chat history. Image redaction is manual; cancel if private data is visible.", 13, Muted));
+            var target = previousWindow; Native.CheckWindow(target); Hide(); byte[] bytes; string capturedApp;
+            try {
+                if (!InputNative.SetForegroundWindow(target)) throw new InvalidOperationException("Activate the window you want to capture first.");
+                await Task.Delay(150, captureTimeout.Token);
+                var perception = assistant?.Perception ?? new ScreenPerception(() => desktop);
+                var snapshot = await perception.Capture(target, captureTimeout.Token); capturedApp = snapshot.Context.App;
+                bytes = await perception.Image(snapshot, captureTimeout.Token) ?? throw new InvalidOperationException("Buddy could not establish a private capture scope for this window. Use reviewed screen text instead.");
+            } finally { Summon(); }
+            var p = new StackPanel(); p.Children.Add(Text("Check this image before sharing", 23)); p.Children.Add(Text("Detected private fields are masked. Review the image and cancel if anything private remains. This capture stays on this PC and is not saved in chat history.", 13, Muted));
             p.Children.Add(new System.Windows.Controls.Image { Source = Bitmap(bytes), MaxHeight = 390 }); Window? w = null; bool retained = false;
-            p.Children.Add(Btn("Attach image", () => { ClearContext(); image = bytes; retained = true; contextLabel.Text = "Window image attached · sent with your next message"; w?.Close(); }, true)); p.Children.Add(Btn("Discard", () => w?.Close()));
+            p.Children.Add(Btn("Attach image", () => { ClearContext(); image = bytes; screenApp = capturedApp; retained = true; contextLabel.Text = "Window image attached · sent with your next message"; w?.Close(); }, true)); p.Children.Add(Btn("Discard", () => w?.Close()));
             w = Dialog("Buddy · Capture preview", p, 720); w.Closed += (_, _) => { if (!retained) Array.Clear(bytes); };
         }
         catch (Exception ex) { status.Text = ex.Message; }
+        finally { if (ReferenceEquals(captureRequest, captureTimeout)) captureRequest = null; }
     }
     private static BitmapImage Bitmap(byte[] bytes) { using var stream = new MemoryStream(bytes); var b = new BitmapImage(); b.BeginInit(); b.CacheOption = BitmapCacheOption.OnLoad; b.StreamSource = stream; b.EndInit(); b.Freeze(); return b; }
-    private async Task Setup()
+    private async Task Setup(bool embedded = false, int revision = 0)
     {
-        if (host is null) return; var p = new StackPanel(); p.Children.Add(Text("Make Buddy yours", 27)); p.Children.Add(Text("1. Install or start Ollama\n2. Download the chat model\n3. Ask Buddy a question\n4. Pair your phone on the same Wi-Fi", 15, Muted));
+        if (host is null) return; var p = new StackPanel(); p.Children.Add(Text("Make Buddy yours", 27)); p.Children.Add(Text("1. Install or start Ollama\n2. Download the chat model\n3. Ask Buddy a question" + (desktop.CoreControlsOnly ? "" : "\n4. Pair your phone on the same Wi-Fi"), 15, Muted));
         var info = Text("Checking…", 14, Accent); p.Children.Add(info);
         p.Children.Add(Btn("Install Ollama (official installer)", () => Process.Start(new ProcessStartInfo("https://ollama.com/download/windows") { UseShellExecute = true })));
         p.Children.Add(Btn("Start installed Ollama", () => {
@@ -314,15 +503,19 @@ public sealed class MainWindow : Window
         async Task Pull(string selected, bool select)
         {
             if (download is not null) return; download = new();
-            try { await foreach (var progress in host.Service.Engine.Pull(selected, download.Token)) info.Text = progress; if (select) await host.Service.Store.Update(st => { st.Model = selected; return true; }); info.Text = "Model ready: " + selected; status.Text = info.Text; }
+            try { await foreach (var progress in host.Service.Engine.Pull(selected, download.Token)) info.Text = progress; if (select) { await host.Service.Store.Update(st => { st.Model = selected; return true; }); islandBrainStatus = "Local brain ready · " + selected; } info.Text = "Model ready: " + selected; status.Text = info.Text; }
             catch (Exception ex) { info.Text = ex is OperationCanceledException ? "Download paused. Start again to resume." : "Download failed: " + ex.Message; }
             finally { download.Dispose(); download = null; }
         }
         p.Children.Add(Btn("Download & use chat model", () => _ = Pull(model.SelectedItem?.ToString() ?? "qwen3:4b-instruct-2507-q4_K_M", true), true));
-        p.Children.Add(Btn("Download vision model (optional)", () => _ = Pull("gemma3:4b", false))); p.Children.Add(Btn("Pause download", () => download?.Cancel()));
-        async Task Check() { var st = await host.Service.Store.Read(st => st); var result = await host.Service.Engine.Status(st.Model, st.VisionModel); info.Text = result.Message + "\nSelected: " + st.Model + "\nInstalled: " + string.Join(", ", result.Installed); }
+        p.Children.Add(Btn("Download vision model (optional)", () => _ = Pull("gemma3:4b", false)));
+        p.Children.Add(Btn("Download local Refine intent-check model", () => _ = Pull(s.EmbeddingModel, false)));
+        p.Children.Add(Btn("Pause download", () => download?.Cancel()));
+        async Task Check() { var st = await host.Service.Store.Read(st => st); var result = await host.Service.Engine.Status(st.Model, st.VisionModel); SetNotchModels(result, st.Model, st.EmbeddingModel); info.Text = result.Message + "\nSelected: " + st.Model + "\nInstalled: " + string.Join(", ", result.Installed); islandBrainStatus = (result.Ready ? "Local brain ready · " : "Local brain unavailable · ") + st.Model; }
         p.Children.Add(Btn("Check connection", () => _ = Check())); p.Children.Add(Text("Closing Buddy to the tray keeps phone access available. Quit stops it. No cloud API key is needed.", 13, Muted));
-        var w = Dialog("Buddy · PC setup", p); w.Closed += (_, _) => download?.Cancel(); await Check();
+        if (embedded) { if (homeSection != "Settings" || settingsSection != "AI" || settingsRevision != revision) return; settingsBody.Content = p; p.Unloaded += (_, _) => download?.Cancel(); }
+        else { var w = Dialog("Buddy · PC setup", p); w.Closed += (_, _) => download?.Cancel(); }
+        await Check();
     }
     private void Pair()
     {
@@ -366,8 +559,17 @@ public sealed class MainWindow : Window
         var dialog = new Microsoft.Win32.SaveFileDialog { FileName = "Buddy-conversation.md", Filter = "Markdown|*.md" }; if (dialog.ShowDialog(this) != true) return;
         await File.WriteAllTextAsync(dialog.FileName, "# " + c.Title + "\n\n" + string.Join("\n\n", c.Messages.Select(m => "## " + m.Role + "\n\n" + m.Text))); status.Text = "Conversation exported.";
     }
-    private async Task Quit()
+    internal async Task Quit()
     {
-        if (shuttingDown) return; shuttingDown = true; Cancel(); quick?.Dispose(); companion?.Dispose(); refresh.Stop(); foreground.Stop(); tray.Dispose(); tts?.Dispose(); shortcut?.Dispose(); Native.UnregisterHotKey(hwnd, 2); Native.UnregisterHotKey(hwnd, 3); if (host is not null) await host.DisposeAsync(); System.Windows.Application.Current.Shutdown();
+        if (!FlushPendingPreferences()) return;
+        windowSelectionMonitor?.Dispose(); windowSelectionMonitor = null;
+        island?.Dispose();
+        notchChat?.Dispose();
+        speechModelDownload?.Cancel();WhisperInference.Stop();
+        if (shuttingDown) return; shuttingDown = true; Cancel(); contextWindow?.Close(); refinementContext.Dispose(); promptWatcher?.Dispose(); refineWindow?.Close(); dictationWindow?.Close(); fieldBadge?.Dispose(); ptt?.Dispose(); regionHook?.Dispose(); regionShortcut?.Dispose(); voiceOverlay?.Dispose(); assistant?.Dispose(); quick?.Dispose(); companion?.Dispose(); refresh.Stop(); foreground.Stop(); tray.Dispose(); tts?.Dispose(); shortcut?.Dispose(); voiceShortcut?.Dispose(); Native.UnregisterHotKey(hwnd, 2); Native.UnregisterHotKey(hwnd, 5); Native.UnregisterHotKey(hwnd, 6);
+        trayArtwork?.Dispose(); trayArtwork = null;
+        await DisposeOptionalSessions();
+        try { if(tasks is not null){await tasks.Flush();tasks.Dispose();} if (host is not null) await host.DisposeAsync(); }
+        finally { System.Windows.Application.Current.Shutdown(); }
     }
 }

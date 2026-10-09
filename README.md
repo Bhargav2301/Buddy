@@ -1,10 +1,12 @@
+Current continuation: [installed update and OCR text correction](docs/Continuation63.md).
+
 # Buddy
 
 Native Windows and Android applications backed by an AI model running on the user's Windows PC.
 
 **Current version:** [VERSION](VERSION) · testing prerelease. [Changes](CHANGELOG.md) · [Downloads](https://github.com/Bhargav2301/Buddy/releases) · [Build status](https://github.com/Bhargav2301/Buddy/actions/workflows/build.yml).
 
-This repository implements a usable local-PC subset of the supplied Nexa technical specification. It does not claim completion of the specification's multi-phase cloud, agent, and automation platform.
+Buddy is a local-first cursor companion for voice, screen-aware teaching and reviewed prompt refinement. Home holds settings/history; closing it keeps the configured companion running. Optional action agents, local knowledge and Android access retain explicit privacy and approval boundaries. See [the current source checkpoint and acceptance limits](docs/Source-sync-2026-10-09.md).
 
 ## Start using it
 
@@ -12,7 +14,17 @@ Read [the setup guide](docs/Buddy-Setup-Guide.md). The Windows download contains
 
 **Windows installation:** the updated Windows ZIP corrects the `WindowsBase.dll` packaging collision. Extract it into a fresh folder, then run `Install-Buddy.cmd` to install, or `Run-Buddy.cmd` to launch with startup diagnostics. Logs are in `%LOCALAPPDATA%\Buddy\Logs`. Windows voice initialization is deferred until read-aloud is used. The native installer keeps PC conversations and pairing state in the user profile.
 
-**Windows cursor companion:** Buddy has a native click-through companion beside the mouse and a compact chat/voice bar. Ctrl+Space opens chat; Ctrl+Shift+Space starts one voice utterance. Use Home → Cursor & shortcuts to change activation, hide the companion or control spoken answers. Win+Space is reserved by Windows for keyboard-layout switching and is only selectable if registration succeeds. Existing local AI, conversation history and Android pairing are reused. Native Windows interaction still needs device acceptance; see the validation record.
+**Windows companion:** Use your configured voice/chat shortcuts or click the companion to talk. Right-click for Type, Guide and optional tools. **Refine source field** captures the original supported AI composer before Buddy takes focus, then offers a field-anchored diff, Accept and Undo without sending. **Refine Buddy draft** is a separate local action. **Hide Home - keep Buddy running** preserves the tray service; **Exit Buddy (stops companion)** exits. Current settings and voices survive local upgrades. See [current behavior, tests and limits](docs/Source-sync-2026-10-09.md).
+
+**Settings:** Open Buddy again to show Home and select Settings, use the tray or Buddy Settings shortcut, or run `Open-Buddy-Settings.cmd` in a portable folder. `--background` requests companion startup. Offline Piper voice setup is optional and separate; model weights and user profiles are never committed.
+
+See the [core teaching and validation report](docs/Windows-0.4.2.md), [local Whisper evidence](docs/Whisper-local.md), and [evidence-linked Clicky comparison](docs/Clicky-comparison-0.4.md) for implementation status and remaining gaps.
+
+**October 9 source checkpoint:** version 0.4.8 includes the handoff's integrated browser61 refinement/context work and preceding Calculator fixes. The last recorded installed version in the handoff was 0.4.5; source synchronization does not install an update. Browser integration remains incomplete for real provider history and attachments. See the [source reconciliation and fresh checks](docs/Source-sync-2026-10-09.md), [browser preview limits](docs/Windows-browser61.md), and [development records](docs/development/README.md).
+
+[Continuation62](docs/Continuation62.md) adds bounded explicit-detail local replies and rejects token-limited answers as incomplete. A separate Windows review build is validated but not installed; the report records remaining model-quality and browser/native gaps.
+
+The standalone [readiness probe 0.1.6](docs/Browser-readiness-0.1.6.md) recognizes the message-container structure inspected in Chrome and deduplicates loaded units. All 231 Node and 60 owned offline Chrome cases pass. The user confirmed live detection of one editor candidate and one user/assistant pair, with the conversation route recognized. Loaded DOM counts do not establish complete history or draft access.
 
 ## Project map
 
@@ -20,10 +32,13 @@ Read [the setup guide](docs/Buddy-Setup-Guide.md). The Windows download contains
 |---|---|
 | `apps/windows/Buddy.Windows` | C#/.NET 8 native WPF application; chat, local setup, QR pairing, Windows speech, hotkeys, UI Automation context, capture preview |
 | `apps/android` | Kotlin 2 / Jetpack Compose native app; pinned HTTPS, chat, history, voice, share receiver, bubble, tile, default assistant, basic keyboard |
+| `apps/windows/Buddy.BrowserHost`, `integrations/browser` | Uninstalled native-messaging/browser context foundation; production provider support remains incomplete |
 | `services/Buddy.Server` | Embedded ASP.NET Core service, local model adapter, encrypted state, pairing and shared conversation API |
 | `tests/Buddy.Tests` | Dependency-free executable service test suite, including actual TLS/HTTP integration |
 | `tests/Buddy.Windows.PackageChecks` | Windows PE architecture, WPF type and managed dependency validation; runs on any .NET 8 build host |
 | `tests/Buddy.Desktop.Tests` | Placement across monitor origins/scales and shortcut conflict regression checks |
+| `tests/Buddy.Assistant.Tests` | Grounding, action policy, web isolation, tool loop and cancellation; optional live Ollama checks |
+| `tests/Buddy.Windows.IntegrationTests` | Interactive native fixture for UIA edits/invocation, overlay flags and cancellation |
 | `apps/android/app/src/androidTest` | Native Android UI integration and sensitive-field tests |
 | `scripts` | Windows build, per-user install, local AI setup, narrowly scoped firewall setup |
 | `docs` | Setup, coverage, architecture, and validation |
@@ -78,6 +93,7 @@ Images and raw screen context are request-scoped and excluded from persisted con
 ## Source references
 
 - Supplied `Technical Specification: Nexa — Windows + Android AI Buddy Ecosystem`, v1.0, 26 September 2026.
+- [Updated Windows TRD](docs/Buddy-TRD.md) and [UI/UX specification](docs/Buddy-UI-UX.md), v1.2; [0.3.0 implementation scope](docs/Windows-Assistant-Preview.md).
 - [Ollama chat API](https://docs.ollama.com/api/chat)
 - [Ollama on Windows](https://docs.ollama.com/windows)
 - [Qwen3 4B model](https://ollama.com/library/qwen3:4b-instruct-2507-q4_K_M)
@@ -87,3 +103,5 @@ Images and raw screen context are request-scoped and excluded from persisted con
 - [Android SpeechRecognizer](https://developer.android.com/reference/android/speech/SpeechRecognizer)
 
 Third-party dependencies remain under their respective licenses. The Windows runtime's license and notices are included with its distribution. Ollama and model weights are downloaded separately from their official sources.
+
+Current local Windows update: [0.4.0 behavior](docs/Windows-0.4.0.md), [local Whisper](docs/Whisper-local.md), and [pinned Clicky comparison](docs/Clicky-comparison-0.4.md).

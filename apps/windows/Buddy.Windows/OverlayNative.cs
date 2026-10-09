@@ -14,6 +14,7 @@ internal static class OverlayNative
     [DllImport("user32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)] private static extern bool GetMonitorInfoW(IntPtr monitor, ref MonitorInfo info);
     [DllImport("user32.dll")] private static extern uint GetDpiForWindow(IntPtr window);
     [DllImport("user32.dll")] private static extern bool GetWindowRect(IntPtr window, out Rect rect);
+    [DllImport("user32.dll",CharSet=CharSet.Unicode)] private static extern int GetClassName(IntPtr window,System.Text.StringBuilder text,int length);
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")] private static extern IntPtr GetWindowLongPtr(IntPtr window, int index);
     [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW")] private static extern IntPtr SetWindowLongPtr(IntPtr window, int index, IntPtr value);
     [DllImport("user32.dll")] private static extern bool SetWindowPos(IntPtr window, IntPtr after, int x, int y, int width, int height, uint flags);
@@ -27,21 +28,43 @@ internal static class OverlayNative
         return new(fallback.Left, fallback.Top, fallback.Width, fallback.Height);
     }
     internal static double Scale(IntPtr window) => Math.Max(96, GetDpiForWindow(window)) / 96.0;
-    internal static void Configure(IntPtr window, bool clickThrough)
+    internal static void Configure(IntPtr window, bool clickThrough, bool noActivate = false)
     {
         long style = GetWindowLongPtr(window, -20).ToInt64() | 0x80; // tool window
+        style &= ~(0x20L | 0x08000000L); // Restore interactivity when a temporary visual pointer ends.
+        if (noActivate) style |= 0x08000000;
         if (clickThrough) style |= 0x08000000 | 0x20 | 0x80000; // no-activate, transparent, layered
         SetWindowLongPtr(window, -20, new IntPtr(style));
-        Native.SetWindowDisplayAffinity(window, 0x11);
+        CaptureProtection.Apply(window);
     }
     internal static void Place(Window window, Point point)
+        => Move(window, Position(window, point));
+    internal static PixelPosition Position(Window window, Point point)
     {
         var handle = new WindowInteropHelper(window).EnsureHandle();
         double scale = Scale(handle);
         double width = window.Width * scale, height = window.Height * scale;
         if (GetWindowRect(handle, out var rect) && rect.Right > rect.Left && rect.Bottom > rect.Top)
         { width = rect.Right - rect.Left; height = rect.Bottom - rect.Top; }
-        var position = OverlayPlacement.NearPointer(point.X, point.Y, width, height, WorkArea(point), scale);
+        return OverlayPlacement.NearPointer(point.X, point.Y, width, height, WorkArea(point), scale);
+    }
+    internal static void Move(Window window, PixelPosition position)
+    {
+        var handle = new WindowInteropHelper(window).EnsureHandle();
         SetWindowPos(handle, new IntPtr(-1), (int)Math.Round(position.X), (int)Math.Round(position.Y), 0, 0, 0x0010 | 0x0001);
+    }
+    internal static bool IsFullscreenForeground()
+    {
+        var window = Native.GetForegroundWindow();
+        if (window == IntPtr.Zero || Native.IsOwnWindow(window) || !GetWindowRect(window, out var rect)) return false;
+        var info = new MonitorInfo { Size = Marshal.SizeOf<MonitorInfo>() };
+        if (!GetMonitorInfoW(MonitorFromPoint(new Point { X = (rect.Left + rect.Right) / 2, Y = (rect.Top + rect.Bottom) / 2 }, 2), ref info)) return false;
+        var name=new System.Text.StringBuilder(256);GetClassName(window,name,name.Capacity);
+        return FullscreenPolicy.Suppress(name.ToString(),GetWindowLongPtr(window,-16).ToInt64(),rect.Left <= info.Monitor.Left && rect.Top <= info.Monitor.Top && rect.Right >= info.Monitor.Right && rect.Bottom >= info.Monitor.Bottom);
+    }
+    internal static void SetBounds(Window window, int x, int y, int width, int height)
+    {
+        var handle = new WindowInteropHelper(window).EnsureHandle();
+        SetWindowPos(handle, new IntPtr(-1), x, y, width, height, 0x0010);
     }
 }

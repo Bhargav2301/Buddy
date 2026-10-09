@@ -1,0 +1,5 @@
+# Owner-supplied Buddy artwork
+
+`Buddy.png` is an unmodified copy of `mint-green-slime-character.png`, explicitly supplied and approved by the repository owner for Buddy branding and this source update. SHA-256: E675CA4CF129CB57784964F1600A44CAD725BFA2442AF8D7830DD0220CF5192D. No third-party artwork license is inferred from that permission.
+
+The character already includes eyes and a mouth. Static branding keeps that image unchanged. The runtime companion masks just those facial regions with sampled mint gradients, then animates the separately supplied eye pair (`Expressions/eyes.png`, originally `cartoon-eyes-1.png`) and mouth (`Expressions/mouth.png`, originally `smiling-mouth.png`) once. A clean faceless plate was not supplied; slight texture seams can appear enlarged. Reduced motion draws the original image. The photo's beige background and Grok watermark are not used as application branding. `Buddy.ico` packages scaled, aspect-preserving copies at 16, 24, 32, 48, 64, 128 and 256 pixels. No new artwork is generated. Reproduce with `scripts/build-branding.ps1`.

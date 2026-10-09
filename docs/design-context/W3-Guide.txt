@@ -1,0 +1,66 @@
+Figma file JzvFxWvZqgP0d6fNYMgxHa, node 5:67. Extracted 2026-09-30.
+Reference only; native WPF adaptation is in apps/windows.
+
+const assetPathPrefix = "https://www.figma.com/api/mcp/asset/f078ee9e-746e-442a-9c7e-2c142ed74e96";
+const imgEllipse = `${assetPathPrefix}/5d71e.svg`;
+const imgEllipse1 = `${assetPathPrefix}/1cced.svg`;
+
+export default function W3GuidePointing() {
+  return (
+    <a className="bg-[#1e293b] block cursor-pointer relative size-full" data-node-id="5:67" data-name="W3 Guide / Pointing">
+      <div className="absolute bg-[#0b1220] h-[40px] left-0 top-[860px] w-[1440px]" data-node-id="5:68" data-name="Rectangle" />
+      <div className="absolute bg-[#f1f5f9] h-[560px] left-[260px] rounded-[8px] top-[80px] w-[920px]" data-node-id="5:69" data-name="Rectangle" />
+      <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[36px] left-[300px] rounded-[6px] top-[160px] w-[120px]" data-node-id="5:70" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[332px] not-italic text-[#111827] text-[14px] text-left top-[168px] whitespace-nowrap" data-node-id="5:71">
+        Export
+      </p>
+      <div className="absolute h-[64px] left-[286px] top-[146px] w-[148px]" data-node-id="5:72" data-name="Ellipse">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgEllipse} />
+      </div>
+      <div className="absolute left-[430px] size-[40px] top-[220px]" data-node-id="5:73" data-name="Ellipse">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgEllipse1} />
+      </div>
+      <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Bold'] font-bold h-[16px] leading-[normal] left-[450px] not-italic text-[10px] text-center text-white top-[232px] w-[40px]" data-node-id="5:74">
+        ^ w ^
+      </p>
+      <div className="[word-break:break-word] absolute bg-white h-[140px] leading-[normal] left-[800px] not-italic overflow-clip rounded-[12px] text-left top-[360px] w-[360px] whitespace-nowrap" data-node-id="5:75" data-name="Frame">
+        <p className="absolute font-['Inter:Medium'] font-medium left-[16px] text-[#20b8a6] text-[12px] top-[12px]" data-node-id="5:76">
+          Step 2 of 5
+        </p>
+        <p className="absolute font-['Inter:Regular'] font-normal left-[16px] text-[#111827] text-[14px] top-[36px]" data-node-id="5:77">
+          Click Export. I ringed it.
+        </p>
+        <p className="absolute font-['Inter:Regular'] font-normal left-[16px] text-[#111827] text-[14px] top-[58px]" data-node-id="5:78">
+          Then pick CSV in the menu.
+        </p>
+      </div>
+      <div className="absolute bg-[#ccfbf1] content-stretch flex h-[100px] items-start left-[816px] overflow-clip px-[10px] py-[5px] rounded-[999px] top-[464px]" data-node-id="5:79" data-name="Frame">
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[#0f766e] text-[12px] text-left whitespace-nowrap" data-node-id="5:80">
+          Back
+        </p>
+      </div>
+      <div className="absolute bg-[#ccfbf1] content-stretch flex h-[100px] items-start left-[876px] overflow-clip px-[10px] py-[5px] rounded-[999px] top-[464px]" data-node-id="5:81" data-name="Frame">
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[#0f766e] text-[12px] text-left whitespace-nowrap" data-node-id="5:82">
+          Next
+        </p>
+      </div>
+      <div className="absolute bg-[#ccfbf1] content-stretch flex h-[100px] items-start left-[936px] overflow-clip px-[10px] py-[5px] rounded-[999px] top-[464px]" data-node-id="5:83" data-name="Frame">
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[#0f766e] text-[12px] text-left whitespace-nowrap" data-node-id="5:84">
+          Skip
+        </p>
+      </div>
+    </a>
+  );
+}
+
+SUPER CRITICAL: The generated React+Tailwind code MUST be converted to match the target project's technology stack and styling system.
+1. Analyze the target codebase to identify: technology stack, styling approach, component patterns, and design tokens
+2. Convert React syntax to the target framework/library
+3. Transform all Tailwind classes to the target styling system while preserving exact visual design
+4. Follow the project's existing patterns and conventions
+DO NOT install any Tailwind as a dependency unless the user instructs you to do so.
+
+
+Node ids have been added to the code as data attributes, e.g. `data-node-id="1:2"`.
+
+Images and SVGs will be stored as constants, e.g. const image = `${assetPathPrefix}/<asset file name>`, where assetPathPrefix is declared once at the top of the code and every asset URL interpolates it. These constants will be used in the code as the source for the image, ex: <img src={image} />. Image assets are stored on a remote server for 7 days and can be fetched using the provided URLs until they expire.

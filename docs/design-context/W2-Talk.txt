@@ -1,0 +1,57 @@
+Figma file JzvFxWvZqgP0d6fNYMgxHa, node 5:51. Extracted 2026-09-30.
+Reference only; native WPF adaptation is in apps/windows.
+
+const assetPathPrefix = "https://www.figma.com/api/mcp/asset/4a1d3e50-d595-43fc-817f-4c20e64b75e1";
+const imgEllipse = `${assetPathPrefix}/2f2b4.svg`;
+const imgEllipse1 = `${assetPathPrefix}/fc18a.svg`;
+const imgEllipse2 = `${assetPathPrefix}/1cced.svg`;
+
+export default function W2TalkWithScreen() {
+  return (
+    <a className="bg-[#1e293b] block cursor-pointer relative size-full" data-node-id="5:51" data-name="W2 Talk with screen">
+      <div className="absolute bg-[#0b1220] h-[40px] left-0 top-[860px] w-[1440px]" data-node-id="5:52" data-name="Rectangle" />
+      <div className="absolute bg-[#f1f5f9] h-[560px] left-[260px] rounded-[8px] top-[80px] w-[920px]" data-node-id="5:53" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[280px] not-italic text-[#111827] text-[13px] text-left top-[92px] whitespace-pre" data-node-id="5:54">{`Book1.xlsx  -  Excel`}</p>
+      <div className="absolute bg-white border border-[#e5e7eb] border-solid h-[36px] left-[300px] rounded-[6px] top-[160px] w-[120px]" data-node-id="5:55" data-name="Rectangle" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[332px] not-italic text-[#111827] text-[14px] text-left top-[168px] whitespace-nowrap" data-node-id="5:56">
+        Export
+      </p>
+      <div className="absolute border-4 border-[#20b8a6] border-solid h-[568px] left-[256px] rounded-[8px] top-[76px] w-[928px]" data-node-id="5:57" data-name="Rectangle" />
+      <div className="absolute bg-[#ccfbf1] content-stretch flex gap-[8px] h-[100px] items-start left-[620px] overflow-clip pl-[12px] pr-[14px] py-[6px] rounded-[999px] top-[36px]" data-node-id="5:58" data-name="Frame">
+        <div className="relative shrink-0 size-[8px]" data-node-id="5:59" data-name="Ellipse">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgEllipse} />
+        </div>
+        <p className="[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[#0f766e] text-[12px] text-left whitespace-pre" data-node-id="5:60">{`Looking  -  Excel - Book1`}</p>
+      </div>
+      <div className="absolute left-[1174px] size-[52px] top-[514px]" data-node-id="5:61" data-name="Ellipse">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgEllipse1} />
+      </div>
+      <div className="absolute left-[1180px] size-[40px] top-[520px]" data-node-id="5:62" data-name="Ellipse">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgEllipse2} />
+      </div>
+      <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Bold'] font-bold h-[16px] leading-[normal] left-[1200px] not-italic text-[10px] text-center text-white top-[532px] w-[40px]" data-node-id="5:63">
+        o o
+      </p>
+      <div className="[word-break:break-word] absolute bg-white h-[100px] leading-[normal] left-[800px] not-italic overflow-clip rounded-[12px] text-left top-[400px] w-[360px]" data-node-id="5:64" data-name="Frame">
+        <p className="absolute font-['Inter:Medium'] font-medium left-[16px] text-[#20b8a6] text-[12px] top-[14px] whitespace-nowrap" data-node-id="5:65">
+          Listening
+        </p>
+        <p className="absolute font-['Inter:Regular'] font-normal h-[40px] left-[16px] text-[#111827] text-[14px] top-[40px] w-[328px]" data-node-id="5:66">
+          What does this Export button do?
+        </p>
+      </div>
+    </a>
+  );
+}
+
+SUPER CRITICAL: The generated React+Tailwind code MUST be converted to match the target project's technology stack and styling system.
+1. Analyze the target codebase to identify: technology stack, styling approach, component patterns, and design tokens
+2. Convert React syntax to the target framework/library
+3. Transform all Tailwind classes to the target styling system while preserving exact visual design
+4. Follow the project's existing patterns and conventions
+DO NOT install any Tailwind as a dependency unless the user instructs you to do so.
+
+
+Node ids have been added to the code as data attributes, e.g. `data-node-id="1:2"`.
+
+Images and SVGs will be stored as constants, e.g. const image = `${assetPathPrefix}/<asset file name>`, where assetPathPrefix is declared once at the top of the code and every asset URL interpolates it. These constants will be used in the code as the source for the image, ex: <img src={image} />. Image assets are stored on a remote server for 7 days and can be fetched using the provided URLs until they expire.

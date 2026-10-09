@@ -1,0 +1,4 @@
+C:\Program Files\dotnet\sdk\10.0.302\NuGet.targets(782,5): error : Failed to read NuGet.Config due to unauthorized access. Path: 'C:\Users\bharg\AppData\Roaming\NuGet\NuGet.Config'. [C:\Users\bharg\Documents\Codex\2026-10-03\task\workers\qa53\tests\validation\Buddy.Followup54Boundary.Tests\Buddy.Followup54Boundary.Tests.csproj]
+C:\Program Files\dotnet\sdk\10.0.302\NuGet.targets(782,5): error :   Access to the path 'C:\Users\bharg\AppData\Roaming\NuGet\NuGet.Config' is denied. [C:\Users\bharg\Documents\Codex\2026-10-03\task\workers\qa53\tests\validation\Buddy.Followup54Boundary.Tests\Buddy.Followup54Boundary.Tests.csproj]
+
+The build failed. Fix the build errors and run again.

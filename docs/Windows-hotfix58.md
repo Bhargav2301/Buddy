@@ -1,0 +1,15 @@
+# Buddy 0.4.8 focused local candidate
+
+This candidate combines the previously approved comparison-refinement repair with guarded Calculator restoration. It is based on local source f8c56b90f6d80479717d0988182ba37492d998f1; server source remains byte-identical to the approved refinement commit cebb4650c12de0376dd6cb0bceeee26c32c6a41d. No unfinished followup55 or wider feature work was incorporated.
+
+Calculator is activated once through its verified Windows registration. The returned process and unique window are pinned; a minimized root may be restored once and receive at most one ordinary foreground request. The original input, Agent/privacy, desktop/elevation, identity, checkpoint/deadline, settlement and no-retry guards remain. Strict final foreground verification is mandatory. See [implementation and native acceptance limits](Windows-calculator-activation58.md).
+
+All 59 final nonforeground regression commands passed with unchanged build inputs. This includes 432 app-binding, 132 controller/owned-file, 82 reporting checks and 56 user-boundary cases. Final package metadata/dependency validation and the packaged native OCR dependency probe passed without desktop startup. All 3,754 reused voice/model/runtime/license assets were hash-verified from the preserved package; none were downloaded or changed.
+
+The exact final 0.4.8 service accepted the reported comparison prompt using the existing local gemma3:4b and all-minilm:22m models in 18.505 seconds, with similarity 0.9005715024022094. This used isolated test state, no saved-profile/credential decoding, no source-field writes and no cloud route. It validates the service result, not interactive source-field acceptance.
+
+The preview, acceptance copy and installable copy are separately sealed under release/Buddy-0.4.8-hotfix58-*. Their exact byte maps, source archive, build snapshot and local source commit are recorded in Build-Info.json and private validation/hotfix58 receipts. Preview and acceptance copies retain .buddy-preview and isolated data. The installable copy is reserved for the already-authorized, coordinated transaction after all gates pass.
+
+Native Calculator acceptance, preview Home checks and the backed-up installed update are not performed by packaging. Fresh private helpers retain a new one-use attempt, an immutable deadline created only at local START, current-profile/shortcut preservation, exact file checks and the official rollback restrictions. The consumed hotfix57 attempt and deadline are never reset or reused. Final workflow readiness and current measurements are recorded outside source in validation/hotfix58; do not infer live readiness from older hotfix57 reports.
+
+Installed Buddy 0.4.5, current preferences, old sealed candidates and historical evidence remain preserved. No live activation, restoration, focus change or installed replacement ran during this preparation. No push, PR change, merge or release occurred; publication remains independently blocked through the previously denied route. A fresh coordinated desktop session is still required before the local workflow starts.

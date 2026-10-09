@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../services/Buddy.Server/Buddy.Server.csproj" />
+    <Compile Include="../../apps/windows/Buddy.Windows/CompanionPresentation.cs" Link="CompanionPresentation.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/LocalTaskJournal.cs" Link="LocalTaskJournal.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/NotchInteractionState.cs" Link="NotchInteractionState.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/NotchChatSession.cs" Link="NotchChatSession.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/NotchNoteStore.cs" Link="NotchNoteStore.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/NotchTextInbox.cs" Link="NotchTextInbox.cs" />
+    <Compile Include="../../apps/windows/Buddy.Windows/RefinementResourceReader.cs" Link="RefinementResourceReader.cs" />
+  </ItemGroup>
+</Project>
