@@ -1,3 +1,9 @@
+# Current: 0.1.3 live check completed; 0.1.4 composer detection candidate
+
+The user reported a successful 0.1.3 structural observation and confirmed that its zero composer count occurred with the new-chat message box visible. R02 did not recur in this attempt; composer detection failed. No live DOM was inspected by the assistant. File inputs 2+ count controls, not attachments.
+
+PROBE-014 /root broadens provisional composer detection using actual HTML editability, form ancestry and accessible textbox roles, with hidden/disabled/nested exclusions and clearer result interpretation. 210 Node cases and 28 owned offline Chrome DOM cases pass. A fresh 0.1.4 package preserves the 0.1.2/0.1.3 artifacts. Live recognition of the user's editor remains unverified. No installed Windows, native host or full adapter activation changed; Windows remains 0.4.8. See [the current report](../Browser-readiness-0.1.4.md). Older pending-live statements below describe their original checkpoints.
+
 # Current: readiness probe 0.1.3 implemented; live popup acceptance pending
 
 PROBE-013 is owned and integrated by `/root` in the canonical checkout. The user reported R02 from probe0.1.2. The standalone replacement at `integrations/readiness-probe` implements direct popup ownership, exact window/tab/document binding and immediate cancellation without a background worker. The old focus predicate and early Disconnect/session-resurrection race were reproduced against preserved0.1.2 using synthetic APIs.

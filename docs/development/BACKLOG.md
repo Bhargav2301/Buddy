@@ -1,3 +1,10 @@
+# Composer observation follow-up
+
+- PROBE-014 /root: recorded the user's successful 0.1.3 live structural check and visible new-chat composer false negative; implemented broader provisional detection and clearer count interpretation.
+- Source checks pass: 210 Node cases and 28 owned offline Chrome DOM cases. Fresh 0.1.4 packaging preserves older artifacts.
+- Next live acceptance: one user-invoked 0.1.4 check with the same new-chat composer visible. Exact live markup is unknown; no provider identity, history or attachment acceptance follows from the counts.
+- The full adapter and Windows MVP gaps remain separate. [Current report](../Browser-readiness-0.1.4.md).
+
 # Readiness R02 repair checkpoint
 
 - PROBE-013 /root: direct-popup read-only probe, cancellation, fixed diagnostics, package builder and CI regression job implemented;100 new and107 existing synthetic browser cases pass.

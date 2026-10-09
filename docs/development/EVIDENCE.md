@@ -1,3 +1,9 @@
+# Probe0.1.4 and user observation — October 9
+
+User-reported real0.1.3 check: editors0, roles0, users0, assistants0, file inputs2+, streamingfalse, conversationroutefalse. User confirmed the new-chat message box was visible. This run passed its structural path; it did not recognize the editor. No assistant live DOM inspection occurred.
+
+Candidate0.1.4:210/210 synthetic Node cases pass, plus28/28 actual owned offline Chrome DOM cases. The latter uses fresh headless context, intercepted fixture HTML, actual layout/editability and throwing private-content getters; zero content reads, input/submit events and DOM writes. This is isolated native-browser evidence, not a live provider check. Root integration review only. Exact receipts/source hashes are local under `diagnostics/readiness-014`; [report and limits](../Browser-readiness-0.1.4.md).
+
 # Probe0.1.3 evidence — October 9
 
 Preserved0.1.2 synthetic reproduction: false window focus yieldsR02 before injection; Disconnect during the first pending window call still permits later injection/read and session recreation. Source hashes and reproduction receipt are local in `diagnostics/readiness-013/legacy-reproduction.json`.

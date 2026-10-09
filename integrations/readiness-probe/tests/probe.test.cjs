@@ -123,15 +123,16 @@ test('dispose removes handlers and refuses future use',async()=>{
   assert.equal((await f.probe.run()).diagnostic,'R31');assert.equal(f.calls.length,0);
 });
 test('UI uses explicit version and no raw errors or observation fields',()=>{
-  assert.match(describe(observed()),/probe 0.1.3/);assert.ok(!diagnostic('private browser error').includes('private browser error'));
+  assert.match(describe(observed()),/probe 0.1.4/);assert.ok(!diagnostic('private browser error').includes('private browser error'));
   assert.match(describe({...observed(),privateText:'SECRET'}),/R23/);assert.ok(!describe({...observed(),privateText:'SECRET'}).includes('SECRET'));
 });
 function inspectFixture(nodes,options={}) {
   let index=0,readText=0;
   const href='https://chatgpt.com/c/11111111-1111-1111-1111-111111111111';
   for(const node of nodes) {
-    node.isConnected=true;node.hidden=false;node.getClientRects=()=>node.invisible?[]:[{}];
-    node.matches=selector=>selector.startsWith('#prompt')?!!node.editor:selector.startsWith('form')?!!node.file:!!node.streaming;
+    node.isConnected=true;node.isContentEditable=!!node.editor;node.getClientRects=()=>node.invisible?[]:[{width:100,height:30}];
+    node.closest=()=>null;
+    node.matches=selector=>selector==='#prompt-textarea'?!!node.editor:selector===':disabled'?false:selector.startsWith('form')?!!node.file:!!node.streaming;
     node.hasAttribute=name=>name==='data-message-author-role'&&node.role!==undefined;
     node.getAttribute=name=>name==='data-message-author-role'?node.role:null;
     for(const name of ['textContent','innerText','value','files'])Object.defineProperty(node,name,{get(){readText++;throw Error('PRIVATE');}});
@@ -162,7 +163,7 @@ test('node/time limits refuse instead of returning partial counts',()=>{
 });
 test('package has no background worker, content listener, native host or broad permissions',()=>{
   const manifest=JSON.parse(fs.readFileSync(require.resolve('../manifest.json'),'utf8'));
-  assert.equal(manifest.version,'0.1.3');assert.deepEqual(manifest.permissions,['activeTab','scripting']);
+  assert.equal(manifest.version,'0.1.4');assert.deepEqual(manifest.permissions,['activeTab','scripting']);
   for(const key of ['background','content_scripts','host_permissions','externally_connectable'])assert.equal(manifest[key],undefined);
   const source=fs.readFileSync(require.resolve('../probe.js'),'utf8')+fs.readFileSync(require.resolve('../popup.js'),'utf8');
   assert.doesNotMatch(source,/connectNative|sendNativeMessage|sendMessage\(|\.fetch\(|fetch\(|localStorage|\.submit\(|\.click\(|dispatchEvent\(/);
@@ -189,5 +190,12 @@ test('popup close disposes its owner and suppresses the pending result',async()=
 });
 test('popup failure shows a versioned fixed code and re-enables a deliberate new check',async()=>{
   const f=popupFixture();const task=f.elements.check.handlers.click();f.settle({ok:false,diagnostic:'R02',privateError:'SECRET'});await task;
-  assert.match(f.elements.status.textContent,/R02 \(probe 0.1.3\)/);assert.ok(!f.elements.status.textContent.includes('SECRET'));assert.equal(f.elements.check.disabled,false);
+  assert.match(f.elements.status.textContent,/R02 \(probe 0.1.4\)/);assert.ok(!f.elements.status.textContent.includes('SECRET'));assert.equal(f.elements.check.disabled,false);
 });
+
+for(const [count, expected] of [[0,/does not prove the message box is absent/],[1,/draft access is not verified/],[2,/composer is ambiguous/]])
+  test('reported editor count '+count+' does not grant a provider capability',()=>{
+    const text=describe({...observed(),editorCandidates:count,fileInputCandidates:2,stableConversationRoute:false});
+    assert.match(text,expected);assert.match(text,/controls, not attachments/);assert.match(text,/only \/c\/UUID/);
+    assert.match(text,/capabilities remain unavailable/);
+  });

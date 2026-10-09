@@ -1,5 +1,7 @@
 # Readiness probe 0.1.3 — R02 and early Disconnect repair
 
+**October 9 follow-up:** the user reported a successful live 0.1.3 check, with a missed visible new-chat composer. See [0.1.4 follow-up](Browser-readiness-0.1.4.md). The pending-live statements below describe the original build checkpoint.
+
 The reported **R02 / 0.1.2** stops before tab lookup or script injection. It establishes that the old background-worker browser-focus predicate failed; the screenshot and code do not identify the exact live cause.
 
 The preserved 0.1.2 code also has a reproducible early-Disconnect race: Disconnect during its initial window lookup leaves no session to close, then the resumed lookup can inject, read structure and recreate a session. Both the R02 predicate and the race were reproduced using synthetic Chrome APIs against the original hashed files. No live browser was operated.

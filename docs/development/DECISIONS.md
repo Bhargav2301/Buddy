@@ -1,3 +1,9 @@
+# Provisional editor detection — October 9
+
+Treat the successful user-reported 0.1.3 observation as evidence that this attempt passed the focus/structural path, not as complete popup or provider acceptance. The user confirmed a visible new-chat editor; its zero count is a detection miss. Keep the original seven-field schema and content-free read boundary.
+
+Use actual isContentEditable state and count editing hosts/textarea controls with a legacy ID, form ancestry or textbox role. These are candidates; broad structure is not a verified ChatGPT composer identity. Do not read labels/placeholders/drafts to make the count appear successful. Keep zero/one/multiple interpretations explicit, retain bounded traversal and require live evidence before claiming the editor issue resolved. Preserve previous package versions.
+
 # Direct popup readiness repair — October 9
 
 Implement the narrow probe as a standalone extension with no background worker or account/native-host path. Accept a false browser parent focus flag only when the genuine packaged toolbar popup is itself focused/visible and bound to the same current/last-focused window and selected document. Do not remove focus checks globally or infer permission from a last-focused window alone.

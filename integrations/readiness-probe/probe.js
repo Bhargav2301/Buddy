@@ -1,6 +1,6 @@
 (function (root) {
   'use strict';
-  const VERSION = '0.1.3';
+  const VERSION = '0.1.4';
   const counts = Object.freeze({editorCandidates: 2, renderedRoleNodes: 513,
     renderedUserCount: 513, renderedAssistantCount: 513, fileInputCandidates: 2});
   const flags = ['streamingIndicatorPresent', 'stableConversationRoute'];
@@ -56,7 +56,11 @@
       'File input elements: ' + count('fileInputCandidates'),
       'Streaming indicator present: ' + (safe.streamingIndicatorPresent ? 'yes' : 'no'),
       'Conversation-shaped URL: ' + (safe.stableConversationRoute ? 'yes' : 'no'),
+      safe.editorCandidates === 0 ? 'No supported visible editor was detected; this does not prove the message box is absent.' :
+        safe.editorCandidates === 1 ? 'One provisional editor candidate was detected; draft access is not verified.' :
+          'Multiple editor candidates were detected; the composer is ambiguous.',
       '+ means at least that many. Counts do not prove complete history.',
+      'File inputs count controls, not attachments. The URL check recognizes only /c/UUID routes.',
       'Live account, history, draft and attachment capabilities remain unavailable.',
       'No chat text, draft, account details or file contents were read. Nothing was sent.'].join('\n');
   }
@@ -72,17 +76,29 @@
       renderedAssistantCount: 0, fileInputCandidates: 0, streamingIndicatorPresent: false,
       stableConversationRoute: /^\/c\/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\/?$/i.test(url.pathname)};
     function visible(node) {
-      if (!node.isConnected || node.hidden || node.getAttribute('aria-hidden') === 'true') return false;
+      if (!node.isConnected || node.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
       const style = getComputedStyle(node);
       return style.display !== 'none' && style.visibility !== 'hidden' &&
-        style.visibility !== 'collapse' && node.getClientRects().length > 0;
+        style.visibility !== 'collapse' && style.opacity !== '0' &&
+        Array.from(node.getClientRects()).some(rect => rect.width > 0 && rect.height > 0);
+    }
+    function composerCandidate(node) {
+      // isContentEditable handles empty/plaintext-only/inherited HTML states.
+      // Count editing hosts, not their editable descendants. No labels or values.
+      const textarea = node.localName === 'textarea';
+      const editingHost = node.isContentEditable === true && node.parentElement?.isContentEditable !== true;
+      if (!textarea && !editingHost) return false;
+      if (!node.matches('#prompt-textarea') && !node.closest('form') && node.getAttribute('role') !== 'textbox') return false;
+      if (node.matches(':disabled') || node.readOnly === true ||
+          node.closest('[aria-disabled="true"], [aria-readonly="true"]')) return false;
+      return visible(node);
     }
     const start = performance.now();
     const walker = document.createTreeWalker(document.documentElement, NodeFilter.SHOW_ELEMENT);
     let node = walker.currentNode, visited = 0;
     while (node) {
       if (++visited > 8000 || performance.now() - start > 100) return {ok: false, reason: 'limit'};
-      if (result.editorCandidates < 2 && node.matches('#prompt-textarea[contenteditable="true"], textarea#prompt-textarea') && visible(node)) result.editorCandidates++;
+      if (result.editorCandidates < 2 && composerCandidate(node)) result.editorCandidates++;
       if (node.hasAttribute('data-message-author-role')) {
         result.renderedRoleNodes = Math.min(513, result.renderedRoleNodes + 1);
         const role = node.getAttribute('data-message-author-role');
