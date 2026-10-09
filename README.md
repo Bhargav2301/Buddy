@@ -1,3 +1,5 @@
+Current continuation: [installed update and OCR text correction](docs/Continuation63.md).
+
 # Buddy
 
 Native Windows and Android applications backed by an AI model running on the user's Windows PC.

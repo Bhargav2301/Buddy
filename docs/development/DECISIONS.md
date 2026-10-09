@@ -1,3 +1,9 @@
+# Explicit installed update and human OCR correction — October 9
+
+The current user request authorizes installed app updates and GitHub pushes. Use the existing staged installer and preserve rollback and user data; this replaces the older installation hold. Do not infer permission to transmit private browser data or change account grants.
+
+Make the observed OCR error directly correctable against the original selected image. Keep human correction distinct from automatic recognition; preserve image bytes and first-extraction provenance, bind edits to an exact revision, invalidate old prepared context, and require separate review. Reset/Cancel must not mutate the workspace. No guessed digit substitution or recognition-accuracy claim.
+
 # Continue useful local work without weakening browser admission — October9
 
 The comprehensive handoff confirms source checkpoint pushes on the existing feature branch/PR; update the stale machine-readable publication field accordingly while retaining installation/live Calculator holds. Continue in the clean canonical checkout; no new fork or reset is needed.

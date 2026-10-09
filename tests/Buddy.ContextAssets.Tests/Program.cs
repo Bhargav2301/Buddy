@@ -9,7 +9,7 @@ internal static class Program
     private static int checks;
     private static int Main()
     {
-        try{Ownership();WorkspaceLifecycle();ImagesAndDelivery();Bounds();ExactSelectedUrls();Console.WriteLine($"PASS: {checks} original-asset assertions. In-memory synthetic bytes only; no decoder, files, transport or upload.");return 0;}
+        try{Ownership();WorkspaceLifecycle();ImagesAndDelivery();Bounds();ExactSelectedUrls();OcrCorrections();Console.WriteLine($"PASS: {checks} original-asset assertions. In-memory synthetic bytes only; no decoder, files, transport or upload.");return 0;}
         catch(Exception e){Console.Error.WriteLine(e);return 1;}
     }
     private static void Check(bool value,string label){if(!value)throw new Exception("FAIL: "+label);checks++;Console.WriteLine("PASS: "+label);}
@@ -50,6 +50,48 @@ internal static class Program
         foreach(var name in new[]{"../secret.txt","C:\\secret.txt","bad\nname.txt",".."})Reject(()=>ContextOriginalAsset.CreateCopy([1],name,"text/plain"),"Unsafe asset display name is refused");
         Reject(()=>ContextOriginalAsset.CreateCopy([1],"archive.zip","application/zip"),"Unsupported asset MIME type cannot be retained");
         Reject(()=>ContextOriginalAsset.CreateCopy([],"empty.png","image/png"),"An empty original cannot masquerade as a supported asset");
+    }
+    private static void OcrCorrections()
+    {
+        using var w=new RefinementWorkspace();var scope=Scope("ocr-correction");var other=Scope("other-ocr");w.Open(scope);w.Open(other);
+        using var asset=ContextOriginalAsset.CreateCopy([1,2,3,4],"owned.png","image/png");
+        var state=Stage(w,scope,asset,"ALPHA 125",RefinementSourceKind.LocalOcr);var original=state.Sources.Single();var frozen=Freeze(w,scope);
+        using(var preview=w.RetainOcrOriginalForReview(scope,original.Id,original.ReviewDigest,state.Revision))
+            Check(preview.CopyBytes().SequenceEqual(new byte[]{1,2,3,4})&&w.IsCurrent(frozen),"Opening correction preview retains original bytes without changing reviewed context");
+        Reject(()=>w.CorrectOcrText(other,original.Id,original.ReviewDigest,"ALPHA 123",0),"Correction cannot cross chat scopes");
+        Reject(()=>w.CorrectOcrText(scope,original.Id,new string('0',64),"ALPHA 123",state.Revision),"Correction refuses a mismatched source digest");
+        foreach(string bad in new[]{"", "\0", "\ud800",new string('x',20001)})
+            Reject(()=>w.CorrectOcrText(scope,original.Id,original.ReviewDigest,bad,state.Revision),"Invalid correction leaves original context untouched");
+        var same=w.CorrectOcrText(scope,original.Id,original.ReviewDigest,original.Text,state.Revision);
+        Check(same.Revision==state.Revision&&same.Sources.Single().Reviewed&&!frozen.Invalidated.IsCancellationRequested,"Unchanged text does not revoke a valid review");
+        const string exact="ALPHA 123\r\nUnit: µm 👩‍💻\n";
+        state=w.CorrectOcrText(scope,original.Id,original.ReviewDigest,exact,state.Revision);var corrected=state.Sources.Single();
+        Check(corrected.Text==exact&&!corrected.Reviewed&&corrected.TextSha256!=original.TextSha256,"Correction preserves exact Unicode/newlines and requires fresh review");
+        Check(corrected.Id==original.Id&&corrected.OriginalAsset==original.OriginalAsset&&corrected.OriginalSha256==original.OriginalSha256&&corrected.OriginalBytes==original.OriginalBytes,"Correction preserves source identity and original image provenance");
+        Check(corrected.Correction==new OcrTextCorrection(original.TextSha256,original.ExtractionMethod)&&corrected.ExtractionMethod=="user-corrected-ocr-v1","Human correction retains first extraction digest and method distinctly");
+        Check(frozen.Invalidated.IsCancellationRequested&&!w.IsCurrent(frozen),"Correction immediately invalidates previously prepared context");
+        Reject(()=>ContextDeliveryPlan.Project(frozen),"An old draft cannot project text after correction");
+        Reject(()=>Freeze(w,scope),"Corrected text cannot be used before separate review");
+        Reject(()=>w.ReviewSource(scope,original.Id,original.ReviewDigest,state.Revision),"Original review digest cannot authorize corrected text");
+        state=w.ReviewSource(scope,corrected.Id,corrected.ReviewDigest,state.Revision);var fresh=Freeze(w,scope);
+        Check(fresh.Sources.Single().Text==exact&&ContextDeliveryPlan.Project(fresh).Ready,"Fresh explicit review admits the corrected text");
+        state=w.CorrectOcrText(scope,corrected.Id,corrected.ReviewDigest,"ALPHA 123",state.Revision);
+        Check(state.Sources.Single().Correction==corrected.Correction&&fresh.Invalidated.IsCancellationRequested,"Repeated edits retain first OCR provenance and revoke each old generation");
+        using(var bytes=w.RetainOcrOriginalForReview(scope,corrected.Id,state.Sources.Single().ReviewDigest,state.Revision))
+            Check(bytes.CopyBytes().SequenceEqual(new byte[]{1,2,3,4}),"Repeated text correction never rewrites retained image bytes");
+        var stale=state;w.Clear(scope);
+        Reject(()=>w.CorrectOcrText(scope,corrected.Id,stale.Sources.Single().ReviewDigest,"late",stale.Revision),"Clear prevents late correction from resurrecting a source");
+        state=w.StageSource(scope,new("Unretained OCR","text",RefinementSourceKind.LocalOcr),w.Snapshot(scope).Revision);
+        Reject(()=>w.CorrectOcrText(scope,state.Sources[0].Id,state.Sources[0].ReviewDigest,"new",state.Revision),"Correction requires a retained original image");
+        w.Clear(scope);state=w.StageSource(scope,new("Plain text","text"),w.Snapshot(scope).Revision);
+        Reject(()=>w.CorrectOcrText(scope,state.Sources[0].Id,state.Sources[0].ReviewDigest,"new",state.Revision),"Plain text cannot acquire OCR correction provenance");
+        w.Clear(scope);state=Stage(w,scope,asset,"ALPHA 125",RefinementSourceKind.LocalOcr,original:true);
+        var requiring=state.Sources.Single();state=w.CorrectOcrText(scope,requiring.Id,requiring.ReviewDigest,"ALPHA 123",state.Revision);
+        Check(state.Sources.Single().OriginalDeliveryRequired,"Editing OCR cannot clear the original-attachment requirement");
+        for(int i=0;i<6;i++)w.StageSource(scope,new("Large "+i,new string('a',20000)),w.Snapshot(scope).Revision);
+        w.StageSource(scope,new("Tail",new string('b',10000)),w.Snapshot(scope).Revision);state=w.Snapshot(scope);var item=state.Sources[0];
+        Reject(()=>w.CorrectOcrText(scope,item.Id,item.ReviewDigest,new string('c',20000),state.Revision),"Correction observes total session UTF-8 capacity without dropping other sources");
+        Check(w.Snapshot(scope).Revision==state.Revision&&w.Snapshot(scope).Sources.Count==8,"Capacity refusal leaves all prior sources unchanged");
     }
     private static void WorkspaceLifecycle()
     {

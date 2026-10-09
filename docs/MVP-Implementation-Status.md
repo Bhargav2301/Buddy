@@ -1,3 +1,5 @@
+Current continuation: [installed update and OCR text correction](Continuation63.md).
+
 # Windows MVP implementation status
 
 This is an unreleased implementation increment toward the accepted Windows MVP plan, not a completed 0.5.0 release. Android wire compatibility is retained. Existing installed files and user data have not been replaced.

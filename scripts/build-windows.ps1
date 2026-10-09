@@ -16,10 +16,12 @@ dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Windows.IntegrationTests
 if ($LASTEXITCODE -ne 0) { throw 'Native OCR dependency or fixture tests failed.' }
 dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Assistant.Tests') -c Release -r win-x64 --self-contained true
 if ($LASTEXITCODE -ne 0) { throw 'Assistant safety and tool tests failed.' }
-foreach($buddySuite in @('Preview','Teaching','Optional','Qa','Execution','PlanningRepair','Staged','SpeechFeedback')) {
+foreach($buddySuite in @('Preview','Teaching','Optional','Qa','Execution','PlanningRepair','Staged','SpeechFeedback','ContextWorkspace','ContextAssets')) {
     dotnet run --project (Join-Path $buddyRoot ('tests\Buddy.'+$buddySuite+'.Tests')) -c Release -r win-x64 --self-contained true
     if($LASTEXITCODE -ne 0){throw ('Additional policy/service tests failed: '+$buddySuite)}
 }
+dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.RefinementFollowup.Tests\Unshown') -c Release
+if ($LASTEXITCODE -ne 0) { throw 'Unshown context/refinement window checks failed.' }
 dotnet run --project (Join-Path $buddyRoot 'tests\Buddy.Mvp.Tests') -c Release -r win-x64 --self-contained true
 if ($LASTEXITCODE -ne 0) { throw 'MVP workflow tests failed.' }
 dotnet publish (Join-Path $buddyRoot 'apps\windows\Buddy.Windows\Buddy.Windows.csproj') -c Release -r win-x64 --self-contained true -o $buddyOutput

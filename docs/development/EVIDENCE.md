@@ -1,3 +1,9 @@
+# Continuation63 implementation and initial installed acceptance
+
+Verified local upgrade 0.4.5 to continuation62 0.4.8/a80b143: installer exit0, previous binaries retained for rollback, three data files byte-identical before startup. The running executable is in the installed Programs/Buddy folder; Home and Settings navigation observed through supported Windows accessibility. No settings, private drafts or messages were changed.
+
+OCR correction validation passes:82 original-asset assertions,64 unshown WPF checks,77 workspace,69 browser-context and169 reply assertions. Self-contained Windows publish and package/type/native dependency probes pass. This is not automatic OCR accuracy, visible correction or general native acceptance. Exact local receipts and logs: `diagnostics/continuation63`. [Report](../Continuation63.md).
+
 # Continuation62 — source, isolated model and package evidence
 
 Base415fe28 matched canonical local/origin and passed prior PR37882669728/push37882666389 CI. New validation:169 planning/reply assertions; Preview45/Staged89/SpeechFeedback72/Teaching46/RegionResearch71 and core service pass;231 Node browser cases,69 broker,12 framing/14 selected-context checks and48 independent cases/81 assertions pass. Windows Release0warnings/errors; separate0.4.8 review package/type/dependency/native OCR-load checks pass. These are not physical/native workflow acceptance.

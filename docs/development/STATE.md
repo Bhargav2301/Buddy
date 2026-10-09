@@ -1,3 +1,7 @@
+# Current: authorized installed update and OCR correction63
+
+User authorization now covers installed updates and pushing source changes to the existing GitHub branch/PR. Continuation62 installed successfully over 0.4.5 with rollback retained; three saved data files were byte-identical before launch. Installed Home and Settings were observed working. OCR-63 adds original-image/text correction, zoom, exact provenance, fresh review and old-draft invalidation. 82 asset /64 unshown WPF /77 workspace /69 browser /169 reply checks and Windows package probes pass. Installing and visibly checking continuation63 is the next delivery step. No broader MVP acceptance is implied. [Report](../Continuation63.md).
+
 # Current: continuation62 requested-detail replies and browser contract audit
 
 The comprehensive October9 handoff matched clean canonical415fe28 and origin; its CI passed. REPLY-62 /root adds explicit detailed local replies (up to12 sentences /6,000 UTF-16 units), while ordinary/tighter/specialist limits remain. Token-budget termination is refused for every Ollama model path; incomplete/late replies are not saved. No stream contract or settings migration changed.

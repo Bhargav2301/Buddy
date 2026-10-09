@@ -7,6 +7,7 @@ namespace Buddy.Server;
 public sealed record RefinementChatScope(string Kind, string Id);
 public enum RefinementSourceKind { SelectedText, LocalTextFile, UserLink, LocalImage, LocalOcr }
 public enum RefinementTurnOrigin { BuddyCompleted, AdapterCompleted, UserImported }
+public sealed record OcrTextCorrection(string ExtractedTextSha256, string ExtractionMethod);
 public sealed record RefinementSourceInput(string Title, string Text, RefinementSourceKind Kind = RefinementSourceKind.SelectedText,
     bool Required = false, bool FullImageRequired = false, string? OriginalSha256 = null,
     long? OriginalBytes = null, string ExtractionMethod = "selected-text", string? SuppliedUrl = null,
@@ -14,7 +15,7 @@ public sealed record RefinementSourceInput(string Title, string Text, Refinement
 public sealed record RefinementSourceSnapshot(string Id, string Title, string Text, RefinementSourceKind Kind,
     bool Required, bool FullImageRequired, string OriginalSha256, string TextSha256, long OriginalBytes,
     string ExtractionMethod, string? SuppliedUrl, DateTimeOffset AddedAt, string ReviewDigest, bool Reviewed,
-    ContextOriginalAssetInfo? OriginalAsset = null, bool OriginalDeliveryRequired = false);
+    ContextOriginalAssetInfo? OriginalAsset = null, bool OriginalDeliveryRequired = false, OcrTextCorrection? Correction = null);
 public sealed record RefinementCompletedTurn(string Id, string UserText, string AssistantText,
     RefinementTurnOrigin Origin, DateTimeOffset CompletedAt, string ContentSha256);
 public sealed record RefinementWorkspaceSnapshot(RefinementChatScope Scope, long Revision,
@@ -139,6 +140,49 @@ public sealed class RefinementWorkspace : IDisposable
             previous = Advance(session); result = Copy(scope, session);
         }
         Cancel(previous); return result;
+    }
+
+    // Explicit human correction, never another OCR/model inference. Keep the
+    // original bytes and first extraction provenance; invalidate all old drafts.
+    public RefinementWorkspaceSnapshot CorrectOcrText(RefinementChatScope scope, string id, string reviewDigest,
+        string replacement, long expectedRevision)
+    {
+        ValidateText(replacement, MaximumTextCharacters, "Corrected text");
+        CancellationTokenSource previous; RefinementWorkspaceSnapshot result;
+        lock (gate) {
+            var session = Get(scope, expectedRevision);
+            var source = OcrSource(session, id, reviewDigest);
+            if (source.Text == replacement) return Copy(scope, session);
+            if (TextBytes(session) - Encoding.UTF8.GetByteCount(source.Text) + Encoding.UTF8.GetByteCount(replacement) > MaximumSessionTextBytes)
+                throw Refused("This context session is full. Shorten the correction or remove another source first.");
+            var correction = source.Correction ?? new OcrTextCorrection(source.TextSha256, source.ExtractionMethod);
+            string textHash = ContextHash.Text(replacement);
+            string digest = ContextHash.Of(new { source.ReviewDigest, replacement, textHash, correction, revision = checked(session.Revision + 1) });
+            session.Sources[session.Sources.IndexOf(source)] = source with {
+                Text = replacement, TextSha256 = textHash, ExtractionMethod = "user-corrected-ocr-v1",
+                Correction = correction, Reviewed = false, ReviewDigest = digest
+            };
+            previous = Advance(session); result = Copy(scope, session);
+        }
+        Cancel(previous); return result;
+    }
+
+    // A local preview lease grants no inference, attachment or send authority.
+    public ContextOriginalAsset RetainOcrOriginalForReview(RefinementChatScope scope, string id, string reviewDigest, long expectedRevision)
+    {
+        lock (gate) {
+            var session = Get(scope, expectedRevision);
+            _ = OcrSource(session, id, reviewDigest);
+            return session.Assets[id].Retain();
+        }
+    }
+    private static RefinementSourceSnapshot OcrSource(Session session, string id, string digest)
+    {
+        var source = session.Sources.FirstOrDefault(s => s.Id == id);
+        if (source is null || source.ReviewDigest != digest || source.Kind != RefinementSourceKind.LocalOcr ||
+            source.OriginalAsset is null || !session.Assets.TryGetValue(id, out var asset) || asset.MimeType is not ("image/png" or "image/jpeg"))
+            throw Refused("The image text changed or its original is unavailable. Select and review the image again.");
+        asset.EnsureAvailable(); return source;
     }
 
     public RefinementWorkspaceSnapshot SetOriginalDeliveryRequired(RefinementChatScope scope,string id,bool required,long expectedRevision)

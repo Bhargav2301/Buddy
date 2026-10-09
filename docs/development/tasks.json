@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "integrationOwner": "/root",
-  "publication": "source_checkpoint_push_authorized_existing_feature_branch_and_draft_pr_only; installation_merge_release_held",
-  "installedBaseline": "0.4.5 / 63ca5e9b6b8d2785b6941ce4ad216b627b960d8c",
+  "publication": "source_changes_and_existing_feature_branch_PR_push_authorized; merge_and_release_not_requested",
+  "installedBaseline": "0.4.8 / a80b1437f335e4a7367db883f98608ee62e93993; upgraded from 0.4.5 with rollback retained",
   "tasks": [
     {
       "id": "DEV-01",
@@ -4028,8 +4028,36 @@
       "deliverable": "Reviewed source, meaningful service regressions, local-model evidence if available, and synchronized report",
       "worktree": "integration",
       "finalEvidence": "docs/Continuation62.md"
+    },
+    {
+      "id": "OCR-63",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "a80b1437f335e4a7367db883f98608ee62e93993",
+      "writeScope": [
+        "services/Buddy.Server/RefinementWorkspace.cs",
+        "apps/windows/Buddy.Windows/OcrCorrectionWindow.cs",
+        "apps/windows/Buddy.Windows/ContextWorkspaceWindow.cs",
+        "tests/Buddy.ContextAssets.Tests/Program.cs",
+        "tests/Buddy.RefinementFollowup.Tests/Unshown/Program.cs",
+        "scripts/build-windows.ps1",
+        "docs/*",
+        "docs/development/*",
+        "README.md"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Installed update preserves saved data and rollback; Home and Settings startup checked",
+        "Human OCR correction retains original image and extraction provenance; requires fresh review and invalidates prepared context",
+        "Cancellation, stale edits, exact text, unchanged originals, budgets and WPF review behavior tested",
+        "Build and package checks pass; tested checkpoint pushed through existing feature branch/PR"
+      ],
+      "status": "running",
+      "deliverable": "Integrated OCR correction UI, service contract, regression tests, updated installed build and handoff",
+      "worktree": "integration",
+      "finalEvidence": "docs/Continuation63.md"
     }
   ],
   "executionMode": "active",
-  "installation": "HOLD: user explicitly paused installation and live Calculator testing on 2026-10-07"
+  "installation": "AUTHORIZED by current user request: update installed Buddy and validate Home/Settings. Live Calculator acceptance remains separate."
 }

@@ -1,3 +1,5 @@
+Current continuation: [installed update and OCR text correction](Continuation63.md).
+
 # Buddy: pinned upstream union and core scope
 
 The target is the verified Clicky/Coucou feature union, with **prompt refinement as the only additional feature**. A feature present in one upstream platform is a candidate requirement, not proof that it exists on another platform or already works in Buddy. This report separates source inspection, implemented Buddy behavior, mock/owned-fixture evidence and actual runtime acceptance. No upstream runtime acceptance is claimed.

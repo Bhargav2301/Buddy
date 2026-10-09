@@ -1,3 +1,9 @@
+# OCR correction63 and installed update
+
+- Implemented: explicit correction against retained original image, zoom/reset/cancel, first-extraction provenance, exact changed-text review and frozen-draft invalidation. Automated tests and package checks pass.
+- Installed continuation62 successfully; next delivery step is installing continuation63 and checking the synthetic correction flow. Current user request supersedes older installation holds.
+- Open: actual OCR digit accuracy, factual model accuracy, general Guide usefulness, stronger browser identity/history/attachment contract and physical/native gates. No repeated structural probe is needed. [Report](../Continuation63.md).
+
 # Continuation62 checkpoint
 
 - REPLY-62 /root: bounded requested-detail local chat, whole-answer correction, per-turn isolation and universal Ollama length-stop refusal implemented; focused source/model/package checks complete. New CI includes PlanningRepair/Staged/SpeechFeedback.

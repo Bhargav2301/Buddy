@@ -87,7 +87,7 @@ internal sealed class ContextWorkspaceWindow : Window
             var value=loaded=await readSelected(path,owner.Token);owner.Token.ThrowIfCancellationRequested();
             if(closed||reading!=owner)return;
             if(value.Image is not null){var decoded=ContextSourceImagePreview.Decode(value.Image,owner.Token);pendingImage=value;imageReview.Children.Clear();var preview=new System.Windows.Controls.Image{Source=decoded,MaxHeight=240,Stretch=Stretch.Uniform};imageReview.Children.Add(preview);
-                imageReview.Children.Add(Note(value.Name+" - OCR can misread letters and numbers. Compare the extracted text with this image before adding it; only reviewed text is sent. Remove incorrect extraction and paste corrected text as a separate source. Closing discards unreviewed image extraction."));
+                imageReview.Children.Add(Note(value.Name+" - OCR can misread letters and numbers. Compare the extracted text with this image before adding it; use Correct extracted text to fix mistakes. Only reviewed text is used. Closing discards unreviewed image extraction."));
                 imageReview.Children.Add(BuddyTheme.Button("Extract text locally for review",()=>_=ExtractImage()));
                 imageReview.Children.Add(BuddyTheme.Button("Keep original image for attachment review",()=>Try(()=>{if(pendingOcrSourceId is not null)throw new InvalidOperationException("Review or discard the current image source first.");pendingOcrSourceId=Stage(value,requireOriginal:true);Refresh();})));
                 imageReview.Children.Add(BuddyTheme.Button("Discard image and unreviewed extraction",()=>Try(()=>{StopReading();Refresh();})));
@@ -113,7 +113,10 @@ internal sealed class ContextWorkspaceWindow : Window
         if(closed)return;var snapshot=workspace.Snapshot(scope);sources.Children.Clear();turns.Children.Clear();selectedSources.Clear();selectedTurns.Clear();
         foreach(var source in snapshot.Sources){var row=new StackPanel();row.Children.Add(Note(source.Title+" - "+source.Kind+" - "+(source.Reviewed?"reviewed":"staged; not reviewed")));
             row.Children.Add(Note(source.OriginalAsset is {} original?$"Original retained locally: {original.MimeType}, {original.ByteCount} bytes; SHA-256 {original.Sha256}. No file is attached or sent.":source.Kind==RefinementSourceKind.UserLink?"Link text only; page contents were not fetched. Reference-text SHA-256 "+source.TextSha256:"Selected-text SHA-256 "+source.TextSha256));
-            if(source.Kind==RefinementSourceKind.LocalOcr)row.Children.Add(Note("Extracted OCR text; this is not the original image. Text SHA-256 "+source.TextSha256));
+            if(source.Kind==RefinementSourceKind.LocalOcr){
+                row.Children.Add(Note(source.Correction is null?"Extracted OCR text; this is not the original image. Text SHA-256 "+source.TextSha256:"User-corrected OCR text; original image retained. Review these changes before use. Text SHA-256 "+source.TextSha256));
+                if(source.OriginalAsset is not null)row.Children.Add(BuddyTheme.Button("Correct extracted text",()=>Try(()=>{var correction=CreateOcrCorrection(source,snapshot.Revision);correction.Owner=this;correction.ShowDialog();})));
+            }
             if(source.OriginalAsset is not null){var originalRequired=new CheckBox{Content="Require the original file/image attachment (current text destinations will refuse)",IsChecked=source.OriginalDeliveryRequired,Foreground=BuddyTheme.Ink};originalRequired.Click+=(_,_)=>Try(()=>{workspace.SetOriginalDeliveryRequired(scope,source.Id,originalRequired.IsChecked==true,workspace.Snapshot(scope).Revision);Refresh();});row.Children.Add(originalRequired);}
             var text=Editor(source.Text,20000,100);text.IsReadOnly=true;row.Children.Add(text);
             if(!source.Reviewed)row.Children.Add(BuddyTheme.Button("Add reviewed source",()=>Try(()=>{workspace.ReviewSource(scope,source.Id,source.ReviewDigest,workspace.Snapshot(scope).Revision);if(source.Id==pendingOcrSourceId){pendingOcrSourceId=null;ReleaseImage();}Refresh();})));
@@ -126,6 +129,7 @@ internal sealed class ContextWorkspaceWindow : Window
         referent.ItemsSource=choices;referent.SelectedItem=choices.FirstOrDefault(c=>c.Id==prior)??choices[0];Preview();
     }
     private void Select(string id,bool yes){if(yes)deselected.Remove(id);else deselected.Add(id);Preview();}
+    internal OcrCorrectionWindow CreateOcrCorrection(RefinementSourceSnapshot source,long revision)=>new(workspace,scope,source,revision,Refresh);
     private FrozenRefinementContext FreezeSelection()
     {
         if(reading is not null||pendingImage is not null)throw new InvalidOperationException("Finish or discard the pending image/source review first.");
