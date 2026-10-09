@@ -1,3 +1,11 @@
+# October 9 source synchronization decisions
+
+Use the latest integrated snapshot, not the newest timestamp or HEAD alone. browser61 has 680 source files including previously uncommitted refinement/context work; GitHub 0.4.5 is its ancestor. Preserve the three local hotfix commits and import the exact sealed snapshot as a separate commit.
+
+The user's direct source-sync request authorizes this reviewed payload on `Bhargav2301/Buddy` / `feature/interactive-assistant` and updating draft PR #1. Earlier publication restrictions described a different authorization state. Keep main, release/install state, accounts and browser setup outside this source-only step.
+
+Continue in the clean canonical project checkout; preserve the detached browser61 folder and the older divergent task checkout instead of resetting them. Unfinished Calculator59 and browser-probe work remain separate. Fix a demonstrated stale test extraction delimiter without changing production guards or claiming broader native acceptance.
+
 # Browser61 decisions - 2026-10-07
 
 Keep provider admission host-owned and empty for production until account/workspace/chat and completion signals are verified. Structural readiness and user confirmation cannot substitute for provider identity. Preserve a real shared DOM/transport path but label its synthetic acceptance and live gaps precisely. No automatic Send; original file bytes require separate upload consent and a correlated ready receipt, with unknown/partial state stopping without replay.

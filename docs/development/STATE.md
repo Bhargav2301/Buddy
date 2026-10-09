@@ -1,3 +1,13 @@
+# Current: October 9 source synchronization
+
+The user directly requested reconciliation of local source and GitHub. The canonical working checkout is now `C:/Projects/Buddy/repository`, branch `feature/interactive-assistant`. The integrated browser61 source is committed as `9df490c`; the adjacent synchronization commit repairs one stale test extraction marker and updates these records. This source-sync authorization supersedes the historical publication hold below for this reviewed source and the existing draft PR only.
+
+GitHub's starting head was `63ca5e9` (0.4.5). Its three descendant local hotfix commits through `cf38d5e`, plus the complete 680-file browser61 snapshot, are included. The source snapshot matched every live file and the handoff ZIP; Git normalized CRLF to LF in 88 text files with no other import changes. The old canonical checkout is preserved by `backup/pre-sync-20261009`. Original browser61/refinement60 folders, archives, private evidence and separate hotfix59 work are preserved.
+
+Fresh Windows and browser-host builds pass with zero warnings/errors. All 26 selected .NET suite invocations and 107 JavaScript cases pass; the full acceptance suite was not rerun. Tests use cached dependencies and self-contained .NET 8 as needed. See [source synchronization and exact remaining work](../Source-sync-2026-10-09.md). This is version 0.4.8 source, not completed 0.5.0 MVP acceptance or a newly installed/released package.
+
+Next work remains the verified live browser adapter and the handoff's readiness/disconnect issue, separate Calculator59 integration, actual local-agent consumer, OCR usefulness and coordinated physical/foreground acceptance. Browser probe 0.1.3 is design-only. Installed Buddy, settings, models, browser profiles and registrations were not changed. Older entries below are historical and do not replace this source location or current source-sync authorization.
+
 # Current: browser61 preview verified; live adapter and setup held
 
 October 7: Buddy-browser61 is the uncommitted integration at base cf38d5efc36792ae805fafd32e0a0ed2055b3a4a. Separate release/Buddy-0.4.8-browser61-review passes package/branding and local fixture checks. Installed0.4.5, sealed refinement60 and Calculator59/disabled diagnostic remain preserved. No install, extension loading, native registration, account/history read, upload, Send or publication.

@@ -25,7 +25,7 @@ $main=[IO.File]::ReadAllText((Join-Path $sourceRoot $mainRelative))
 $inline=[IO.File]::ReadAllText((Join-Path $sourceRoot $inlineRelative))
 $sync=Between $main '    private readonly RefinementWorkspace refinementContext' '    private ContextWorkspaceWindow OpenNotchContext()'
 $consume=Between $main '    private (string Text,CancellationToken Invalidated)? ConsumeNotchContext' '    private sealed class NotchDraftField'
-$arm=Between $main '            if(notchChat?.Snapshot.SessionId!=scope.Id' '        });contextWindow=window;'
+$arm=Between $main '            if(notchChat?.Snapshot.SessionId!=scope.Id' '        },browser:OpenBrowserContext);contextWindow=window;'
 $request=Between $inline '        using var selectedLifetime=' '        try {'
 $apply=Between $inline '            using var linked=CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token,contextReview?.Invalidated??default);' 'applied=true;status.Text="Applied without sending.'
 $generated=@"

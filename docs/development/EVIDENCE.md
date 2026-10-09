@@ -1,3 +1,13 @@
+# October 9 source synchronization evidence
+
+Exact handoff archive SHA-256: `a0f80c8587efb1d3f54ab413082a82f7b6ee1c2107779586cddaae332c70a5f1`. All 680 entries match the original live browser61 source. Imported commit `9df490c` matches all entries with Git-only newline normalization in 88 text files. All three unpublished ancestor commits and the complete source/staged payload passed the bounded runtime/recognizable-secret scan.
+
+Fresh checks: Windows Release and browser-host builds, both zero warnings/errors; 26 selected .NET suite invocations, including 72 context integration assertions and 56 unshown WPF checks; 107 JavaScript cases. Source version check reports 0.4.8 / Windows 0.4.8.0 / Android code 4009. Work ledger validates 82 tasks and acyclic dependencies.
+
+Initial framework-dependent test launches failed because the installed ASP.NET runtime is 10, while tests target 8. Cached self-contained .NET 8 reruns pass; no system runtime was installed. The context generator then exposed its outdated callback terminator; a one-line fixture update fixes extraction of unchanged production logic. An attempted explicit RID server path was absent; the successful fixture binds the actual freshly built net8.0 server DLL. All failed attempts and successful reruns remain in local `diagnostics/sync-20261009`, outside Git.
+
+[The synchronization report](../Source-sync-2026-10-09.md) lists command scopes and limitations. No fresh actual-model, Android, live-provider, original-upload, physical voice, foreground or installed-upgrade acceptance is claimed.
+
 # Browser61 and refinement61 evidence - 2026-10-07
 
 Exact packaged Server bc36d2ac614513dbcebb2e2f8a07bbc2951aa5b7c912919e7375ef2cef75ec8b: all18 synthetic local-model calls settled. Frozen original12:10 faithful useful changes/2 truthful unchanged/0 unsafe accepted observed; prior8 useful outputs unchanged. Six builder-authored additional cases pass independently as supporting evidence, not unseen heldouts. Root affected refinement checks:7 builds/8 runs,1,501 assertions; allpass,0warnings/errors. See private validation/refinement61.

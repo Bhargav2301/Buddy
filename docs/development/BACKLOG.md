@@ -1,3 +1,13 @@
+# October 9 reconciliation checkpoint
+
+- Completed: recover and publish the handoff's integrated browser61 source through the existing draft PR; preserve the three local hotfix ancestors and old source snapshots.
+- Completed: canonical Windows/browser-host builds, 26 selected .NET suite invocations, 107 JavaScript cases, version/source/ledger checks. Repair the stale context fixture marker; production source is unchanged from browser61.
+- Next: resolve the separately recorded browser readiness focus/Disconnect race and verify a real provider contract. Readiness probe 0.1.3 remains a design, not an implemented fix.
+- Separate intake: hotfix59 Calculator discovery changes remain in their original uncommitted worktree. They were not part of the sealed browser61 integration and need review/integration of their own.
+- Remaining: actual local-agent consumer, OCR usefulness, visible field/Agent workflows, physical speech/headphone acceptance and a separately validated installed update. The synchronization does not complete these gates.
+
+[Current source and evidence](../Source-sync-2026-10-09.md) supersede the historical publication holds below for the authorized source sync only.
+
 # Browser61 remaining work
 
 - Obtain only the concrete readiness-probe setup approval for a selected browser/profile; no native host registration or data access implied.

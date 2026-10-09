@@ -12,6 +12,8 @@ The root [VERSION](VERSION) file controls both applications. See
 
 ## [0.4.8] - 2026-10-06
 
+- October 9 source checkpoint: integrate sealed browser61 local refinement/context UI, complete selected conversation pairs, reviewed original assets and browser/native-host foundation. Real provider identity/history/attachment support remains incomplete.
+- Recover the 680-file handoff snapshot into the canonical Git checkout, preserve earlier source history, and repair a stale context fixture extraction marker. Fresh checks and remaining acceptance are recorded in [the synchronization report](docs/Source-sync-2026-10-09.md).
 - Restore a minimized Calculator window only after binding it to the exact signed Windows activation result; request ordinary foreground activation once and retain strict final verification.
 - Preserve Stop, input ownership, original checkpoint/deadline and one-use launch safeguards; report bounded activation and final verification failures without exposing private exception text.
 - Include the previously approved bounded comparison-refinement fix. Physical/native acceptance and installed replacement remain separate gates for this local candidate.
