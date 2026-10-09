@@ -1,3 +1,7 @@
+# Close the observed detector miss without promoting capabilities — October 9
+
+Accept the user's version-labelled0.1.6 result as live evidence for structural detection on that page: one editor candidate and one user/assistant pair with a recognized conversation route. Do not request another identical count probe for this resolved issue. Preserve the distinction between loaded DOM counts, exact field/provider identity and complete virtualized history. Do not enable account/history/draft/attachment capabilities from these counts. Keep the sealed package unchanged; update project evidence and handoff with only sanitized counts and exact implementation CI results.
+
 # Use the inspected message structure; count only loaded units — October 9
 
 The user explicitly approved live selected-page inspection, including possible rendered chat text in browser-tool output. This approval persists. Chrome Elements revealed paired search-unit role keys inside a marked conversation root. Implement this observed key family with structural pairing, rather than role headings or text inference. Do not copy private page content, screenshots or IDs into project files.

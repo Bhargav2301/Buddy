@@ -1,8 +1,8 @@
-# Current: live message structure inspected; probe 0.1.6 implemented
+# Current: probe 0.1.6 structural detection confirmed on the live page
 
 The approved inspection of the selected conversation succeeded through Chrome's Elements panel. The user and assistant wrappers use paired search-unit keys inside a marked conversation root; legacy role attributes were absent on those wrappers. Virtualized turns explain why loaded counts cannot represent complete history. No private page content or IDs are retained in project records.
 
-PROBE-016 /root implements the observed structure, bounded alias/key deduplication and conflict abstention. 231 Node and 60 owned offline Chrome cases pass; preserved0.1.5 reproduces the zero-role failure. Source and fresh packaging are ready for the existing feature branch/PR. Live0.1.6 extension execution remains pending; no Windows install/native registration was performed. Windows remains0.4.8, not completed0.5.0. See [report and acceptance limits](../Browser-readiness-0.1.6.md). Older entries below describe their original checkpoints.
+PROBE-016 /root implements the observed structure, bounded alias/key deduplication and conflict abstention. 231 Node and 60 owned offline Chrome cases pass; preserved0.1.5 reproduces the zero-role failure. Implementation and package were synchronized at `50c6226`. The user subsequently reported live0.1.6 editor1 / roles2 / user1 / assistant1 / fileinputs2+ / streamingfalse / routetrue. This closes the observed detection miss for this page. Both implementation PR/push CI runs passed version/browser/Windows/Android. No further unchanged probe run is needed; full identity/history/draft/attachment contracts and other native acceptance remain open. No Windows install/native registration was performed. Windows remains0.4.8, not completed0.5.0. See [report and acceptance limits](../Browser-readiness-0.1.6.md). Older entries below describe their original checkpoints.
 
 # Current: live 0.1.4 detects an editor; scoped-route repair 0.1.5
 

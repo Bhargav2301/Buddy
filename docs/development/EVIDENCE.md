@@ -1,3 +1,9 @@
+# Probe0.1.6 user-reported live detection — October 9
+
+The user supplied a version-labelled 0.1.6 observation and screenshot: editor candidates 1; role units 2, comprising user 1 and assistant 1; file inputs 2+; streaming indicator false; conversation-shaped URL true. The reported popup says no content was read or sent. The screenshot supports the displayed version and counts; private chat text, account labels, exact URL, project name and IDs are not retained in source/evidence. This is positive-path structural acceptance on one selected page, not full provider/field/history or physical/native acceptance.
+
+Both [PR CI](https://github.com/Bhargav2301/Buddy/actions/runs/37881971392) and [push CI](https://github.com/Bhargav2301/Buddy/actions/runs/37881968682) passed version, browser, Windows and Android jobs for implementation commit `50c62261d117a63cf2ee42b6fa74f3bc7594fae8`. Tagged prerelease preparation was skipped. Documentation-only follow-up; no new runtime or package version. Sanitized local receipt: `diagnostics/readiness-016/user-live-result.json`. [Updated report](../Browser-readiness-0.1.6.md).
+
 # Probe0.1.6 and selected-page structural inspection — October 9
 
 Approved live Chrome Elements inspection found paired `data-chatgpt-search-unit-key` / `data-content-search-unit-key` markers with `fallback-turn-N:N:user|assistant` shapes inside both conversation-root attributes beneath `main`. One user wrapper pairs through its first element child; the assistant wrapper pairs on itself. Virtualized turn structure was observed. These sanitized facts contain no private IDs or text.

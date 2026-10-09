@@ -2,7 +2,7 @@
 
 - PROBE-016 /root, base `a8d91e29354aca6ae450d9691f1016d9602cfcf4`, canonical integration checkout: selected-page inspection complete; implement observed paired search-unit role markers, bounded deduplication and conflict abstention; preserve the existing seven-field/cancellation/privacy contract.
 - Passed:231 Node cases and60 owned offline Chrome cases; old0.1.5 reproduces the same message-marker miss. Source review and fresh package provenance are integration-owner tasks. Scope: probe source/tests/docs and development records only.
-- Remaining: one deliberate live0.1.6 invocation for message recognition; production account/identity/history/draft/attachment admission and Windows MVP acceptance remain incomplete. Loaded counts cannot measure missing virtualized turns. [Report](../Browser-readiness-0.1.6.md).
+- Live detection follow-up complete for this page: user-reported0.1.6 editor1, roles2 (user1/assistant1), fileinputs2+, streamingfalse, routetrue. Implementation CI50c6226 passed all version/browser/Windows/Android jobs. No further unchanged readiness run is needed. Production account/identity/history/draft/attachment admission and Windows MVP acceptance remain incomplete. Loaded counts cannot measure missing virtualized turns. [Report](../Browser-readiness-0.1.6.md).
 
 # Scoped conversation follow-up
 

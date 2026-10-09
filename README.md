@@ -20,7 +20,7 @@ See the [core teaching and validation report](docs/Windows-0.4.2.md), [local Whi
 
 **October 9 source checkpoint:** version 0.4.8 includes the handoff's integrated browser61 refinement/context work and preceding Calculator fixes. The last recorded installed version in the handoff was 0.4.5; source synchronization does not install an update. Browser integration remains incomplete for real provider history and attachments. See the [source reconciliation and fresh checks](docs/Source-sync-2026-10-09.md), [browser preview limits](docs/Windows-browser61.md), and [development records](docs/development/README.md).
 
-The standalone [readiness probe 0.1.6](docs/Browser-readiness-0.1.6.md) recognizes the message-container structure inspected in Chrome and deduplicates loaded units. All 231 Node and 60 owned offline Chrome cases pass. Live execution of the new extension remains pending; loaded DOM counts do not establish complete history or draft access.
+The standalone [readiness probe 0.1.6](docs/Browser-readiness-0.1.6.md) recognizes the message-container structure inspected in Chrome and deduplicates loaded units. All 231 Node and 60 owned offline Chrome cases pass. The user confirmed live detection of one editor candidate and one user/assistant pair, with the conversation route recognized. Loaded DOM counts do not establish complete history or draft access.
 
 ## Project map
 
