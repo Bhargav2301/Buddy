@@ -1,3 +1,11 @@
+# Current: continuation62 requested-detail replies and browser contract audit
+
+The comprehensive October9 handoff matched clean canonical415fe28 and origin; its CI passed. REPLY-62 /root adds explicit detailed local replies (up to12 sentences /6,000 UTF-16 units), while ordinary/tighter/specialist limits remain. Token-budget termination is refused for every Ollama model path; incomplete/late replies are not saved. No stream contract or settings migration changed.
+
+169 planning/reply assertions, affected preview/staged/speech/teaching/research/core suites,231 Node browser cases and broker/framing/independent checks pass. Windows builds cleanly; a fresh0.4.8-continuation62-review package passes dependency/OCR-load checks. Four local Gemma responses meet length bounds, but one includes unsupported benchmark figures: no general factual-quality acceptance. [Report](../Continuation62.md).
+
+The production browser identity/history/attachment contract is still unavailable; source-owned admission remains closed. Probe0.1.6 and its accepted observation are preserved. Installed Buddy was not replaced; last installed0.4.5 is historical, not freshly rechecked. Installation/live Calculator remain held. Windows0.5.0 and broader native gates remain incomplete.
+
 # Current: probe 0.1.6 structural detection confirmed on the live page
 
 The approved inspection of the selected conversation succeeded through Chrome's Elements panel. The user and assistant wrappers use paired search-unit keys inside a marked conversation root; legacy role attributes were absent on those wrappers. Virtualized turns explain why loaded counts cannot represent complete history. No private page content or IDs are retained in project records.

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "integrationOwner": "/root",
-  "publication": "blocked_prior_auto_review_denial_no_retry_no_push_merge_or_release",
+  "publication": "source_checkpoint_push_authorized_existing_feature_branch_and_draft_pr_only; installation_merge_release_held",
   "installedBaseline": "0.4.5 / 63ca5e9b6b8d2785b6941ce4ad216b627b960d8c",
   "tasks": [
     {
@@ -4000,6 +4000,34 @@
         }
       ],
       "finalEvidence": "validation/browser61/FINAL-OUTCOME.json"
+    },
+    {
+      "id": "REPLY-62",
+      "attempt": 1,
+      "owner": "/root",
+      "baseRevision": "415fe28ae3caf58c1b0ba4fd049af9045a43e63e",
+      "writeScope": [
+        "services/Buddy.Server/ReplyConstraints.cs",
+        "services/Buddy.Server/ConversationalReply.cs",
+        "services/Buddy.Server/OllamaEngine.cs",
+        "services/Buddy.Server/BuddyService.cs",
+        "services/Buddy.Server/ReviewedRegionResearch.cs",
+        "tests/Buddy.PlanningRepair.Tests/*",
+        "docs/*",
+        "docs/development/*",
+        "scripts/build-windows.ps1",
+        "README.md"
+      ],
+      "dependencies": {},
+      "acceptance": [
+        "Explicit detail requests admit bounded complete local answers; ordinary, one/two-sentence and specialist limits remain intact",
+        "Whole-answer correction, source and promotion checks, cancellation, atomic persistence and model-length termination tested",
+        "Browser production identity/history/attachment gap remains accurately documented; no expanded live access or install"
+      ],
+      "status": "validated",
+      "deliverable": "Reviewed source, meaningful service regressions, local-model evidence if available, and synchronized report",
+      "worktree": "integration",
+      "finalEvidence": "docs/Continuation62.md"
     }
   ],
   "executionMode": "active",

@@ -1,3 +1,9 @@
+# Continuation62 — source, isolated model and package evidence
+
+Base415fe28 matched canonical local/origin and passed prior PR37882669728/push37882666389 CI. New validation:169 planning/reply assertions; Preview45/Staged89/SpeechFeedback72/Teaching46/RegionResearch71 and core service pass;231 Node browser cases,69 broker,12 framing/14 selected-context checks and48 independent cases/81 assertions pass. Windows Release0warnings/errors; separate0.4.8 review package/type/dependency/native OCR-load checks pass. These are not physical/native workflow acceptance.
+
+Four synthetic local Gemma3:4b prompts return3/6/12/1 sentences within each requested contract. The tested and packaged server DLL hashes match66ce5e88e08e37c53867966a96241989567ace4a2cfbd4156ca124abf45edadd. First broader detail trials fell back after excess sentences; a better target/repair prompt improves length compliance. Final RAM explanation contains unsupported benchmark numbers and an unnecessary follow-up, so usefulness/accuracy is not fully accepted. Logs, retained failures, synthetic drafts, source/package hashes and invocation corrections are local in `diagnostics/continuation-20261009`. [Full report](../Continuation62.md). No real user content, browser upload, installed replacement or foreground testing occurred.
+
 # Probe0.1.6 user-reported live detection — October 9
 
 The user supplied a version-labelled 0.1.6 observation and screenshot: editor candidates 1; role units 2, comprising user 1 and assistant 1; file inputs 2+; streaming indicator false; conversation-shaped URL true. The reported popup says no content was read or sent. The screenshot supports the displayed version and counts; private chat text, account labels, exact URL, project name and IDs are not retained in source/evidence. This is positive-path structural acceptance on one selected page, not full provider/field/history or physical/native acceptance.

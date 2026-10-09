@@ -2,6 +2,8 @@
 
 This is an unreleased implementation increment toward the accepted Windows MVP plan, not a completed 0.5.0 release. Android wire compatibility is retained. Existing installed files and user data have not been replaced.
 
+Latest October9 continuation: [requested-detail replies and browser contract audit](Continuation62.md). A separate review package exists; live browser data capabilities and native MVP gates remain incomplete. Historical validation below retains its original scope and dates.
+
 ## Implemented in this increment
 
 - Local Quick, Guided and Council refinement with real specialist passes, synthesis, progress events, cancellation, estimated scores, literal preservation and local embedding similarity checks. Missing validation models and oversized contexts retain the exact original. The legacy response fields remain available.

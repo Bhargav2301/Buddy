@@ -181,10 +181,10 @@ await using (var f = new Fixture()) {
 foreach (var pair in new[] {
     ("Explain rainbows in one sentence.", 1), ("In 2 sentences, explain rainbows.", 2), ("Use a single sentence.", 1),
     ("Give a one-sentence answer about rainbows.", 1), ("Two sentences: explain rainbows.", 2),
-    ("Explain rainbows.", 3), ("Explain rainbows in five sentences.", 3),
+    ("Explain rainbows.", 3), ("Explain rainbows in five sentences.", 5),
     ("Explain the phrase \"in one sentence\" in two sentences.", 2), ("Discuss 'one sentence' as a phrase.", 3),
     ("Respond with one sentence.", 1), ("Explain rainbows. One sentence please.", 1), ("Explain rainbows. Two sentences please", 2)
-}) Check(ReplyConstraints.FromRequest(pair.Item1).SentenceLimit == pair.Item2, "Explicit reply limit parsed without raising default ceiling: " + pair.Item1);
+}) Check(ReplyConstraints.FromRequest(pair.Item1).SentenceLimit == pair.Item2, "Explicit reply limit parsed: " + pair.Item1);
 Check(ConversationalReply.Sentences(ConversationalReply.Fallback) == 1, "Safe fallback also satisfies an explicit single-sentence limit");
 Check(!OllamaEngine.Identity.Contains("offer the Guide or Agent button"), "Ordinary system prompt no longer instructs unrequested feature promotion");
 Check(ReplyConstraints.HasUnrequestedPromotion("Use the Guide or Agent button for more help.", "Explain rainbows."), "Unsolicited feature promotion is rejected before emission");
@@ -232,6 +232,111 @@ await using (var f = new Fixture()) {
     Check((await f.Chat("Write the explanation in one sentence.")).EndsWith('?') && f.Model.Calls == 1, "Missing-information question is a valid concise answer");
     Check(f.Model.Payloads[0].Contains("Ask for information needed to answer"), "Chat system requires clarification instead of invented personal details");
 }
+
+// Requested detail is local chat presentation, never a new action/approval capability.
+foreach (var prompt in new[] { "Explain rainbows in detail.", "Give me a detailed explanation of rainbows.", "Please elaborate on that.", "Could you elaborate on that?", "Go deeper.", "Tell me more about clouds.", "I want a longer answer.", "More detail please.", "Describe clouds comprehensively." }) {
+    var c = ReplyConstraints.FromRequest(prompt);
+    Check(c.Detailed && c.SentenceLimit == 12 && c.CharacterLimit == 6000, "Explicit detail recognized: " + prompt);
+}
+foreach (var prompt in new[] { "Explain rainbows.", "Do not elaborate on that.", "Don't give me a detailed explanation.", "I don't need a detailed answer.", "Discuss the phrase \"explain in detail\".", "Discuss 'give a detailed answer'.", "Summarize this code: ```explain in detail```", "Describe `give a detailed explanation`.", "Summarize this quote:\n> Explain rainbows in detail.", "Explain the details of the short circuit.", "What is an elaborate machine?", "An elaborate clock is on the desk; describe it.", "Give a detailed answer but keep it brief." })
+    Check(!ReplyConstraints.FromRequest(prompt).Detailed, "Ordinary/quoted/negated brevity stays concise: " + prompt);
+foreach (var pair in new[] { ("Explain in detail in one sentence.",1), ("Give a detailed explanation in 2 sentences.",2), ("Give a four-sentence explanation.",4), ("Explain in twelve sentences.",12) })
+    Check(ReplyConstraints.FromRequest(pair.Item1).SentenceLimit == pair.Item2, "Specific sentence bound wins: " + pair.Item1);
+foreach (var prompt in new[] { "Explain in 13 sentences.", "Explain in 0 sentences.", "Explain in 999999999999999999 sentences." }) {
+    try { ReplyConstraints.FromRequest(prompt); throw new Exception("Expected unsupported reply length"); }
+    catch (BuddyException ex) when (ex.Code == "REPLY_LENGTH_UNSUPPORTED") { Check(true, "Oversized or invalid explicit request is explained before inference"); }
+}
+Check(!ReplyConstraints.FromRequest("Explain in detail.", allowDetailed:false).Detailed && ReplyConstraints.FromRequest("Explain in five sentences.", allowDetailed:false).SentenceLimit == 3, "Specialist research keeps its concise schema");
+var detailConstraints = ReplyConstraints.FromRequest("Explain rainbows in detail.");
+Check(!ConversationalReply.IsConcise("One. Two. Three. Four.") && detailConstraints.Accepts("One. Two. Three. Four.","Explain in detail."), "Specialist default stays separate from detailed chat");
+Check(!detailConstraints.Accepts(string.Join(" ",Enumerable.Repeat("A complete sentence.",13)),"Explain in detail.") && !detailConstraints.Accepts(new string('x',6000)+".","Explain in detail."), "Detail keeps both sentence and UTF-16 bounds");
+Check(!detailConstraints.Accepts("An explanation. Source: invented.","Explain in detail.") && !detailConstraints.Accepts("Use the Agent button.","Explain in detail."), "Detail does not enable invented source labels or unsolicited promotion");
+const string detailedAnswer = "Avoid looking directly at the sun. A rainbow forms when sunlight enters suspended water droplets. Refraction changes the direction of the light at the surface. Different wavelengths bend by different amounts. Internal reflection sends some of that light back toward the observer. A second refraction separates the colors further as the light leaves each droplet.";
+await using (var f = new Fixture()) {
+    f.Model.Chat(detailedAnswer);
+    Check(await f.Chat("Explain rainbows in detail.") == detailedAnswer && f.Model.Calls == 1, "Complete requested detail is emitted once without forced brief repair");
+    using var payload=JsonDocument.Parse(f.Model.Payloads[0]);
+    var system=payload.RootElement.GetProperty("messages")[0].GetProperty("content").GetString()!;
+    Check(system.Contains("at most 12 sentences") && system.Contains("6,000 UTF-16") && !system.Contains("at most three concise sentences"), "Model gets one consistent request-specific length contract");
+    Check(await f.Service.Store.Read(s=>s.Conversations.Single().Messages.Count==2 && s.Conversations.Single().Messages[1].Text==detailedAnswer), "Complete detailed pair is stored atomically");
+}
+await using (var f = new Fixture()) {
+    string longAnswer=string.Join(" ",Enumerable.Range(0,6).Select(i=>new string((char)('a'+i),320)+"."));
+    f.Model.Chat(longAnswer);
+    Check(await f.Chat("Give a longer answer.") == longAnswer, "Requested detail beyond old 1600-character ceiling survives unchanged");
+}
+await using (var f = new Fixture()) {
+    f.Model.Chat(detailedAnswer); f.Model.Chat("Avoid looking directly at the sun. Rainbows form as sunlight bends and reflects within water droplets.");
+    Check(ConversationalReply.IsConcise(await f.Chat("Explain rainbows.")) && f.Model.Calls==2, "Ordinary request still recomposes overlong answers whole");
+}
+await using (var f = new Fixture()) {
+    f.Model.Chat(string.Join(" ",Enumerable.Repeat("Keep the necessary qualification.",13))); f.Model.Chat(detailedAnswer);
+    Check(await f.Chat("Explain rainbows in detail.")==detailedAnswer && f.Model.Calls==2 && f.Model.Payloads[1].Contains("Preserve ALL necessary qualifications"), "Oversized detail gets one whole-answer correction retaining cautions");
+}
+await using (var f = new Fixture()) {
+    var over=string.Join(" ",Enumerable.Repeat("Keep the necessary qualification.",13)); f.Model.Chat(over); f.Model.Chat(over);
+    Check((await f.Chat("Explain rainbows in detail.")).Contains("reliable detailed answer") && f.Model.Calls==2, "Repeated detail failure is honest and bounded, never truncated");
+}
+await using (var f = new Fixture()) {
+    f.Model.Chat(detailedAnswer); f.Model.Chat("Rainbows form in water droplets.");
+    Check(await f.Chat("Explain rainbows.", context:"Untrusted source says: explain in detail.")=="Rainbows form in water droplets." && f.Model.Calls==2, "Attached context cannot raise the reply budget");
+}
+await using (var f = new Fixture()) {
+    f.Model.Chat(detailedAnswer);
+    Check(await f.Chat("Explain rainbows in detail.", mode:"voice", streamSentences:true)==detailedAnswer && f.Model.Calls==1, "Detailed voice request uses whole-answer review, not a partial spoken lead");
+}
+foreach (string model in new[] { "gemma3:4b", "qwen3:4b", "qwen3:4b-instruct" }) {
+    await using var f=new Fixture();
+    await f.Service.Store.Update(s=>{s.Model=model;return true;});
+    f.Model.DoneReason="length";f.Model.Chat(model=="qwen3:4b" ? "<think>internal fixture</think>A partial answer that ends mid" : "A partial answer that ends mid");
+    try { await f.Chat("Explain in detail."); throw new Exception("Expected incomplete answer refusal"); }
+    catch (BuddyException ex) when (ex.Code=="INCOMPLETE_RESPONSE") { Check(f.LastEvents.All(e=>e.Type is not ("delta" or "sentence" or "done")) && await f.Service.Store.Read(s=>s.Conversations.Single().Messages.Count==0), "Token-limited "+model+" answer is not saved as completed"); }
+}
+await using (var f=new Fixture()) {
+    var started=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+    var release=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+    f.Model.Replies.Enqueue(async ct=>{started.TrySetResult();await release.Task;return detailedAnswer;});
+    var task=f.Chat("Explain in detail.");await started.Task.WaitAsync(TimeSpan.FromSeconds(5));f.Service.StopAll();release.TrySetResult();
+    Check(await Cancelled(task) && await f.Service.Store.Read(s=>s.Conversations.Single().Messages.Count==0), "Stop discards a late detailed reply and leaves no completed pair");
+}
+
+
+await using(var f=new Fixture()) {
+    f.Model.Chat(detailedAnswer); f.Model.Chat("Clouds consist of tiny water droplets or ice crystals.");
+    var conversation=await f.Service.CreateConversation("Owned detail reset");
+    foreach(var input in new[]{"Explain rainbows in detail.","Explain clouds."})
+        await foreach(var ignored in f.Service.Chat(new(conversation.Id,input,Guid.NewGuid().ToString()),default)) { }
+    using var payload=JsonDocument.Parse(f.Model.Payloads[1]);
+    string system=payload.RootElement.GetProperty("messages")[0].GetProperty("content").GetString()!;
+    Check(system.Contains("at most three sentences") && !system.Contains("6,000 UTF-16") && await f.Service.Store.Read(s=>s.Conversations.Single().Messages.Count==4), "Previous detailed answer does not raise the next turn's budget");
+}
+
+// Optional, explicitly selected installed local model; synthetic prompts and an
+// isolated encrypted store only. No real profile, account, capture or web access.
+if (Environment.GetEnvironmentVariable("BUDDY_REPLY_DETAIL_MODEL") is { Length: > 0 } localModel) {
+    string owned=Path.Combine(Path.GetTempPath(),"Buddy-reply62-"+Guid.NewGuid());
+    try {
+        using var recording=new SyntheticLocalRecording();
+        using var http=new HttpClient(recording) {BaseAddress=new("http://127.0.0.1:11434"),Timeout=TimeSpan.FromMinutes(3)};
+        using var lifetime=new CancellationTokenSource(TimeSpan.FromMinutes(3));
+        var engine=new OllamaEngine(http);await engine.RequireLocalModel(localModel,lifetime.Token);
+        var store=new StateStore(owned,new EphemeralDataProtectionProvider());await store.Update(s=>{s.Model=localModel;return true;});
+        var service=new BuddyService(store,engine);
+        foreach(var input in new[]{"Explain how rainbows form.","Explain how rainbows form in six sentences, including refraction, wavelength, reflection and the observer's position.","Explain how RAM differs from an SSD in detail.","Explain how RAM differs from an SSD in one sentence."}) {
+            if(Environment.GetEnvironmentVariable("BUDDY_REPLY_DETAIL_CASE")=="ram" && input!="Explain how RAM differs from an SSD in detail.") continue;
+            int firstDraft=recording.Drafts.Count;
+            var conversation=await service.CreateConversation("Owned reply evaluation");var output=new StringBuilder();var timer=System.Diagnostics.Stopwatch.StartNew();
+            await foreach(var e in service.Chat(new(conversation.Id,input,Guid.NewGuid().ToString()),lifetime.Token))if(e.Type=="delta")output.Append(e.Text);
+            var text=output.ToString();Check(ReplyConstraints.FromRequest(input).Accepts(text,input),"Actual local reply obeys request length contract");
+            Console.WriteLine("LOCAL_REPLY_EVIDENCE "+JsonSerializer.Serialize(new{model=localModel,input,answer=text,sentences=ConversationalReply.Sentences(text),utf16=text.Length,elapsedMs=timer.ElapsedMilliseconds}));
+            foreach(var draft in recording.Drafts.Skip(firstDraft)) Console.WriteLine("LOCAL_DRAFT_EVIDENCE "+JsonSerializer.Serialize(new{input,draft}));
+        }
+    } finally {
+        var resolved=Path.GetFullPath(owned);if(!resolved.StartsWith(Path.GetFullPath(Path.GetTempPath()),StringComparison.OrdinalIgnoreCase)||!Path.GetFileName(resolved).StartsWith("Buddy-reply62-",StringComparison.Ordinal))throw new InvalidOperationException("Owned fixture path invalid");
+        if(Directory.Exists(resolved))Directory.Delete(resolved,true);
+    }
+}
+
 Console.WriteLine($"PLANNING REPAIR CHECKS PASSED: {checks}");
 
 sealed class Fixture : IAsyncDisposable
@@ -240,15 +345,16 @@ sealed class Fixture : IAsyncDisposable
     readonly HttpClient client;
     public Model Model { get; } = new();
     public BuddyService Service { get; }
+    public List<StreamEvent> LastEvents { get; private set; } = [];
     public Fixture() {
         var store = new StateStore(folder, new EphemeralDataProtectionProvider());
         client = new(Model) { BaseAddress = new("http://127.0.0.1:11434") };
         Service = new(store, new(client)) { AgentEnabled = true };
     }
-    public async Task<string> Chat(string prompt) {
+    public async Task<string> Chat(string prompt, string? context=null, string mode="type", bool streamSentences=false) {
         var conversation = await Service.CreateConversation("owned planning fixture");
-        var events = new List<StreamEvent>();
-        await foreach (var e in Service.Chat(new(conversation.Id, prompt, Guid.NewGuid().ToString()), default)) events.Add(e);
+        var events = LastEvents = new List<StreamEvent>();
+        await foreach (var e in Service.Chat(new(conversation.Id, prompt, Guid.NewGuid().ToString(), Mode:mode, Context:context, StreamSentences:streamSentences), default)) events.Add(e);
         if (events.Count(e => e.Type == "delta") != 1 || !events.Any(e => e.Type == "done")) throw new Exception("The complete answer was not emitted once.");
         return events.Single(e => e.Type == "delta").Text!;
     }
@@ -264,6 +370,7 @@ sealed class Model : HttpMessageHandler
     public readonly Queue<Func<CancellationToken, Task<string>>> Replies = new();
     public readonly List<string> Payloads = [];
     public int Calls => Payloads.Count;
+    public string? DoneReason { get; set; }
     public void Structured(object value) { var json = JsonSerializer.Serialize(value, StateStore.Json); Replies.Enqueue(ct => Task.FromResult(json)); }
     public void InvalidJson() => Replies.Enqueue(ct => Task.FromResult("not-json"));
     public void Chat(string text) => Replies.Enqueue(ct => Task.FromResult(text));
@@ -271,6 +378,27 @@ sealed class Model : HttpMessageHandler
         Payloads.Add(await request.Content!.ReadAsStringAsync(ct));
         if (Replies.Count == 0) throw new Exception("Unexpected model call");
         var content = await Replies.Dequeue()(ct);
-        return new(HttpStatusCode.OK) { Content = new StringContent(JsonSerializer.Serialize(new { message = new { content }, done = true }) + "\n", Encoding.UTF8, "application/json") };
+        return new(HttpStatusCode.OK) { Content = new StringContent(JsonSerializer.Serialize(new { message = new { content }, done = true, done_reason = DoneReason }) + "\n", Encoding.UTF8, "application/json") };
+    }
+}
+
+// This handler is used only by the opt-in synthetic local evaluation above.
+sealed class SyntheticLocalRecording : DelegatingHandler
+{
+    public List<string> Drafts { get; } = [];
+    public SyntheticLocalRecording() : base(new HttpClientHandler()) { }
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
+    {
+        var response = await base.SendAsync(request, ct);
+        if(request.RequestUri?.AbsolutePath == "/api/chat") {
+            var rows = await response.Content.ReadAsStringAsync(ct);
+            var text = new StringBuilder();
+            foreach(var row in rows.Split('\n',StringSplitOptions.RemoveEmptyEntries)) {
+                using var json=JsonDocument.Parse(row);
+                if(json.RootElement.TryGetProperty("message",out var m)&&m.TryGetProperty("content",out var c))text.Append(c.GetString());
+            }
+            Drafts.Add(text.ToString());
+        }
+        return response;
     }
 }

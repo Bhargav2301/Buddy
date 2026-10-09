@@ -5,7 +5,9 @@ namespace Buddy.Server;
 public static class ConversationalReply
 {
     private static readonly TimeSpan TextTimeout = TimeSpan.FromMilliseconds(100);
-    public const string Policy = "Use a calm, composed, warm conversational voice. Give at most three concise sentences, honoring an explicitly requested tighter limit. Put safety-critical qualifications first. If essential information is missing, ask for it instead of inventing details or requirements. Answer directly without unsolicited feature offers or follow-up tasks. Do not imitate a specific actor. Use plain conversational text. Do not append source labels, citations, links, lists or decorative symbols: the application separately attaches verified evidence from retrieval. Detailed action plans and approval reviews are separate and must retain every action and risk.";
+    public const string StylePolicy = "Use a calm, composed, warm conversational voice. Put safety-critical qualifications first. If essential information is missing, ask for it instead of inventing details or requirements. Answer directly without unsolicited feature offers or follow-up tasks. Do not imitate a specific actor. Use plain conversational text. Do not append source labels, citations, links, lists or decorative symbols: the application separately attaches verified evidence from retrieval. Detailed action plans and approval reviews are separate and must retain every action and risk.";
+
+    public const string Policy = StylePolicy + " Give at most three concise sentences, honoring an explicitly requested tighter limit.";
 
     public static string PlainText(string value)
     {

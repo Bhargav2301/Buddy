@@ -1,3 +1,9 @@
+# Continue useful local work without weakening browser admission — October9
+
+The comprehensive handoff confirms source checkpoint pushes on the existing feature branch/PR; update the stale machine-readable publication field accordingly while retaining installation/live Calculator holds. Continue in the clean canonical checkout; no new fork or reset is needed.
+
+A loaded user/assistant pair cannot prove account/workspace identity, complete virtualized history or attachment readiness. Keep the stronger production contract closed and preserve local/text review. Fix the independently actionable requested-detail gap in local chat: current-request-only finite phrase/length selection,12-sentence/6,000-unit maximum, ordinary/specialist ceilings unchanged, complete recomposition and no truncation. Reject Ollama token-limited terminal responses across all model paths. Keep accepted length and factual quality as distinct evidence; the observed unsupported benchmark claims remain a recorded limitation.
+
 # Close the observed detector miss without promoting capabilities — October 9
 
 Accept the user's version-labelled0.1.6 result as live evidence for structural detection on that page: one editor candidate and one user/assistant pair with a recognized conversation route. Do not request another identical count probe for this resolved issue. Preserve the distinction between loaded DOM counts, exact field/provider identity and complete virtualized history. Do not enable account/history/draft/attachment capabilities from these counts. Keep the sealed package unchanged; update project evidence and handoff with only sanitized counts and exact implementation CI results.

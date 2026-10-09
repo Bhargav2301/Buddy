@@ -1,3 +1,10 @@
+# Continuation62 checkpoint
+
+- REPLY-62 /root: bounded requested-detail local chat, whole-answer correction, per-turn isolation and universal Ollama length-stop refusal implemented; focused source/model/package checks complete. New CI includes PlanningRepair/Staged/SpeechFeedback.
+- Browser phase1 source/test audit complete: production lacks verified account/workspace, virtualized-history coverage and correlated attachment-ready evidence. Do not promote probe counts or request another identical check. Reviewed local/text path remains.
+- Remaining quality work: unsupported benchmark claims appeared in one accepted detailed local answer; length compliance does not prove factual utility. Preserve that output and test factual grounding separately. OCR digit accuracy and general Guide teaching usefulness remain open.
+- Remaining native work and holds: visible Apply/Undo, physical audio/monitor/Guide/Agent acceptance, separate Calculator59 intake and installed upgrade. No installation or live Calculator test is authorized by this source checkpoint. [Report](../Continuation62.md).
+
 # Observed message-container repair
 
 - PROBE-016 /root, base `a8d91e29354aca6ae450d9691f1016d9602cfcf4`, canonical integration checkout: selected-page inspection complete; implement observed paired search-unit role markers, bounded deduplication and conflict abstention; preserve the existing seven-field/cancellation/privacy contract.
