@@ -1,3 +1,11 @@
+# Current: readiness probe 0.1.3 implemented; live popup acceptance pending
+
+PROBE-013 is owned and integrated by `/root` in the canonical checkout. The user reported R02 from probe0.1.2. The standalone replacement at `integrations/readiness-probe` implements direct popup ownership, exact window/tab/document binding and immediate cancellation without a background worker. The old focus predicate and early Disconnect/session-resurrection race were reproduced against preserved0.1.2 using synthetic APIs.
+
+100 new probe cases plus107 existing browser cases pass. A separate whitelist-only0.1.3 package and checksum builder is provided; the old probe/source folders are preserved. Source and test work follow the ongoing repository workflow. No extension loading, live readiness invocation, account/content access, native registration or installed Windows update was performed. Real Chrome popup acceptance remains pending a deliberate user check of the version-labelled new package.
+
+See [R02 repair, evidence and delivery](../Browser-readiness-0.1.3.md). The0.1.3 probe is now implemented rather than design-only; this does not complete the separate full browser adapter, Calculator59 or other MVP acceptance gaps below.
+
 # Current: October 9 source synchronization
 
 The user directly requested reconciliation of local source and GitHub. The canonical working checkout is now `C:/Projects/Buddy/repository`, branch `feature/interactive-assistant`. The integrated browser61 source is committed as `9df490c`; the adjacent synchronization commit repairs one stale test extraction marker and updates these records. This source-sync authorization supersedes the historical publication hold below for this reviewed source and the existing draft PR only.

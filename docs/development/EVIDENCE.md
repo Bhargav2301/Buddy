@@ -1,3 +1,11 @@
+# Probe0.1.3 evidence — October 9
+
+Preserved0.1.2 synthetic reproduction: false window focus yieldsR02 before injection; Disconnect during the first pending window call still permits later injection/read and session recreation. Source hashes and reproduction receipt are local in `diagnostics/readiness-013/legacy-reproduction.json`.
+
+Final combined Node run:207/207 cases pass (100 new probe +107 existing browser). Cancellation/expiry/rejection at all14 awaited boundaries, immutable popup/window/tab/document scope, navigation and late results, structural privacy limits and popup Stop UI are covered. Initial96/97 failure identified an unhandled late window-focus event; production now subscribes to it and final coverage passes. These are synthetic fixtures, not live Chrome or provider acceptance.
+
+Package integrity is bound through the whitelist builder and SHA256SUMS. No browser profile, live DOM, installed app, native registry, account or message was touched. Full scope/limits: [readiness repair report](../Browser-readiness-0.1.3.md).
+
 # October 9 source synchronization evidence
 
 Exact handoff archive SHA-256: `a0f80c8587efb1d3f54ab413082a82f7b6ee1c2107779586cddaae332c70a5f1`. All 680 entries match the original live browser61 source. Imported commit `9df490c` matches all entries with Git-only newline normalization in 88 text files. All three unpublished ancestor commits and the complete source/staged payload passed the bounded runtime/recognizable-secret scan.

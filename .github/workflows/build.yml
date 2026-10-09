@@ -27,6 +27,21 @@ jobs:
           python scripts/check-source-safety.py
           echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
 
+  browser:
+    name: Browser and readiness regression tests
+    needs: version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test read-only popup and browser boundaries
+        env:
+          BUDDY_BROWSER_SOURCE_ROOT: ${{ github.workspace }}/integrations/browser
+        run: node --test integrations/readiness-probe/tests/*.test.cjs integrations/browser/tests/*.test.cjs tests/validation/Buddy.BrowserIndependent.Tests/*.test.cjs
+
   windows:
     needs: version
     runs-on: windows-latest

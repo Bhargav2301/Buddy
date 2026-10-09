@@ -1,3 +1,9 @@
+# Direct popup readiness repair — October 9
+
+Implement the narrow probe as a standalone extension with no background worker or account/native-host path. Accept a false browser parent focus flag only when the genuine packaged toolbar popup is itself focused/visible and bound to the same current/last-focused window and selected document. Do not remove focus checks globally or infer permission from a last-focused window alone.
+
+Own attempts before awaiting Chrome; cancel pending callers and block later dispatch after Disconnect, lifecycle events or expiry. Report already-dispatched reads honestly. Preserve0.1.2 artifacts and return only the original seven structural fields. Live popup behavior remains an acceptance item, not a conclusion from synthetic tests.
+
 # October 9 source synchronization decisions
 
 Use the latest integrated snapshot, not the newest timestamp or HEAD alone. browser61 has 680 source files including previously uncommitted refinement/context work; GitHub 0.4.5 is its ancestor. Preserve the three local hotfix commits and import the exact sealed snapshot as a separate commit.

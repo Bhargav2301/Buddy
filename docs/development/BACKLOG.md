@@ -1,3 +1,11 @@
+# Readiness R02 repair checkpoint
+
+- PROBE-013 /root: direct-popup read-only probe, cancellation, fixed diagnostics, package builder and CI regression job implemented;100 new and107 existing synthetic browser cases pass.
+- Next acceptance: load the fresh0.1.3 folder, verify its visible version and make one deliberate structural check. Existing0.1.2 is preserved and remains affected by its reported focus failure. No live check was run during the repair.
+- Full browser/native-host identity/history/attachment work remains separate and incomplete; the standalone probe does not activate it. Other source/physical acceptance gaps remain as recorded below.
+
+[Repair report](../Browser-readiness-0.1.3.md).
+
 # October 9 reconciliation checkpoint
 
 - Completed: recover and publish the handoff's integrated browser61 source through the existing draft PR; preserve the three local hotfix ancestors and old source snapshots.
