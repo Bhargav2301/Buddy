@@ -1,3 +1,9 @@
+# Use the observed route; preserve unknown message semantics — October 9
+
+The screenshot supplies enough evidence to add a generic `/g/g-.../c/UUID` shape; it does not supply DOM message attributes. Keep strict origin/document binding separate, return only the existing boolean, and test with invented IDs/slugs. Do not save the user's chat text, URL or identifiers.
+
+Record one editor candidate as live detection evidence for this page only. Keep message-role selectors unchanged until structurally supported. Do not label zero counts as an empty conversation or make them positive using guessed containers/text parsing. A new route-only build does not justify requiring another manual check to investigate the same unknown roles.
+
 # Provisional editor detection — October 9
 
 Treat the successful user-reported 0.1.3 observation as evidence that this attempt passed the focus/structural path, not as complete popup or provider acceptance. The user confirmed a visible new-chat editor; its zero count is a detection miss. Keep the original seven-field schema and content-free read boundary.

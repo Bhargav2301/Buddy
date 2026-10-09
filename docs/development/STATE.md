@@ -1,3 +1,9 @@
+# Current: live 0.1.4 detects an editor; scoped-route repair 0.1.5
+
+The user supplied a 0.1.4 observation with editor candidates1 on a visible existing project conversation. R02 did not recur. Roles/users/assistants remain0 despite visible messages. The screenshot's generic `/g/g-p-.../c/UUID` route explains the false URL flag; no private IDs/text are retained.
+
+PROBE-015 /root adds scoped route recognition and missing-role interpretation only. 230 Node and32 owned offline Chrome cases pass; preserved0.1.4 reproduces the route bug. A fresh0.1.5 package preserves older builds. Candidate detection has user-reported live evidence; exact field binding and role/history recognition remain unverified. Another seven-count run cannot establish the missing message markup. Next work needs structural evidence for message containers, not guessed selectors. See [current report](../Browser-readiness-0.1.5.md). Windows stays0.4.8 and installed state is unchanged. Older live-pending statements retain their original checkpoints.
+
 # Current: 0.1.3 live check completed; 0.1.4 composer detection candidate
 
 The user reported a successful 0.1.3 structural observation and confirmed that its zero composer count occurred with the new-chat message box visible. R02 did not recur in this attempt; composer detection failed. No live DOM was inspected by the assistant. File inputs 2+ count controls, not attachments.

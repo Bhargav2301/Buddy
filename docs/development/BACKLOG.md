@@ -1,3 +1,10 @@
+# Scoped conversation follow-up
+
+- PROBE-015 /root: record user-reported0.1.4 candidate detection on an existing project conversation; repair the screenshot-supported scoped conversation route and clarify zero-role interpretation.
+- Passed:230 Node cases and32 actual owned offline Chrome cases, with the old route failure reproduced against preserved0.1.4.
+- Remaining: obtain content-free message-container structural evidence before changing role selectors. Current zero counts do not represent conversation length; full identity/history/draft/attachment support remains unavailable. Repeating the same counts is insufficient.
+- Earlier0.1.4 CI now fully passed (Windows, Android, browser, version). New live0.1.5 acceptance is untested; installation and native MVP gates are unchanged. [Report](../Browser-readiness-0.1.5.md).
+
 # Composer observation follow-up
 
 - PROBE-014 /root: recorded the user's successful 0.1.3 live structural check and visible new-chat composer false negative; implemented broader provisional detection and clearer count interpretation.

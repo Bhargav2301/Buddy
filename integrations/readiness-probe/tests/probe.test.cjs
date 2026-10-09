@@ -123,12 +123,12 @@ test('dispose removes handlers and refuses future use',async()=>{
   assert.equal((await f.probe.run()).diagnostic,'R31');assert.equal(f.calls.length,0);
 });
 test('UI uses explicit version and no raw errors or observation fields',()=>{
-  assert.match(describe(observed()),/probe 0.1.4/);assert.ok(!diagnostic('private browser error').includes('private browser error'));
+  assert.match(describe(observed()),/probe 0.1.5/);assert.ok(!diagnostic('private browser error').includes('private browser error'));
   assert.match(describe({...observed(),privateText:'SECRET'}),/R23/);assert.ok(!describe({...observed(),privateText:'SECRET'}).includes('SECRET'));
 });
 function inspectFixture(nodes,options={}) {
   let index=0,readText=0;
-  const href='https://chatgpt.com/c/11111111-1111-1111-1111-111111111111';
+  const href=options.href ?? 'https://chatgpt.com/c/11111111-1111-1111-1111-111111111111';
   for(const node of nodes) {
     node.isConnected=true;node.isContentEditable=!!node.editor;node.getClientRects=()=>node.invisible?[]:[{width:100,height:30}];
     node.closest=()=>null;
@@ -142,7 +142,7 @@ function inspectFixture(nodes,options={}) {
   const globals={window,document,location:{href},URL,NodeFilter:{SHOW_ELEMENT:1},
     getComputedStyle:()=>({display:'block',visibility:'visible'}),performance:{now:()=>options.expired?index*101:0}};
   if(options.hidden)document.visibilityState='hidden';if(options.frame)window.top={};
-  const output=vm.runInNewContext('('+inspectDocument.toString()+')("'+href+'", "nonce", '+(options.bind?'false':'true')+')',globals);
+  const output=vm.runInNewContext('('+inspectDocument.toString()+')('+JSON.stringify(href)+', "nonce", '+(options.bind?'false':'true')+')',globals);
   return {output:JSON.parse(JSON.stringify(output)),readText};
 }
 test('structural function reads only attributes, not text/value/files',()=>{
@@ -163,7 +163,7 @@ test('node/time limits refuse instead of returning partial counts',()=>{
 });
 test('package has no background worker, content listener, native host or broad permissions',()=>{
   const manifest=JSON.parse(fs.readFileSync(require.resolve('../manifest.json'),'utf8'));
-  assert.equal(manifest.version,'0.1.4');assert.deepEqual(manifest.permissions,['activeTab','scripting']);
+  assert.equal(manifest.version,'0.1.5');assert.deepEqual(manifest.permissions,['activeTab','scripting']);
   for(const key of ['background','content_scripts','host_permissions','externally_connectable'])assert.equal(manifest[key],undefined);
   const source=fs.readFileSync(require.resolve('../probe.js'),'utf8')+fs.readFileSync(require.resolve('../popup.js'),'utf8');
   assert.doesNotMatch(source,/connectNative|sendNativeMessage|sendMessage\(|\.fetch\(|fetch\(|localStorage|\.submit\(|\.click\(|dispatchEvent\(/);
@@ -190,12 +190,49 @@ test('popup close disposes its owner and suppresses the pending result',async()=
 });
 test('popup failure shows a versioned fixed code and re-enables a deliberate new check',async()=>{
   const f=popupFixture();const task=f.elements.check.handlers.click();f.settle({ok:false,diagnostic:'R02',privateError:'SECRET'});await task;
-  assert.match(f.elements.status.textContent,/R02 \(probe 0.1.4\)/);assert.ok(!f.elements.status.textContent.includes('SECRET'));assert.equal(f.elements.check.disabled,false);
+  assert.match(f.elements.status.textContent,/R02 \(probe 0.1.5\)/);assert.ok(!f.elements.status.textContent.includes('SECRET'));assert.equal(f.elements.check.disabled,false);
 });
 
 for(const [count, expected] of [[0,/does not prove the message box is absent/],[1,/draft access is not verified/],[2,/composer is ambiguous/]])
   test('reported editor count '+count+' does not grant a provider capability',()=>{
     const text=describe({...observed(),editorCandidates:count,fileInputCandidates:2,stableConversationRoute:false});
-    assert.match(text,expected);assert.match(text,/controls, not attachments/);assert.match(text,/only \/c\/UUID/);
+    assert.match(text,expected);assert.match(text,/controls, not attachments/);assert.match(text,/Recognized URL shapes/);
     assert.match(text,/capabilities remain unavailable/);
   });
+
+
+const routeUuid='12345678-1234-4321-abcd-123456789abc';
+for(const [name,path,expected] of [
+  ['standard conversation','/c/'+routeUuid,true],
+  ['standard trailing slash','/c/'+routeUuid+'/',true],
+  ['project conversation','/g/g-p-0123456789abcdef-example-project/c/'+routeUuid,true],
+  ['GPT conversation','/g/g-Example123-example/c/'+routeUuid,true],
+  ['project trailing slash','/g/g-p-0123456789abcdef-example/c/'+routeUuid+'/',true],
+  ['query and fragment','/g/g-p-example/c/'+routeUuid+'?view=example#section',true],
+  ['new chat','/',false],
+  ['project home','/g/g-p-example/project',false],
+  ['GPT home','/g/g-example',false],
+  ['missing conversation UUID','/g/g-p-example/c/',false],
+  ['malformed UUID','/g/g-p-example/c/1234',false],
+  ['unsupported prefix','/unrelated/c/'+routeUuid,false],
+  ['missing scoped ID prefix','/g/example/c/'+routeUuid,false],
+  ['extra suffix','/g/g-p-example/c/'+routeUuid+'/settings',false],
+  ['encoded slash','/g/g-p-example%2Fextra/c/'+routeUuid,false],
+  ['empty scoped ID','/g/g-/c/'+routeUuid,false]
+])test('route shape: '+name,()=>{
+  const f=inspectFixture([{editor:true}],{href:'https://chatgpt.com'+path});
+  assert.equal(f.output.ok,true);assert.equal(f.output.observation.stableConversationRoute,expected);
+  assert.equal(f.output.observation.renderedRoleNodes,0);assert.equal(f.readText,0);
+  assert.equal(Object.keys(f.output.observation).length,7);
+  assert.ok(!JSON.stringify(f.output).includes(routeUuid),'URL/IDs are not returned');
+});
+for(const href of ['https://chatgpt.com.example.com/c/'+routeUuid,'https://example.com/g/g-p-example/c/'+routeUuid,'https://private@chatgpt.com/c/'+routeUuid])
+  test('route shape never admits a different or credential-bearing origin: '+new URL(href).hostname,()=>{
+    assert.equal(inspectFixture([],{href}).output.ok,false);
+  });
+test('unrecognized message roles are explained even with a recognized route and editor',()=>{
+  const result=describe({...observed(),renderedRoleNodes:0,renderedUserCount:0,renderedAssistantCount:0});
+  assert.match(result,/visible messages may still be present/);
+  assert.match(result,/draft access is not verified/);
+  assert.match(result,/capabilities remain unavailable/);
+});

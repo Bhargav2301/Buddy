@@ -1,6 +1,6 @@
 (function (root) {
   'use strict';
-  const VERSION = '0.1.4';
+  const VERSION = '0.1.5';
   const counts = Object.freeze({editorCandidates: 2, renderedRoleNodes: 513,
     renderedUserCount: 513, renderedAssistantCount: 513, fileInputCandidates: 2});
   const flags = ['streamingIndicatorPresent', 'stableConversationRoute'];
@@ -60,7 +60,8 @@
         safe.editorCandidates === 1 ? 'One provisional editor candidate was detected; draft access is not verified.' :
           'Multiple editor candidates were detected; the composer is ambiguous.',
       '+ means at least that many. Counts do not prove complete history.',
-      'File inputs count controls, not attachments. The URL check recognizes only /c/UUID routes.',
+      ...(safe.renderedRoleNodes === 0 ? ['No supported message-role markers were detected; visible messages may still be present.'] : []),
+      'File inputs count controls, not attachments. Recognized URL shapes: /c/UUID and /g/g-.../c/UUID.',
       'Live account, history, draft and attachment capabilities remain unavailable.',
       'No chat text, draft, account details or file contents were read. Nothing was sent.'].join('\n');
   }
@@ -74,7 +75,7 @@
     if (!readStructure) return {ok: true, nonce};
     const result = {editorCandidates: 0, renderedRoleNodes: 0, renderedUserCount: 0,
       renderedAssistantCount: 0, fileInputCandidates: 0, streamingIndicatorPresent: false,
-      stableConversationRoute: /^\/c\/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\/?$/i.test(url.pathname)};
+      stableConversationRoute: /^\/(?:g\/g-[a-z0-9]+(?:-[a-z0-9]+)*\/)?c\/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\/?$/i.test(url.pathname)};
     function visible(node) {
       if (!node.isConnected || node.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
       const style = getComputedStyle(node);

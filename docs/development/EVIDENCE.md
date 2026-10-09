@@ -1,3 +1,9 @@
+# Probe0.1.5 and live0.1.4 — October 9
+
+User observation + screenshot:0.1.4 editors1, roles/users/assistants0, fileinputs2+, streamingfalse, routefalse on an existing project conversation with visible messages. Generic address shape `/g/g-p-.../c/UUID`; no exact URL/IDs or message text recorded. This supports candidate detection and the route mismatch, not exact composer binding or a replacement message selector.
+
+Root validation:230 Node cases and32 owned offline Chrome DOM cases pass. Preserved0.1.4 fails the same project-route fixture as expected. New route recognition discloses no IDs and does not turn unmarked synthetic message text into roles. Logs/hashes local in `diagnostics/readiness-015`. Previous0.1.4 PR37877375423/push37877371589 CI both passed all version/browser/Windows/Android jobs. These historical native CI results do not claim current-head coverage. [Current report](../Browser-readiness-0.1.5.md).
+
 # Probe0.1.4 and user observation — October 9
 
 User-reported real0.1.3 check: editors0, roles0, users0, assistants0, file inputs2+, streamingfalse, conversationroutefalse. User confirmed the new-chat message box was visible. This run passed its structural path; it did not recognize the editor. No assistant live DOM inspection occurred.

@@ -1,5 +1,7 @@
 # Readiness probe 0.1.4 — visible composer detection
 
+**Later October 9 observation:** the user reported one editor candidate on an existing project conversation. Scoped URL recognition and zero message-role counts are covered by the [0.1.5 follow-up](Browser-readiness-0.1.5.md). Earlier pending-live statements below describe the original checkpoint.
+
 ## User-reported live observation
 
 On October 9, the user returned a successful observation from 0.1.3: composer candidates 0; role/user/assistant elements 0; file input elements 2+; streaming false; conversation-shaped URL false. They confirmed the message box was visible on the new-chat page. The R02 focus refusal did not recur in this attempt. This is a user-reported live check, not an assistant-inspected tab or proof of all popup/cancellation behavior.

@@ -20,7 +20,7 @@ See the [core teaching and validation report](docs/Windows-0.4.2.md), [local Whi
 
 **October 9 source checkpoint:** version 0.4.8 includes the handoff's integrated browser61 refinement/context work and preceding Calculator fixes. The last recorded installed version in the handoff was 0.4.5; source synchronization does not install an update. Browser integration remains incomplete for real provider history and attachments. See the [source reconciliation and fresh checks](docs/Source-sync-2026-10-09.md), [browser preview limits](docs/Windows-browser61.md), and [development records](docs/development/README.md).
 
-The standalone [readiness probe 0.1.4](docs/Browser-readiness-0.1.4.md) adds broader composer detection after a user-reported successful 0.1.3 check missed the visible new-chat editor. The R02 refusal did not recur in that attempt. Live 0.1.4 recognition remains pending; see its separate loading instructions.
+The standalone [readiness probe 0.1.5](docs/Browser-readiness-0.1.5.md) adds project/GPT conversation route recognition after the user reported one editor candidate in 0.1.4. Message-role recognition remains unsupported on the observed conversation; the route fix does not enable history or draft access.
 
 ## Project map
 

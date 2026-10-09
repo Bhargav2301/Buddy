@@ -82,6 +82,28 @@ const cases = [
         fileInputCandidates:2,streamingIndicatorPresent:false,stableConversationRoute:false});
       results.push({name,passed:true,editorCandidates:expected});
     }
+    // Exercise the real location parser without navigating or accessing a provider.
+    for (const [name,path,expected] of [
+      ['standard conversation route','/c/12345678-1234-4321-abcd-123456789abc',true],
+      ['project conversation route','/g/g-p-0123456789abcdef-example-project/c/12345678-1234-4321-abcd-123456789abc',true],
+      ['GPT conversation route','/g/g-Example123-example/c/12345678-1234-4321-abcd-123456789abc',true],
+      ['project home is not a conversation','/g/g-p-example/project',false]
+    ]) {
+      const reply=await page.evaluate(path=>{
+        history.replaceState(null,'',path);
+        document.body.innerHTML='<article>Owned message without provider markers</article><form><textarea></textarea></form>';
+        for(const node of document.body.querySelectorAll('*'))
+          for(const key of ['textContent','innerText','value','files'])Object.defineProperty(node,key,{get(){throw Error('No content read');}});
+        return BuddyReadiness.inspectDocument(location.href,'owned-fixture',true);
+      },path);
+      assert.equal(reply.ok,true,name);
+      assert.equal(reply.observation.stableConversationRoute,expected,name);
+      assert.equal(reply.observation.editorCandidates,1,name);
+      assert.equal(reply.observation.renderedRoleNodes,0,name+': text is not a role marker');
+      assert.equal(Object.keys(reply.observation).length,7,name);
+      assert.ok(!JSON.stringify(reply).includes('12345678'),name+': no URL or IDs returned');
+      results.push({name,passed:true,stableConversationRoute:expected});
+    }
     assert.equal(requests,1,'Only the intercepted owned page was requested');
     console.log(JSON.stringify({scope:'Owned offline HTML; fresh headless context; no real provider/profile/extension',
       sourceSha256:crypto.createHash('sha256').update(source).digest('hex'),

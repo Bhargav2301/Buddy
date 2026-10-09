@@ -1,12 +1,12 @@
-# Buddy readiness probe 0.1.4
+# Buddy readiness probe 0.1.5
 
 This standalone Chrome extension repairs the readiness-only popup path. It is separate from the full browser/native-host adapter in `integrations/browser`. Its permissions remain `activeTab` and `scripting`. There is no service worker, host permission, native messaging, account integration, upload or Send operation.
 
 ## Use the updated probe
 
-1. Extract the 0.1.4 ZIP into a new folder, or use the already extracted 0.1.4 folder supplied with this build.
-2. Open `chrome://extensions`. Disable the previous Buddy readiness probes 0.1.2 / 0.1.3 so their toolbar buttons are not confused with the new one. Keep the old folders for recovery.
-3. Choose **Load unpacked** and select the new folder containing this `manifest.json`. Its extension card and popup must both show **0.1.4**. Reloading an old folder does not update it.
+1. Extract the 0.1.5 ZIP into a new folder, or use the already extracted 0.1.5 folder supplied with this build.
+2. Open `chrome://extensions`. Disable the previous Buddy readiness probes 0.1.2 / 0.1.3 / 0.1.4 so their toolbar buttons are not confused with the new one. Keep the old folders for recovery.
+3. Choose **Load unpacked** and select the new folder containing this `manifest.json`. Its extension card and popup must both show **0.1.5**. Reloading an old folder does not update it.
 4. Open the intended ChatGPT tab. Open the new probe from Chrome's toolbar, click **Check this tab's readiness** once and keep the popup open. The check is read-only; it does not send a message.
 5. Report the seven structural fields or the displayed diagnostic code. A successful observation is not proof of verified account identity, complete history or working attachments.
 
@@ -24,9 +24,9 @@ A first top-frame isolated script returns a nonce and Chrome supplies its docume
 
 The scan retains provisional role/file/streaming selectors. Version 0.1.4 recognizes a textarea or a contenteditable editing host when it has the legacy `prompt-textarea` ID, belongs to a form, or has `role="textbox"`. It uses the browser's `isContentEditable` state, including empty and plaintext-only attributes, instead of requiring the literal value `true`. Editable descendants are not counted again. Disabled/readonly fields, hidden/inert/ARIA-hidden ancestors and zero-sized rectangles are excluded.
 
-These are **provisional editor candidates**, not verified ChatGPT composer identities. An unrelated editable form can still be a candidate. No candidate grants draft access. Zero means no supported candidate detected, not that the message box is absent; two or more means ambiguity. Shadow trees and subframes are not traversed. File inputs are controls, not uploaded files. The URL boolean recognizes only `/c/UUID`, so `no` is not proof that a tab has no conversation.
+These are **provisional editor candidates**, not verified ChatGPT composer identities. An unrelated editable form can still be a candidate. No candidate grants draft access. Zero means no supported candidate detected, not that the message box is absent; two or more means ambiguity. Shadow trees and subframes are not traversed. File inputs are controls, not uploaded files. The URL boolean recognizes `/c/UUID` and `/g/g-.../c/UUID`, including the project-prefixed shape observed in the user screenshot. It returns no URL, project slug or conversation ID. A recognized shape is not verified conversation identity; an unrecognized shape does not establish absence.
 
-On October 9 the user reported a successful 0.1.3 observation and confirmed the composer was visibly present on the new-chat page. That establishes that this attempt passed the focus/structural path while missing its composer. The exact live markup was not inspected. The 0.1.4 rule is validated against owned HTML, not yet against that live editor.
+On October 9 the user reported a successful 0.1.3 observation and confirmed the composer was visibly present on the new-chat page. That establishes that this attempt passed the focus/structural path while missing its composer. The exact live markup was not inspected. The user subsequently returned a 0.1.4 observation with one editor candidate on an existing project conversation. That is live evidence of candidate detection on that page; the exact field identity and draft access remain unverified. Its role counts remained zero despite visible messages. Version 0.1.5 corrects the screenshot-supported scoped route mismatch and explains missing role markers. It does not change role selectors or enable history access. Repeating these counts cannot identify the correct message markup.
 
 The scan reads only structural attributes and layout visibility, with limits of 8,000 nodes and 100 ms. Reaching a limit refuses the observation instead of presenting partial totals. Chat text, input values, file lists/bytes, account labels, storage and cookies are not read. No listeners or controller state are left in the page.
 
@@ -37,9 +37,9 @@ node --test integrations/readiness-probe/tests/*.test.cjs
 python scripts/package-readiness-probe.py
 ```
 
-The Node suite covers the actual popup orchestrator using synthetic Chrome responses, cancellation/deadline/rejection at all 14 awaited boundaries, ownership and navigation, exact document targeting, late completions, capped structural fields and the no-content-read contract. These checks are not a real provider test. Existing 0.1.2 and 0.1.3 artifacts are preserved.
+The Node suite covers the actual popup orchestrator using synthetic Chrome responses, cancellation/deadline/rejection at all 14 awaited boundaries, ownership and navigation, exact document targeting, late completions, capped structural fields and the no-content-read contract. These checks are not a real provider test. Existing 0.1.2, 0.1.3 and 0.1.4 artifacts are preserved.
 
-`tests/owned-dom.cjs` additionally runs actual DOM/layout checks in a fresh headless Chrome context. It requires an available `playwright` package and optionally `BUDDY_TEST_CHROME` pointing to Chrome. Run `node integrations/readiness-probe/tests/owned-dom.cjs`; dependencies are not installed by the script. It intercepts the synthetic ChatGPT-origin fixture before navigation with networking offline, never attaches to a user browser/profile, and verifies no content getters, input/submit events or DOM writes. Twenty-eight owned cases pass. This test is separate from the Node-only CI suite. `BUDDY_TEST_PROBE_SOURCE` can select a preserved probe for a regression comparison; its hash appears in successful receipts.
+`tests/owned-dom.cjs` additionally runs actual DOM/layout checks in a fresh headless Chrome context. It requires an available `playwright` package and optionally `BUDDY_TEST_CHROME` pointing to Chrome. Run `node integrations/readiness-probe/tests/owned-dom.cjs`; dependencies are not installed by the script. It intercepts the synthetic ChatGPT-origin fixture before navigation with networking offline, never attaches to a user browser/profile, and verifies no content getters, input/submit events or DOM writes. Thirty-two owned cases pass, including four real location-parser cases. The preserved 0.1.4 source reproduces the project-route false negative in the same fixture. This test is separate from the Node-only CI suite. `BUDDY_TEST_PROBE_SOURCE` can select a preserved probe for a regression comparison; its hash appears in successful receipts.
 
 The HTML rules follow [MDN contenteditable](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/contenteditable) and [isContentEditable](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/isContentEditable). These references define browser semantics; they do not establish ChatGPT's current DOM.
 
