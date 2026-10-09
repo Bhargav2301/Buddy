@@ -1,6 +1,6 @@
 (function (root) {
   'use strict';
-  const VERSION = '0.1.5';
+  const VERSION = '0.1.6';
   const counts = Object.freeze({editorCandidates: 2, renderedRoleNodes: 513,
     renderedUserCount: 513, renderedAssistantCount: 513, fileInputCandidates: 2});
   const flags = ['streamingIndicatorPresent', 'stableConversationRoute'];
@@ -59,7 +59,7 @@
       safe.editorCandidates === 0 ? 'No supported visible editor was detected; this does not prove the message box is absent.' :
         safe.editorCandidates === 1 ? 'One provisional editor candidate was detected; draft access is not verified.' :
           'Multiple editor candidates were detected; the composer is ambiguous.',
-      '+ means at least that many. Counts do not prove complete history.',
+      '+ means at least that many. Counts cover loaded DOM only; virtualized turns may be absent.',
       ...(safe.renderedRoleNodes === 0 ? ['No supported message-role markers were detected; visible messages may still be present.'] : []),
       'File inputs count controls, not attachments. Recognized URL shapes: /c/UUID and /g/g-.../c/UUID.',
       'Live account, history, draft and attachment capabilities remain unavailable.',
@@ -94,21 +94,61 @@
           node.closest('[aria-disabled="true"], [aria-readonly="true"]')) return false;
       return visible(node);
     }
+    // Live-observed search-unit wrappers replace the legacy role attribute on
+    // the current page. Keys stay request-local; only capped counts leave here.
+    const markerNodes = new Map(), groups = new Set(), unitsByScope = new Map();
+    const markerSelector = '[data-message-author-role], [data-chatgpt-search-unit-key]';
+    function roleMarker(node) {
+      const legacy = node.hasAttribute('data-message-author-role') ? node.getAttribute('data-message-author-role') : null;
+      const key = node.getAttribute('data-chatgpt-search-unit-key');
+      const match = typeof key === 'string' && key.length <= 128 ? /^fallback-turn-\d+:\d+:(user|assistant)$/.exec(key) : null;
+      const scope = match && node.closest('main [data-chatgpt-conversation-selection-target="true"][data-thread-find-target="conversation"]');
+      const paired = scope && (node.getAttribute('data-content-search-unit-key') === key ||
+        node.firstElementChild?.getAttribute('data-content-search-unit-key') === key);
+      if (paired) return {role: match[1], key, scope, conflict: legacy !== null && legacy !== match[1]};
+      return legacy === null ? null : {role: legacy, key: null, scope: null, conflict: false};
+    }
+    function addMarker(node, marker) {
+      let ancestor = node.parentElement?.closest(markerSelector);
+      while (ancestor && !markerNodes.has(ancestor)) {
+        if (performance.now() - start > 100) return false;
+        ancestor = ancestor.parentElement?.closest(markerSelector);
+      }
+      let sameKey;
+      if (marker.key) {
+        if (!unitsByScope.has(marker.scope)) unitsByScope.set(marker.scope, new Map());
+        sameKey = unitsByScope.get(marker.scope).get(marker.key);
+      }
+      const group = markerNodes.get(ancestor) ?? sameKey ?? {role: marker.role, key: null, scope: null, conflict: false};
+      if (marker.conflict || group.role !== marker.role) group.conflict = true;
+      // Overlapping units with inconsistent identity cannot establish a count.
+      if (marker.key && group.key && (marker.key !== group.key || marker.scope !== group.scope)) group.conflict = true;
+      if (marker.key && !group.key) { group.key = marker.key; group.scope = marker.scope; }
+      if (sameKey && sameKey !== group) { sameKey.conflict = true; group.conflict = true; }
+      if (marker.key) unitsByScope.get(marker.scope).set(marker.key, group);
+      markerNodes.set(node, group); groups.add(group);
+      return true;
+    }
     const start = performance.now();
     const walker = document.createTreeWalker(document.documentElement, NodeFilter.SHOW_ELEMENT);
     let node = walker.currentNode, visited = 0;
     while (node) {
       if (++visited > 8000 || performance.now() - start > 100) return {ok: false, reason: 'limit'};
       if (result.editorCandidates < 2 && composerCandidate(node)) result.editorCandidates++;
-      if (node.hasAttribute('data-message-author-role')) {
-        result.renderedRoleNodes = Math.min(513, result.renderedRoleNodes + 1);
-        const role = node.getAttribute('data-message-author-role');
-        if (role === 'user') result.renderedUserCount = Math.min(513, result.renderedUserCount + 1);
-        if (role === 'assistant') result.renderedAssistantCount = Math.min(513, result.renderedAssistantCount + 1);
+      if (node.hasAttribute('data-message-author-role') || node.hasAttribute('data-chatgpt-search-unit-key')) {
+        const marker = roleMarker(node);
+        if (marker && !addMarker(node, marker)) return {ok: false, reason: 'limit'};
       }
       if (result.fileInputCandidates < 2 && node.matches('form input[type="file"]')) result.fileInputCandidates++;
       if (!result.streamingIndicatorPresent && node.matches('[data-is-streaming="true"], [data-testid="stop-button"]') && visible(node)) result.streamingIndicatorPresent = true;
       node = walker.nextNode();
+    }
+    for (const group of groups) {
+      if (performance.now() - start > 100) return {ok: false, reason: 'limit'};
+      if (group.conflict) continue;
+      result.renderedRoleNodes = Math.min(513, result.renderedRoleNodes + 1);
+      if (group.role === 'user') result.renderedUserCount = Math.min(513, result.renderedUserCount + 1);
+      if (group.role === 'assistant') result.renderedAssistantCount = Math.min(513, result.renderedAssistantCount + 1);
     }
     if (location.href !== expectedHref || document.visibilityState !== 'visible') return {ok: false};
     return {ok: true, nonce, observation: result};

@@ -123,7 +123,7 @@ test('dispose removes handlers and refuses future use',async()=>{
   assert.equal((await f.probe.run()).diagnostic,'R31');assert.equal(f.calls.length,0);
 });
 test('UI uses explicit version and no raw errors or observation fields',()=>{
-  assert.match(describe(observed()),/probe 0.1.5/);assert.ok(!diagnostic('private browser error').includes('private browser error'));
+  assert.match(describe(observed()),/probe 0.1.6/);assert.ok(!diagnostic('private browser error').includes('private browser error'));
   assert.match(describe({...observed(),privateText:'SECRET'}),/R23/);assert.ok(!describe({...observed(),privateText:'SECRET'}).includes('SECRET'));
 });
 function inspectFixture(nodes,options={}) {
@@ -163,7 +163,7 @@ test('node/time limits refuse instead of returning partial counts',()=>{
 });
 test('package has no background worker, content listener, native host or broad permissions',()=>{
   const manifest=JSON.parse(fs.readFileSync(require.resolve('../manifest.json'),'utf8'));
-  assert.equal(manifest.version,'0.1.5');assert.deepEqual(manifest.permissions,['activeTab','scripting']);
+  assert.equal(manifest.version,'0.1.6');assert.deepEqual(manifest.permissions,['activeTab','scripting']);
   for(const key of ['background','content_scripts','host_permissions','externally_connectable'])assert.equal(manifest[key],undefined);
   const source=fs.readFileSync(require.resolve('../probe.js'),'utf8')+fs.readFileSync(require.resolve('../popup.js'),'utf8');
   assert.doesNotMatch(source,/connectNative|sendNativeMessage|sendMessage\(|\.fetch\(|fetch\(|localStorage|\.submit\(|\.click\(|dispatchEvent\(/);
@@ -190,7 +190,7 @@ test('popup close disposes its owner and suppresses the pending result',async()=
 });
 test('popup failure shows a versioned fixed code and re-enables a deliberate new check',async()=>{
   const f=popupFixture();const task=f.elements.check.handlers.click();f.settle({ok:false,diagnostic:'R02',privateError:'SECRET'});await task;
-  assert.match(f.elements.status.textContent,/R02 \(probe 0.1.5\)/);assert.ok(!f.elements.status.textContent.includes('SECRET'));assert.equal(f.elements.check.disabled,false);
+  assert.match(f.elements.status.textContent,/R02 \(probe 0.1.6\)/);assert.ok(!f.elements.status.textContent.includes('SECRET'));assert.equal(f.elements.check.disabled,false);
 });
 
 for(const [count, expected] of [[0,/does not prove the message box is absent/],[1,/draft access is not verified/],[2,/composer is ambiguous/]])
@@ -236,3 +236,5 @@ test('unrecognized message roles are explained even with a recognized route and 
   assert.match(result,/draft access is not verified/);
   assert.match(result,/capabilities remain unavailable/);
 });
+
+test('loaded message counts never imply complete virtualized history',()=>{assert.match(describe(observed()),/loaded DOM only; virtualized turns may be absent/);});

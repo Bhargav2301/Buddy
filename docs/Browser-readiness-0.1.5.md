@@ -24,3 +24,7 @@ Local receipts are in `C:/Projects/Buddy/diagnostics/readiness-015`. Review is b
 The next integration gap is establishing message-container structural evidence, followed by exact provider identity and history coverage. Repeated runs of the same seven-field probe cannot reveal which message attributes are missing. This route repair does not resolve the role counts or enable account/history/draft/file capabilities. Live 0.1.5 behavior remains untested.
 
 A separate fresh 0.1.5 package is available through the [probe instructions](../integrations/readiness-probe/README.md). It is not necessary to repeat a live check merely to confirm the known zero-role limitation. The [0.1.4 report](Browser-readiness-0.1.4.md) retains the composer implementation evidence.
+
+## Follow-up
+
+The subsequently approved live structural inspection established a replacement message-marker path. See [0.1.6 implementation and evidence](Browser-readiness-0.1.6.md); this report retains the earlier route-only checkpoint.

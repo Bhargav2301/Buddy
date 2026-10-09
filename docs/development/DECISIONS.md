@@ -1,3 +1,9 @@
+# Use the inspected message structure; count only loaded units — October 9
+
+The user explicitly approved live selected-page inspection, including possible rendered chat text in browser-tool output. This approval persists. Chrome Elements revealed paired search-unit role keys inside a marked conversation root. Implement this observed key family with structural pairing, rather than role headings or text inference. Do not copy private page content, screenshots or IDs into project files.
+
+Deduplicate nested aliases and repeated keys within a root; abstain on conflicting roles or overlapping identities. Preserve legacy markers and all existing scope, cancellation, limits and content-free output boundaries. State that virtualized turns can be absent. Actual markup inspection and passing offline fixtures are separate from live execution of0.1.6, complete history, provider identity and Windows/native acceptance.
+
 # Use the observed route; preserve unknown message semantics — October 9
 
 The screenshot supplies enough evidence to add a generic `/g/g-.../c/UUID` shape; it does not supply DOM message attributes. Keep strict origin/document binding separate, return only the existing boolean, and test with invented IDs/slugs. Do not save the user's chat text, URL or identifiers.

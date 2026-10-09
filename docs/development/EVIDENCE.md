@@ -1,3 +1,11 @@
+# Probe0.1.6 and selected-page structural inspection — October 9
+
+Approved live Chrome Elements inspection found paired `data-chatgpt-search-unit-key` / `data-content-search-unit-key` markers with `fallback-turn-N:N:user|assistant` shapes inside both conversation-root attributes beneath `main`. One user wrapper pairs through its first element child; the assistant wrapper pairs on itself. Virtualized turn structure was observed. These sanitized facts contain no private IDs or text.
+
+231 Node cases and60 actual owned offline Chrome DOM cases pass. Preserved0.1.5 reproduces zero roles for the observed-structure pair; new0.1.6 counts2/1/1. Cases cover legacy support, duplicates, conflicts, unknown scopes/keys, bounded counts and no content/identifier/label reads, user events or writes. Logs and exact source/package hashes are local in `diagnostics/readiness-016`. [Detailed report](../Browser-readiness-0.1.6.md).
+
+The inspection tool could expose rendered page text under the user's approval; none was copied into source/evidence. DevTools was closed; no settings, drafts, messages or uploads were changed. This is selector evidence and offline validation, not live0.1.6 extension acceptance. Earlier0.1.5 CI passed PR37879259630/push37879256330; new-head CI is recorded separately.
+
 # Probe0.1.5 and live0.1.4 — October 9
 
 User observation + screenshot:0.1.4 editors1, roles/users/assistants0, fileinputs2+, streamingfalse, routefalse on an existing project conversation with visible messages. Generic address shape `/g/g-p-.../c/UUID`; no exact URL/IDs or message text recorded. This supports candidate detection and the route mismatch, not exact composer binding or a replacement message selector.

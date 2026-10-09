@@ -1,3 +1,9 @@
+# Observed message-container repair
+
+- PROBE-016 /root, base `a8d91e29354aca6ae450d9691f1016d9602cfcf4`, canonical integration checkout: selected-page inspection complete; implement observed paired search-unit role markers, bounded deduplication and conflict abstention; preserve the existing seven-field/cancellation/privacy contract.
+- Passed:231 Node cases and60 owned offline Chrome cases; old0.1.5 reproduces the same message-marker miss. Source review and fresh package provenance are integration-owner tasks. Scope: probe source/tests/docs and development records only.
+- Remaining: one deliberate live0.1.6 invocation for message recognition; production account/identity/history/draft/attachment admission and Windows MVP acceptance remain incomplete. Loaded counts cannot measure missing virtualized turns. [Report](../Browser-readiness-0.1.6.md).
+
 # Scoped conversation follow-up
 
 - PROBE-015 /root: record user-reported0.1.4 candidate detection on an existing project conversation; repair the screenshot-supported scoped conversation route and clarify zero-role interpretation.
